@@ -1,0 +1,2925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GOLD | Emporium</title>
+    <link rel="icon" type="image/x-icon" href="../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════ CSS VARIABLES (IDENTICAL TO DASHBOARD/HOME) ═══ */
+        :root {
+            --gold: #ffd966;
+            --gold-dim: #c9a840;
+            --gold-glow: rgba(255, 217, 102, 0.25);
+            --gold-soft: rgba(255, 217, 102, 0.08);
+            --gold-hover: rgba(255, 217, 102, 0.18);
+            --bg-deep: #030303;
+            --bg-card: rgba(20, 18, 16, 0.75);
+            --bg-card-solid: #1a1714;
+            --border-subtle: rgba(255, 217, 102, 0.15);
+            --border-medium: rgba(255, 217, 102, 0.3);
+            --border-strong: rgba(255, 217, 102, 0.5);
+            --text-primary: #f5f0e6;
+            --text-secondary: #bbb6aa;
+            --text-muted: #8a8478;
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --radius-xl: 40px;
+            --radius-full: 60px;
+            --shadow-card: 0 8px 32px -8px rgba(0,0,0,0.5);
+            --shadow-hover: 0 20px 40px -10px rgba(0,0,0,0.6);
+            --shadow-glow: 0 0 40px -5px rgba(255,217,102,0.15);
+            --transition-fast: 0.15s cubic-bezier(0.4,0,0.2,1);
+            --transition-smooth: 0.3s cubic-bezier(0.4,0,0.2,1);
+            --transition-bounce: 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            --theme-bg: #030303;
+            --theme-card: rgba(20,18,16,0.75);
+            --theme-gold: #ffd966;
+            --theme-gold-dim: #c9a840;
+            --theme-border-subtle: rgba(255,217,102,0.15);
+            --theme-text-primary: #f5f0e6;
+            --theme-text-secondary: #bbb6aa;
+            --theme-text-muted: #8a8478;
+        }
+        .theme-midnight {
+            --theme-bg: #0a0a1a;
+            --theme-card: rgba(15,18,30,0.8);
+            --theme-gold: #6d8cff;
+            --theme-gold-dim: #4a5eb3;
+            --theme-border-subtle: rgba(109,140,255,0.2);
+            --theme-text-primary: #e0e5ff;
+            --theme-text-secondary: #b0b8d8;
+            --theme-text-muted: #7a829c;
+        }
+        .theme-emerald {
+            --theme-bg: #021a10;
+            --theme-card: rgba(10,28,18,0.8);
+            --theme-gold: #50c878;
+            --theme-gold-dim: #38a55c;
+            --theme-border-subtle: rgba(80,200,120,0.2);
+            --theme-text-primary: #d4f0e0;
+            --theme-text-secondary: #a0c8b0;
+            --theme-text-muted: #6a907a;
+        }
+        .theme-crimson {
+            --theme-bg: #1a0505;
+            --theme-card: rgba(28,10,10,0.85);
+            --theme-gold: #ff6b6b;
+            --theme-gold-dim: #cc4444;
+            --theme-border-subtle: rgba(255,107,107,0.2);
+            --theme-text-primary: #ffe0e0;
+            --theme-text-secondary: #d4a0a0;
+            --theme-text-muted: #9a7070;
+        }
+        .theme-aurora {
+            --theme-bg: #050a1a;
+            --theme-card: rgba(10,15,30,0.85);
+            --theme-gold: #a855f7;
+            --theme-gold-dim: #7c3aed;
+            --theme-border-subtle: rgba(168,85,247,0.2);
+            --theme-text-primary: #e8d5ff;
+            --theme-text-secondary: #c4a8e8;
+            --theme-text-muted: #8a6fa8;
+        }
+
+        /* ═══════════════════════════════════════ BASE ═══ */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--theme-bg);
+            color: var(--theme-text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            transition: background 0.5s;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: -30%;
+            left: -20%;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle at 40% 50%, rgba(255,180,60,0.04) 0%, transparent 65%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: orbFloat1 22s ease-in-out infinite;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -25%;
+            right: -15%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle at 50% 40%, rgba(255,217,102,0.05) 0%, transparent 60%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: orbFloat2 18s ease-in-out infinite;
+        }
+        @keyframes orbFloat1 {
+            0%,100% { transform: translate(0,0) scale(1); }
+            25% { transform: translate(8vw,6vh) scale(1.08); }
+            50% { transform: translate(3vw,-4vh) scale(0.94); }
+            75% { transform: translate(-5vw,2vh) scale(1.04); }
+        }
+        @keyframes orbFloat2 {
+            0%,100% { transform: translate(0,0) scale(1); }
+            30% { transform: translate(-6vw,-8vh) scale(1.1); }
+            60% { transform: translate(4vw,3vh) scale(0.92); }
+            85% { transform: translate(2vw,-2vh) scale(1.05); }
+        }
+
+        /* ═══════════════════════════════════════ NAV BAR (MATCHES DASHBOARD) ═══ */
+        .tab-nav-wrapper {
+            position: sticky;
+            top: 0;
+            z-index: 500;
+            background: rgba(3,3,3,0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--theme-border-subtle);
+            padding: 0 2rem;
+        }
+        .tab-nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+        }
+        .tab-nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 1rem 0;
+            min-width: 140px;
+        }
+        .tab-nav-brand .brand-icon {
+            font-size: 1.2rem;
+            color: var(--theme-gold);
+        }
+        .tab-nav-brand span {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--theme-gold);
+            letter-spacing: 2px;
+        }
+        .tab-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            min-width: 200px;
+            justify-content: flex-end;
+        }
+        .nav-back-link {
+            background: rgba(255,217,102,0.08);
+            border: 1px solid var(--theme-border-subtle);
+            color: var(--theme-gold);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 0.4rem 0.9rem;
+            border-radius: 40px;
+            text-decoration: none;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+        }
+        .nav-back-link:hover { background: var(--gold-hover); }
+        .nav-balance-chip {
+            background: rgba(255,217,102,0.1);
+            border: 1px solid var(--theme-border-subtle);
+            border-radius: 40px;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--theme-gold);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* ═══════════════════════════════════════ PAGE LAYOUT ═══ */
+        .shop-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 6rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ═══════════════════════════════════════ SHOP HERO ═══ */
+        .shop-hero {
+            text-align: center;
+            padding: 2.5rem 1rem 1.5rem;
+            position: relative;
+        }
+        .shop-hero-eyebrow {
+            font-size: 0.68rem;
+            letter-spacing: 4px;
+            color: var(--theme-gold);
+            font-weight: 800;
+            margin-bottom: 0.7rem;
+            opacity: 0.8;
+        }
+        .shop-hero-title {
+            font-size: 2.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--theme-gold) 0%, var(--theme-gold-dim) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.6rem;
+            letter-spacing: -1px;
+        }
+        .shop-hero-sub {
+            font-size: 0.88rem;
+            color: var(--theme-text-muted);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .shop-hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            margin-top: 1.8rem;
+            flex-wrap: wrap;
+        }
+        .hero-stat { text-align: center; }
+        .hero-stat-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--theme-gold);
+        }
+        .hero-stat-label {
+            font-size: 0.65rem;
+            color: var(--theme-text-muted);
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            margin-top: 0.1rem;
+        }
+
+        /* ═══════════════════════════════════════ FEATURED BANNER ═══ */
+        .featured-banner {
+            background: var(--theme-card);
+            border: 1px solid var(--theme-border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            position: relative;
+            overflow: hidden;
+        }
+        .featured-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,217,102,0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .featured-banner-badge {
+            background: var(--theme-gold);
+            color: #1a1712;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            flex-shrink: 0;
+            animation: featPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes featPulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(255,217,102,0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(255,217,102,0); }
+        }
+        .featured-banner-content { flex: 1; min-width: 200px; }
+        .featured-banner-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+        }
+        .featured-banner-desc {
+            font-size: 0.82rem;
+            color: var(--theme-text-secondary);
+        }
+        .featured-timer {
+            font-size: 0.72rem;
+            color: var(--theme-gold);
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-top: 0.4rem;
+        }
+        .featured-buy-btn {
+            background: linear-gradient(135deg, var(--theme-gold), var(--theme-gold-dim));
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: var(--radius-full);
+            font-weight: 800;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: #1a1712;
+            transition: all var(--transition-bounce);
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        .featured-buy-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+        .featured-buy-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; filter: none; }
+
+        /* ═══════════════════════════════════════ DAILY DEALS ═══ */
+        .daily-deals-section { margin-bottom: 2.5rem; }
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .section-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+        .section-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            color: var(--theme-text-muted);
+        }
+        .section-badge {
+            background: rgba(255,100,100,0.2);
+            color: #ff8080;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+        }
+        .deals-timer {
+            font-size: 0.72rem;
+            color: var(--theme-text-muted);
+            font-weight: 700;
+        }
+        .deals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.2rem;
+        }
+
+        /* ═══════════════════════════════════════ CATEGORY TABS ═══ */
+        .category-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.8rem;
+            flex-wrap: wrap;
+        }
+        .cat-btn {
+            background: rgba(255,217,102,0.07);
+            border: 1px solid var(--theme-border-subtle);
+            color: var(--theme-text-muted);
+            padding: 0.5rem 1.1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .cat-btn:hover {
+            background: rgba(255,217,102,0.14);
+            color: var(--theme-text-primary);
+            border-color: var(--border-medium);
+        }
+        .cat-btn.active {
+            background: rgba(255,217,102,0.18);
+            color: var(--theme-gold);
+            border-color: var(--border-medium);
+        }
+        .cat-count {
+            background: rgba(255,217,102,0.2);
+            color: var(--theme-gold);
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 0.1rem 0.4rem;
+            border-radius: 20px;
+        }
+
+        /* ═══════════════════════════════════════ SEARCH & SORT ═══ */
+        .shop-controls {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .search-input-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 180px;
+            max-width: 340px;
+        }
+        .search-input-wrap i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--theme-text-muted);
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+        .shop-search {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--theme-border-subtle);
+            border-radius: var(--radius-full);
+            padding: 0.55rem 1rem 0.55rem 2.5rem;
+            color: var(--theme-text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            transition: border-color var(--transition-fast);
+        }
+        .shop-search:focus { outline: none; border-color: var(--theme-gold); }
+        .shop-search::placeholder { color: var(--theme-text-muted); }
+        .sort-select {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--theme-border-subtle);
+            border-radius: var(--radius-full);
+            padding: 0.55rem 1rem;
+            color: var(--theme-text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: border-color var(--transition-fast);
+        }
+        .sort-select:focus { outline: none; border-color: var(--theme-gold); }
+        .results-count {
+            font-size: 0.72rem;
+            color: var(--theme-text-muted);
+            margin-left: auto;
+            white-space: nowrap;
+        }
+
+        /* ═══════════════════════════════════════ SHOP CARDS ═══ */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+            gap: 1.5rem;
+        }
+        .shop-card {
+            background: var(--theme-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--theme-border-subtle);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+        }
+        .shop-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-medium);
+            box-shadow: var(--shadow-hover);
+        }
+        .shop-card.owned { opacity: 0.75; }
+        .shop-card.equipped {
+            border-color: var(--border-strong);
+            box-shadow: 0 0 20px rgba(255,217,102,0.12);
+        }
+
+        /* rarity borders */
+        .shop-card.rarity-common { border-color: rgba(158,158,158,0.25); }
+        .shop-card.rarity-rare { border-color: rgba(147,112,219,0.4); }
+        .shop-card.rarity-epic { border-color: rgba(255,165,0,0.45); }
+        .shop-card.rarity-legendary {
+            border-color: rgba(255,215,0,0.6);
+            box-shadow: 0 0 20px rgba(255,215,0,0.08);
+        }
+        .shop-card.rarity-mythic {
+            border-color: rgba(255,0,128,0.6);
+            box-shadow: 0 0 25px rgba(255,0,128,0.12);
+        }
+
+        /* rarity shimmer for higher tiers */
+        .shop-card.rarity-legendary::before,
+        .shop-card.rarity-mythic::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,215,0,0.04) 0%, transparent 50%, rgba(255,215,0,0.02) 100%);
+            pointer-events: none;
+            animation: shimmerGlow 3s ease-in-out infinite;
+        }
+        .shop-card.rarity-mythic::before {
+            background: linear-gradient(135deg, rgba(255,0,128,0.06) 0%, transparent 50%, rgba(180,0,255,0.04) 100%);
+        }
+        @keyframes shimmerGlow {
+            0%,100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* card top row */
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .card-icon-wrap {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background: rgba(255,217,102,0.08);
+            border: 1px solid var(--theme-border-subtle);
+            flex-shrink: 0;
+        }
+        .shop-card.rarity-rare .card-icon-wrap { background: rgba(147,112,219,0.1); border-color: rgba(147,112,219,0.3); }
+        .shop-card.rarity-epic .card-icon-wrap { background: rgba(255,165,0,0.1); border-color: rgba(255,165,0,0.3); }
+        .shop-card.rarity-legendary .card-icon-wrap { background: rgba(255,215,0,0.1); border-color: rgba(255,215,0,0.4); }
+        .shop-card.rarity-mythic .card-icon-wrap { background: rgba(255,0,128,0.12); border-color: rgba(255,0,128,0.5); }
+
+        .card-badges {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.3rem;
+        }
+        .rarity-badge {
+            display: inline-block;
+            padding: 0.15rem 0.55rem;
+            border-radius: 20px;
+            font-size: 0.58rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+        .rarity-common .rarity-badge { background: rgba(158,158,158,0.2); color: #9e9e9e; }
+        .rarity-rare .rarity-badge { background: rgba(147,112,219,0.2); color: #9370db; }
+        .rarity-epic .rarity-badge { background: rgba(255,165,0,0.2); color: #ffa500; }
+        .rarity-legendary .rarity-badge { background: rgba(255,215,0,0.2); color: #ffd700; }
+        .rarity-mythic .rarity-badge {
+            background: linear-gradient(135deg, rgba(255,0,128,0.2), rgba(180,0,255,0.2));
+            color: #ff69b4;
+        }
+        .type-badge {
+            padding: 0.12rem 0.45rem;
+            border-radius: 20px;
+            font-size: 0.56rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: rgba(255,217,102,0.12);
+            color: var(--theme-text-muted);
+        }
+        .sale-badge {
+            background: rgba(255,80,80,0.2);
+            color: #ff8080;
+            font-size: 0.58rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+        }
+        .new-badge {
+            background: rgba(100,220,100,0.2);
+            color: #80ff80;
+            font-size: 0.58rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+        }
+        .limited-badge {
+            background: rgba(255,180,60,0.2);
+            color: #ffb03c;
+            font-size: 0.58rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            animation: limitedFlash 2s ease-in-out infinite;
+        }
+        @keyframes limitedFlash {
+            0%,100% { opacity: 1; }
+            50% { opacity: 0.65; }
+        }
+
+        /* card body */
+        .card-name {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--theme-text-primary);
+            margin-bottom: 0.35rem;
+            line-height: 1.25;
+        }
+        .card-desc {
+            font-size: 0.78rem;
+            color: var(--theme-text-secondary);
+            line-height: 1.5;
+            flex: 1;
+            margin-bottom: 0.8rem;
+        }
+        .card-effect-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-bottom: 1rem;
+        }
+        .effect-tag {
+            background: rgba(255,217,102,0.07);
+            border: 1px solid rgba(255,217,102,0.15);
+            color: var(--theme-text-muted);
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+        }
+        .card-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }
+        .card-price {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--theme-gold);
+        }
+        .card-price-original {
+            font-size: 0.75rem;
+            color: var(--theme-text-muted);
+            text-decoration: line-through;
+            margin-left: 0.4rem;
+            font-weight: 500;
+        }
+        .card-duration {
+            font-size: 0.68rem;
+            color: var(--theme-text-muted);
+            font-weight: 600;
+        }
+        .owned-indicator {
+            font-size: 0.7rem;
+            color: #4caf50;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .equipped-indicator {
+            font-size: 0.7rem;
+            color: var(--theme-gold);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .active-indicator {
+            font-size: 0.7rem;
+            color: #66bb6a;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .cooldown-indicator {
+            font-size: 0.68rem;
+            color: #ffb74d;
+            font-weight: 700;
+        }
+
+        /* buy button */
+        .buy-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--theme-gold), var(--theme-gold-dim));
+            border: none;
+            padding: 0.65rem 1rem;
+            border-radius: var(--radius-full);
+            font-weight: 800;
+            font-size: 0.82rem;
+            cursor: pointer;
+            color: #1a1712;
+            transition: all var(--transition-bounce);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .buy-btn:hover:not(:disabled) { transform: scale(1.03); filter: brightness(1.1); }
+        .buy-btn:active:not(:disabled) { transform: scale(0.97); }
+        .buy-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+            filter: none;
+            background: rgba(255,255,255,0.1);
+            color: var(--theme-text-muted);
+        }
+        .buy-btn.owned-btn {
+            background: rgba(76,175,80,0.15);
+            color: #4caf50;
+            border: 1px solid rgba(76,175,80,0.3);
+        }
+        .buy-btn.equipped-btn {
+            background: rgba(255,217,102,0.15);
+            color: var(--theme-gold);
+            border: 1px solid var(--theme-border-subtle);
+        }
+        .buy-btn.active-btn {
+            background: rgba(100,200,100,0.12);
+            color: #66bb6a;
+            border: 1px solid rgba(100,200,100,0.3);
+        }
+        .buy-btn.cant-afford {
+            background: rgba(255,80,80,0.1);
+            color: rgba(255,80,80,0.6);
+            border: 1px solid rgba(255,80,80,0.2);
+        }
+
+        /* ═══════════════════════════════════════ INVENTORY PANEL ═══ */
+        .inventory-section {
+            background: var(--theme-card);
+            border: 1px solid var(--theme-border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 1.8rem;
+            margin-top: 3rem;
+        }
+        .inventory-title {
+            font-size: 0.7rem;
+            letter-spacing: 2.5px;
+            color: var(--theme-gold);
+            font-weight: 800;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .inventory-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .inv-tab {
+            background: rgba(255,217,102,0.08);
+            border: 1px solid var(--theme-border-subtle);
+            color: var(--theme-text-muted);
+            padding: 0.35rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all var(--transition-fast);
+        }
+        .inv-tab.active, .inv-tab:hover {
+            background: rgba(255,217,102,0.18);
+            color: var(--theme-gold);
+            border-color: var(--border-medium);
+        }
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+        .inv-item {
+            background: rgba(255,217,102,0.04);
+            border: 1px solid var(--theme-border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 1.2rem 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            position: relative;
+        }
+        .inv-item:hover { transform: translateY(-3px); border-color: var(--border-medium); }
+        .inv-item.equipped { border-color: var(--border-strong); background: rgba(255,217,102,0.08); }
+        .inv-item.active-booster { border-color: rgba(100,200,100,0.5); background: rgba(100,200,100,0.06); }
+        .inv-item-icon { font-size: 2rem; margin-bottom: 0.4rem; }
+        .inv-item-name { font-size: 0.68rem; font-weight: 700; color: var(--theme-text-secondary); line-height: 1.3; }
+        .inv-item-qty {
+            position: absolute;
+            top: 0.4rem;
+            right: 0.4rem;
+            background: rgba(255,217,102,0.2);
+            color: var(--theme-gold);
+            font-size: 0.58rem;
+            font-weight: 800;
+            padding: 0.1rem 0.4rem;
+            border-radius: 20px;
+        }
+        .inv-item-status {
+            font-size: 0.6rem;
+            margin-top: 0.4rem;
+            font-weight: 700;
+        }
+        .inv-empty {
+            color: var(--theme-text-muted);
+            font-size: 0.82rem;
+            text-align: center;
+            padding: 2rem;
+            grid-column: 1/-1;
+        }
+
+        /* active boosters bar */
+        .active-boosters-bar {
+            background: rgba(100,200,100,0.06);
+            border: 1px solid rgba(100,200,100,0.2);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.4rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .active-boosters-label {
+            font-size: 0.68rem;
+            letter-spacing: 2px;
+            color: #66bb6a;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .booster-chip {
+            background: rgba(100,200,100,0.12);
+            border: 1px solid rgba(100,200,100,0.25);
+            border-radius: 30px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #80c880;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .booster-chip-time {
+            color: rgba(128,200,128,0.6);
+            font-size: 0.62rem;
+        }
+        .no-active-boosters {
+            font-size: 0.78rem;
+            color: var(--theme-text-muted);
+        }
+
+        /* ═══════════════════════════════════════ TOAST ═══ */
+        .toast-msg {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(22,20,17,0.97);
+            border: 1px solid var(--theme-border-subtle);
+            border-left: 4px solid var(--theme-gold);
+            padding: 14px 22px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            pointer-events: none;
+            white-space: nowrap;
+            font-size: 0.88rem;
+            max-width: 90vw;
+        }
+        .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast-msg.error { border-left-color: #ff6b6b; }
+        .toast-msg.success { border-left-color: #4caf50; }
+
+        /* ═══════════════════════════════════════ PURCHASE BURST ═══ */
+        .purchase-burst {
+            position: fixed;
+            pointer-events: none;
+            z-index: 4000;
+        }
+        .burst-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--theme-gold);
+            animation: burstOut 0.8s ease-out forwards;
+        }
+        @keyframes burstOut {
+            0% { transform: translate(0,0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+        }
+
+        /* ═══════════════════════════════════════ CONFIRM MODAL ═══ */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--theme-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 2.2rem;
+            max-width: 460px;
+            width: 90%;
+            border: 1px solid var(--theme-border-subtle);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            animation: modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-icon { font-size: 2.5rem; text-align: center; margin-bottom: 0.8rem; }
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.6rem;
+        }
+        .modal-desc {
+            font-size: 0.82rem;
+            color: var(--theme-text-secondary);
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+        .modal-price {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--theme-gold);
+            margin-bottom: 1.5rem;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+        .modal-confirm-btn {
+            flex: 1;
+            background: linear-gradient(135deg, var(--theme-gold), var(--theme-gold-dim));
+            border: none;
+            padding: 0.8rem;
+            border-radius: var(--radius-full);
+            font-weight: 800;
+            cursor: pointer;
+            color: #1a1712;
+            transition: all var(--transition-bounce);
+        }
+        .modal-confirm-btn:hover { transform: scale(1.03); filter: brightness(1.1); }
+        .modal-cancel-btn {
+            flex: 1;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--theme-border-subtle);
+            padding: 0.8rem;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--theme-text-secondary);
+            transition: all var(--transition-fast);
+        }
+        .modal-cancel-btn:hover { background: rgba(255,255,255,0.1); }
+
+        /* ═══════════════════════════════════════ CRATE REVEAL MODAL ═══ */
+        .crate-modal-content {
+            text-align: center;
+        }
+        .crate-reveal-item {
+            background: rgba(255,217,102,0.06);
+            border: 2px solid var(--theme-border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            animation: crateReveal 0.6s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes crateReveal {
+            from { transform: scale(0.5) rotateY(90deg); opacity: 0; }
+            to { transform: scale(1) rotateY(0); opacity: 1; }
+        }
+        .crate-reveal-icon { font-size: 3rem; margin-bottom: 0.6rem; }
+        .crate-reveal-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.3rem; }
+        .crate-reveal-val { font-size: 1.5rem; font-weight: 800; color: var(--theme-gold); }
+        .crate-close-btn {
+            background: linear-gradient(135deg, var(--theme-gold), var(--theme-gold-dim));
+            border: none;
+            padding: 0.7rem 2rem;
+            border-radius: var(--radius-full);
+            font-weight: 800;
+            cursor: pointer;
+            color: #1a1712;
+            margin-top: 0.5rem;
+            transition: all var(--transition-bounce);
+        }
+        .crate-close-btn:hover { transform: scale(1.05); }
+
+        /* ═══════════════════════════════════════ PARTICLES ═══ */
+        canvas.particles-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+        /* ═══════════════════════════════════════ EMPTY STATE ═══ */
+        .empty-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--theme-text-muted);
+            grid-column: 1/-1;
+        }
+        .empty-results i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+        .empty-results p { font-size: 0.9rem; }
+
+        /* ═══════════════════════════════════════ RESPONSIVE ═══ */
+        @media (max-width: 900px) {
+            .shop-hero-title { font-size: 2rem; }
+            .featured-banner { flex-direction: column; align-items: stretch; }
+        }
+        @media (max-width: 700px) {
+            .shop-container { padding: 1.5rem 1rem 6rem; }
+            .tab-nav-brand span { display: none; }
+            .tab-nav-actions .nav-back-link:not(:last-child) { display: none; }
+            .shop-hero-title { font-size: 1.6rem; }
+            .shop-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+            .inventory-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+            .modal-buttons { flex-direction: column; }
+        }
+        @media (max-width: 480px) {
+            .category-nav { gap: 0.3rem; }
+            .cat-btn { font-size: 0.65rem; padding: 0.4rem 0.8rem; }
+            .shop-hero-stats { gap: 1.5rem; }
+        }
+
+        /* ═══════════════════════════════════════ PAGE FADE IN ═══ */
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .shop-container { animation: pageFadeIn 0.4s ease; }
+
+        /* ═══════════════════════════════════════ PROGRESS BAR ═══ */
+        .progress-bar { height: 5px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--theme-gold); border-radius: 10px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+
+        /* ═══════════════════════════════════════ SECTION DIVIDER ═══ */
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--theme-border-subtle);
+            margin: 2.5rem 0;
+        }
+
+        /* ═══════════════════════════════════════ TOOLTIP ═══ */
+        .tooltip-wrap { position: relative; display: inline-flex; }
+        .tooltip-wrap:hover .tooltip-text { opacity: 1; pointer-events: auto; transform: translateY(-2px); }
+        .tooltip-text {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: rgba(20,18,16,0.97);
+            border: 1px solid var(--theme-border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem 0.8rem;
+            font-size: 0.7rem;
+            color: var(--theme-text-secondary);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+<canvas class="particles-canvas" id="particlesCanvas"></canvas>
+
+<!-- ═══════════════════════════ NAV BAR ═══ -->
+<div class="tab-nav-wrapper">
+    <div class="tab-nav-inner">
+        <div class="tab-nav-brand">
+            <i class="fas fa-store brand-icon"></i>
+            <span>EMPORIUM</span>
+        </div>
+        <div class="tab-nav-actions">
+            <div class="nav-balance-chip">
+                <i class="fas fa-coins"></i>
+                <span id="navWalletBalance">0</span> GOLD
+            </div>
+            <a href="home.html" class="nav-back-link"><i class="fas fa-gamepad"></i> Games</a>
+            <a href="dashboard.html" class="nav-back-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════ MAIN CONTAINER ═══ -->
+<div class="shop-container">
+
+    <!-- HERO -->
+    <div class="shop-hero">
+        <div class="shop-hero-eyebrow">GOLD EMPORIUM</div>
+        <h1 class="shop-hero-title">✦ ELITE BAZAAR ✦</h1>
+        <p class="shop-hero-sub">Boosters · Cosmetics · Crates · Upgrades — spend wisely and climb higher</p>
+        <div class="shop-hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-val" id="heroBalance">0</div>
+                <div class="hero-stat-label">WALLET GOLD</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-val" id="heroLevel">1</div>
+                <div class="hero-stat-label">LEVEL</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-val" id="heroOwned">0</div>
+                <div class="hero-stat-label">ITEMS OWNED</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-val" id="heroActive">0</div>
+                <div class="hero-stat-label">ACTIVE EFFECTS</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVE BOOSTERS BAR -->
+    <div class="active-boosters-bar" id="activeBoosters">
+        <span class="active-boosters-label"><i class="fas fa-bolt"></i> ACTIVE EFFECTS</span>
+        <span class="no-active-boosters" id="noBoostersMsg">No active boosters — purchase some below!</span>
+    </div>
+
+    <!-- FEATURED BANNER -->
+    <div class="featured-banner" id="featuredBanner">
+        <div class="featured-banner-badge">⭐ FEATURED</div>
+        <div class="featured-banner-content">
+            <div class="featured-banner-title" id="featuredTitle">Loading...</div>
+            <div class="featured-banner-desc" id="featuredDesc"></div>
+            <div class="featured-timer" id="featuredTimer"></div>
+        </div>
+        <button class="featured-buy-btn" id="featuredBuyBtn">
+            <i class="fas fa-crown"></i> Buy Featured
+        </button>
+    </div>
+
+    <!-- DAILY DEALS -->
+    <div class="daily-deals-section">
+        <div class="section-header">
+            <div class="section-header-left">
+                <span class="section-title">DAILY DEALS</span>
+                <span class="section-badge">🔥 LIMITED</span>
+            </div>
+            <span class="deals-timer" id="dailyDealsTimer"></span>
+        </div>
+        <div class="deals-grid" id="dailyDealsGrid"></div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- CATEGORY TABS -->
+    <div class="category-nav" id="categoryNav"></div>
+
+    <!-- SEARCH + SORT -->
+    <div class="shop-controls">
+        <div class="search-input-wrap">
+            <i class="fas fa-search"></i>
+            <input type="text" class="shop-search" id="shopSearch" placeholder="Search items...">
+        </div>
+        <select class="sort-select" id="sortSelect">
+            <option value="default">Sort: Default</option>
+            <option value="price-asc">Price: Low → High</option>
+            <option value="price-desc">Price: High → Low</option>
+            <option value="rarity">Rarity</option>
+            <option value="name">Name A–Z</option>
+        </select>
+        <span class="results-count" id="resultsCount"></span>
+    </div>
+
+    <!-- SHOP GRID -->
+    <div class="shop-grid" id="shopGrid"></div>
+
+    <hr class="section-divider">
+
+    <!-- INVENTORY -->
+    <div class="inventory-section">
+        <div class="inventory-title">
+            <i class="fas fa-archive"></i>
+            MY INVENTORY
+        </div>
+        <div class="inventory-tabs" id="invTabs">
+            <button class="inv-tab active" data-tab="all">All Items</button>
+            <button class="inv-tab" data-tab="boosters">Boosters</button>
+            <button class="inv-tab" data-tab="cosmetics">Cosmetics</button>
+            <button class="inv-tab" data-tab="upgrades">Upgrades</button>
+        </div>
+        <div class="inventory-grid" id="inventoryGrid"></div>
+    </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast-msg" id="toastMsg"></div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal" id="confirmModal">
+    <div class="modal-content">
+        <div class="modal-icon" id="confirmIcon">🛒</div>
+        <div class="modal-title" id="confirmTitle"></div>
+        <div class="modal-desc" id="confirmDesc"></div>
+        <div class="modal-price" id="confirmPrice"></div>
+        <div class="modal-buttons">
+            <button class="modal-cancel-btn" id="confirmCancel">Cancel</button>
+            <button class="modal-confirm-btn" id="confirmBuy">Confirm Purchase</button>
+        </div>
+    </div>
+</div>
+
+<!-- CRATE REVEAL MODAL -->
+<div class="modal" id="crateModal">
+    <div class="modal-content crate-modal-content">
+        <div style="font-size:0.7rem;letter-spacing:3px;color:var(--theme-text-muted);margin-bottom:0.8rem;">CRATE OPENED</div>
+        <div id="crateRevealContent"></div>
+        <button class="crate-close-btn" id="crateCloseBtn">✦ Collect Reward</button>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+
+    // ══════════════════════════════════════════════════════
+    // STORAGE HELPERS (IDENTICAL TO DASHBOARD/HOME)
+    // ══════════════════════════════════════════════════════
+    const getUsers = () => { try { return JSON.parse(localStorage.getItem('gold_users') || '{}'); } catch(e) { return {}; } };
+    const saveUsers = users => localStorage.setItem('gold_users', JSON.stringify(users));
+
+    // ══════════════════════════════════════════════════════
+    // STATE
+    // ══════════════════════════════════════════════════════
+    let currentUser = null;
+    let toastTimeout = null;
+    let activeCategory = 'all';
+    let activeInvTab = 'all';
+    let searchQuery = '';
+    let sortMode = 'default';
+    let pendingItem = null;
+    let confirmCallback = null;
+
+    // ══════════════════════════════════════════════════════
+    // LEVEL HELPERS (MATCHES DASHBOARD)
+    // ══════════════════════════════════════════════════════
+    function getLevel(xp) {
+        let level = 1, totalXp = 0;
+        const xpTable = [0,100,250,450,700,1000,1400,1900,2500,3200,4000,5000,6200,7600,9200,11000,13100,15500,18200,21200,24600,28500,33000,38200,44200,51000,58700,67500,77500,89000];
+        for (let i = 0; i < xpTable.length; i++) {
+            if (xp >= totalXp + xpTable[i]) { totalXp += xpTable[i]; level = i + 1; }
+            else { return { level, xpInLevel: xp - totalXp, xpForLevel: xpTable[i], progress: xpTable[i] > 0 ? (xp - totalXp) / xpTable[i] : 1 }; }
+        }
+        return { level: 30, xpInLevel: 0, xpForLevel: 1, progress: 1 };
+    }
+
+    // ══════════════════════════════════════════════════════
+    // TRANSACTION HELPER (MATCHES DASHBOARD)
+    // ══════════════════════════════════════════════════════
+    function addTransaction(desc, amount, type) {
+        if (!currentUser.transactions) currentUser.transactions = [];
+        currentUser.transactions.unshift({ desc, amount, type, date: new Date().toISOString() });
+        if (currentUser.transactions.length > 200) currentUser.transactions = currentUser.transactions.slice(0, 200);
+    }
+
+    // ══════════════════════════════════════════════════════
+    // ACTIVE EFFECTS SYSTEM
+    // ══════════════════════════════════════════════════════
+    function initActiveEffects() {
+        if (!currentUser.activeEffects) currentUser.activeEffects = {};
+    }
+
+    function isEffectActive(effectKey) {
+        initActiveEffects();
+        const effect = currentUser.activeEffects[effectKey];
+        if (!effect) return false;
+        if (effect.expiresAt && Date.now() > effect.expiresAt) {
+            delete currentUser.activeEffects[effectKey];
+            return false;
+        }
+        return true;
+    }
+
+    function applyEffect(effectKey, durationHours, data = {}) {
+        initActiveEffects();
+        currentUser.activeEffects[effectKey] = {
+            ...data,
+            activatedAt: Date.now(),
+            expiresAt: durationHours > 0 ? Date.now() + durationHours * 3600000 : null
+        };
+    }
+
+    function getEffectTimeLeft(effectKey) {
+        const effect = currentUser.activeEffects?.[effectKey];
+        if (!effect || !effect.expiresAt) return null;
+        const ms = effect.expiresAt - Date.now();
+        if (ms <= 0) return null;
+        const h = Math.floor(ms / 3600000);
+        const m = Math.floor((ms % 3600000) / 60000);
+        return h > 0 ? `${h}h ${m}m` : `${m}m`;
+    }
+
+    // ══════════════════════════════════════════════════════
+    // PURCHASE COOLDOWNS (anti-exploit)
+    // ══════════════════════════════════════════════════════
+    function getCooldownKey(itemId) { return `cooldown_${itemId}`; }
+
+    function isOnCooldown(item) {
+        if (!item.cooldownHours) return false;
+        const key = getCooldownKey(item.id);
+        const last = currentUser.purchaseCooldowns?.[key];
+        if (!last) return false;
+        return (Date.now() - last) < item.cooldownHours * 3600000;
+    }
+
+    function getCooldownRemaining(item) {
+        if (!item.cooldownHours) return null;
+        const key = getCooldownKey(item.id);
+        const last = currentUser.purchaseCooldowns?.[key];
+        if (!last) return null;
+        const ms = (item.cooldownHours * 3600000) - (Date.now() - last);
+        if (ms <= 0) return null;
+        const h = Math.floor(ms / 3600000);
+        const m = Math.floor((ms % 3600000) / 60000);
+        return h > 0 ? `${h}h ${m}m` : `${m}m`;
+    }
+
+    function setCooldown(itemId) {
+        if (!currentUser.purchaseCooldowns) currentUser.purchaseCooldowns = {};
+        currentUser.purchaseCooldowns[itemId] = Date.now();
+    }
+
+    // ══════════════════════════════════════════════════════
+    // OWNED / EQUIPPED CHECKS
+    // ══════════════════════════════════════════════════════
+    function isOwned(item) {
+        if (item.type === 'cosmetic_avatar') return (currentUser.unlockedAvatars || []).includes(item.avatarValue);
+        if (item.type === 'cosmetic_theme') return (currentUser.unlockedThemes || []).includes(item.themeValue);
+        if (item.type === 'upgrade') return (currentUser.upgrades || {})[item.id] >= (item.maxStack || 1);
+        return false;
+    }
+
+    function isEquipped(item) {
+        if (item.type === 'cosmetic_avatar') return currentUser.avatar === item.avatarValue;
+        if (item.type === 'cosmetic_theme') return currentUser.theme === item.themeValue;
+        return false;
+    }
+
+    // ══════════════════════════════════════════════════════
+    // RARITY CONFIG
+    // ══════════════════════════════════════════════════════
+    const RARITY_ORDER = { common: 0, rare: 1, epic: 2, legendary: 3, mythic: 4 };
+    const RARITY_LABELS = { common: 'COMMON', rare: 'RARE', epic: 'EPIC', legendary: 'LEGENDARY', mythic: 'MYTHIC' };
+
+    // ══════════════════════════════════════════════════════
+    // SHOP ITEM CATALOGUE
+    // ══════════════════════════════════════════════════════
+    const SHOP_ITEMS = [
+
+        // ─── BOOSTERS ──────────────────────────────────────────
+        {
+            id: 'xp_elixir_sm',
+            name: 'XP Elixir',
+            icon: '⚗️',
+            desc: 'Instantly gain 400 XP. Great for pushing past a level threshold quickly.',
+            tags: ['⚡ Instant', '+400 XP'],
+            price: 150,
+            rarity: 'common',
+            category: 'boosters',
+            type: 'consumable',
+            cooldownHours: 4,
+            effect(user) {
+                user.xp = (user.xp || 0) + 400;
+                addTransaction('XP Elixir (+400 XP)', 0, 'deposit');
+                return { msg: '+400 XP gained!', icon: '⚗️' };
+            }
+        },
+        {
+            id: 'xp_elixir_lg',
+            name: 'Grand XP Draught',
+            icon: '🧪',
+            desc: 'A powerful elixir granting 1,200 XP. Best used before a big gaming session.',
+            tags: ['+1,200 XP', '3× Elixir'],
+            price: 400,
+            rarity: 'rare',
+            category: 'boosters',
+            type: 'consumable',
+            cooldownHours: 12,
+            effect(user) {
+                user.xp = (user.xp || 0) + 1200;
+                addTransaction('Grand XP Draught (+1200 XP)', 0, 'deposit');
+                return { msg: '+1,200 XP gained!', icon: '🧪' };
+            }
+        },
+        {
+            id: 'xp_boost_2x',
+            name: 'XP Multiplier 2×',
+            icon: '✨',
+            desc: 'Doubles all XP earned from games for the next 2 hours. Stack with other bonuses.',
+            tags: ['⏱ 2 Hours', '2× XP', 'Stackable'],
+            price: 600,
+            rarity: 'rare',
+            category: 'boosters',
+            type: 'timed_boost',
+            duration: 2,
+            effectKey: 'xp_multiplier',
+            cooldownHours: 2,
+            effect(user) {
+                applyEffect('xp_multiplier', 2, { multiplier: 2 });
+                addTransaction('XP Multiplier 2× (2h)', 0, 'deposit');
+                return { msg: '2× XP active for 2 hours!', icon: '✨' };
+            }
+        },
+        {
+            id: 'xp_boost_3x',
+            name: 'XP Surge 3×',
+            icon: '⚡',
+            desc: 'Triple XP from all game outcomes for 1 hour. Massive gains, short window.',
+            tags: ['⏱ 1 Hour', '3× XP', 'Epic Boost'],
+            price: 1200,
+            rarity: 'epic',
+            category: 'boosters',
+            type: 'timed_boost',
+            duration: 1,
+            effectKey: 'xp_multiplier',
+            cooldownHours: 6,
+            effect(user) {
+                applyEffect('xp_multiplier', 1, { multiplier: 3 });
+                addTransaction('XP Surge 3× (1h)', 0, 'deposit');
+                return { msg: '3× XP active for 1 hour!', icon: '⚡' };
+            }
+        },
+        {
+            id: 'streak_shield_sm',
+            name: 'Streak Shield',
+            icon: '🛡️',
+            desc: 'Protects your win streak once — lose a game without breaking your streak. Expires in 6 hours or one use.',
+            tags: ['1 Use', '⏱ 6 Hours', 'Streak Safe'],
+            price: 300,
+            rarity: 'rare',
+            category: 'boosters',
+            type: 'timed_boost',
+            effectKey: 'streak_shield',
+            cooldownHours: 1,
+            effect(user) {
+                applyEffect('streak_shield', 6, { charges: 1 });
+                if (!user.inventory) user.inventory = [];
+                user.inventory.push({ id: 'streak_shield_sm', name: 'Streak Shield', icon: '🛡️', category: 'booster', acquiredAt: Date.now() });
+                addTransaction('Streak Shield (1 use / 6h)', 0, 'deposit');
+                return { msg: 'Streak protected for 6 hours!', icon: '🛡️' };
+            }
+        },
+        {
+            id: 'streak_fortress',
+            name: 'Streak Fortress',
+            icon: '🏰',
+            desc: 'Grants 3 streak protection charges, each saving you from a streak break. Lasts 24 hours.',
+            tags: ['3 Charges', '⏱ 24 Hours', 'Full Guard'],
+            price: 800,
+            rarity: 'epic',
+            category: 'boosters',
+            type: 'timed_boost',
+            effectKey: 'streak_shield_multi',
+            cooldownHours: 6,
+            effect(user) {
+                applyEffect('streak_shield_multi', 24, { charges: 3 });
+                addTransaction('Streak Fortress (3 charges / 24h)', 0, 'deposit');
+                return { msg: '3 streak charges active for 24h!', icon: '🏰' };
+            }
+        },
+        {
+            id: 'daily_multiplier_sm',
+            name: 'Daily Reward Boost',
+            icon: '📅',
+            desc: 'Next daily bonus is doubled. Activates automatically on your next login.',
+            tags: ['1 Use', 'Double Daily'],
+            price: 200,
+            rarity: 'common',
+            category: 'boosters',
+            type: 'flag',
+            effectKey: 'daily_boost',
+            cooldownHours: 20,
+            effect(user) {
+                applyEffect('daily_boost', 48, { multiplier: 2 });
+                addTransaction('Daily Reward Boost (2× next daily)', 0, 'deposit');
+                return { msg: 'Your next daily bonus is doubled!', icon: '📅' };
+            }
+        },
+        {
+            id: 'daily_multiplier_5x',
+            name: 'Daily Jackpot Boost',
+            icon: '🎯',
+            desc: 'Your next 3 daily bonuses are each multiplied by 5×. Bank the gains!',
+            tags: ['3 Dailies', '5× Reward'],
+            price: 1800,
+            rarity: 'legendary',
+            category: 'boosters',
+            type: 'flag',
+            effectKey: 'daily_jackpot',
+            cooldownHours: 48,
+            effect(user) {
+                applyEffect('daily_jackpot', 96, { multiplier: 5, charges: 3 });
+                addTransaction('Daily Jackpot Boost (5× × 3)', 0, 'deposit');
+                return { msg: '5× daily bonus active for next 3 days!', icon: '🎯' };
+            }
+        },
+        {
+            id: 'luck_charm',
+            name: 'Lucky Charm',
+            icon: '🍀',
+            desc: 'Slightly improves random outcomes across all games for 1 hour. Subtle but real.',
+            tags: ['⏱ 1 Hour', '+Luck', 'All Games'],
+            price: 350,
+            rarity: 'rare',
+            category: 'boosters',
+            type: 'timed_boost',
+            effectKey: 'luck_boost',
+            cooldownHours: 3,
+            effect(user) {
+                applyEffect('luck_boost', 1, { bonus: 0.05 });
+                addTransaction('Lucky Charm (1h luck)', 0, 'deposit');
+                return { msg: 'Lucky Charm active for 1 hour!', icon: '🍀' };
+            }
+        },
+        {
+            id: 'fortune_anchor',
+            name: 'Fortune Anchor',
+            icon: '⚓',
+            desc: 'Major luck improvement for all game RNG for 30 minutes. High intensity, short window.',
+            tags: ['⏱ 30 Min', '++Luck', 'Intense'],
+            price: 900,
+            rarity: 'epic',
+            category: 'boosters',
+            type: 'timed_boost',
+            effectKey: 'fortune_anchor',
+            cooldownHours: 6,
+            effect(user) {
+                applyEffect('fortune_anchor', 0.5, { bonus: 0.12 });
+                addTransaction('Fortune Anchor (30min)', 0, 'deposit');
+                return { msg: 'Fortune Anchor active for 30 minutes!', icon: '⚓' };
+            }
+        },
+
+        // ─── PASSIVE INCOME ────────────────────────────────────
+        {
+            id: 'interest_boost_sm',
+            name: 'Interest Amplifier I',
+            icon: '📈',
+            desc: 'Permanently increases your daily bank interest rate by 0.25%, stacking up to 3 times.',
+            tags: ['Permanent', '+0.25% Interest', 'Stack ×3'],
+            price: 1500,
+            rarity: 'epic',
+            category: 'upgrades',
+            type: 'upgrade',
+            maxStack: 3,
+            effect(user) {
+                if (!user.upgrades) user.upgrades = {};
+                user.upgrades['interest_boost_sm'] = (user.upgrades['interest_boost_sm'] || 0) + 1;
+                user.interestBonus = (user.interestBonus || 0) + 0.0025;
+                addTransaction('Interest Amplifier I (+0.25% interest)', 0, 'deposit');
+                return { msg: '+0.25% bank interest rate!', icon: '📈' };
+            }
+        },
+        {
+            id: 'interest_boost_lg',
+            name: 'Interest Amplifier II',
+            icon: '💹',
+            desc: 'Permanently boosts daily bank interest by 1%. Stackable once — serious long-term value.',
+            tags: ['Permanent', '+1% Interest', 'Stack ×1'],
+            price: 5000,
+            rarity: 'legendary',
+            category: 'upgrades',
+            type: 'upgrade',
+            maxStack: 1,
+            effect(user) {
+                if (!user.upgrades) user.upgrades = {};
+                user.upgrades['interest_boost_lg'] = (user.upgrades['interest_boost_lg'] || 0) + 1;
+                user.interestBonus = (user.interestBonus || 0) + 0.01;
+                addTransaction('Interest Amplifier II (+1% interest)', 0, 'deposit');
+                return { msg: '+1% bank interest rate permanently!', icon: '💹' };
+            }
+        },
+        {
+            id: 'passive_drip',
+            name: 'Gold Drip',
+            icon: '💧',
+            desc: 'Earn 50 GOLD per hour passively for 12 hours. Total: 600 GOLD — steady reliable income.',
+            tags: ['⏱ 12 Hours', '+50/hr Passive', '600 GOLD Total'],
+            price: 480,
+            rarity: 'rare',
+            category: 'upgrades',
+            type: 'timed_boost',
+            effectKey: 'gold_drip',
+            cooldownHours: 12,
+            effect(user) {
+                applyEffect('gold_drip', 12, { perHour: 50 });
+                addTransaction('Gold Drip (50/hr × 12h)', 0, 'deposit');
+                return { msg: 'Gold Drip active! +50/hr for 12 hours', icon: '💧' };
+            }
+        },
+        {
+            id: 'passive_flood',
+            name: 'Gold Flood',
+            icon: '🌊',
+            desc: 'Earn 200 GOLD per hour passively for 8 hours. Best passive income rate in the shop.',
+            tags: ['⏱ 8 Hours', '+200/hr Passive', '1,600 GOLD Total'],
+            price: 1300,
+            rarity: 'epic',
+            category: 'upgrades',
+            type: 'timed_boost',
+            effectKey: 'gold_flood',
+            cooldownHours: 8,
+            effect(user) {
+                applyEffect('gold_flood', 8, { perHour: 200 });
+                addTransaction('Gold Flood (200/hr × 8h)', 0, 'deposit');
+                return { msg: 'Gold Flood active! +200/hr for 8 hours', icon: '🌊' };
+            }
+        },
+        {
+            id: 'wheel_extra',
+            name: 'Bonus Wheel Spin',
+            icon: '🎡',
+            desc: 'Grants one additional spin on the Loyalty Wheel, bypassing the daily limit.',
+            tags: ['1 Extra Spin', 'Wheel Only'],
+            price: 250,
+            rarity: 'common',
+            category: 'upgrades',
+            type: 'consumable',
+            cooldownHours: 0.25,
+            effect(user) {
+                user.extraWheelSpins = (user.extraWheelSpins || 0) + 1;
+                addTransaction('Bonus Wheel Spin (+1 spin)', 0, 'deposit');
+                return { msg: 'Extra wheel spin added!', icon: '🎡' };
+            }
+        },
+
+        // ─── CRATES ────────────────────────────────────────────
+        {
+            id: 'crate_bronze',
+            name: 'Bronze Crate',
+            icon: '📦',
+            desc: 'A standard mystery crate. Yields 100–700 GOLD or a small booster. No guarantee — pure luck.',
+            tags: ['🎲 Random', 'GOLD or Booster', '100–700 GOLD'],
+            price: 300,
+            rarity: 'common',
+            category: 'crates',
+            type: 'gacha',
+            cooldownHours: 1,
+            effect(user) {
+                const roll = Math.random();
+                let reward, msg;
+                if (roll < 0.55) {
+                    const gold = Math.floor(Math.random() * 601) + 100;
+                    user.balance += gold;
+                    addTransaction(`Bronze Crate → ${gold} GOLD`, gold, 'deposit');
+                    reward = { icon: '💰', name: 'GOLD Found', value: `+${gold} GOLD`, rarity: 'common' };
+                    msg = `+${gold} GOLD from crate!`;
+                } else if (roll < 0.85) {
+                    user.xp = (user.xp || 0) + 300;
+                    addTransaction('Bronze Crate → 300 XP', 0, 'deposit');
+                    reward = { icon: '⚗️', name: 'XP Cache', value: '+300 XP', rarity: 'common' };
+                    msg = '+300 XP from crate!';
+                } else {
+                    applyEffect('luck_boost', 0.5, { bonus: 0.03 });
+                    addTransaction('Bronze Crate → Mini Luck Boost', 0, 'deposit');
+                    reward = { icon: '🍀', name: 'Mini Luck Charm', value: 'Luck +30min', rarity: 'rare' };
+                    msg = 'Luck boost activated!';
+                }
+                return { msg, crateReward: reward };
+            }
+        },
+        {
+            id: 'crate_silver',
+            name: 'Silver Crate',
+            icon: '🪙',
+            desc: 'Upgraded crate with better odds. Can yield rare cosmetics, large XP, or solid GOLD chunks.',
+            tags: ['🎲 Random', 'Higher Odds', '300–2k GOLD'],
+            price: 700,
+            rarity: 'rare',
+            category: 'crates',
+            type: 'gacha',
+            cooldownHours: 2,
+            effect(user) {
+                const roll = Math.random();
+                let reward, msg;
+                if (roll < 0.45) {
+                    const gold = Math.floor(Math.random() * 1701) + 300;
+                    user.balance += gold;
+                    addTransaction(`Silver Crate → ${gold} GOLD`, gold, 'deposit');
+                    reward = { icon: '💰', name: 'GOLD Stash', value: `+${gold} GOLD`, rarity: 'rare' };
+                    msg = `+${gold} GOLD!`;
+                } else if (roll < 0.70) {
+                    user.xp = (user.xp || 0) + 800;
+                    addTransaction('Silver Crate → 800 XP', 0, 'deposit');
+                    reward = { icon: '🧪', name: 'XP Surge', value: '+800 XP', rarity: 'rare' };
+                    msg = '+800 XP!';
+                } else if (roll < 0.87) {
+                    applyEffect('xp_multiplier', 1, { multiplier: 2 });
+                    addTransaction('Silver Crate → 2× XP (1h)', 0, 'deposit');
+                    reward = { icon: '✨', name: '2× XP Boost', value: '2× XP for 1 hour', rarity: 'rare' };
+                    msg = '2× XP boost for 1 hour!';
+                } else if (roll < 0.96) {
+                    user.bankBalance = (user.bankBalance || 0) + 500;
+                    addTransaction('Silver Crate → 500 Bank GOLD', 500, 'deposit');
+                    reward = { icon: '🏦', name: 'Bank Injection', value: '+500 Bank GOLD', rarity: 'epic' };
+                    msg = '+500 GOLD in your bank!';
+                } else {
+                    // Rare: streak shield
+                    applyEffect('streak_shield', 8, { charges: 1 });
+                    addTransaction('Silver Crate → Streak Shield (8h)', 0, 'deposit');
+                    reward = { icon: '🛡️', name: 'Streak Shield', value: 'Streak protected 8h', rarity: 'epic' };
+                    msg = 'Streak shield activated!';
+                }
+                return { msg, crateReward: reward };
+            }
+        },
+        {
+            id: 'crate_gold',
+            name: 'Gold Crate',
+            icon: '🏆',
+            desc: 'Premium crate with high-value rewards. Guaranteed minimum 500 GOLD value. Legendary tier possible.',
+            tags: ['🎲 Random', '500+ Value', 'Legendary Possible'],
+            price: 1800,
+            rarity: 'epic',
+            category: 'crates',
+            type: 'gacha',
+            cooldownHours: 4,
+            effect(user) {
+                const roll = Math.random();
+                let reward, msg;
+                if (roll < 0.40) {
+                    const gold = Math.floor(Math.random() * 2001) + 800;
+                    user.balance += gold;
+                    addTransaction(`Gold Crate → ${gold} GOLD`, gold, 'deposit');
+                    reward = { icon: '💰', name: 'GOLD Vault', value: `+${gold} GOLD`, rarity: 'epic' };
+                    msg = `+${gold} GOLD!`;
+                } else if (roll < 0.60) {
+                    user.xp = (user.xp || 0) + 2000;
+                    addTransaction('Gold Crate → 2000 XP', 0, 'deposit');
+                    reward = { icon: '⚡', name: 'XP Nova', value: '+2,000 XP', rarity: 'epic' };
+                    msg = '+2,000 XP!';
+                } else if (roll < 0.75) {
+                    applyEffect('xp_multiplier', 2, { multiplier: 3 });
+                    addTransaction('Gold Crate → 3× XP (2h)', 0, 'deposit');
+                    reward = { icon: '⚡', name: '3× XP Surge', value: '3× XP for 2 hours', rarity: 'epic' };
+                    msg = '3× XP for 2 hours!';
+                } else if (roll < 0.88) {
+                    user.bankBalance = (user.bankBalance || 0) + 1500;
+                    addTransaction('Gold Crate → 1500 Bank GOLD', 1500, 'deposit');
+                    reward = { icon: '🏦', name: 'Bank Boom', value: '+1,500 Bank GOLD', rarity: 'epic' };
+                    msg = '+1,500 GOLD in your bank!';
+                } else if (roll < 0.96) {
+                    applyEffect('streak_shield_multi', 24, { charges: 2 });
+                    applyEffect('luck_boost', 2, { bonus: 0.08 });
+                    addTransaction('Gold Crate → Double Shield + Luck', 0, 'deposit');
+                    reward = { icon: '⚓', name: 'Fortune Guard', value: '2 shields + luck boost 2h', rarity: 'legendary' };
+                    msg = 'Fortune Guard activated!';
+                } else {
+                    // Ultra rare: huge gold
+                    const jackpot = Math.floor(Math.random() * 2001) + 3000;
+                    user.balance += jackpot;
+                    addTransaction(`Gold Crate JACKPOT → ${jackpot} GOLD`, jackpot, 'deposit');
+                    reward = { icon: '🌟', name: 'JACKPOT', value: `+${jackpot} GOLD`, rarity: 'legendary' };
+                    msg = `🌟 JACKPOT! +${jackpot} GOLD!`;
+                }
+                return { msg, crateReward: reward };
+            }
+        },
+        {
+            id: 'crate_mythic',
+            name: 'Mythic Crate',
+            icon: '🌌',
+            desc: 'The rarest crate in the Emporium. Guaranteed legendary-tier reward or higher. Exclusive loot pool.',
+            tags: ['🌠 Mythic Pool', '5,000+ Value', '⚠️ Rare Drop'],
+            price: 5500,
+            rarity: 'mythic',
+            category: 'crates',
+            type: 'gacha',
+            cooldownHours: 8,
+            effect(user) {
+                const roll = Math.random();
+                let reward, msg;
+                const loot = [
+                    () => { const g = Math.floor(Math.random()*4001)+3000; user.balance+=g; addTransaction(`Mythic Crate → ${g} GOLD`,g,'deposit'); return { icon:'💎', name:'Mythic Hoard', value:`+${g} GOLD`, rarity:'legendary' }; },
+                    () => { user.xp=(user.xp||0)+6000; addTransaction('Mythic Crate → 6000 XP',0,'deposit'); return { icon:'🌟', name:'Ascension XP', value:'+6,000 XP', rarity:'legendary' }; },
+                    () => { applyEffect('xp_multiplier',4,{multiplier:3}); applyEffect('luck_boost',4,{bonus:0.15}); addTransaction('Mythic Crate → 3×XP+Luck 4h',0,'deposit'); return { icon:'✨', name:'Mythic Aura', value:'3×XP + Major Luck for 4h', rarity:'mythic' }; },
+                    () => { user.bankBalance=(user.bankBalance||0)+5000; addTransaction('Mythic Crate → 5000 Bank',5000,'deposit'); return { icon:'🏦', name:'Vault Conquest', value:'+5,000 Bank GOLD', rarity:'legendary' }; },
+                    () => { applyEffect('streak_shield_multi',72,{charges:5}); applyEffect('fortune_anchor',2,{bonus:0.2}); addTransaction('Mythic Crate → Legend Guard',0,'deposit'); return { icon:'🏰', name:'Legend Guard', value:'5 streak shields + fortune 2h', rarity:'mythic' }; },
+                    () => { const g=Math.floor(Math.random()*3001)+6000; user.balance+=g; addTransaction(`Mythic Crate ULTRA → ${g} GOLD`,g,'deposit'); return { icon:'🌌', name:'COSMIC JACKPOT', value:`+${g} GOLD`, rarity:'mythic' }; }
+                ];
+                const weights = [0.30, 0.20, 0.18, 0.17, 0.10, 0.05];
+                let r = Math.random(), cumul = 0, pick = 0;
+                for (let i = 0; i < weights.length; i++) { cumul += weights[i]; if (r < cumul) { pick = i; break; } }
+                reward = loot[pick]();
+                msg = `${reward.icon} ${reward.name}: ${reward.value}`;
+                return { msg, crateReward: reward };
+            }
+        },
+
+        // ─── GAME MODIFIERS ────────────────────────────────────
+        {
+            id: 'mines_safe_reveal',
+            name: 'Mines Safe Reveal',
+            icon: '💡',
+            desc: 'Reveals one safe cell in Mines before your next game. One-time use per purchase.',
+            tags: ['1 Use', 'Mines Only', 'Safe Hint'],
+            price: 400,
+            rarity: 'rare',
+            category: 'game_mods',
+            type: 'consumable',
+            cooldownHours: 2,
+            effect(user) {
+                user.minesSafeReveals = (user.minesSafeReveals || 0) + 1;
+                addTransaction('Mines Safe Reveal (+1 reveal)', 0, 'deposit');
+                return { msg: 'Safe reveal added for Mines!', icon: '💡' };
+            }
+        },
+        {
+            id: 'payout_amp_sm',
+            name: 'Payout Amplifier',
+            icon: '🎰',
+            desc: 'All game wins yield +15% bonus GOLD for the next 45 minutes. Applies to all games.',
+            tags: ['⏱ 45 Min', '+15% Payouts', 'All Games'],
+            price: 550,
+            rarity: 'rare',
+            category: 'game_mods',
+            type: 'timed_boost',
+            effectKey: 'payout_amp',
+            cooldownHours: 3,
+            effect(user) {
+                applyEffect('payout_amp', 0.75, { bonus: 0.15 });
+                addTransaction('Payout Amplifier (+15% wins / 45min)', 0, 'deposit');
+                return { msg: '+15% payout boost for 45 minutes!', icon: '🎰' };
+            }
+        },
+        {
+            id: 'payout_amp_lg',
+            name: 'Payout Overdrive',
+            icon: '🚀',
+            desc: 'All game wins yield +40% bonus GOLD for 30 minutes. Risk it with big bets!',
+            tags: ['⏱ 30 Min', '+40% Payouts', 'High Gain'],
+            price: 1600,
+            rarity: 'epic',
+            category: 'game_mods',
+            type: 'timed_boost',
+            effectKey: 'payout_amp',
+            cooldownHours: 8,
+            effect(user) {
+                applyEffect('payout_amp', 0.5, { bonus: 0.40 });
+                addTransaction('Payout Overdrive (+40% wins / 30min)', 0, 'deposit');
+                return { msg: '+40% payout boost for 30 minutes!', icon: '🚀' };
+            }
+        },
+        {
+            id: 'bet_shield',
+            name: 'Bet Insurance',
+            icon: '🔒',
+            desc: 'Refunds 25% of your wager if you lose your next game. Activates once then expires.',
+            tags: ['1 Use', '25% Loss Refund', 'Any Game'],
+            price: 600,
+            rarity: 'rare',
+            category: 'game_mods',
+            type: 'flag',
+            effectKey: 'bet_insurance',
+            cooldownHours: 4,
+            effect(user) {
+                applyEffect('bet_insurance', 24, { refundPct: 0.25, charges: 1 });
+                addTransaction('Bet Insurance (25% refund on loss)', 0, 'deposit');
+                return { msg: '25% loss insurance active!', icon: '🔒' };
+            }
+        },
+
+        // ─── AVATARS ───────────────────────────────────────────
+        {
+            id: 'avatar_crown',
+            name: 'Royal Crown',
+            icon: '👑',
+            desc: 'The iconic Gold crown — a mark of prestige. Default elite avatar.',
+            tags: ['Avatar', 'Classic'],
+            price: 0,
+            rarity: 'common',
+            category: 'cosmetics',
+            type: 'cosmetic_avatar',
+            avatarValue: 'fas fa-crown',
+            effect(user) {
+                if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                if (!user.unlockedAvatars.includes('fas fa-crown')) user.unlockedAvatars.push('fas fa-crown');
+                user.avatar = 'fas fa-crown';
+                return { msg: '👑 Royal Crown equipped!', icon: '👑' };
+            }
+        },
+        {
+            id: 'avatar_dragon',
+            name: 'Dragon Lord',
+            icon: '🐉',
+            desc: 'Command the table with the legendary Dragon avatar. Fear and respect follow you.',
+            tags: ['Avatar', 'Legendary'],
+            price: 800,
+            rarity: 'legendary',
+            category: 'cosmetics',
+            type: 'cosmetic_avatar',
+            avatarValue: 'fas fa-dragon',
+            effect(user) {
+                if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                if (!user.unlockedAvatars.includes('fas fa-dragon')) user.unlockedAvatars.push('fas fa-dragon');
+                user.avatar = 'fas fa-dragon';
+                return { msg: '🐉 Dragon Lord equipped!', icon: '🐉' };
+            }
+        },
+        {
+            id: 'avatar_phoenix',
+            name: 'Phoenix Reborn',
+            icon: '🔥',
+            desc: 'Rise from the ashes with this iconic blazing phoenix avatar. Fire and glory.',
+            tags: ['Avatar', 'Epic'],
+            price: 700,
+            rarity: 'epic',
+            category: 'cosmetics',
+            type: 'cosmetic_avatar',
+            avatarValue: 'fas fa-fire',
+            effect(user) {
+                if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                if (!user.unlockedAvatars.includes('fas fa-fire')) user.unlockedAvatars.push('fas fa-fire');
+                user.avatar = 'fas fa-fire';
+                return { msg: '🔥 Phoenix Reborn equipped!', icon: '🔥' };
+            }
+        },
+        {
+            id: 'avatar_gem',
+            name: 'Gem Baron',
+            icon: '💎',
+            desc: 'Rare gem avatar for those who truly shine. Diamond-class prestige.',
+            tags: ['Avatar', 'Rare'],
+            price: 450,
+            rarity: 'rare',
+            category: 'cosmetics',
+            type: 'cosmetic_avatar',
+            avatarValue: 'fas fa-gem',
+            effect(user) {
+                if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                if (!user.unlockedAvatars.includes('fas fa-gem')) user.unlockedAvatars.push('fas fa-gem');
+                user.avatar = 'fas fa-gem';
+                return { msg: '💎 Gem Baron equipped!', icon: '💎' };
+            }
+        },
+        {
+            id: 'avatar_bolt',
+            name: 'Lightning God',
+            icon: '⚡',
+            desc: 'Strike fast, strike hard. The bolt avatar for high-speed players.',
+            tags: ['Avatar', 'Rare'],
+            price: 350,
+            rarity: 'rare',
+            category: 'cosmetics',
+            type: 'cosmetic_avatar',
+            avatarValue: 'fas fa-bolt',
+            effect(user) {
+                if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                if (!user.unlockedAvatars.includes('fas fa-bolt')) user.unlockedAvatars.push('fas fa-bolt');
+                user.avatar = 'fas fa-bolt';
+                return { msg: '⚡ Lightning God equipped!', icon: '⚡' };
+            }
+        },
+        {
+            id: 'avatar_star',
+            name: 'Stardust',
+            icon: '⭐',
+            desc: 'A celestial star for those who reached for the sky and grabbed it.',
+            tags: ['Avatar', 'Common'],
+            price: 200,
+            rarity: 'common',
+            category: 'cosmetics',
+            type: 'cosmetic_avatar',
+            avatarValue: 'fas fa-star',
+            effect(user) {
+                if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                if (!user.unlockedAvatars.includes('fas fa-star')) user.unlockedAvatars.push('fas fa-star');
+                user.avatar = 'fas fa-star';
+                return { msg: '⭐ Stardust equipped!', icon: '⭐' };
+            }
+        },
+        {
+            id: 'avatar_skull',
+            name: 'Grim Gambler',
+            icon: '💀',
+            desc: 'Not for the faint of heart. The skull avatar for those who play without fear.',
+            tags: ['Avatar', 'Rare'],
+            price: 500,
+            rarity: 'rare',
+            category: 'cosmetics',
+            type: 'cosmetic_avatar',
+            avatarValue: 'fas fa-skull',
+            effect(user) {
+                if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                if (!user.unlockedAvatars.includes('fas fa-skull')) user.unlockedAvatars.push('fas fa-skull');
+                user.avatar = 'fas fa-skull';
+                return { msg: '💀 Grim Gambler equipped!', icon: '💀' };
+            }
+        },
+        {
+            id: 'avatar_dice',
+            name: 'Dice Master',
+            icon: '🎲',
+            desc: 'All luck, all game. The dice is life.',
+            tags: ['Avatar', 'Common'],
+            price: 180,
+            rarity: 'common',
+            category: 'cosmetics',
+            type: 'cosmetic_avatar',
+            avatarValue: 'fas fa-dice',
+            effect(user) {
+                if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                if (!user.unlockedAvatars.includes('fas fa-dice')) user.unlockedAvatars.push('fas fa-dice');
+                user.avatar = 'fas fa-dice';
+                return { msg: '🎲 Dice Master equipped!', icon: '🎲' };
+            }
+        },
+        {
+            id: 'avatar_wolf',
+            name: 'Lone Wolf',
+            icon: '🐺',
+            desc: 'A cunning predator avatar for solo players who trust only themselves.',
+            tags: ['Avatar', 'Epic'],
+            price: 650,
+            rarity: 'epic',
+            category: 'cosmetics',
+            type: 'cosmetic_avatar',
+            avatarValue: 'fas fa-wolf-pack-battalion',
+            effect(user) {
+                if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                if (!user.unlockedAvatars.includes('fas fa-wolf-pack-battalion')) user.unlockedAvatars.push('fas fa-wolf-pack-battalion');
+                user.avatar = 'fas fa-wolf-pack-battalion';
+                return { msg: '🐺 Lone Wolf equipped!', icon: '🐺' };
+            }
+        },
+        {
+            id: 'avatar_moon',
+            name: 'Moonchaser',
+            icon: '🌙',
+            desc: 'Play in the dark hours. A serene midnight crescent for the nocturnal gambler.',
+            tags: ['Avatar', 'Rare'],
+            price: 420,
+            rarity: 'rare',
+            category: 'cosmetics',
+            type: 'cosmetic_avatar',
+            avatarValue: 'fas fa-moon',
+            effect(user) {
+                if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                if (!user.unlockedAvatars.includes('fas fa-moon')) user.unlockedAvatars.push('fas fa-moon');
+                user.avatar = 'fas fa-moon';
+                return { msg: '🌙 Moonchaser equipped!', icon: '🌙' };
+            }
+        },
+        {
+            id: 'avatar_chess',
+            name: 'Chess Master',
+            icon: '♟️',
+            desc: 'Every move is calculated. For strategic minds who see 10 moves ahead.',
+            tags: ['Avatar', 'Epic'],
+            price: 580,
+            rarity: 'epic',
+            category: 'cosmetics',
+            type: 'cosmetic_avatar',
+            avatarValue: 'fas fa-chess-king',
+            effect(user) {
+                if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                if (!user.unlockedAvatars.includes('fas fa-chess-king')) user.unlockedAvatars.push('fas fa-chess-king');
+                user.avatar = 'fas fa-chess-king';
+                return { msg: '♟️ Chess Master equipped!', icon: '♟️' };
+            }
+        },
+        {
+            id: 'avatar_cosmic',
+            name: 'Cosmic Entity',
+            icon: '🌌',
+            desc: 'Beyond mortal comprehension. Reserved for those who have transcended the leaderboard.',
+            tags: ['Avatar', 'Mythic', '✦ Exclusive'],
+            price: 3000,
+            rarity: 'mythic',
+            category: 'cosmetics',
+            type: 'cosmetic_avatar',
+            avatarValue: 'fas fa-meteor',
+            effect(user) {
+                if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                if (!user.unlockedAvatars.includes('fas fa-meteor')) user.unlockedAvatars.push('fas fa-meteor');
+                user.avatar = 'fas fa-meteor';
+                return { msg: '🌌 Cosmic Entity unleashed!', icon: '🌌' };
+            }
+        },
+
+        // ─── THEMES ────────────────────────────────────────────
+        {
+            id: 'theme_gold',
+            name: 'Classic Gold',
+            icon: '🌟',
+            desc: 'The original GOLD theme. Timeless luxury — dark blacks with pure golden accents.',
+            tags: ['Theme', 'Default', 'Free'],
+            price: 0,
+            rarity: 'common',
+            category: 'cosmetics',
+            type: 'cosmetic_theme',
+            themeValue: 'theme-gold',
+            effect(user) {
+                if (!user.unlockedThemes) user.unlockedThemes = [];
+                if (!user.unlockedThemes.includes('theme-gold')) user.unlockedThemes.push('theme-gold');
+                user.theme = 'theme-gold';
+                applyTheme('theme-gold');
+                return { msg: '🌟 Classic Gold theme applied!', icon: '🌟' };
+            }
+        },
+        {
+            id: 'theme_midnight',
+            name: 'Midnight Void',
+            icon: '🌙',
+            desc: 'Deep space blue neon. Transforms the entire UI to a midnight prestige palette.',
+            tags: ['Theme', 'Rare'],
+            price: 600,
+            rarity: 'rare',
+            category: 'cosmetics',
+            type: 'cosmetic_theme',
+            themeValue: 'theme-midnight',
+            effect(user) {
+                if (!user.unlockedThemes) user.unlockedThemes = [];
+                if (!user.unlockedThemes.includes('theme-midnight')) user.unlockedThemes.push('theme-midnight');
+                user.theme = 'theme-midnight';
+                applyTheme('theme-midnight');
+                return { msg: '🌙 Midnight Void activated!', icon: '🌙' };
+            }
+        },
+        {
+            id: 'theme_emerald',
+            name: 'Emerald Kingdom',
+            icon: '🟢',
+            desc: 'Lush emerald greens meet gold. A premium organic theme for the nature-minded high roller.',
+            tags: ['Theme', 'Rare'],
+            price: 600,
+            rarity: 'rare',
+            category: 'cosmetics',
+            type: 'cosmetic_theme',
+            themeValue: 'theme-emerald',
+            effect(user) {
+                if (!user.unlockedThemes) user.unlockedThemes = [];
+                if (!user.unlockedThemes.includes('theme-emerald')) user.unlockedThemes.push('theme-emerald');
+                user.theme = 'theme-emerald';
+                applyTheme('theme-emerald');
+                return { msg: '🟢 Emerald Kingdom activated!', icon: '🟢' };
+            }
+        },
+        {
+            id: 'theme_crimson',
+            name: 'Crimson Empire',
+            icon: '🔴',
+            desc: 'Blazing crimson and blood-red. For players who dominate with aggression.',
+            tags: ['Theme', 'Epic', '🆕 NEW'],
+            price: 1200,
+            rarity: 'epic',
+            category: 'cosmetics',
+            type: 'cosmetic_theme',
+            themeValue: 'theme-crimson',
+            isNew: true,
+            effect(user) {
+                if (!user.unlockedThemes) user.unlockedThemes = [];
+                if (!user.unlockedThemes.includes('theme-crimson')) user.unlockedThemes.push('theme-crimson');
+                user.theme = 'theme-crimson';
+                applyTheme('theme-crimson');
+                return { msg: '🔴 Crimson Empire activated!', icon: '🔴' };
+            }
+        },
+        {
+            id: 'theme_aurora',
+            name: 'Aurora Nexus',
+            icon: '🔮',
+            desc: 'Ethereal purples and violets. An otherworldly theme for the mystically inclined.',
+            tags: ['Theme', 'Epic', '🆕 NEW'],
+            price: 1200,
+            rarity: 'epic',
+            category: 'cosmetics',
+            type: 'cosmetic_theme',
+            themeValue: 'theme-aurora',
+            isNew: true,
+            effect(user) {
+                if (!user.unlockedThemes) user.unlockedThemes = [];
+                if (!user.unlockedThemes.includes('theme-aurora')) user.unlockedThemes.push('theme-aurora');
+                user.theme = 'theme-aurora';
+                applyTheme('theme-aurora');
+                return { msg: '🔮 Aurora Nexus activated!', icon: '🔮' };
+            }
+        },
+
+        // ─── COLLECTIBLES ──────────────────────────────────────
+        {
+            id: 'collectible_lucky_7',
+            name: 'Lucky Sevens',
+            icon: '7️⃣',
+            desc: 'A rare collectible. Owning it permanently adds a +7 GOLD bonus to every wheel spin result.',
+            tags: ['Collectible', '+7 Wheel Bonus', 'Permanent'],
+            price: 2200,
+            rarity: 'epic',
+            category: 'collectibles',
+            type: 'upgrade',
+            maxStack: 1,
+            effect(user) {
+                if (!user.upgrades) user.upgrades = {};
+                user.upgrades['lucky_7'] = 1;
+                user.wheelBonus = (user.wheelBonus || 0) + 7;
+                if (!user.inventory) user.inventory = [];
+                user.inventory.push({ id: 'collectible_lucky_7', name: 'Lucky Sevens', icon: '7️⃣', category: 'collectible', acquiredAt: Date.now() });
+                addTransaction('Lucky Sevens collectible (+7 wheel)', 0, 'deposit');
+                return { msg: '+7 GOLD to every wheel spin!', icon: '7️⃣' };
+            }
+        },
+        {
+            id: 'collectible_gold_bar',
+            name: 'Gold Bar',
+            icon: '🥇',
+            desc: 'A collectible gold bar. Grants a 500 GOLD signing bonus just for owning it.',
+            tags: ['Collectible', '+500 GOLD', '1× Bonus'],
+            price: 1000,
+            rarity: 'rare',
+            category: 'collectibles',
+            type: 'upgrade',
+            maxStack: 1,
+            effect(user) {
+                if (!user.upgrades) user.upgrades = {};
+                user.upgrades['gold_bar'] = 1;
+                user.balance += 500;
+                if (!user.inventory) user.inventory = [];
+                user.inventory.push({ id: 'collectible_gold_bar', name: 'Gold Bar', icon: '🥇', category: 'collectible', acquiredAt: Date.now() });
+                addTransaction('Gold Bar collectible (+500 GOLD)', 500, 'deposit');
+                return { msg: '+500 GOLD signing bonus!', icon: '🥇' };
+            }
+        },
+        {
+            id: 'collectible_jade',
+            name: 'Jade Stone',
+            icon: '🪨',
+            desc: 'Ancient jade grants fortune. Permanently increases XP gained from games by +10 flat.',
+            tags: ['Collectible', '+10 XP/Game', 'Permanent'],
+            price: 3500,
+            rarity: 'legendary',
+            category: 'collectibles',
+            type: 'upgrade',
+            maxStack: 1,
+            effect(user) {
+                if (!user.upgrades) user.upgrades = {};
+                user.upgrades['jade_stone'] = 1;
+                user.xpBonus = (user.xpBonus || 0) + 10;
+                if (!user.inventory) user.inventory = [];
+                user.inventory.push({ id: 'collectible_jade', name: 'Jade Stone', icon: '🪨', category: 'collectible', acquiredAt: Date.now() });
+                addTransaction('Jade Stone collectible (+10 XP/game)', 0, 'deposit');
+                return { msg: '+10 XP per game — permanently!', icon: '🪨' };
+            }
+        },
+        {
+            id: 'collectible_orb',
+            name: 'Void Orb',
+            icon: '🔮',
+            desc: 'An ancient artifact. Holding it grants +50 GOLD to every bank interest payout.',
+            tags: ['Collectible', '+50 Interest Bonus', 'Mythic'],
+            price: 8000,
+            rarity: 'mythic',
+            category: 'collectibles',
+            type: 'upgrade',
+            maxStack: 1,
+            effect(user) {
+                if (!user.upgrades) user.upgrades = {};
+                user.upgrades['void_orb'] = 1;
+                user.interestFlatBonus = (user.interestFlatBonus || 0) + 50;
+                if (!user.inventory) user.inventory = [];
+                user.inventory.push({ id: 'collectible_orb', name: 'Void Orb', icon: '🔮', category: 'collectible', acquiredAt: Date.now() });
+                addTransaction('Void Orb collectible (+50 interest/day)', 0, 'deposit');
+                return { msg: '+50 GOLD to every bank interest payout!', icon: '🔮' };
+            }
+        }
+    ];
+
+    // ══════════════════════════════════════════════════════
+    // CATEGORY CONFIG
+    // ══════════════════════════════════════════════════════
+    const CATEGORIES = [
+        { id: 'all', label: 'All Items', icon: 'fas fa-th' },
+        { id: 'boosters', label: 'Boosters', icon: 'fas fa-bolt' },
+        { id: 'crates', label: 'Crates', icon: 'fas fa-box-open' },
+        { id: 'game_mods', label: 'Game Mods', icon: 'fas fa-gamepad' },
+        { id: 'upgrades', label: 'Upgrades', icon: 'fas fa-arrow-up' },
+        { id: 'cosmetics', label: 'Cosmetics', icon: 'fas fa-palette' },
+        { id: 'collectibles', label: 'Collectibles', icon: 'fas fa-star' }
+    ];
+
+    // ══════════════════════════════════════════════════════
+    // DAILY DEALS (seeded by date for consistency)
+    // ══════════════════════════════════════════════════════
+    function getDailyDeals() {
+        const seed = new Date().toDateString();
+        let hash = 0;
+        for (let c of seed) hash = (hash * 31 + c.charCodeAt(0)) & 0xffffffff;
+        const eligible = SHOP_ITEMS.filter(i => i.price > 0 && i.type !== 'cosmetic_theme' && i.rarity !== 'mythic');
+        const picks = [];
+        for (let i = 0; i < 4; i++) {
+            hash = (hash * 1664525 + 1013904223) & 0xffffffff;
+            const idx = Math.abs(hash) % eligible.length;
+            const item = eligible[idx];
+            if (!picks.find(p => p.id === item.id)) {
+                picks.push({ ...item, dealDiscount: 0.20 + (0.15 * ((hash >> (i*4)) & 1)), isLimited: true });
+            }
+        }
+        return picks.slice(0, 3);
+    }
+
+    let dailyDeals = [];
+
+    // ══════════════════════════════════════════════════════
+    // FEATURED ITEM (changes weekly)
+    // ══════════════════════════════════════════════════════
+    function getFeaturedItem() {
+        const week = Math.floor(Date.now() / (7 * 24 * 3600000));
+        const featPool = SHOP_ITEMS.filter(i => i.rarity === 'legendary' || i.rarity === 'mythic');
+        return featPool[week % featPool.length];
+    }
+
+    // ══════════════════════════════════════════════════════
+    // THEME APPLICATION (MATCHES DASHBOARD)
+    // ══════════════════════════════════════════════════════
+    function applyTheme(themeClass) {
+        document.body.className = themeClass;
+        if (currentUser) { currentUser.theme = themeClass; }
+        localStorage.setItem('gold_theme', themeClass);
+    }
+
+    // ══════════════════════════════════════════════════════
+    // PERSIST USER (MATCHES DASHBOARD)
+    // ══════════════════════════════════════════════════════
+    async function persistUser() {
+        const users = getUsers();
+        users[currentUser.username] = currentUser;
+        saveUsers(users);
+        const sess = sessionStorage.getItem('gold_current_user');
+        if (sess) {
+            const s = JSON.parse(sess);
+            s.balance = currentUser.balance;
+            sessionStorage.setItem('gold_current_user', JSON.stringify(s));
+        }
+    }
+
+    // ══════════════════════════════════════════════════════
+    // TOAST
+    // ══════════════════════════════════════════════════════
+    function showToast(msg, type = 'default') {
+        const t = document.getElementById('toastMsg');
+        if (toastTimeout) clearTimeout(toastTimeout);
+        t.className = 'toast-msg';
+        if (type === 'error') t.classList.add('error');
+        if (type === 'success') t.classList.add('success');
+        t.textContent = msg;
+        void t.offsetWidth;
+        t.classList.add('show');
+        toastTimeout = setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // ══════════════════════════════════════════════════════
+    // PURCHASE BURST EFFECT
+    // ══════════════════════════════════════════════════════
+    function spawnBurst(x, y) {
+        const wrap = document.createElement('div');
+        wrap.className = 'purchase-burst';
+        wrap.style.cssText = `left:${x}px;top:${y}px;`;
+        document.body.appendChild(wrap);
+        const colors = ['var(--theme-gold)', '#fff', 'var(--theme-gold-dim)', '#fffacc'];
+        for (let i = 0; i < 14; i++) {
+            const p = document.createElement('div');
+            p.className = 'burst-particle';
+            const angle = (i / 14) * 360;
+            const dist = 40 + Math.random() * 40;
+            const dx = Math.cos(angle * Math.PI / 180) * dist;
+            const dy = Math.sin(angle * Math.PI / 180) * dist;
+            p.style.cssText = `--dx:${dx}px;--dy:${dy}px;background:${colors[i%colors.length]};animation-delay:${Math.random()*0.1}s;`;
+            wrap.appendChild(p);
+        }
+        setTimeout(() => wrap.remove(), 900);
+    }
+
+    // ══════════════════════════════════════════════════════
+    // CRATE REVEAL MODAL
+    // ══════════════════════════════════════════════════════
+    function showCrateReveal(reward) {
+        const rarityColors = { common: '#9e9e9e', rare: '#9370db', epic: '#ffa500', legendary: '#ffd700', mythic: '#ff69b4' };
+        const color = rarityColors[reward.rarity || 'common'] || '#ffd966';
+        document.getElementById('crateRevealContent').innerHTML = `
+            <div class="crate-reveal-item" style="border-color:${color}40;background:${color}08;">
+                <div class="crate-reveal-icon">${reward.icon}</div>
+                <div class="crate-reveal-name" style="color:${color}">${reward.name}</div>
+                <div class="crate-reveal-val">${reward.value}</div>
+                <div style="font-size:0.65rem;letter-spacing:2px;font-weight:800;color:${color};margin-top:0.5rem;">${(reward.rarity||'common').toUpperCase()}</div>
+            </div>`;
+        document.getElementById('crateModal').classList.add('active');
+    }
+
+    // ══════════════════════════════════════════════════════
+    // PURCHASE FLOW
+    // ══════════════════════════════════════════════════════
+    function openConfirmModal(item, discountedPrice) {
+        const price = discountedPrice ?? item.price;
+        pendingItem = { item, price };
+        document.getElementById('confirmIcon').textContent = item.icon;
+        document.getElementById('confirmTitle').textContent = item.name;
+        document.getElementById('confirmDesc').textContent = item.desc;
+        document.getElementById('confirmPrice').textContent = price === 0 ? 'FREE' : `${price.toLocaleString()} GOLD`;
+        document.getElementById('confirmModal').classList.add('active');
+    }
+
+    async function executePurchase(item, price) {
+        if (!currentUser) return;
+        if (price > 0 && currentUser.balance < price) {
+            showToast(`❌ Need ${price.toLocaleString()} GOLD — you have ${currentUser.balance.toLocaleString()}`, 'error');
+            return;
+        }
+        if (isOnCooldown(item)) {
+            showToast(`⏱ ${item.name} is on cooldown — ${getCooldownRemaining(item)} remaining`, 'error');
+            return;
+        }
+        // Deduct cost
+        if (price > 0) {
+            currentUser.balance -= price;
+            addTransaction(`🛒 Shop: ${item.name} (–${price} GOLD)`, -price, 'withdraw');
+        }
+        // Apply effect
+        let result;
+        try { result = item.effect(currentUser); }
+        catch (e) { console.error(e); result = { msg: 'Item applied!', icon: item.icon }; }
+        // Set cooldown
+        if (item.cooldownHours) setCooldown(item.id);
+        // Track purchase
+        if (!currentUser.shopHistory) currentUser.shopHistory = [];
+        currentUser.shopHistory.unshift({ id: item.id, name: item.name, price, date: new Date().toISOString() });
+        await persistUser();
+        updateUI();
+        renderInventory();
+        showToast(`${result.icon || '✅'} ${result.msg}`, 'success');
+        if (result.crateReward) {
+            setTimeout(() => showCrateReveal(result.crateReward), 400);
+        }
+    }
+
+    // ══════════════════════════════════════════════════════
+    // CARD RENDERING
+    // ══════════════════════════════════════════════════════
+    function getCardState(item, discountedPrice) {
+        const price = discountedPrice ?? item.price;
+        const owned = isOwned(item);
+        const equipped = isEquipped(item);
+        const effectActive = item.effectKey ? isEffectActive(item.effectKey) : false;
+        const onCooldown = isOnCooldown(item);
+        const canAfford = currentUser.balance >= price;
+        return { price, owned, equipped, effectActive, onCooldown, canAfford };
+    }
+
+    function buildCard(item, isDaily = false, discountedPrice = null) {
+        const state = getCardState(item, discountedPrice);
+        const card = document.createElement('div');
+        card.className = `shop-card rarity-${item.rarity}`;
+        if (state.owned || state.equipped) card.classList.add(state.equipped ? 'equipped' : 'owned');
+
+        // Badges top-right
+        let badgesHtml = `<span class="rarity-badge">${RARITY_LABELS[item.rarity]}</span>`;
+        if (isDaily) badgesHtml += `<span class="sale-badge">🔥 DEAL</span>`;
+        if (item.isNew) badgesHtml += `<span class="new-badge">NEW</span>`;
+        if (item.isLimited) badgesHtml += `<span class="limited-badge">LIMITED</span>`;
+
+        // Effect tags
+        const effectTagsHtml = (item.tags || []).map(t => `<span class="effect-tag">${t}</span>`).join('');
+
+        // Price + duration row
+        let priceHtml = '';
+        if (state.price === 0) {
+            priceHtml = `<div class="card-price" style="color:#4caf50">FREE</div>`;
+        } else {
+            const orig = discountedPrice !== null ? `<span class="card-price-original">${item.price.toLocaleString()}</span>` : '';
+            priceHtml = `<div class="card-price"><i class="fas fa-coins" style="font-size:0.85rem;margin-right:0.3rem;"></i>${state.price.toLocaleString()} GOLD${orig}</div>`;
+        }
+        if (item.duration) {
+            priceHtml += `<div class="card-duration"><i class="fas fa-clock" style="margin-right:0.25rem;"></i>${item.duration}h</div>`;
+        }
+
+        // Status indicator
+        let statusHtml = '';
+        if (state.equipped) statusHtml = `<div class="equipped-indicator"><i class="fas fa-check-circle"></i> EQUIPPED</div>`;
+        else if (state.owned && item.type !== 'consumable') statusHtml = `<div class="owned-indicator"><i class="fas fa-check-circle"></i> OWNED</div>`;
+        else if (state.effectActive) statusHtml = `<div class="active-indicator"><i class="fas fa-bolt"></i> ACTIVE — ${getEffectTimeLeft(item.effectKey) || 'Permanent'}</div>`;
+        else if (state.onCooldown) statusHtml = `<div class="cooldown-indicator"><i class="fas fa-clock"></i> Cooldown: ${getCooldownRemaining(item)}</div>`;
+
+        // Button
+        let btnClass = 'buy-btn', btnText = 'Purchase', btnDisabled = false;
+        if (state.equipped) { btnClass += ' equipped-btn'; btnText = '✓ Equipped'; btnDisabled = true; }
+        else if (state.owned && item.type !== 'consumable' && item.type !== 'timed_boost') { btnClass += ' owned-btn'; btnText = '✓ Owned'; btnDisabled = true; }
+        else if (state.effectActive && item.type === 'timed_boost') { btnClass += ' active-btn'; btnText = '⚡ Active'; btnDisabled = true; }
+        else if (state.onCooldown) { btnDisabled = true; btnText = `⏱ ${getCooldownRemaining(item)}`; }
+        else if (!state.canAfford && state.price > 0) { btnClass += ' cant-afford'; btnText = `Need ${state.price.toLocaleString()} GOLD`; btnDisabled = false; }
+        else if (state.price === 0) { btnText = 'Equip Free'; }
+
+        card.innerHTML = `
+            <div class="card-top">
+                <div class="card-icon-wrap">${item.icon}</div>
+                <div class="card-badges">${badgesHtml}</div>
+            </div>
+            <div class="card-name">${item.name}</div>
+            <div class="card-desc">${item.desc}</div>
+            <div class="card-effect-tags">${effectTagsHtml}</div>
+            <div class="card-price-row">${priceHtml}${statusHtml}</div>
+            <button class="${btnClass}" data-id="${item.id}" data-price="${state.price}" ${btnDisabled ? 'disabled' : ''}>${btnText}</button>
+        `;
+
+        // Click listener
+        const btn = card.querySelector('.buy-btn');
+        if (btn && !btn.disabled) {
+            btn.addEventListener('click', e => {
+                e.stopPropagation();
+                const canAffordCheck = currentUser.balance >= state.price || state.price === 0;
+                if (!canAffordCheck) { showToast(`❌ Need ${state.price.toLocaleString()} GOLD!`, 'error'); return; }
+                openConfirmModal(item, state.price);
+                spawnBurst(e.clientX, e.clientY);
+            });
+        }
+
+        return card;
+    }
+
+    // ══════════════════════════════════════════════════════
+    // RENDER FUNCTIONS
+    // ══════════════════════════════════════════════════════
+    function renderFeatured() {
+        const featured = getFeaturedItem();
+        if (!featured) return;
+        document.getElementById('featuredTitle').textContent = `${featured.icon} ${featured.name}`;
+        document.getElementById('featuredDesc').textContent = featured.desc;
+        // Weekly rotation timer
+        const weekMs = 7 * 24 * 3600000;
+        const nextWeek = (Math.floor(Date.now() / weekMs) + 1) * weekMs;
+        const diff = nextWeek - Date.now();
+        const days = Math.floor(diff / 86400000);
+        const hrs = Math.floor((diff % 86400000) / 3600000);
+        document.getElementById('featuredTimer').textContent = `🕐 Rotates in ${days}d ${hrs}h`;
+        const btn = document.getElementById('featuredBuyBtn');
+        const state = getCardState(featured);
+        if (state.owned || state.equipped) { btn.textContent = '✓ Owned'; btn.disabled = true; }
+        else { btn.textContent = `${featured.icon} Buy — ${state.price.toLocaleString()} GOLD`; btn.disabled = false; }
+        btn.onclick = () => {
+            if (!state.canAfford && state.price > 0) { showToast(`❌ Need ${state.price.toLocaleString()} GOLD!`, 'error'); return; }
+            openConfirmModal(featured, state.price);
+        };
+    }
+
+    function renderDailyDeals() {
+        const grid = document.getElementById('dailyDealsGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        // Timer until midnight
+        const now = new Date();
+        const midnight = new Date(now); midnight.setDate(midnight.getDate()+1); midnight.setHours(0,0,0,0);
+        const diff = midnight - now;
+        const hrs = Math.floor(diff/3600000), mins = Math.floor((diff%3600000)/60000);
+        document.getElementById('dailyDealsTimer').textContent = `Resets in ${hrs}h ${mins}m`;
+
+        dailyDeals.forEach(deal => {
+            const discPrice = Math.floor(deal.price * (1 - deal.dealDiscount));
+            grid.appendChild(buildCard(deal, true, discPrice));
+        });
+    }
+
+    function renderCategories() {
+        const nav = document.getElementById('categoryNav');
+        nav.innerHTML = '';
+        CATEGORIES.forEach(cat => {
+            const counts = cat.id === 'all' ? SHOP_ITEMS.length : SHOP_ITEMS.filter(i => i.category === cat.id).length;
+            const btn = document.createElement('button');
+            btn.className = `cat-btn${activeCategory === cat.id ? ' active' : ''}`;
+            btn.dataset.cat = cat.id;
+            btn.innerHTML = `<i class="${cat.icon}"></i> ${cat.label} <span class="cat-count">${counts}</span>`;
+            btn.addEventListener('click', () => {
+                activeCategory = cat.id;
+                document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat.id));
+                renderShopGrid();
+            });
+            nav.appendChild(btn);
+        });
+    }
+
+    function getFilteredItems() {
+        let items = SHOP_ITEMS.filter(i => {
+            if (activeCategory !== 'all' && i.category !== activeCategory) return false;
+            if (searchQuery && !i.name.toLowerCase().includes(searchQuery) && !i.desc.toLowerCase().includes(searchQuery)) return false;
+            return true;
+        });
+        if (sortMode === 'price-asc') items.sort((a,b) => a.price - b.price);
+        else if (sortMode === 'price-desc') items.sort((a,b) => b.price - a.price);
+        else if (sortMode === 'rarity') items.sort((a,b) => (RARITY_ORDER[b.rarity]||0) - (RARITY_ORDER[a.rarity]||0));
+        else if (sortMode === 'name') items.sort((a,b) => a.name.localeCompare(b.name));
+        return items;
+    }
+
+    function renderShopGrid() {
+        const grid = document.getElementById('shopGrid');
+        const items = getFilteredItems();
+        document.getElementById('resultsCount').textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
+        grid.innerHTML = '';
+        if (items.length === 0) {
+            grid.innerHTML = `<div class="empty-results"><i class="fas fa-search"></i><p>No items found for "${searchQuery}"</p></div>`;
+            return;
+        }
+        items.forEach(item => grid.appendChild(buildCard(item)));
+    }
+
+    function renderActiveBoosters() {
+        initActiveEffects();
+        const bar = document.getElementById('activeBoosters');
+        const noMsg = document.getElementById('noBoostersMsg');
+        const chips = bar.querySelectorAll('.booster-chip');
+        chips.forEach(c => c.remove());
+        const activeKeys = Object.keys(currentUser.activeEffects || {}).filter(k => isEffectActive(k));
+        if (activeKeys.length === 0) {
+            noMsg.style.display = '';
+            return;
+        }
+        noMsg.style.display = 'none';
+        const labels = {
+            xp_multiplier: '⚡ XP Boost',
+            streak_shield: '🛡️ Streak Shield',
+            streak_shield_multi: '🏰 Streak Fortress',
+            daily_boost: '📅 Daily Boost',
+            daily_jackpot: '🎯 Daily Jackpot',
+            luck_boost: '🍀 Luck Charm',
+            fortune_anchor: '⚓ Fortune Anchor',
+            gold_drip: '💧 Gold Drip',
+            gold_flood: '🌊 Gold Flood',
+            payout_amp: '🎰 Payout Amp',
+            bet_insurance: '🔒 Bet Insurance'
+        };
+        activeKeys.forEach(key => {
+            const chip = document.createElement('div');
+            chip.className = 'booster-chip';
+            const timeLeft = getEffectTimeLeft(key);
+            chip.innerHTML = `${labels[key] || key}${timeLeft ? `<span class="booster-chip-time">${timeLeft}</span>` : ''}`;
+            bar.appendChild(chip);
+        });
+    }
+
+    function renderInventory() {
+        const grid = document.getElementById('inventoryGrid');
+        if (!grid) return;
+        const inv = currentUser.inventory || [];
+        const owned = {
+            avatars: (currentUser.unlockedAvatars || []).map(v => SHOP_ITEMS.find(i => i.avatarValue === v)).filter(Boolean),
+            themes: (currentUser.unlockedThemes || []).map(v => SHOP_ITEMS.find(i => i.themeValue === v)).filter(Boolean),
+            upgrades: Object.keys(currentUser.upgrades || {}).map(k => SHOP_ITEMS.find(i => i.id === k)).filter(Boolean),
+            boosters: inv.filter(i => i.category === 'booster')
+        };
+        const allItems = [...owned.avatars, ...owned.themes, ...owned.upgrades];
+        // add active boosts as inventory
+        initActiveEffects();
+        const activeKeys = Object.keys(currentUser.activeEffects || {}).filter(k => isEffectActive(k));
+        const activeLabels = { xp_multiplier:'⚡ XP Boost',streak_shield:'🛡️ Shield',luck_boost:'🍀 Luck',fortune_anchor:'⚓ Fortune',gold_drip:'💧 Drip',gold_flood:'🌊 Flood',payout_amp:'🎰 Payout',bet_insurance:'🔒 Insurance',daily_boost:'📅 Daily Boost',daily_jackpot:'🎯 Jackpot',streak_shield_multi:'🏰 Fortress' };
+
+        let filteredItems = allItems;
+        if (activeInvTab === 'boosters') filteredItems = [];
+        else if (activeInvTab === 'cosmetics') filteredItems = [...owned.avatars, ...owned.themes];
+        else if (activeInvTab === 'upgrades') filteredItems = owned.upgrades;
+
+        grid.innerHTML = '';
+        // Active effects chips
+        if (activeInvTab === 'all' || activeInvTab === 'boosters') {
+            activeKeys.forEach(key => {
+                const el = document.createElement('div');
+                el.className = 'inv-item active-booster';
+                const tl = getEffectTimeLeft(key);
+                el.innerHTML = `<div class="inv-item-icon">${(activeLabels[key]||'').split(' ')[0]}</div><div class="inv-item-name">${activeLabels[key]||key}</div><div class="inv-item-status" style="color:#66bb6a;">${tl ? tl+' left' : 'Active'}</div>`;
+                grid.appendChild(el);
+            });
+        }
+
+        if (filteredItems.length === 0 && activeKeys.length === 0) {
+            grid.innerHTML = `<div class="inv-empty"><i class="fas fa-archive" style="font-size:2rem;margin-bottom:0.8rem;display:block;opacity:0.3;"></i>Nothing here yet — visit the shop!</div>`;
+            return;
+        }
+
+        filteredItems.forEach(item => {
+            if (!item) return;
+            const el = document.createElement('div');
+            el.className = `inv-item rarity-${item.rarity || 'common'}`;
+            const eq = isEquipped(item);
+            if (eq) el.classList.add('equipped');
+            el.innerHTML = `
+                <div class="inv-item-icon">${item.icon}</div>
+                <div class="inv-item-name">${item.name}</div>
+                <div class="inv-item-status" style="color:${eq ? 'var(--theme-gold)' : '#4caf50'}">${eq ? '✓ Equipped' : '✓ Owned'}</div>
+            `;
+            if (item.type === 'cosmetic_avatar' || item.type === 'cosmetic_theme') {
+                el.addEventListener('click', () => {
+                    if (!eq) {
+                        item.effect(currentUser);
+                        persistUser();
+                        updateUI();
+                        renderInventory();
+                        showToast(`${item.icon} ${item.name} equipped!`, 'success');
+                    }
+                });
+            }
+            grid.appendChild(el);
+        });
+    }
+
+    // ══════════════════════════════════════════════════════
+    // HERO STATS UPDATE
+    // ══════════════════════════════════════════════════════
+    function updateUI() {
+        if (!currentUser) return;
+        const bal = currentUser.balance || 0;
+        document.getElementById('navWalletBalance').textContent = bal.toLocaleString();
+        document.getElementById('heroBalance').textContent = bal.toLocaleString();
+        const lv = getLevel(currentUser.xp || 0);
+        document.getElementById('heroLevel').textContent = lv.level;
+        // Count owned items
+        const owned = (currentUser.unlockedAvatars||[]).length + (currentUser.unlockedThemes||[]).length + Object.keys(currentUser.upgrades||{}).length;
+        document.getElementById('heroOwned').textContent = owned;
+        initActiveEffects();
+        const activeCount = Object.keys(currentUser.activeEffects||{}).filter(k => isEffectActive(k)).length;
+        document.getElementById('heroActive').textContent = activeCount;
+        renderActiveBoosters();
+    }
+
+    // ══════════════════════════════════════════════════════
+    // PARTICLES (MATCHES DASHBOARD)
+    // ══════════════════════════════════════════════════════
+    function initParticles() {
+        const canvas = document.getElementById('particlesCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let W = canvas.width = window.innerWidth;
+        let H = canvas.height = window.innerHeight;
+        const particles = [];
+        for (let i = 0; i < 28; i++) {
+            particles.push({ x: Math.random()*W, y: Math.random()*H, vx:(Math.random()-0.5)*0.35, vy:(Math.random()-0.5)*0.35, r:Math.random()*1.5+0.5, a:Math.random() });
+        }
+        function draw() {
+            ctx.clearRect(0,0,W,H);
+            const gold = getComputedStyle(document.body).getPropertyValue('--theme-gold').trim() || '#ffd966';
+            particles.forEach(p => {
+                p.x = (p.x + p.vx + W) % W;
+                p.y = (p.y + p.vy + H) % H;
+                p.a = 0.08 + 0.06 * Math.sin(Date.now()/1800 + p.x);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+                ctx.fillStyle = gold.replace(')',`, ${p.a})`).replace('rgb','rgba').replace('#', 'rgba(').replace(/^rgba\(([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/, (m,r,g,b) => `rgba(${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)}`);
+                ctx.fill();
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
+        window.addEventListener('resize', () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; });
+    }
+
+    // ══════════════════════════════════════════════════════
+    // LOAD USER (MATCHES DASHBOARD AUTH FLOW)
+    // ══════════════════════════════════════════════════════
+    async function loadCurrentUser() {
+        const raw = sessionStorage.getItem('gold_current_user');
+        if (!raw) { window.location.href = '../sign-in.html'; return false; }
+        const sess = JSON.parse(raw);
+        const users = getUsers();
+        let user = users[sess.username];
+        if (!user) { sessionStorage.removeItem('gold_current_user'); window.location.href = '../sign-in.html'; return false; }
+        // Init missing fields
+        if (!user.unlockedAvatars) user.unlockedAvatars = [];
+        if (!user.unlockedThemes) user.unlockedThemes = [];
+        if (user.theme === undefined) user.theme = 'theme-gold';
+        if (user.avatar === undefined) user.avatar = 'fas fa-crown';
+        if (user.bankBalance === undefined) user.bankBalance = 0;
+        if (user.xp === undefined) user.xp = 0;
+        if (!user.globalStats) user.globalStats = { totalWagered:0, totalWon:0, totalGames:0, totalWins:0, currentStreak:0, bestStreak:0 };
+        if (!user.activeEffects) user.activeEffects = {};
+        if (!user.upgrades) user.upgrades = {};
+        if (!user.purchaseCooldowns) user.purchaseCooldowns = {};
+        if (!user.inventory) user.inventory = [];
+        currentUser = user;
+        return true;
+    }
+
+    // ══════════════════════════════════════════════════════
+    // SEARCH / SORT BINDINGS
+    // ══════════════════════════════════════════════════════
+    function bindControls() {
+        document.getElementById('shopSearch').addEventListener('input', e => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            renderShopGrid();
+        });
+        document.getElementById('sortSelect').addEventListener('change', e => {
+            sortMode = e.target.value;
+            renderShopGrid();
+        });
+        // Inventory tabs
+        document.querySelectorAll('.inv-tab').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.inv-tab').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                activeInvTab = this.dataset.tab;
+                renderInventory();
+            });
+        });
+        // Confirm modal
+        document.getElementById('confirmCancel').addEventListener('click', () => {
+            document.getElementById('confirmModal').classList.remove('active');
+            pendingItem = null;
+        });
+        document.getElementById('confirmBuy').addEventListener('click', async () => {
+            if (!pendingItem) return;
+            document.getElementById('confirmModal').classList.remove('active');
+            const { item, price } = pendingItem;
+            pendingItem = null;
+            await executePurchase(item, price);
+            renderFeatured();
+            renderDailyDeals();
+            renderShopGrid();
+        });
+        // Crate close
+        document.getElementById('crateCloseBtn').addEventListener('click', () => {
+            document.getElementById('crateModal').classList.remove('active');
+        });
+        // Close modals on backdrop
+        document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => {
+            if (e.target === m) m.classList.remove('active');
+        }));
+    }
+
+    // ══════════════════════════════════════════════════════
+    // COLLECT PASSIVE GOLD (gold drip/flood on page load)
+    // ══════════════════════════════════════════════════════
+    async function collectPassiveGold() {
+        initActiveEffects();
+        const now = Date.now();
+        let totalPassive = 0;
+        ['gold_drip', 'gold_flood'].forEach(key => {
+            const effect = currentUser.activeEffects[key];
+            if (!effect || !isEffectActive(key)) return;
+            const lastCollect = effect.lastCollect || effect.activatedAt;
+            const hoursElapsed = Math.min((now - lastCollect) / 3600000, 24); // cap at 24h offline
+            if (hoursElapsed >= 0.25) { // collect every 15 min minimum
+                const gold = Math.floor(effect.perHour * hoursElapsed);
+                if (gold > 0) {
+                    currentUser.balance += gold;
+                    totalPassive += gold;
+                    addTransaction(`Passive Income (${key === 'gold_drip' ? 'Drip' : 'Flood'}): +${gold} GOLD`, gold, 'deposit');
+                    currentUser.activeEffects[key].lastCollect = now;
+                }
+            }
+        });
+        if (totalPassive > 0) {
+            await persistUser();
+            showToast(`💧 Passive income collected: +${totalPassive} GOLD`, 'success');
+        }
+    }
+
+    // ══════════════════════════════════════════════════════
+    // INIT
+    // ══════════════════════════════════════════════════════
+    async function init() {
+        const ok = await loadCurrentUser();
+        if (!ok) return;
+        // Apply saved theme
+        const theme = currentUser.theme || localStorage.getItem('gold_theme') || 'theme-gold';
+        applyTheme(theme);
+        // Collect any passive gold accrued since last visit
+        await collectPassiveGold();
+        // Init daily deals
+        dailyDeals = getDailyDeals();
+        // Render everything
+        initParticles();
+        renderFeatured();
+        renderDailyDeals();
+        renderCategories();
+        renderShopGrid();
+        renderInventory();
+        updateUI();
+        bindControls();
+        // Refresh active booster countdown every minute
+        setInterval(() => { updateUI(); renderShopGrid(); renderDailyDeals(); }, 60000);
+    }
+
+    init();
+})();
+</script>
+</body>
+</html>
