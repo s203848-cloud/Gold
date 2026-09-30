@@ -2970,7 +2970,7 @@
 
             // ── Withdrawal limit settings ──
                 const WITHDRAW_LIMIT = 5000;                     // max GOLD per window
-                const WITHDRAW_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours (rolling)
+                const WITHDRAW_WINDOW_MS = 12 * 60 * 60 * 1000; // 24 hours (rolling)
 
             function getWithdrawnInWindow() {
                 const cutoff = Date.now() - WITHDRAW_WINDOW_MS;
