@@ -3091,7 +3091,42 @@
     function applyTheme(themeClass){document.body.className=themeClass;currentUser.theme=themeClass;saveUserData();localStorage.setItem('gold_theme',themeClass);}
 
     async function walletDeposit(amount){if(amount<=0)return;currentUser.balance+=amount;addTransaction(`Deposit +${amount} GOLD`,amount,'deposit');await saveUserData();await fetchAndRender();playCoinSound();}
-    async function walletWithdraw(amount){if(amount<=0||amount>currentUser.balance)return;currentUser.balance-=amount;addTransaction(`Withdraw -${amount} GOLD`,-amount,'withdraw');await saveUserData();await fetchAndRender();playSwooshSound();}
+    const WITHDRAW_LIMIT = 5000;
+    const WITHDRAW_WINDOW_MS = 12 * 60 * 60 * 1000;
+    
+    function getWithdrawnInWindow() {
+        const cutoff = Date.now() - WITHDRAW_WINDOW_MS;
+        currentUser.withdrawLog = (currentUser.withdrawLog || []).filter(e => e.t > cutoff);
+        return currentUser.withdrawLog.reduce((sum, e) => sum + e.amount, 0);
+    }
+    
+    function formatWait(ms) {
+        const mins = Math.ceil(ms / 60000);
+        return mins >= 60 ? `${Math.floor(mins / 60)}h ${mins % 60}m` : `${mins}m`;
+    }
+    async function walletWithdraw(amount) {
+        if (amount <= 0 || amount > currentUser.balance) return;
+    
+        const remaining = WITHDRAW_LIMIT - getWithdrawnInWindow();
+        if (amount > remaining) {
+            const oldest = currentUser.withdrawLog[0];
+            const wait = oldest ? formatWait(oldest.t + WITHDRAW_WINDOW_MS - Date.now()) : '';
+            showToast(
+                remaining > 0
+                    ? `Limit: ${remaining} GOLD left. Resets in ${wait}`
+                    : `Withdrawal limit reached. Resets in ${wait}`,
+                true
+            );
+            return;
+        }
+    
+        currentUser.balance -= amount;
+        currentUser.withdrawLog.push({ t: Date.now(), amount });
+        addTransaction(`Withdraw -${amount} GOLD`, -amount, 'withdraw');
+        await saveUserData();
+        await fetchAndRender();
+        playSwooshSound();
+    }
     async function transferToBank(amount){if(amount<=0||amount>currentUser.balance)return;currentUser.balance-=amount;currentUser.bankBalance+=amount;addTransaction(`Transfer to Bank -${amount} GOLD`,-amount,'transfer');await saveUserData();await fetchAndRender();playSwooshSound();}
     async function transferToWallet(amount){if(amount<=0||amount>currentUser.bankBalance)return;currentUser.balance+=amount;currentUser.bankBalance-=amount;addTransaction(`Transfer to Wallet +${amount} GOLD`,amount,'transfer');await saveUserData();await fetchAndRender();playSwooshSound();}
 
