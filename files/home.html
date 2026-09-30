@@ -2968,10 +2968,41 @@
                 checkAchievements();
             }
 
+            // ── Withdrawal limit settings ──
+                const WITHDRAW_LIMIT = 5000;                     // max GOLD per window
+                const WITHDRAW_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours (rolling)
+
+            function getWithdrawnInWindow() {
+                const cutoff = Date.now() - WITHDRAW_WINDOW_MS;
+                currentUser.withdrawLog = (currentUser.withdrawLog || []).filter(e => e.t > cutoff);
+                return currentUser.withdrawLog.reduce((sum, e) => sum + e.amount, 0);
+            }
+
+            function formatWait(ms) {
+                const mins = Math.ceil(ms / 60000);
+                return mins >= 60 ? `${Math.floor(mins / 60)}h ${mins % 60}m` : `${mins}m`;
+            }
+
             async function withdraw(amount) {
                 if (amount <= 0) { showToast('Enter a valid amount', true); return; }
                 if (amount > currentUser.balance) { showToast('Insufficient wallet balance', true); return; }
+            
+                // ── Limit check ──
+                const remaining = WITHDRAW_LIMIT - getWithdrawnInWindow();
+                if (amount > remaining) {
+                    const oldest = currentUser.withdrawLog[0];
+                    const wait = oldest ? formatWait(oldest.t + WITHDRAW_WINDOW_MS - Date.now()) : '';
+                    showToast(
+                        remaining > 0
+                            ? `Limit: ${remaining.toLocaleString()} GOLD left. Resets in ${wait}`
+                            : `Withdrawal limit reached. Resets in ${wait}`,
+                        true
+                    );
+                    return;
+                }
+            
                 currentUser.balance -= amount;
+                currentUser.withdrawLog.push({ t: Date.now(), amount });   // record it
                 addTransaction(`Withdraw -${amount} GOLD`, -amount, 'withdraw');
                 await saveUserData();
                 await updateBalanceDisplay();
