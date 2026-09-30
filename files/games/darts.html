@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>DARTS | Aim at the dartboard. Each ring has a multiplier. Hit the bullseye to multiply your bet up to 50x. Miss and lose.</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #f0c850;
+            --gold-bright: #ffe478;
+            --gold-dim: #b89830;
+            --gold-glow: rgba(240, 200, 80, 0.3);
+            --bg-deep: #050505;
+            --bg-card: rgba(18, 16, 13, 0.88);
+            --border-subtle: rgba(240, 200, 80, 0.12);
+            --border-medium: rgba(240, 200, 80, 0.3);
+            --text-primary: #f2efe8;
+            --text-secondary: #b8b2a6;
+            --text-muted: #7d776c;
+            --danger: #ff5252;
+            --win: #4caf50;
+            --rare: #e040fb;
+            --radius-xl: 26px;
+            --radius-lg: 18px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --radius-full: 60px;
+            --transition-smooth: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-card: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 40px rgba(240, 200, 80, 0.06);
+            --font-mono: 'Inter', monospace;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            font-size: 16px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(ellipse at 45% 25%, #100e0a 0%, #030202 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
+            color: var(--text-primary);
+            padding: clamp(0.5rem, 2vw, 1.1rem);
+            padding-bottom: calc(clamp(0.5rem, 2vw, 1.1rem) + var(--safe-bottom));
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            line-height: 1.5;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 22% 28%, rgba(255, 170, 50, 0.04) 0%, transparent 55%),
+                radial-gradient(circle at 72% 62%, rgba(200, 140, 30, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        canvas#particleCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.8;
+        }
+        .game-container {
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            background: rgba(20, 18, 14, 0.75);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: var(--radius-full);
+            padding: 0.45rem 1.4rem;
+            border: 1px solid var(--border-subtle);
+            transition: var(--transition-fast);
+        }
+        .back-link {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(240, 200, 80, 0.07);
+            padding: 0.28rem 0.9rem;
+            border-radius: 40px;
+            transition: var(--transition-fast);
+            white-space: nowrap;
+        }
+        .back-link:hover {
+            background: rgba(240, 200, 80, 0.18);
+            color: var(--gold-bright);
+        }
+        .balance-chip {
+            background: #1c1914;
+            border: 1px solid var(--border-subtle);
+            border-radius: 40px;
+            padding: 0.28rem 0.9rem;
+            font-weight: 800;
+            font-size: 0.82rem;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+            letter-spacing: -0.3px;
+        }
+        .rank-badge {
+            border-radius: 40px;
+            padding: 0.2rem 0.7rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            background: rgba(240, 200, 80, 0.15);
+            color: var(--gold);
+            border: 1px solid rgba(240, 200, 80, 0.3);
+        }
+        .sound-toggle {
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 1.15rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 0.3rem;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sound-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(240, 200, 80, 0.08);
+        }
+        .main-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-subtle);
+            padding: clamp(0.9rem, 2.5vw, 1.5rem);
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+        .main-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(240, 200, 80, 0.2), transparent);
+            pointer-events: none;
+        }
+        .darts-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .board-panel {
+            flex: 1;
+            min-width: 300px;
+            max-width: 440px;
+            text-align: center;
+            position: relative;
+        }
+        .board-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            aspect-ratio: 1/1;
+        }
+        canvas#dartCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.7), 0 0 60px rgba(240, 200, 80, 0.1), inset 0 0 30px rgba(0, 0, 0, 0.5);
+            cursor: crosshair;
+            transition: filter 0.3s;
+        }
+        canvas#dartCanvas.skill-active {
+            cursor: crosshair;
+            animation: board-glow-pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes board-glow-pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.7), 0 0 60px rgba(240, 200, 80, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.7), 0 0 80px rgba(240, 200, 80, 0.25);
+            }
+        }
+        .board-label {
+            margin-top: 6px;
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+        .controls-panel {
+            flex: 1.2;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .bet-area {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: var(--radius-lg);
+            padding: 0.8rem;
+            border: 1px solid var(--border-subtle);
+        }
+        .input-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 0.4rem 0;
+        }
+        .bet-input {
+            background: #1b1712;
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            padding: 0.38rem 0.6rem;
+            width: 95px;
+            text-align: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            transition: border-color 0.2s;
+        }
+        .bet-input:focus {
+            border-color: var(--gold);
+            outline: none;
+            box-shadow: 0 0 10px rgba(240, 200, 80, 0.12);
+        }
+        .preset-sm {
+            background: rgba(240, 200, 80, 0.06);
+            border: 1px solid var(--border-subtle);
+            border-radius: 22px;
+            padding: 0.18rem 0.5rem;
+            font-size: 0.6rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition-fast);
+            white-space: nowrap;
+            user-select: none;
+        }
+        .preset-sm:hover {
+            background: rgba(240, 200, 80, 0.18);
+            color: #fff;
+        }
+        .mode-buttons {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+            margin: 0.4rem 0;
+        }
+        .mode-btn {
+            padding: 0.32rem 0.7rem;
+            border-radius: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-subtle);
+            font-weight: 700;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            user-select: none;
+        }
+        .mode-btn.active {
+            background: var(--gold-dim);
+            color: #1a1712;
+            border-color: var(--gold);
+            box-shadow: 0 0 12px rgba(240, 200, 80, 0.2);
+        }
+        .mode-btn:hover:not(.active) {
+            background: rgba(240, 200, 80, 0.12);
+            color: #fff;
+        }
+        .powerup-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            margin: 0.4rem 0;
+        }
+        .powerup-btn {
+            background: rgba(240, 200, 80, 0.06);
+            border: 1px solid var(--border-subtle);
+            border-radius: 28px;
+            padding: 0.22rem 0.55rem;
+            font-size: 0.58rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            user-select: none;
+            white-space: nowrap;
+            color: var(--text-muted);
+        }
+        .powerup-btn:hover {
+            background: rgba(240, 200, 80, 0.15);
+            color: #fff;
+            border-color: var(--border-medium);
+        }
+        .powerup-btn.active {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: #4caf50;
+            color: #4caf50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0.4rem 0;
+        }
+        .btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: var(--radius-full);
+            font-weight: 800;
+            font-size: 0.78rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            letter-spacing: -0.2px;
+            user-select: none;
+        }
+        .btn:active {
+            transform: scale(0.94);
+        }
+        .btn-throw {
+            background: linear-gradient(135deg, #b8860b, #daa520);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+            font-size: 0.84rem;
+            padding: 0.55rem 1.6rem;
+        }
+        .btn-throw:hover:not(:disabled) {
+            background: linear-gradient(135deg, #c99718, #e6b800);
+            transform: scale(1.03);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(240, 200, 80, 0.2);
+        }
+        .btn-cashout {
+            background: #2e7d32;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+        .btn-cashout:hover:not(:disabled) {
+            background: #388e3c;
+            transform: scale(1.03);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border-medium);
+            color: var(--text-primary);
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+            filter: grayscale(0.2);
+        }
+        .skill-info {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-md);
+            padding: 0.6rem;
+            text-align: center;
+            font-size: 0.7rem;
+            border: 1px solid var(--border-subtle);
+            display: none;
+        }
+        .skill-info .aim-grade {
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: var(--gold-bright);
+        }
+        .result-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-md);
+            padding: 0.5rem 0.7rem;
+            text-align: center;
+            font-size: 0.76rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+            min-height: 2.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .result-panel.win {
+            background: rgba(76, 175, 80, 0.14);
+            border-color: rgba(76, 175, 80, 0.4);
+            color: #a5d6a7;
+        }
+        .result-panel.loss {
+            background: rgba(255, 82, 82, 0.1);
+            border-color: rgba(255, 82, 82, 0.35);
+            color: #ef9a9a;
+        }
+        .result-panel.jackpot {
+            background: rgba(240, 200, 80, 0.15);
+            border-color: rgba(240, 200, 80, 0.5);
+            animation: jackpot-flash 0.4s ease-in-out 3;
+        }
+        @keyframes jackpot-flash {
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(240, 200, 80, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(240, 200, 80, 0.6);
+            }
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.022);
+            padding: 0.3rem 0.5rem;
+            border-radius: var(--radius-sm);
+            flex: 1;
+            text-align: center;
+            font-size: 0.62rem;
+            letter-spacing: -0.2px;
+            min-width: 50px;
+        }
+        .stat-card strong {
+            display: block;
+            font-size: 0.78rem;
+            color: var(--gold);
+            margin-top: 1px;
+        }
+        .leaderboard-mini {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-md);
+            padding: 0.5rem;
+            font-size: 0.6rem;
+            border: 1px solid var(--border-subtle);
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .xp-bar-outer {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            height: 6px;
+            margin: 0.3rem 0;
+            overflow: hidden;
+        }
+        .xp-bar-inner {
+            background: linear-gradient(90deg, #b89830, #ffe478);
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+        .cosmetic-row {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            margin: 0.3rem 0;
+        }
+        .cosmetic-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .cosmetic-dot:hover {
+            transform: scale(1.2);
+        }
+        .cosmetic-dot.selected {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        .floating-score {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10001;
+            font-weight: 900;
+            font-size: 1.6rem;
+            color: #ffe478;
+            text-shadow: 0 0 20px rgba(240, 200, 80, 0.8);
+            animation: float-up 1.2s ease-out forwards;
+        }
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1.5);
+            }
+        }
+        .shake {
+            animation: screen-shake 0.4s ease;
+        }
+        @keyframes screen-shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            15% {
+                transform: translateX(-6px);
+            }
+            30% {
+                transform: translateX(6px);
+            }
+            45% {
+                transform: translateX(-4px);
+            }
+            60% {
+                transform: translateX(4px);
+            }
+            75% {
+                transform: translateX(-2px);
+            }
+            90% {
+                transform: translateX(2px);
+            }
+        }
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: rgba(20, 16, 10, 0.95);
+            border: 1px solid var(--gold);
+            border-radius: var(--radius-md);
+            padding: 0.5rem 0.9rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            box-shadow: 0 0 30px rgba(240, 200, 80, 0.4);
+            animation: achieve-in 0.5s ease, achieve-out 0.5s ease 2.5s forwards;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        @keyframes achieve-in {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes achieve-out {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+        @media (max-width: 750px) {
+            .darts-layout {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.8rem;
+            }
+            .board-panel {
+                max-width: 320px;
+                min-width: auto;
+            }
+            .controls-panel {
+                min-width: auto;
+                width: 100%;
+            }
+            .btn {
+                padding: 0.4rem 0.9rem;
+                font-size: 0.7rem;
+            }
+            .btn-throw {
+                padding: 0.45rem 1.2rem;
+                font-size: 0.74rem;
+            }
+            .mode-btn {
+                font-size: 0.58rem;
+                padding: 0.25rem 0.5rem;
+            }
+            .top-bar {
+                padding: 0.35rem 0.8rem;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+    <div class="game-container">
+        <div class="top-bar">
+            <a href="../home.html" class="back-link"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <div class="balance-chip"><i class="fas fa-coins"></i> <span id="balanceDisplay">0</span> GOLD</div>
+            <span class="rank-badge" id="rankBadge">🎯 Beginner</span>
+            <button id="soundToggle" class="sound-toggle" aria-label="Toggle sound"><i class="fas fa-volume-up"></i></button>
+        </div>
+        <div class="main-card" id="mainCard">
+            <div class="darts-layout">
+                <div class="board-panel">
+                    <div class="board-wrapper" id="boardWrapper">
+                        <canvas id="dartCanvas" width="400" height="400" aria-label="Dartboard"></canvas>
+                    </div>
+                    <div class="board-label" id="boardLabel">🎯 Click board for Skill Shot | Bullseye: 10x | Golden Bull: 50x</div>
+                </div>
+                <div class="controls-panel">
+                    <div class="bet-area">
+                        <div class="input-row">
+                            <i class="fas fa-coins" style="color:var(--gold);"></i> Bet:
+                            <input type="number" id="betAmount" class="bet-input" value="10" min="1" step="1" inputmode="numeric">
+                            <span class="preset-sm" data-bet="half">½</span>
+                            <span class="preset-sm" data-bet="double">2×</span>
+                            <span class="preset-sm" data-bet="10">10</span>
+                            <span class="preset-sm" data-bet="50">50</span>
+                            <span class="preset-sm" data-bet="100">100</span>
+                            <span class="preset-sm" data-bet="max">MAX</span>
+                        </div>
+                        <div class="mode-buttons">
+                            <span class="mode-btn active" data-mode="quick">🎲 Quick Throw</span>
+                            <span class="mode-btn" data-mode="skill">🎯 Skill Shot</span>
+                            <span class="mode-btn" data-mode="challenge">🏆 Challenge (3)</span>
+                            <span class="mode-btn" data-mode="survival">🔥 Survival</span>
+                        </div>
+                        <div class="powerup-row">
+                            <span class="powerup-btn" id="scopePw" data-pw="scope">🔭 Scope</span>
+                            <span class="powerup-btn" id="visionPw" data-pw="vision">👁️ Vision</span>
+                            <span class="powerup-btn" id="stabilizerPw" data-pw="stabilizer">💨 Stabilizer</span>
+                            <span class="powerup-btn" id="featherPw" data-pw="feather">🪶 Lucky</span>
+                            <span class="powerup-btn" id="freezePw" data-pw="freeze">❄️ Freeze</span>
+                        </div>
+                        <div class="action-buttons">
+                            <button id="throwBtn" class="btn btn-throw"><i class="fas fa-dart"></i> Throw Dart</button>
+                            <button id="cashoutSurvivalBtn" class="btn btn-cashout" style="display:none;">💰 Collect</button>
+                            <button id="cashoutChallengeBtn" class="btn btn-cashout" style="display:none;">💰 Collect Challenge</button>
+                        </div>
+                    </div>
+                    <div class="skill-info" id="skillInfo">
+                        <div>🎯 <span id="skillStatus">Click the dartboard to stop the aim ring!</span></div>
+                        <div class="aim-grade" id="aimGrade"></div>
+                    </div>
+                    <div id="challengeInfo" style="display:none;background:rgba(0,0,0,0.4);border-radius:var(--radius-md);padding:0.5rem;text-align:center;font-size:0.7rem;">
+                        🏆 Darts left: <strong id="challengeDartsLeft">3</strong> | Total: <strong id="challengeTotal">0</strong> GOLD
+                    </div>
+                    <div id="survivalInfo" style="display:none;background:rgba(0,0,0,0.4);border-radius:var(--radius-md);padding:0.5rem;text-align:center;font-size:0.7rem;">
+                        🔥 Streak: <strong id="survivalStreak">0</strong> | Multiplier: <strong id="survivalMult">1.00x</strong> | Best: <strong id="survivalBest">0</strong>
+                    </div>
+                    <div class="result-panel" id="resultMessage">🎯 Select mode, place bet, and throw!</div>
+                    <div class="xp-bar-outer"><div class="xp-bar-inner" id="xpBar" style="width:0%;"></div></div>
+                    <div style="font-size:0.55rem;color:var(--text-muted);text-align:center;">Level <span id="levelDisplay">1</span> · XP: <span id="xpDisplay">0</span></div>
+                    <div class="stats-row">
+                        <div class="stat-card">🎯 Games<strong id="gamesCount">0</strong></div>
+                        <div class="stat-card">🏆 Wins<strong id="winsCount">0</strong></div>
+                        <div class="stat-card">📈 P/L<strong id="sessionPL">0</strong></div>
+                        <div class="stat-card">💎 Best<strong id="bestHit">-</strong></div>
+                        <div class="stat-card">🎯 Rate<strong id="winRate">0%</strong></div>
+                    </div>
+                    <div class="leaderboard-mini" id="leaderboardMini">🏅 Weekly Leaderboard: Loading...</div>
+                    <div style="font-size:0.55rem;color:var(--text-muted);margin-top:2px;">🎨 Dart Style:
+                        <span class="cosmetic-row" id="dartStyles"></span>
+                    </div>
+                    <div class="milestone-note" id="milestoneNote" style="text-align:center;font-size:0.6rem;color:var(--gold);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        (() => {
+            // ═══════════════════════════════════
+            //  CONFIGURATION
+            // ═══════════════════════════════════
+            const CONFIG = Object.freeze({
+                STORAGE_KEY_USERS: 'gold_users',
+                STORAGE_KEY_SESSION: 'gold_current_user',
+                STORAGE_KEY_SOUND: 'darts_sound_v2',
+                STORAGE_KEY_LEADERBOARD: 'darts_weekly_lb',
+                CANVAS_SIZE: 400,
+                RINGS: [
+                    { name: 'Golden Bull', radiusMax: 10, multiplier: 50, prob: 0.008, color: '#ffd700',
+                        glowColor: '#fff8c0' },
+                    { name: 'Bullseye', radiusMax: 22, multiplier: 10, prob: 0.04, color: '#e53935',
+                    glowColor: '#ff6b6b' },
+                    { name: 'Double Ring', radiusMax: 50, multiplier: 5, prob: 0.10, color: '#d4af37',
+                        glowColor: '#ffe082' },
+                    { name: 'Triple Ring', radiusMax: 88, multiplier: 3, prob: 0.16, color: '#cd7f32',
+                        glowColor: '#e8a860' },
+                    { name: 'Inner Single', radiusMax: 130, multiplier: 2, prob: 0.22, color: '#8d6e4c',
+                        glowColor: '#b8956e' },
+                    { name: 'Outer Single', radiusMax: 172, multiplier: 1.5, prob: 0.25, color: '#6d8a5e',
+                        glowColor: '#8faa7e' },
+                    { name: 'Miss', radiusMax: 200, multiplier: 0, prob: 0.222, color: '#3a3530',
+                glowColor: '#555' },
+                ],
+                RANKS: ['Beginner', 'Amateur', 'Skilled', 'Expert', 'Master', 'Elite', 'Champion', 'Legend'],
+                RANK_THRESHOLDS: [0, 10, 30, 70, 150, 300, 600, 1000],
+                DART_STYLES: ['Classic', 'Gold', 'Diamond', 'Plasma', 'Cyber', 'Dragon'],
+                DART_COLORS: ['#c0c0c0', '#ffd700', '#b9f2ff', '#e040fb', '#00e5ff', '#ff6d3a'],
+                TRAIL_COLORS: ['#aaa', '#ffe478', '#e0f0ff', '#e040fb', '#00e5ff', '#ff6d3a'],
+                BOARD_SKINS: ['Classic', 'Royal Gold', 'Diamond Elite', 'Ancient Temple', 'Cyber Arena',
+                'Cosmic Void'],
+                POWERUP_COST: 30,
+                SURVIVAL_MULTIPLIERS: [1, 1.5, 2, 3, 5, 8, 12, 18, 25, 35, 50, 75, 100],
+                MILESTONE_PLAYS: 12,
+                MILESTONE_REWARD: 600,
+            });
+
+            // ═══════════════════════════════════
+            //  UTILITY
+            // ═══════════════════════════════════
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+            const rand = (min, max) => min + Math.random() * (max - min);
+            const safeJson = (str, fb = {}) => { try { return JSON.parse(str) || fb; } catch { return fb; } };
+            const fmtGold = (n) => Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+
+            // ═══════════════════════════════════
+            //  STORAGE MANAGER
+            // ═══════════════════════════════════
+            class StorageMgr {
+                static getUsers() { return safeJson(localStorage.getItem(CONFIG.STORAGE_KEY_USERS), {}); }
+                static saveUsers(u) { try { localStorage.setItem(CONFIG.STORAGE_KEY_USERS, JSON.stringify(
+                    u)); } catch {} }
+                static getSession() { return safeJson(sessionStorage.getItem(CONFIG.STORAGE_KEY_SESSION), null); }
+                static setSession(u) { try { sessionStorage.setItem(CONFIG.STORAGE_KEY_SESSION, JSON.stringify({ username: u
+                            .username, balance: u.balance })); } catch {} }
+                static clearSession() { sessionStorage.removeItem(CONFIG.STORAGE_KEY_SESSION); }
+                static getLeaderboard() { return safeJson(localStorage.getItem(CONFIG.STORAGE_KEY_LEADERBOARD), []); }
+                static setLeaderboard(lb) { localStorage.setItem(CONFIG.STORAGE_KEY_LEADERBOARD, JSON.stringify(lb)); }
+            }
+
+            // ═══════════════════════════════════
+            //  AUDIO MANAGER
+            // ═══════════════════════════════════
+            class AudioMgr {
+                constructor() {
+                    this._ctx = null;
+                    this._enabled = localStorage.getItem(CONFIG.STORAGE_KEY_SOUND) !== 'false';
+                    this._bound = this._init.bind(this);
+                    document.addEventListener('pointerdown', this._bound, { once: true });
+                }
+                _init() {
+                    if (!this._ctx && this._enabled) { try { this._ctx = new(window.AudioContext || window
+                            .webkitAudioContext)(); if (this._ctx.state === 'suspended') this._ctx
+                        .resume(); } catch {} }
+                }
+                get enabled() { return this._enabled; }
+                toggle() { this._enabled = !this._enabled;
+                    localStorage.setItem(CONFIG.STORAGE_KEY_SOUND, this._enabled); if (this._enabled && !this._ctx) this
+                        ._init(); return this._enabled; }
+                _tone(f, d, v = 0.07, t = 'sine') {
+                    if (!this._enabled || !this._ctx) return;
+                    if (this._ctx.state === 'suspended') this._ctx.resume();
+                    const n = this._ctx.currentTime;
+                    const o = this._ctx.createOscillator();
+                    const g = this._ctx.createGain();
+                    o.type = t;
+                    o.connect(g);
+                    g.connect(this._ctx.destination);
+                    o.frequency.setValueAtTime(f, n);
+                    g.gain.setValueAtTime(v, n);
+                    g.gain.exponentialRampToValueAtTime(0.001, n + d);
+                    o.start(n);
+                    o.stop(n + d + 0.01);
+                }
+                play(type) {
+                    switch (type) {
+                        case 'throw':
+                            this._tone(400, 0.15, 0.06, 'sawtooth');
+                            break;
+                        case 'hit':
+                            this._tone(700, 0.06, 0.05);
+                            break;
+                        case 'bullseye':
+                            this._tone(900, 0.15, 0.09);
+                            setTimeout(() => this._tone(1200, 0.15, 0.09), 120);
+                            break;
+                        case 'golden':
+                            for (let i = 0; i < 4; i++) setTimeout(() => this._tone(600 + i * 250, 0.18, 0.1), i *
+                                130);
+                            break;
+                        case 'win':
+                            this._tone(880, 0.12, 0.08);
+                            setTimeout(() => this._tone(1100, 0.12, 0.08), 120);
+                            break;
+                        case 'lose':
+                            this._tone(260, 0.3, 0.07, 'triangle');
+                            break;
+                        case 'click':
+                            this._tone(850, 0.04, 0.03);
+                            break;
+                        case 'achievement':
+                            this._tone(1200, 0.2, 0.09);
+                            setTimeout(() => this._tone(1600, 0.2, 0.09), 160);
+                            break;
+                    }
+                }
+                destroy() { document.removeEventListener('pointerdown', this._bound); if (this._ctx) { this._ctx.close()
+                        .catch(() => {}); } }
+            }
+
+            // ═══════════════════════════════════
+            //  USER SESSION
+            // ═══════════════════════════════════
+            class UserSession {
+                constructor() { this.user = null; }
+                async load() {
+                    const s = StorageMgr.getSession();
+                    if (!s) { this._redirect(); return false; }
+                    const users = StorageMgr.getUsers();
+                    let u = users[s.username];
+                    if (!u) { this._redirect(); return false; }
+                    u.globalStats = u.globalStats || { totalWagered: 0, totalWon: 0, totalGames: 0, totalWins: 0,
+                        currentStreak: 0, bestStreak: 0, totalLosses: 0 };
+                    u.gamePlayCount = u.gamePlayCount || {};
+                    u.gameOutcomes = u.gameOutcomes || [];
+                    u.transactions = u.transactions || [];
+                    u.bankBalance = u.bankBalance ?? 0;
+                    u.xp = u.xp ?? 0;
+                    u.dartsStats = u.dartsStats || { gamesPlayed: 0, wins: 0, totalWagered: 0, totalPayout: 0,
+                        bestMultiplier: 0, bullseyeCount: 0, goldenBullCount: 0, bestStreak: 0,
+                        totalDartsThrown: 0 };
+                    u.earnedAchievements = u.earnedAchievements || [];
+                    u.dartCosmetics = u.dartCosmetics || { dartStyle: 0, boardSkin: 0, trailStyle: 0 };
+                    u.unlockedCosmetics = u.unlockedCosmetics || { darts: [0], boards: [0], trails: [0] };
+                    this.user = u;
+                    StorageMgr.setSession(u);
+                    return true;
+                }
+                _redirect() { StorageMgr.clearSession(); try { window.location.href =
+                    '../../sign-in.html'; } catch {} }
+                async save() {
+                    const users = StorageMgr.getUsers();
+                    users[this.user.username] = this.user;
+                    StorageMgr.saveUsers(users);
+                    StorageMgr.setSession(this.user);
+                }
+                get balance() { return this.user?.balance ?? 0; }
+                set balance(v) { if (this.user) this.user.balance = Math.max(0, Math.floor(v)); }
+                get level() { const xp = this.user?.xp || 0; return Math.floor(Math.sqrt(xp / 80)) + 1; }
+                get rank() {
+                    const lv = this.level;
+                    const ranks = CONFIG.RANK_THRESHOLDS;
+                    for (let i = ranks.length - 1; i >= 0; i--) { if (lv >= ranks[i]) return CONFIG.RANKS[i]; }
+                    return CONFIG.RANKS[0];
+                }
+                get xpForNextLevel() { const lv = this.level; return Math.floor(((lv + 1) ** 2) * 80) - (this.user?.xp ||
+                    0); }
+                get xpProgress() { const lv = this.level; const curr = (lv ** 2) * 80; const nxt = ((lv + 1) ** 2) * 80;
+                    return clamp(((this.user?.xp || 0) - curr) / (nxt - curr), 0, 1); }
+                get stats() { return this.user?.dartsStats || {}; }
+                get sessionStats() {
+                    const s = this.stats;
+                    const profit = (s.totalPayout || 0) - (s.totalWagered || 0);
+                    return { games: s.gamesPlayed || 0, wins: s.wins || 0, profit, bestMultiplier: s.bestMultiplier || 0,
+                        winRate: s.gamesPlayed > 0 ? ((s.wins / s.gamesPlayed) * 100).toFixed(1) : '0',
+                        bullseyeCount: s.bullseyeCount || 0, bestStreak: s.bestStreak || 0 };
+                }
+                addTransaction(desc, amount, type) {
+                    if (!this.user) return;
+                    this.user.transactions.unshift({ desc, amount, type, date: new Date().toISOString() });
+                    if (this.user.transactions.length > 120) this.user.transactions.length = 120;
+                }
+                addXP(amount) { if (this.user) this.user.xp = (this.user.xp || 0) + Math.floor(amount); }
+                unlockCosmetic(category, index) {
+                    const key = category === 'darts' ? 'darts' : category === 'boards' ? 'boards' : 'trails';
+                    if (!this.user.unlockedCosmetics) this.user.unlockedCosmetics = { darts: [0], boards: [0],
+                    trails: [0] };
+                    if (!this.user.unlockedCosmetics[key].includes(index)) this.user.unlockedCosmetics[key].push(
+                    index);
+                }
+            }
+
+            // ═══════════════════════════════════
+            //  DARTBOARD RENDERER
+            // ═══════════════════════════════════
+            class DartboardRenderer {
+                constructor(canvasId, userSession) {
+                    this._c = document.getElementById(canvasId);
+                    this._ctx = this._c?.getContext('2d');
+                    this._user = userSession;
+                    this._size = CONFIG.CANVAS_SIZE;
+                    this._animId = null;
+                    this._aimRadius = 100;
+                    this._aimDir = 1;
+                    this._aimSpeed = 0.8;
+                    this._aimActive = false;
+                    this._dartLanded = null;
+                    this._dartAnimProgress = 0;
+                    this._dartAnimTarget = null;
+                    this._impactRipple = 0;
+                    this._impactPos = null;
+                    this._highlightRing = -1;
+                    this._freezeActive = false;
+                    this._freezeTimer = 0;
+                }
+                get aimRadius() { return this._aimRadius; }
+                set aimActive(v) { this._aimActive = v; if (v) { this._aimRadius = rand(30, 160);
+                        this._aimDir = Math.random() > 0.5 ? 1 : -1; } }
+                get aimActive() { return this._aimActive; }
+                set freezeActive(v) { this._freezeActive = v; if (v) this._freezeTimer = 180; }
+                animateDartLanding(radius, angle) {
+                    this._dartAnimTarget = { radius: clamp(radius, 0, 195), angle: angle || rand(0, Math.PI * 2) };
+                    this._dartAnimProgress = 0;
+                    this._dartLanded = null;
+                    this._impactPos = null;
+                    this._impactRipple = 0;
+                }
+                triggerImpact(radius, angle, ringIndex) {
+                    this._impactPos = { radius: clamp(radius, 0, 195), angle: angle || rand(0, Math.PI * 2) };
+                    this._impactRipple = 1;
+                    this._highlightRing = ringIndex;
+                    this._dartLanded = { ...this._impactPos };
+                    this._dartAnimTarget = null;
+                    this._dartAnimProgress = 1;
+                }
+                render() {
+                    if (!this._c || !this._ctx) return;
+                    const ctx = this._ctx;
+                    const sz = this._size;
+                    const cx = sz / 2;
+                    const cy = sz / 2;
+                    const skin = this._user.user?.dartCosmetics?.boardSkin || 0;
+                    ctx.clearRect(0, 0, sz, sz);
+                    // Board background
+                    const bgGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 210);
+                    bgGrad.addColorStop(0, '#2a2018');
+                    bgGrad.addColorStop(1, '#0d0a06');
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 205, 0, Math.PI * 2);
+                    ctx.fillStyle = bgGrad;
+                    ctx.fill();
+                    // Rings
+                    const rings = CONFIG.RINGS;
+                    for (let i = rings.length - 1; i >= 0; i--) {
+                        const r = rings[i];
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, r.radiusMax, 0, Math.PI * 2);
+                        ctx.fillStyle = r.color;
+                        ctx.fill();
+                        ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+                        ctx.lineWidth = 1.2;
+                        ctx.stroke();
+                    }
+                    // Segment lines (20 segments for visual effect)
+                    for (let i = 0; i < 20; i++) {
+                        const a = (i / 20) * Math.PI * 2 - Math.PI / 2;
+                        ctx.beginPath();
+                        ctx.moveTo(cx, cy);
+                        ctx.lineTo(cx + Math.cos(a) * 200, cy + Math.sin(a) * 200);
+                        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                        ctx.lineWidth = 0.6;
+                        ctx.stroke();
+                    }
+                    // Numbers around edge
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 10px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const nums = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
+                    for (let i = 0; i < 20; i++) {
+                        const a = (i / 20) * Math.PI * 2 - Math.PI / 2;
+                        const tx = cx + Math.cos(a) * 188;
+                        const ty = cy + Math.sin(a) * 188;
+                        ctx.fillText(nums[i], tx, ty);
+                    }
+                    // Skill aim ring
+                    if (this._aimActive) {
+                        if (!this._freezeActive) {
+                            this._aimRadius += this._aimDir * this._aimSpeed;
+                            if (this._aimRadius >= 175) { this._aimRadius = 175;
+                                this._aimDir = -1; }
+                            if (this._aimRadius <= 8) { this._aimRadius = 8;
+                                this._aimDir = 1; }
+                        } else {
+                            this._freezeTimer--;
+                            if (this._freezeTimer <= 0) this._freezeActive = false;
+                        }
+                        const ar = this._aimRadius;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, ar, 0, Math.PI * 2);
+                        ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+                        ctx.lineWidth = 3;
+                        ctx.shadowColor = 'rgba(255,255,255,0.6)';
+                        ctx.shadowBlur = 14;
+                        ctx.stroke();
+                        ctx.shadowBlur = 0;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, ar, 0, Math.PI * 2);
+                        ctx.strokeStyle = 'rgba(240,200,80,0.5)';
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash([8, 6]);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                    // Dart animation
+                    if (this._dartAnimTarget && this._dartAnimProgress < 1) {
+                        this._dartAnimProgress += 0.025;
+                        if (this._dartAnimProgress >= 1) {
+                            this._dartAnimProgress = 1;
+                            this.triggerImpact(this._dartAnimTarget.radius, this._dartAnimTarget.angle, -1);
+                        } else {
+                            const t = this._easeOut(this._dartAnimProgress);
+                            const r = 220 - t * (220 - this._dartAnimTarget.radius);
+                            const a = this._dartAnimTarget.angle;
+                            const dx = cx + Math.cos(a) * r;
+                            const dy = cy + Math.sin(a) * r;
+                            this._drawDart(ctx, dx, dy, a + Math.PI / 2, t);
+                        }
+                    }
+                    // Landed dart
+                    if (this._dartLanded) {
+                        const dx = cx + Math.cos(this._dartLanded.angle) * this._dartLanded.radius;
+                        const dy = cy + Math.sin(this._dartLanded.angle) * this._dartLanded.radius;
+                        this._drawDart(ctx, dx, dy, this._dartLanded.angle + Math.PI / 2, 1);
+                    }
+                    // Impact ripple
+                    if (this._impactRipple > 0 && this._impactPos) {
+                        this._impactRipple -= 0.04;
+                        if (this._impactRipple < 0) this._impactRipple = 0;
+                        const rippleR = (1 - this._impactRipple) * 50 + 5;
+                        const alpha = this._impactRipple;
+                        ctx.beginPath();
+                        ctx.arc(cx + Math.cos(this._impactPos.angle) * this._impactPos.radius, cy + Math.sin(this._impactPos
+                            .angle) * this._impactPos.radius, rippleR, 0, Math.PI * 2);
+                        ctx.strokeStyle = `rgba(255,255,200,${alpha})`;
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                    // Highlight ring
+                    if (this._highlightRing >= 0 && this._impactRipple > 0) {
+                        const ring = CONFIG.RINGS[this._highlightRing];
+                        if (ring) {
+                            ctx.beginPath();
+                            ctx.arc(cx, cy, ring.radiusMax, 0, Math.PI * 2);
+                            ctx.strokeStyle = `rgba(255,255,200,${this._impactRipple})`;
+                            ctx.lineWidth = 3;
+                            ctx.stroke();
+                        }
+                    }
+                    // Center dot
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#fff';
+                    ctx.fill();
+                    this._animId = requestAnimationFrame(() => this.render());
+                }
+                _drawDart(ctx, x, y, angle, alpha) {
+                    ctx.save();
+                    ctx.globalAlpha = alpha;
+                    ctx.translate(x, y);
+                    ctx.rotate(angle);
+                    const style = this._user.user?.dartCosmetics?.dartStyle || 0;
+                    const dartColor = CONFIG.DART_COLORS[style] || '#c0c0c0';
+                    ctx.fillStyle = dartColor;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -14);
+                    ctx.lineTo(-4, 6);
+                    ctx.lineTo(0, 3);
+                    ctx.lineTo(4, 6);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.fillStyle = '#333';
+                    ctx.fillRect(-1.5, 6, 3, 8);
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.moveTo(-3, 14);
+                    ctx.lineTo(3, 14);
+                    ctx.lineTo(0, 20);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                }
+                _easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+                getRingFromRadius(r) {
+                    for (const ring of CONFIG.RINGS) { if (r <= ring.radiusMax) return ring; }
+                    return CONFIG.RINGS[CONFIG.RINGS.length - 1];
+                }
+                destroy() { if (this._animId) cancelAnimationFrame(this._animId); }
+            }
+
+            // ═══════════════════════════════════
+            //  EFFECTS SYSTEM
+            // ═══════════════════════════════════
+            class EffectsSystem {
+                static confetti(intensity = 'normal') {
+                    const c = document.createElement('canvas');
+                    c.style.cssText =
+                        'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;';
+                    document.body.appendChild(c);
+                    c.width = window.innerWidth;
+                    c.height = window.innerHeight;
+                    const ctx = c.getContext('2d');
+                    const counts = { low: 50, normal: 140, high: 280, golden: 400 };
+                    const count = counts[intensity] || 140;
+                    const parts = [];
+                    const colors = intensity === 'golden' ? ['#ffd700', '#ffe478', '#fff8c0', '#ffab00', '#ffea00'] : [
+                        '#ffd966', '#ffe478', '#ff5252', '#4caf50', '#ff8c42', '#e040fb'
+                    ];
+                    for (let i = 0; i < count; i++) parts.push({ x: Math.random() * c.width, y: -Math.random() * c.height *
+                            0.5, vx: (Math.random() - 0.5) * 7, vy: Math.random() * 5 + 2, s: Math.random() * 6 + 2,
+                            col: colors[Math.floor(Math.random() * colors.length)], rot: Math.random() * 360, rv: (Math
+                                .random() - 0.5) * 12, life: 1, dec: 0.004 + Math.random() * 0.005 });
+                    const start = performance.now();
+                    const maxD = 4000;
+
+                    function draw(ts) {
+                        ctx.clearRect(0, 0, c.width, c.height);
+                        let alive = false;
+                        for (const p of parts) { p.vy += 0.07;
+                            p.x += p.vx;
+                            p.y += p.vy;
+                            p.rot += p.rv;
+                            p.life -= p.dec; if (p.life > 0 && p.y < c.height + 50 && ts - start < maxD) { alive = true;
+                                ctx.save();
+                                ctx.translate(p.x, p.y);
+                                ctx.rotate((p.rot * Math.PI) / 180);
+                                ctx.globalAlpha = Math.max(0, p.life);
+                                ctx.fillStyle = p.col;
+                                ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.5);
+                                ctx.restore(); } }
+                        if (alive) requestAnimationFrame(draw);
+                        else c.remove();
+                    }
+                    requestAnimationFrame(draw);
+                    setTimeout(() => { if (c.parentNode) c.remove(); }, maxD + 500);
+                }
+                static floatingText(msg, x = '50%', y = '40%') {
+                    const el = document.createElement('div');
+                    el.className = 'floating-score';
+                    el.textContent = msg;
+                    el.style.left = x;
+                    el.style.top = y;
+                    el.style.transform = 'translateX(-50%)';
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 1300);
+                }
+                static shake(el) { el.classList.add('shake');
+                    setTimeout(() => el.classList.remove('shake'), 450); }
+                static achievementPopup(name) {
+                    const el = document.createElement('div');
+                    el.className = 'achievement-popup';
+                    el.innerHTML = `🏆 <strong>${name}</strong>`;
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 3200);
+                }
+            }
+
+            // ═══════════════════════════════════
+            //  GAME ENGINE
+            // ═══════════════════════════════════
+            class GameEngine {
+                constructor(userSession, audio, renderer) {
+                    this._user = userSession;
+                    this._audio = audio;
+                    this._renderer = renderer;
+                    this._mode = 'quick';
+                    this._challengeActive = false;
+                    this._challengeDartsLeft = 0;
+                    this._challengeAccumulated = 0;
+                    this._challengeBetPerDart = 0;
+                    this._survivalActive = false;
+                    this._survivalStreak = 0;
+                    this._survivalBest = 0;
+                    this._survivalAccumulated = 0;
+                    this._survivalBet = 0;
+                    this._powerups = { scope: false, vision: false, stabilizer: false, feather: false, freeze: false };
+                    this._currentBet = 10;
+                }
+                get mode() { return this._mode; }
+                set mode(v) { this._mode = v; }
+                get challengeActive() { return this._challengeActive; }
+                get survivalActive() { return this._survivalActive; }
+                get survivalStreak() { return this._survivalStreak; }
+                get survivalBest() { return this._survivalBest; }
+                get survivalMultiplier() {
+                    const mults = CONFIG.SURVIVAL_MULTIPLIERS;
+                    return this._survivalStreak < mults.length ? mults[this._survivalStreak] : mults[mults.length -
+                        1] * Math.pow(1.5, this._survivalStreak - mults.length + 1);
+                }
+                get powerups() { return this._powerups; }
+                togglePowerup(type) {
+                    if (this._challengeActive || this._survivalActive) return false;
+                    this._powerups[type] = !this._powerups[type];
+                    return true;
+                }
+                async startChallenge(bet) {
+                    if (this._challengeActive || this._survivalActive) return false;
+                    const total = bet * 3;
+                    if (total > this._user.balance) return false;
+                    this._user.balance -= total;
+                    this._user.addTransaction(`Darts Challenge (3 darts) -${fmtGold(total)}`, -total, 'withdraw');
+                    await this._user.save();
+                    this._challengeActive = true;
+                    this._challengeDartsLeft = 3;
+                    this._challengeAccumulated = 0;
+                    this._challengeBetPerDart = bet;
+                    return true;
+                }
+                async startSurvival(bet) {
+                    if (this._survivalActive || this._challengeActive) return false;
+                    if (bet > this._user.balance) return false;
+                    this._user.balance -= bet;
+                    this._user.addTransaction(`Darts Survival start -${fmtGold(bet)}`, -bet, 'withdraw');
+                    await this._user.save();
+                    this._survivalActive = true;
+                    this._survivalStreak = 0;
+                    this._survivalAccumulated = 0;
+                    this._survivalBet = bet;
+                    this._survivalBest = this._user.stats.bestStreak || 0;
+                    return true;
+                }
+                getEffectiveRing(aimRadius) {
+                    let ring;
+                    if (this._mode === 'quick') {
+                        ring = this._randomRing();
+                    } else {
+                        const variance = this._powerups.stabilizer ? (Math.random() - 0.5) * 10 : (Math.random() -
+                            0.5) * 22;
+                        const finalR = clamp(aimRadius + variance, 0, 198);
+                        ring = this._renderer.getRingFromRadius(finalR);
+                    }
+                    if (this._powerups.feather && ring.multiplier < 50 && Math.random() < 0.12) {
+                        const idx = CONFIG.RINGS.findIndex(r => r === ring);
+                        if (idx > 0) ring = CONFIG.RINGS[idx - 1];
+                    }
+                    return ring;
+                }
+                _randomRing() {
+                    let r = Math.random();
+                    let rings = [...CONFIG.RINGS];
+                    if (this._powerups.scope) {
+                        rings[0].prob += 0.015;
+                        rings[1].prob += 0.04;
+                        rings[6].prob -= 0.055;
+                    }
+                    if (this._powerups.vision) {
+                        rings[2].prob += 0.02;
+                        rings[3].prob += 0.02;
+                        rings[6].prob -= 0.04;
+                    }
+                    let cum = 0;
+                    for (const ring of rings) { cum += ring.prob; if (r < cum) return ring; }
+                    return rings[rings.length - 1];
+                }
+                async processThrow(bet, aimRadius) {
+                    const ring = this.getEffectiveRing(aimRadius);
+                    const mult = ring.multiplier;
+                    const winAmount = Math.floor(bet * mult);
+                    // Add random angle for dartboard display
+                    const angle = rand(0, Math.PI * 2);
+                    const radius = ring.radiusMax > 0 ? rand(ring === CONFIG.RINGS[0] ? 0 : (CONFIG.RINGS.findIndex(r => r ===
+                        ring) > 0 ? CONFIG.RINGS[CONFIG.RINGS.findIndex(r => r === ring) - 1].radiusMax : 0), ring
+                        .radiusMax) : rand(0, 8);
+                    this._renderer.animateDartLanding(radius, angle);
+                    return { ring, mult, winAmount, radius, angle, ringIndex: CONFIG.RINGS.indexOf(ring) };
+                }
+                async finishChallengeThrow(result) {
+                    this._challengeAccumulated += result.winAmount;
+                    this._challengeDartsLeft--;
+                    if (this._challengeDartsLeft <= 0) {
+                        const totalPayout = this._challengeAccumulated;
+                        const totalBet = this._challengeBetPerDart * 3;
+                        const profit = totalPayout - totalBet;
+                        this._user.balance += totalPayout;
+                        this._user.addTransaction(`Darts Challenge win +${fmtGold(totalPayout)}`, totalPayout,
+                            'game_win');
+                        this._recordGame(true, result.ring, result.mult, profit, this._challengeBetPerDart);
+                        this._challengeActive = false;
+                        await this._user.save();
+                        return { finished: true, totalPayout, profit, won: profit >= 0 };
+                    }
+                    await this._user.save();
+                    return { finished: false, accumulated: this._challengeAccumulated, dartsLeft: this
+                            ._challengeDartsLeft };
+                }
+                async collectChallenge() {
+                    if (!this._challengeActive) return null;
+                    const totalPayout = this._challengeAccumulated;
+                    const totalBet = this._challengeBetPerDart * 3;
+                    const profit = totalPayout - totalBet;
+                    this._user.balance += totalPayout;
+                    this._user.addTransaction(`Darts Challenge collect +${fmtGold(totalPayout)}`, totalPayout,
+                    'game_win');
+                    this._recordGame(true, { name: 'Challenge', multiplier: totalPayout / totalBet || 1 }, totalPayout /
+                        totalBet || 1, profit, this._challengeBetPerDart);
+                    this._challengeActive = false;
+                    await this._user.save();
+                    return { totalPayout, profit };
+                }
+                async finishSurvivalThrow(result) {
+                    if (result.mult > 0) {
+                        this._survivalStreak++;
+                        this._survivalAccumulated += result.winAmount;
+                        if (this._survivalStreak > this._survivalBest) {
+                            this._survivalBest = this._survivalStreak;
+                            this._user.stats.bestStreak = this._survivalBest;
+                        }
+                        await this._user.save();
+                        return { alive: true, streak: this._survivalStreak, accumulated: this._survivalAccumulated,
+                            multiplier: this.survivalMultiplier };
+                    } else {
+                        const lost = this._survivalBet;
+                        this._survivalActive = false;
+                        this._recordGame(false, result.ring, 0, -lost, this._survivalBet);
+                        await this._user.save();
+                        return { alive: false, lost, streak: this._survivalStreak };
+                    }
+                }
+                async collectSurvival() {
+                    if (!this._survivalActive || this._survivalStreak === 0) return null;
+                    const payout = this._survivalAccumulated;
+                    const profit = payout - this._survivalBet;
+                    this._user.balance += payout;
+                    this._user.addTransaction(`Darts Survival collect +${fmtGold(payout)}`, payout, 'game_win');
+                    this._recordGame(true, { name: 'Survival', multiplier: this.survivalMultiplier }, this
+                        .survivalMultiplier, profit, this._survivalBet);
+                    this._survivalActive = false;
+                    await this._user.save();
+                    return { payout, profit, streak: this._survivalStreak };
+                }
+                _recordGame(isWin, ring, multiplier, profit, bet) {
+                    const stats = this._user.stats;
+                    stats.gamesPlayed++;
+                    stats.totalWagered += bet;
+                    stats.totalDartsThrown = (stats.totalDartsThrown || 0) + 1;
+                    if (isWin && profit >= 0) {
+                        stats.wins++;
+                        stats.totalPayout += bet + profit;
+                        if (multiplier > stats.bestMultiplier) stats.bestMultiplier = multiplier;
+                        if (ring.name?.includes('Bull')) stats.bullseyeCount++;
+                        if (ring.name?.includes('Golden')) stats.goldenBullCount = (stats.goldenBullCount || 0) + 1;
+                        this._user.user.globalStats.totalWins++;
+                        this._user.user.globalStats.totalWon += (bet + profit);
+                        this._user.user.globalStats.currentStreak = (this._user.user.globalStats.currentStreak || 0) +
+                            1;
+                        if (this._user.user.globalStats.currentStreak > (this._user.user.globalStats.bestStreak || 0))
+                            this._user.user.globalStats.bestStreak = this._user.user.globalStats.currentStreak;
+                    } else {
+                        this._user.user.globalStats.totalLosses = (this._user.user.globalStats.totalLosses || 0) + bet;
+                        this._user.user.globalStats.currentStreak = 0;
+                    }
+                    this._user.user.globalStats.totalGames++;
+                    this._user.user.globalStats.totalWagered += bet;
+                    this._user.addXP(bet * 0.6);
+                    if (!this._user.user.gamePlayCount.darts) this._user.user.gamePlayCount.darts = 0;
+                    this._user.user.gamePlayCount.darts++;
+                    this._user.user.gameOutcomes.unshift({ game: 'Darts', result: isWin ? 'win' : 'loss', profit,
+                        multiplier, ring: ring.name, bet, date: new Date().toISOString() });
+                    if (this._user.user.gameOutcomes.length > 100) this._user.user.gameOutcomes.length = 100;
+                }
+                async processStandardThrow(bet, aimRadius) {
+                    if (bet > this._user.balance) return null;
+                    this._user.balance -= bet;
+                    this._user.addTransaction(`Darts throw -${fmtGold(bet)}`, -bet, 'withdraw');
+                    const result = await this.processThrow(bet, aimRadius);
+                    if (result.mult > 0) {
+                        const winAmount = result.winAmount;
+                        this._user.balance += winAmount;
+                        const profit = winAmount - bet;
+                        this._user.addTransaction(`Darts win ${result.ring.name} +${fmtGold(winAmount)}`, winAmount,
+                            'game_win');
+                        this._recordGame(true, result.ring, result.mult, profit, bet);
+                    } else {
+                        this._recordGame(false, result.ring, 0, -bet, bet);
+                    }
+                    await this._user.save();
+                    return result;
+                }
+                cancelAll() { this._challengeActive = false;
+                    this._survivalActive = false; }
+            }
+
+            // ═══════════════════════════════════
+            //  UI MANAGER
+            // ═══════════════════════════════════
+            class UIManager {
+                constructor(userSession, audio) {
+                    this._user = userSession;
+                    this._audio = audio;
+                    this._renderer = new DartboardRenderer('dartCanvas', userSession);
+                    this._engine = new GameEngine(userSession, audio, this._renderer);
+                    this._resultTimer = null;
+                    this._dom = this._cacheDom();
+                    this._bgParticles = this._initBgParticles();
+                    this._renderer.render();
+                    this._bindEvents();
+                    this._refreshAll();
+                    this._checkAchievements();
+                }
+                _cacheDom() {
+                    const g = (s) => document.getElementById(s);
+                    return {
+                        balance: g('balanceDisplay'),
+                        betInput: g('betAmount'),
+                        throwBtn: g('throwBtn'),
+                        cashoutSurvivalBtn: g('cashoutSurvivalBtn'),
+                        cashoutChallengeBtn: g('cashoutChallengeBtn'),
+                        resultDiv: g('resultMessage'),
+                        gamesCount: g('gamesCount'),
+                        winsCount: g('winsCount'),
+                        sessionPL: g('sessionPL'),
+                        bestHit: g('bestHit'),
+                        winRate: g('winRate'),
+                        leaderboardMini: g('leaderboardMini'),
+                        milestoneNote: g('milestoneNote'),
+                        rankBadge: g('rankBadge'),
+                        xpBar: g('xpBar'),
+                        levelDisplay: g('levelDisplay'),
+                        xpDisplay: g('xpDisplay'),
+                        skillInfo: g('skillInfo'),
+                        skillStatus: g('skillStatus'),
+                        aimGrade: g('aimGrade'),
+                        challengeInfo: g('challengeInfo'),
+                        challengeDartsLeft: g('challengeDartsLeft'),
+                        challengeTotal: g('challengeTotal'),
+                        survivalInfo: g('survivalInfo'),
+                        survivalStreak: g('survivalStreak'),
+                        survivalMult: g('survivalMult'),
+                        survivalBest: g('survivalBest'),
+                        soundToggle: g('soundToggle'),
+                        boardLabel: g('boardLabel'),
+                        boardWrapper: g('boardWrapper'),
+                        mainCard: g('mainCard'),
+                        dartStyles: g('dartStyles'),
+                        dartCanvas: g('dartCanvas'),
+                    };
+                }
+                _bindEvents() {
+                    const d = this._dom;
+                    d.throwBtn.addEventListener('click', () => this._handleThrow());
+                    d.cashoutChallengeBtn.addEventListener('click', () => this._handleCollectChallenge());
+                    d.cashoutSurvivalBtn.addEventListener('click', () => this._handleCollectSurvival());
+                    d.soundToggle.addEventListener('click', () => { const on = this._audio.toggle();
+                        d.soundToggle.innerHTML = on ? '<i class="fas fa-volume-up"></i>' :
+                            '<i class="fas fa-volume-mute"></i>'; });
+                    d.betInput.addEventListener('input', () => this._updateUI());
+                    document.querySelectorAll('.preset-sm[data-bet]').forEach(b => b.addEventListener('click', () => {
+                        const v = b.dataset.bet;
+                        const cur = parseInt(d.betInput.value) || 10;
+                        if (v === 'half') d.betInput.value = Math.max(1, Math.floor(cur / 2));
+                        else if (v === 'double') d.betInput.value = Math.min(100000, cur * 2);
+                        else if (v === 'max') d.betInput.value = Math.floor(this._user.balance) || 1;
+                        else d.betInput.value = parseInt(v);
+                        this._updateUI();
+                        this._audio.play('click');
+                    }));
+                    document.querySelectorAll('.mode-btn').forEach(b => b.addEventListener('click', () => {
+                        if (this._engine.challengeActive || this._engine.survivalActive) return;
+                        document.querySelectorAll('.mode-btn').forEach(x => x.classList.remove('active'));
+                        b.classList.add('active');
+                        const mode = b.dataset.mode;
+                        this._engine.mode = mode;
+                        this._renderer.aimActive = (mode === 'skill');
+                        this._updateModeUI();
+                        this._audio.play('click');
+                    }));
+                    ['scope', 'vision', 'stabilizer', 'feather', 'freeze'].forEach(pw => {
+                        const el = document.getElementById(pw + 'Pw');
+                        if (el) el.addEventListener('click', () => {
+                            if (this._engine.togglePowerup(pw)) {
+                                el.classList.toggle('active', this._engine.powerups[pw]);
+                                this._audio.play('click');
+                            }
+                        });
+                    });
+                    d.dartCanvas.addEventListener('click', (e) => {
+                        if (this._engine.mode === 'skill' && this._renderer.aimActive && !this._engine
+                            .challengeActive && !this._engine.survivalActive) {
+                            this._handleSkillShotClick();
+                        }
+                    });
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === ' ' && this._engine.mode === 'skill' && this._renderer.aimActive && !this
+                            ._engine.challengeActive && !this._engine.survivalActive && !e.target.closest(
+                                'input')) {
+                            e.preventDefault();
+                            this._handleSkillShotClick();
+                        }
+                    });
+                }
+                _handleSkillShotClick() {
+                    const aimR = this._renderer.aimRadius;
+                    this._renderer.aimActive = false;
+                    const grade = aimR < 12 ? 'Perfect' : aimR < 25 ? 'Great' : aimR < 60 ? 'Good' : aimR < 120 ?
+                        'Poor' : 'Missed';
+                    this._dom.aimGrade.textContent = grade;
+                    this._dom.skillStatus.textContent = `Aim: ${Math.round(aimR)}px from center · Grade: ${grade}`;
+                    this._executeThrow(aimR);
+                }
+                async _handleThrow() {
+                    if (this._engine.challengeActive) {
+                        const result = await this._engine.processThrow(this._engine._challengeBetPerDart, this._renderer
+                            .aimRadius);
+                        const fr = await this._engine.finishChallengeThrow(result);
+                        this._handleThrowResult(result, this._engine._challengeBetPerDart);
+                        if (fr.finished) this._onChallengeEnd(fr);
+                        else this._updateChallengeUI();
+                    } else if (this._engine.survivalActive) {
+                        const result = await this._engine.processThrow(this._engine._survivalBet, this._renderer.aimRadius);
+                        const sr = await this._engine.finishSurvivalThrow(result);
+                        this._handleThrowResult(result, this._engine._survivalBet);
+                        if (!sr.alive) this._onSurvivalEnd(sr);
+                        else this._updateSurvivalUI();
+                    } else {
+                        const bet = parseInt(this._dom.betInput.value);
+                        if (isNaN(bet) || bet <= 0 || bet > this._user.balance) {
+                            this._showResult('Invalid bet or insufficient balance.', true);
+                            return;
+                        }
+                        this._executeThrow(this._renderer.aimRadius);
+                    }
+                }
+                async _executeThrow(aimRadius) {
+                    const bet = parseInt(this._dom.betInput.value);
+                    if (isNaN(bet) || bet <= 0 || bet > this._user.balance) {
+                        this._showResult('Invalid bet amount.', true);
+                        return;
+                    }
+                    this._audio.play('throw');
+                    const result = await this._engine.processStandardThrow(bet, aimRadius);
+                    if (!result) { this._showResult('Error processing throw.', true); return; }
+                    this._handleThrowResult(result, bet);
+                }
+                _handleThrowResult(result, bet) {
+                    const ring = result.ring;
+                    const mult = result.mult;
+                    this._renderer.aimActive = false;
+                    setTimeout(() => {
+                        this._renderer.triggerImpact(result.radius, result.angle, result.ringIndex);
+                    }, 350);
+                    if (mult >= 50) {
+                        this._audio.play('golden');
+                        EffectsSystem.confetti('golden');
+                        EffectsSystem.shake(this._dom.mainCard);
+                        EffectsSystem.floatingText('🌟 GOLDEN BULL!', '50%', '35%');
+                        this._showResult(`🌟 GOLDEN BULLSEYE! ${mult}x → +${fmtGold(result.winAmount)} GOLD!`, false,
+                            'jackpot');
+                    } else if (mult >= 10) {
+                        this._audio.play('bullseye');
+                        EffectsSystem.confetti('high');
+                        EffectsSystem.floatingText('🎯 BULLSEYE!', '50%', '35%');
+                        this._showResult(`🎯 BULLSEYE! ${ring.name} ${mult}x → +${fmtGold(result.winAmount)} GOLD!`,
+                            false, 'win');
+                    } else if (mult > 0) {
+                        this._audio.play('win');
+                        if (mult >= 5) EffectsSystem.confetti('low');
+                        this._showResult(`🎯 ${ring.name} ${mult}x → +${fmtGold(result.winAmount)} GOLD!`, false,
+                        'win');
+                    } else {
+                        this._audio.play('lose');
+                        this._showResult(`💔 ${ring.name} → Lost ${fmtGold(bet)} GOLD`, true, 'loss');
+                    }
+                    this._refreshAll();
+                    this._checkAchievements();
+                    this._updateLeaderboard(result);
+                }
+                async _handleCollectChallenge() {
+                    const r = await this._engine.collectChallenge();
+                    if (r) { this._showResult(`💰 Challenge collected: +${fmtGold(r.totalPayout)} GOLD`, false, 'win');
+                        this._audio.play('win');
+                        EffectsSystem.confetti('normal');
+                        this._updateChallengeUI();
+                        this._refreshAll(); }
+                }
+                async _handleCollectSurvival() {
+                    const r = await this._engine.collectSurvival();
+                    if (r) { this._showResult(
+                            `💰 Survival collected: +${fmtGold(r.payout)} GOLD (${r.streak} hits)`, false,
+                        'win');
+                        this._audio.play('win');
+                        EffectsSystem.confetti('normal');
+                        this._updateSurvivalUI();
+                        this._refreshAll(); }
+                }
+                _onChallengeEnd(fr) {
+                    this._audio.play(fr.won ? 'win' : 'lose');
+                    if (fr.won) EffectsSystem.confetti('high');
+                    this._showResult(
+                        `🏆 Challenge ended! Payout: ${fmtGold(fr.totalPayout)} GOLD (${fr.profit >= 0 ? '+' : ''}${fmtGold(fr.profit)})`,
+                        !fr.won, fr.won ? 'win' : 'loss');
+                    this._updateChallengeUI();
+                    this._refreshAll();
+                }
+                _onSurvivalEnd(sr) {
+                    this._audio.play('lose');
+                    this._showResult(`💔 Survival ended! Streak: ${sr.streak} · Lost ${fmtGold(sr.lost)} GOLD`, true,
+                    'loss');
+                    this._updateSurvivalUI();
+                    this._refreshAll();
+                }
+                _updateModeUI() {
+                    const mode = this._engine.mode;
+                    const d = this._dom;
+                    d.skillInfo.style.display = mode === 'skill' ? 'block' : 'none';
+                    d.boardLabel.textContent = mode === 'skill' ? '🎯 Click board to stop aim ring!' : mode ===
+                        'challenge' ? '🏆 Challenge Mode' : mode === 'survival' ? '🔥 Survival Mode' :
+                        '🎲 Quick Throw · Bullseye: 10x | Golden: 50x';
+                    d.dartCanvas.classList.toggle('skill-active', mode === 'skill');
+                    d.throwBtn.style.display = 'inline-flex';
+                    d.cashoutChallengeBtn.style.display = 'none';
+                    d.cashoutSurvivalBtn.style.display = 'none';
+                    d.challengeInfo.style.display = 'none';
+                    d.survivalInfo.style.display = 'none';
+                    if (mode === 'skill') this._renderer.aimActive = true;
+                }
+                _updateChallengeUI() {
+                    const d = this._dom;
+                    if (this._engine.challengeActive) {
+                        d.challengeInfo.style.display = 'block';
+                        d.challengeDartsLeft.textContent = this._engine._challengeDartsLeft;
+                        d.challengeTotal.textContent = fmtGold(this._engine._challengeAccumulated);
+                        d.cashoutChallengeBtn.style.display = 'inline-flex';
+                        d.throwBtn.style.display = 'inline-flex';
+                    } else {
+                        d.challengeInfo.style.display = 'none';
+                        d.cashoutChallengeBtn.style.display = 'none';
+                        d.throwBtn.style.display = 'inline-flex';
+                    }
+                }
+                _updateSurvivalUI() {
+                    const d = this._dom;
+                    if (this._engine.survivalActive) {
+                        d.survivalInfo.style.display = 'block';
+                        d.survivalStreak.textContent = this._engine.survivalStreak;
+                        d.survivalMult.textContent = this._engine.survivalMultiplier.toFixed(2) + 'x';
+                        d.survivalBest.textContent = this._engine.survivalBest;
+                        d.cashoutSurvivalBtn.style.display = 'inline-flex';
+                        d.throwBtn.style.display = 'inline-flex';
+                    } else {
+                        d.survivalInfo.style.display = 'none';
+                        d.cashoutSurvivalBtn.style.display = 'none';
+                        d.throwBtn.style.display = 'inline-flex';
+                    }
+                }
+                _showResult(msg, isErr, extraClass = '') {
+                    const d = this._dom.resultDiv;
+                    d.innerHTML = msg;
+                    d.className = 'result-panel';
+                    if (extraClass) d.classList.add(extraClass);
+                    d.style.color = isErr ? '#ef9a9a' : '';
+                    this._clearTimer();
+                    this._resultTimer = setTimeout(() => { if (!this._engine.challengeActive && !this._engine
+                            .survivalActive && !this._renderer.aimActive) { d.innerHTML =
+                                '🎯 Select mode, place bet, and throw!';
+                            d.className = 'result-panel';
+                            d.style.color = ''; } }, 3500);
+                }
+                _clearTimer() { if (this._resultTimer) { clearTimeout(this._resultTimer);
+                        this._resultTimer = null; } }
+                _refreshAll() {
+                    this._updateBalanceUI();
+                    this._refreshStats();
+                    this._updateProgressionUI();
+                    this._updateMilestoneNote();
+                    this._updateCosmeticsUI();
+                    this._renderLeaderboard();
+                    this._updateUI();
+                }
+                _updateBalanceUI() { this._dom.balance.textContent = fmtGold(this._user.balance); }
+                _updateUI() {
+                    const bet = parseInt(this._dom.betInput.value) || 0;
+                    const mode = this._engine.mode;
+                    const canThrow = bet > 0 && bet <= this._user.balance;
+                    this._dom.throwBtn.disabled = !canThrow && !this._engine.challengeActive && !this._engine
+                        .survivalActive;
+                }
+                _refreshStats() {
+                    const s = this._user.sessionStats;
+                    this._dom.gamesCount.textContent = s.games;
+                    this._dom.winsCount.textContent = s.wins;
+                    this._dom.sessionPL.textContent = (s.profit >= 0 ? '+' : '') + fmtGold(s.profit);
+                    this._dom.sessionPL.style.color = s.profit >= 0 ? '#4caf50' : '#ff5252';
+                    this._dom.bestHit.textContent = s.bestMultiplier > 0 ? s.bestMultiplier + 'x' : '-';
+                    this._dom.winRate.textContent = s.winRate + '%';
+                }
+                _updateProgressionUI() {
+                    const lv = this._user.level;
+                    const xp = this._user.user?.xp || 0;
+                    const rank = this._user.rank;
+                    const prog = this._user.xpProgress;
+                    this._dom.levelDisplay.textContent = lv;
+                    this._dom.xpDisplay.textContent = fmtGold(xp);
+                    this._dom.xpBar.style.width = (prog * 100).toFixed(1) + '%';
+                    this._dom.rankBadge.textContent = '🎯 ' + rank;
+                }
+                _updateMilestoneNote() {
+                    const plays = this._user.user?.gamePlayCount?.darts || 0;
+                    const claimed = this._user.user?.earnedAchievements?.includes('darts_milestone');
+                    const note = this._dom.milestoneNote;
+                    if (plays >= CONFIG.MILESTONE_PLAYS && !claimed) {
+                        note.innerHTML =
+                            `🎁 MILESTONE: ${CONFIG.MILESTONE_PLAYS} PLAYS! <button id="claimMilestone" class="preset-sm">CLAIM ${fmtGold(CONFIG.MILESTONE_REWARD)}</button>`;
+                        const btn = document.getElementById('claimMilestone');
+                        if (btn) btn.addEventListener('click', () => this._claimMilestone(), { once: true });
+                    } else if (plays >= CONFIG.MILESTONE_PLAYS && claimed) note.innerHTML =
+                        `✅ Milestone claimed: +${fmtGold(CONFIG.MILESTONE_REWARD)} GOLD`;
+                    else note.innerHTML =
+                        `🏆 ${CONFIG.MILESTONE_PLAYS - plays} more plays → ${fmtGold(CONFIG.MILESTONE_REWARD)} GOLD`;
+                }
+                async _claimMilestone() {
+                    const plays = this._user.user?.gamePlayCount?.darts || 0;
+                    const key = 'darts_milestone';
+                    if (plays >= CONFIG.MILESTONE_PLAYS && !(this._user.user.earnedAchievements || []).includes(key)) {
+                        this._user.balance += CONFIG.MILESTONE_REWARD;
+                        if (!this._user.user.earnedAchievements) this._user.user.earnedAchievements = [];
+                        this._user.user.earnedAchievements.push(key);
+                        this._user.addTransaction(
+                            `Darts Milestone +${fmtGold(CONFIG.MILESTONE_REWARD)}`, CONFIG.MILESTONE_REWARD, 'deposit');
+                        await this._user.save();
+                        this._refreshAll();
+                        this._showResult(`🎉 Milestone: +${fmtGold(CONFIG.MILESTONE_REWARD)} GOLD!`, false, 'win');
+                        this._audio.play('win');
+                        EffectsSystem.confetti('normal');
+                    }
+                }
+                _checkAchievements() {
+                    const u = this._user.user;
+                    const achieved = u.earnedAchievements || [];
+                    const stats = this._user.stats;
+                    const newA = [];
+                    const check = (key, cond, name) => { if (!achieved.includes(key) && cond) { newA.push(name);
+                            achieved.push(key); } };
+                    check('first_throw', stats.gamesPlayed >= 1, 'First Throw');
+                    check('first_win', stats.wins >= 1, 'First Win');
+                    check('triple_hunter', stats.bestMultiplier >= 3, 'Triple Ring Hunter');
+                    check('bullseye_master', (stats.bullseyeCount || 0) >= 3, 'Bullseye Master');
+                    check('golden_bull', (stats.goldenBullCount || 0) >= 1, 'Golden Bull Collector');
+                    check('precision_expert', stats.winRate >= 60 && stats.gamesPlayed >= 20, 'Precision Expert');
+                    check('50_games', stats.gamesPlayed >= 50, '50 Games Played');
+                    check('100_games', stats.gamesPlayed >= 100, '100 Games Played');
+                    check('big_winner', stats.bestMultiplier >= 50, 'Golden Bullseye Hit');
+                    check('survivor', stats.bestStreak >= 5, 'Survival Expert (5 streak)');
+                    if (newA.length > 0) { u.earnedAchievements = achieved;
+                        this._user.save(); for (const n of newA) { EffectsSystem.achievementPopup(n);
+                            this._audio.play('achievement'); } }
+                }
+                _updateLeaderboard(result) {
+                    if (result && result.mult >= 10) {
+                        const lb = StorageMgr.getLeaderboard();
+                        lb.push({ username: this._user.user.username, multiplier: result.mult, date: new Date()
+                                .toISOString() });
+                        lb.sort((a, b) => b.multiplier - a.multiplier);
+                        StorageMgr.setLeaderboard(lb.slice(0, 10));
+                        this._renderLeaderboard();
+                    }
+                }
+                _renderLeaderboard() {
+                    const lb = StorageMgr.getLeaderboard();
+                    const d = this._dom.leaderboardMini;
+                    if (lb.length === 0) d.innerHTML = '🏅 Weekly Leaderboard: No entries yet';
+                    else {
+                        let html = '🏅 Top Bullseyes:<br>';
+                        lb.slice(0, 8).forEach((e, i) => { html +=
+                                `${i + 1}. ${e.username} — ${e.multiplier}x<br>`; });
+                        d.innerHTML = html;
+                    }
+                }
+                _updateCosmeticsUI() {
+                    const styles = CONFIG.DART_STYLES;
+                    const colors = CONFIG.DART_COLORS;
+                    const current = this._user.user?.dartCosmetics?.dartStyle || 0;
+                    const unlocked = this._user.user?.unlockedCosmetics?.darts || [0];
+                    let html = '';
+                    styles.forEach((name, i) => {
+                        const isUnlocked = unlocked.includes(i);
+                        const isSelected = i === current;
+                        html +=
+                            `<span class="cosmetic-dot${isSelected ? ' selected' : ''}" style="background:${colors[i]};${!isUnlocked ? 'opacity:0.3;' : ''}" data-dart="${i}" title="${name}${!isUnlocked ? ' (Locked)' : ''}"></span>`;
+                    });
+                    this._dom.dartStyles.innerHTML = html;
+                    this._dom.dartStyles.querySelectorAll('.cosmetic-dot').forEach(dot => {
+                        dot.addEventListener('click', () => {
+                            const idx = parseInt(dot.dataset.dart);
+                            const unlockedList = this._user.user?.unlockedCosmetics?.darts || [0];
+                            if (unlockedList.includes(idx)) {
+                                if (!this._user.user.dartCosmetics) this._user.user.dartCosmetics = {
+                                    dartStyle: 0, boardSkin: 0, trailStyle: 0 };
+                                this._user.user.dartCosmetics.dartStyle = idx;
+                                this._user.save();
+                                this._updateCosmeticsUI();
+                                this._audio.play('click');
+                            }
+                        });
+                    });
+                }
+                _initBgParticles() {
+                    const c = document.getElementById('particleCanvas');
+                    if (!c) return;
+                    c.width = window.innerWidth;
+                    c.height = window.innerHeight;
+                    const ctx = c.getContext('2d');
+                    const parts = Array.from({ length: 40 }, () => ({ x: Math.random() * c.width, y: Math.random() * c
+                            .height, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, r: Math.random() *
+                            2 + 0.7, a: Math.random() * 0.3 + 0.1, l: Math.random() * 100 }));
+                    const draw = () => {
+                        ctx.clearRect(0, 0, c.width, c.height);
+                        for (const p of parts) { p.x += p.vx;
+                            p.y += p.vy;
+                            p.l += 0.01; if (p.x < -20) p.x = c.width + 20; if (p.x > c.width + 20) p.x = -20; if (p.y <
+                                -20) p.y = c.height + 20; if (p.y > c.height + 20) p.y = -20;
+                            const f = 0.6 + 0.4 * Math.sin(p.l * 2);
+                            ctx.fillStyle = `rgba(240,200,80,${p.a * f})`;
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                            ctx.fill(); }
+                        requestAnimationFrame(draw);
+                    };
+                    draw();
+                }
+                async startChallengeMode() {
+                    const bet = parseInt(this._dom.betInput.value);
+                    if (isNaN(bet) || bet <= 0) { this._showResult('Invalid bet amount.', true); return; }
+                    const started = await this._engine.startChallenge(bet);
+                    if (!started) { this._showResult('Insufficient balance for 3 darts.', true); return; }
+                    this._updateChallengeUI();
+                    this._updateBalanceUI();
+                    this._showResult('🏆 Challenge started! 3 darts. Throw carefully!', false);
+                }
+                async startSurvivalMode() {
+                    const bet = parseInt(this._dom.betInput.value);
+                    if (isNaN(bet) || bet <= 0) { this._showResult('Invalid bet amount.', true); return; }
+                    const started = await this._engine.startSurvival(bet);
+                    if (!started) { this._showResult('Insufficient balance.', true); return; }
+                    this._updateSurvivalUI();
+                    this._updateBalanceUI();
+                    this._showResult('🔥 Survival mode! Keep hitting to build streak!', false);
+                }
+                destroy() { this._clearTimer();
+                    this._renderer.destroy(); }
+            }
+
+            // ═══════════════════════════════════
+            //  INITIALIZATION
+            // ═══════════════════════════════════
+            async function initApp() {
+                const audio = new AudioMgr();
+                const userSession = new UserSession();
+                const loaded = await userSession.load();
+                if (!loaded) return;
+                const ui = new UIManager(userSession, audio);
+                const soundToggle = document.getElementById('soundToggle');
+                if (soundToggle) soundToggle.innerHTML = audio.enabled ? '<i class="fas fa-volume-up"></i>' :
+                    '<i class="fas fa-volume-mute"></i>';
+                // Override mode button handlers for challenge/survival
+                document.querySelectorAll('.mode-btn').forEach(b => {
+                    b.addEventListener('click', () => {
+                        if (ui._engine.challengeActive || ui._engine.survivalActive) return;
+                        const mode = b.dataset.mode;
+                        if (mode === 'challenge') ui.startChallengeMode();
+                        else if (mode === 'survival') ui.startSurvivalMode();
+                    }, { once: false });
+                });
+                const cleanup = () => { ui.destroy();
+                    audio.destroy(); };
+                window.addEventListener('beforeunload', cleanup, { once: true });
+                window.addEventListener('pagehide', cleanup, { once: true });
+                if (typeof window.__DARTS_DEV__ !== 'undefined') window.__dartsApp = { userSession, audio, ui };
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
+            else initApp();
+        })();
+    </script>
+</body>
+</html>

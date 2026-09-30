@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GOLD TILE PATH | Navigate the tile path and collect gold!</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd966;
+            --gold-bright: #ffe484;
+            --gold-deep: #f5b042;
+            --bg-deep: #0a0908;
+            --card-bg: rgba(20, 18, 16, 0.75);
+            --border-gold: rgba(255, 217, 102, 0.4);
+            --shadow-gold: 0 0 30px rgba(255, 217, 102, 0.2);
+            --radius-lg: 2rem;
+            --radius-md: 1.5rem;
+            --radius-full: 60px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #0c0b0a 0%, #030202 100%);
+            color: #f5f0e6;
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: flex-start;
+            padding: 1.5rem; position: relative; overflow-x: hidden;
+        }
+        .particles-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+        .particle {
+            position: absolute; background: var(--gold); border-radius: 50%; opacity: 0;
+            animation: floatUp 7s infinite ease-in;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            15% { opacity: 0.5; transform: scale(1); }
+            50% { transform: translateY(30vh) scale(0.6); opacity: 0.2; }
+            100% { transform: translateY(-20vh) scale(0); opacity: 0; }
+        }
+        .game-container { max-width: 580px; width: 100%; display: flex; flex-direction: column; gap: 1rem; position: relative; z-index: 1; }
+        .top-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(15,13,11,0.85); backdrop-filter: blur(16px);
+            border-radius: var(--radius-full); padding: 0.65rem 1.8rem;
+            border: 1px solid var(--border-gold); flex-wrap: wrap; gap: 0.6rem;
+        }
+        .back-home {
+            text-decoration: none; color: var(--gold); font-weight: 600;
+            background: rgba(255,217,102,0.12); padding: 0.45rem 1.2rem; border-radius: 40px;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .back-home:hover { background: rgba(255,217,102,0.22); }
+        .balance-tag {
+            background: rgba(31,28,24,0.9); padding: 0.35rem 1.2rem; border-radius: 40px;
+            font-weight: 700; border: 1px solid rgba(255,217,102,0.4);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .sound-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--gold-bright); }
+        .main-card {
+            background: linear-gradient(145deg, rgba(25,22,19,0.95) 0%, rgba(12,10,8,0.98) 100%);
+            backdrop-filter: blur(20px); border-radius: var(--radius-lg);
+            padding: 1.2rem; border: 1px solid var(--border-gold);
+            box-shadow: 0 30px 50px rgba(0,0,0,0.6), var(--shadow-gold);
+            text-align: center;
+        }
+        .multiplier-display {
+            font-size: 2.6rem; font-weight: 900; color: var(--gold-bright);
+            text-shadow: 0 0 25px rgba(255,217,102,0.7); margin: 0.3rem 0;
+            letter-spacing: -1px; transition: all 0.3s;
+        }
+        .multiplier-display.pulse { animation: multiPulse 0.5s ease-out; }
+        @keyframes multiPulse {
+            0%,100% { transform: scale(1); } 50% { transform: scale(1.12); color: #fff; }
+        }
+        .steps-info {
+            font-size: 0.85rem; color: #bfb6a4; margin-bottom: 0.3rem;
+        }
+        .grid-wrapper {
+            position: relative; max-width: 420px; margin: 0.8rem auto;
+        }
+        .grid-container {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+            aspect-ratio: 1/1; width: 100%;
+        }
+        .scout-active-border {
+            position: absolute; inset: -6px; border-radius: 12px;
+            border: 2px solid rgba(100,149,237,0.8);
+            animation: scoutBorderPulse 1.2s ease-in-out infinite;
+            pointer-events: none; z-index: 0; opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .scout-active-border.active { opacity: 1; }
+        @keyframes scoutBorderPulse {
+            0%,100% { box-shadow: 0 0 8px rgba(100,149,237,0.5); }
+            50% { box-shadow: 0 0 20px rgba(100,149,237,0.8); }
+        }
+        .tile {
+            aspect-ratio: 1/1; background: rgba(30,26,20,0.85); border-radius: 6px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; transition: all 0.18s; position: relative;
+            border: 1.5px solid rgba(255,217,102,0.15); user-select: none;
+            z-index: 1;
+        }
+        .tile:hover:not(.revealed-safe):not(.mine-explode) {
+            border-color: rgba(255,217,102,0.5); background: rgba(40,35,28,0.9);
+            transform: scale(1.05); z-index: 2; box-shadow: 0 0 12px rgba(255,217,102,0.25);
+        }
+        .tile.start-tile {
+            background: radial-gradient(circle, rgba(255,217,102,0.35) 0%, rgba(30,26,20,0.9) 70%);
+            border-color: var(--gold-bright); box-shadow: 0 0 18px rgba(255,217,102,0.5);
+            animation: startGlow 2s ease-in-out infinite;
+        }
+        @keyframes startGlow {
+            0%,100% { box-shadow: 0 0 18px rgba(255,217,102,0.5); }
+            50% { box-shadow: 0 0 30px rgba(255,217,102,0.8); }
+        }
+        .tile.visited {
+            background: rgba(255,217,102,0.15); border-color: rgba(255,217,102,0.6);
+            box-shadow: inset 0 0 15px rgba(255,217,102,0.3);
+        }
+        .tile.visited::after {
+            content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+            width: 6px; height: 6px; border-radius: 50%; background: var(--gold-bright);
+        }
+        .tile.player-here {
+            border-color: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.6);
+            animation: playerPulse 1s ease-in-out infinite;
+        }
+        @keyframes playerPulse {
+            0%,100% { box-shadow: 0 0 20px rgba(255,255,255,0.6); }
+            50% { box-shadow: 0 0 32px rgba(255,255,255,0.9); }
+        }
+        .tile.mine-explode {
+            background: radial-gradient(circle, #ff3333 0%, #4a0000 100%) !important;
+            border-color: #ff6b6b !important; animation: shake 0.5s ease-out;
+        }
+        .tile.revealed-safe {
+            background: rgba(76,175,80,0.2); border-color: rgba(76,175,80,0.5);
+        }
+        .tile.scout-reveal {
+            animation: scoutFlash 1.5s ease-out;
+        }
+        @keyframes scoutFlash {
+            0% { filter: brightness(2.5); transform: scale(1.08); }
+            40% { filter: brightness(1.2); }
+            100% { filter: brightness(1); transform: scale(1); }
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        .difficulty-select {
+            background: #0f0d0b; border: 2px solid var(--gold); border-radius: 25px;
+            padding: 0.4rem 1rem; color: var(--gold-bright); font-weight: 600;
+            margin: 0 0.3rem; cursor: pointer;
+        }
+        .action-row {
+            display: flex; gap: 0.7rem; flex-wrap: wrap; justify-content: center; margin: 0.8rem 0;
+        }
+        .btn {
+            border: none; border-radius: var(--radius-full); font-weight: 700;
+            cursor: pointer; padding: 0.6rem 1.4rem; font-size: 0.9rem;
+            font-family: 'Inter', sans-serif; transition: 0.15s;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+        }
+        .btn:active { transform: translateY(2px); }
+        .btn-cashout {
+            background: linear-gradient(135deg, #4caf50, #81c784); color: #1a150e;
+            box-shadow: 0 4px 0 #2e7d32;
+        }
+        .btn-cashout:hover { box-shadow: 0 6px 18px rgba(76,175,80,0.5); transform: translateY(-2px); }
+        .btn-cashout.pulse-btn { animation: cashoutPulse 1.2s ease-in-out infinite; }
+        @keyframes cashoutPulse {
+            0%,100% { box-shadow: 0 4px 0 #2e7d32; }
+            50% { box-shadow: 0 4px 0 #2e7d32, 0 0 28px rgba(76,175,80,0.7); }
+        }
+        .btn-scout {
+            background: rgba(100,149,237,0.2); border: 1px solid rgba(100,149,237,0.5);
+            color: #b8d4ff;
+        }
+        .btn-scout:hover { background: rgba(100,149,237,0.35); }
+        .btn-play {
+            background: linear-gradient(135deg, #f5b042, #ffd966); color: #1a150e;
+            box-shadow: 0 4px 0 #a05f15;
+        }
+        .btn-play:hover { box-shadow: 0 6px 18px rgba(255,217,102,0.5); transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; pointer-events: none; }
+        .bet-row {
+            display: flex; gap: 0.7rem; align-items: center; justify-content: center;
+            flex-wrap: wrap; margin: 0.5rem 0;
+        }
+        .bet-input {
+            width: 90px; background: #0f0d0b; border: 2px solid var(--gold);
+            border-radius: 25px; padding: 0.5rem; text-align: center;
+            color: var(--gold-bright); font-weight: 700; font-family: 'Inter', sans-serif;
+        }
+        .result-message {
+            text-align: center; font-weight: 600; min-height: 2rem; margin: 0.4rem 0;
+            font-size: 0.9rem;
+        }
+        .summary-box {
+            background: rgba(20,18,16,0.9); border: 1px solid var(--border-gold);
+            border-radius: 1rem; padding: 0.8rem; margin-top: 0.5rem;
+            text-align: left; font-size: 0.8rem; display: none;
+        }
+        .summary-box.show { display: block; }
+        @media (max-width: 460px) {
+            .tile { font-size: 1rem; }
+            .grid-container { gap: 2px; max-width: 320px; }
+            .multiplier-display { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="particles-container" id="particlesContainer"></div>
+<div class="game-container">
+    <div class="top-nav">
+        <a href=".././home.html" class="back-home"><i class="fas fa-arrow-left"></i> Lobby</a>
+        <div class="balance-tag" id="balanceTag"><i class="fas fa-coins"></i> <span id="headerBalance">0</span> GOLD</div>
+        <button id="soundToggleBtn" class="sound-btn"><i class="fas fa-volume-up"></i></button>
+    </div>
+
+    <div class="main-card">
+        <h2 style="color:var(--gold-bright);"><i class="fas fa-map"></i> GOLD TILE PATH</h2>
+        <div class="multiplier-display" id="multiplierDisplay">1.000×</div>
+        <div class="steps-info">🦶 <span id="stepsCount">0</span> safe steps | 💰 Cash: <span id="cashValue">0</span> GOLD</div>
+
+        <div class="grid-wrapper" id="gridWrapper">
+            <div class="scout-active-border" id="scoutBorder"></div>
+            <div class="grid-container" id="gridContainer"></div>
+        </div>
+
+        <div class="result-message" id="resultMessage">✨ Set bet & start a new round</div>
+        <div class="summary-box" id="summaryBox"></div>
+
+        <div class="action-row" id="actionRow">
+            <button class="btn btn-cashout" id="cashoutBtn" disabled><i class="fas fa-hand-holding-usd"></i> CASH OUT</button>
+            <button class="btn btn-scout" id="scoutBtn" disabled><i class="fas fa-search"></i> Scout Coin (<span id="scoutCost">20</span> GOLD)</button>
+        </div>
+
+        <div class="bet-row" id="betRow">
+            <span style="color:var(--gold); font-weight:600;">BET</span>
+            <input type="number" id="betAmount" class="bet-input" value="50" min="1" step="1">
+            <select id="difficultySelect" class="difficulty-select">
+                <option value="easy">Easy</option>
+                <option value="normal" selected>Normal</option>
+                <option value="hard">Hard</option>
+            </select>
+            <button class="btn btn-play" id="startBtn"><i class="fas fa-play"></i> START ROUND</button>
+        </div>
+
+        <div id="sessionProfitDisplay" style="font-size:0.8rem;color:#bfb6a4;margin-top:0.3rem;"></div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ── AUDIO ──
+        let audioCtx = null, soundEnabled = true;
+        function initAudio() { if (!audioCtx && soundEnabled) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        function playTone(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio(); if (!audioCtx) return;
+                const now = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                if (type === 'step') { osc.type = 'sine';
+                    osc.frequency.value = 700 + Math.random() * 200;
+                    gain.gain.setValueAtTime(0.07, now); osc.start();
+                    osc.stop(now + 0.12); }
+                else if (type === 'multiplier') { osc.type = 'sine';
+                    osc.frequency.value = 1100;
+                    gain.gain.setValueAtTime(0.08, now); osc.start();
+                    osc.stop(now + 0.25); }
+                else if (type === 'scout') { osc.type = 'sine';
+                    osc.frequency.value = 500;
+                    gain.gain.setValueAtTime(0.05, now); osc.start();
+                    osc.stop(now + 0.3); }
+                else if (type === 'cashout') { osc.type = 'sine';
+                    osc.frequency.value = 880;
+                    gain.gain.setValueAtTime(0.1, now); osc.start();
+                    osc.stop(now + 0.5); }
+                else if (type === 'mine') { osc.type = 'sawtooth';
+                    osc.frequency.value = 80;
+                    gain.gain.setValueAtTime(0.15, now); osc.start();
+                    osc.stop(now + 0.7); }
+            } catch (e) {}
+        }
+
+        // ── USER DATA ──
+        let currentUser = null;
+
+        function getUsers() { return JSON.parse(localStorage.getItem('gold_users') || '{}'); }
+        function saveUsers(users) { localStorage.setItem('gold_users', JSON.stringify(users)); }
+
+        function initializeUserStats(u) {
+            const defaults = {
+                globalStats: { totalWagered: 0, totalWon: 0, totalLosses: 0, totalGames: 0, currentStreak: 0,
+                    bestStreak: 0, totalWins: 0 },
+                transactions: [],
+                gameOutcomes: [],
+                gamePlayCount: {},
+                bankBalance: 0,
+                xp: 0,
+                avatar: 'fas fa-crown',
+                theme: 'theme-gold',
+                earnedAchievements: [],
+                dailyBalanceSnapshots: [],
+                tilePathStats: { roundsPlayed: 0, wins: 0, losses: 0, bestMultiplier: 1.0, mostSteps: 0,
+                    totalScoutCoins: 0, totalBet: 0, totalWin: 0 }
+            };
+            for (let k in defaults)
+                if (u[k] === undefined) u[k] = defaults[k];
+            if (!u.tilePathStats) u.tilePathStats = defaults.tilePathStats;
+            return u;
+        }
+        async function loadUser() {
+            const sess = sessionStorage.getItem('gold_current_user');
+            if (!sess) { window.location.href = '../../sign-in.html'; return false; }
+            const sessionUser = JSON.parse(sess);
+            const users = getUsers();
+            let user = users[sessionUser.username];
+            if (!user) { sessionStorage.removeItem('gold_current_user');
+                window.location.href = '../../sign-in.html'; return false; }
+            currentUser = initializeUserStats(user);
+            sessionUser.balance = currentUser.balance;
+            sessionStorage.setItem('gold_current_user', JSON.stringify(sessionUser));
+            return true;
+        }
+        async function saveUser() {
+            const users = getUsers();
+            users[currentUser.username] = currentUser;
+            saveUsers(users);
+            const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
+            if (sess) { sess.balance = currentUser.balance;
+                sessionStorage.setItem('gold_current_user', JSON.stringify(sess)); }
+        }
+        function updateBalanceDisplay() { document.getElementById('headerBalance').textContent = currentUser.balance.toLocaleString(); }
+
+        // ── GAME STATE ──
+        const GRID_SIZE = 7;
+        const DIFFICULTY_MINES = { easy: [4,6], normal: [6,10], hard: [10,14] };
+        const BASE_SCOUT_COST = 20;
+        const SCOUT_COST_MULTIPLIER = 2;
+
+        let board = [];          // 2D array of cell objects: { type:'start'|'coin'|'mine', revealed:boolean, visited:boolean }
+        let playerPos = { row: -1, col: -1 };
+        let startPos = { row: -1, col: -1 };
+        let safeSteps = 0;
+        let multiplier = 1.0;
+        let bet = 50;
+        let gameActive = false;
+        let scoutMode = false;
+        let scoutCostCurrent = BASE_SCOUT_COST;
+        let scoutCoinsUsedThisRound = 0;
+        let sessionProfit = 0;
+        let currentDifficulty = 'normal';
+        let streak = 0;          // consecutive cashouts without mine
+
+        // DOM element references
+        const gridContainer = document.getElementById('gridContainer');
+        const multiplierDisplay = document.getElementById('multiplierDisplay');
+        const stepsCountEl = document.getElementById('stepsCount');
+        const cashValueEl = document.getElementById('cashValue');
+        const resultMessage = document.getElementById('resultMessage');
+        const scoutCostEl = document.getElementById('scoutCost');
+        const cashoutBtn = document.getElementById('cashoutBtn');
+        const scoutBtn = document.getElementById('scoutBtn');
+        const startBtn = document.getElementById('startBtn');
+        const betInput = document.getElementById('betAmount');
+        const difficultySelect = document.getElementById('difficultySelect');
+        const sessionProfEl = document.getElementById('sessionProfitDisplay');
+        const scoutBorder = document.getElementById('scoutBorder');
+        const summaryBox = document.getElementById('summaryBox');
+
+        // Tile element cache (2D)
+        let tileElements = [];
+
+        function updateSessionDisplay() {
+            sessionProfEl.textContent = `📊 Session P/L: ${sessionProfit>=0?'+':''}${sessionProfit.toFixed(2)} GOLD`;
+        }
+
+        function generateBoard(difficulty) {
+            board = [];
+            for (let r = 0; r < GRID_SIZE; r++) {
+                board[r] = [];
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    board[r][c] = { type: 'coin', revealed: false, visited: false };
+                }
+            }
+            startPos = { row: Math.floor(Math.random() * GRID_SIZE), col: Math.floor(Math.random() * GRID_SIZE) };
+            board[startPos.row][startPos.col] = { type: 'start', revealed: true, visited: true };
+
+            const [minMines, maxMines] = DIFFICULTY_MINES[difficulty];
+            const mineCount = minMines + Math.floor(Math.random() * (maxMines - minMines + 1));
+            let placed = 0;
+            while (placed < mineCount) {
+                const r = Math.floor(Math.random() * GRID_SIZE);
+                const c = Math.floor(Math.random() * GRID_SIZE);
+                if ((r === startPos.row && c === startPos.col) || board[r][c].type === 'mine') continue;
+                board[r][c].type = 'mine';
+                placed++;
+            }
+            playerPos = { row: startPos.row, col: startPos.col };
+            safeSteps = 0;
+            multiplier = 1.0;
+            scoutCostCurrent = BASE_SCOUT_COST;
+            scoutCoinsUsedThisRound = 0;
+            gameActive = true;
+            scoutMode = false;
+        }
+
+        function getAdjacent(row, col) {
+            const adj = [];
+            if (row > 0) adj.push({ row: row - 1, col });
+            if (row < GRID_SIZE - 1) adj.push({ row: row + 1, col });
+            if (col > 0) adj.push({ row, col: col - 1 });
+            if (col < GRID_SIZE - 1) adj.push({ row, col: col + 1 });
+            return adj;
+        }
+
+        // Multiplier calculation with streak bonus
+        function computeMultiplier(steps) {
+            const baseFactor = 1.35 + (streak * 0.05);
+            return 1 * Math.pow(baseFactor, steps);
+        }
+
+        // ── UI UPDATE FUNCTIONS (partial render) ──
+        function createTileElements() {
+            gridContainer.innerHTML = '';
+            tileElements = [];
+            for (let r = 0; r < GRID_SIZE; r++) {
+                tileElements[r] = [];
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    tile.dataset.row = r;
+                    tile.dataset.col = c;
+                    gridContainer.appendChild(tile);
+                    tileElements[r][c] = tile;
+                }
+            }
+        }
+
+        function refreshAllTiles() {
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    updateTileDisplay(r, c);
+                }
+            }
+        }
+
+        function updateTileDisplay(r, c) {
+            const tile = tileElements[r][c];
+            const cell = board[r][c];
+            let className = 'tile';
+            let text = '';
+            if (cell.type === 'start') {
+                className += ' start-tile';
+                text = '⭐';
+            }
+            if (cell.visited) className += ' visited';
+            if (r === playerPos.row && c === playerPos.col) className += ' player-here';
+            if (cell.revealed && cell.type === 'mine') {
+                text = '💣';
+                className += ' mine-explode';
+            }
+            if (cell.revealed && cell.type === 'coin' && !cell.visited) {
+                className += ' revealed-safe';
+                if (!text) text = '🪙';
+            }
+            if (cell.type === 'coin' && !cell.revealed && !cell.visited) {
+                text = ''; // hide
+            }
+            if (cell.type === 'start' || (cell.revealed && cell.type === 'coin') || cell.visited) {
+                if (!text) text = '🪙';
+            }
+            tile.className = className;
+            tile.textContent = text;
+        }
+
+        function updateAllStats() {
+            multiplierDisplay.textContent = multiplier.toFixed(3) + '×';
+            stepsCountEl.textContent = safeSteps;
+            cashValueEl.textContent = (bet * multiplier).toFixed(2);
+            if (multiplier >= 10) multiplierDisplay.style.color = '#ffe484';
+            else if (multiplier >= 5) multiplierDisplay.style.color = '#ffd966';
+            else multiplierDisplay.style.color = 'var(--gold-bright)';
+        }
+
+        function updateScoutUI() {
+            scoutCostEl.textContent = scoutCostCurrent;
+            if (scoutCoinsUsedThisRound > 0) {
+                document.getElementById('scoutInfo') ? null : null; // not used
+            }
+            scoutBorder.classList.toggle('active', scoutMode);
+        }
+
+        function updateButtons() {
+            cashoutBtn.disabled = !gameActive;
+            scoutBtn.disabled = !gameActive || currentUser.balance < scoutCostCurrent;
+            if (gameActive && multiplier >= 5) cashoutBtn.classList.add('pulse-btn');
+            else cashoutBtn.classList.remove('pulse-btn');
+        }
+
+        function setMessage(html) { resultMessage.innerHTML = html; }
+        function setSummary(html) { summaryBox.innerHTML = html;
+            summaryBox.classList.toggle('show', html !== ''); }
+
+        // ── GAME ACTIONS ──
+        function moveToTile(r, c) {
+            if (!gameActive || board[r][c].visited) {
+                if (board[r][c].visited) {
+                    playerPos = { row: r, col: c };
+                    refreshAllTiles();
+                }
+                return;
+            }
+            const cell = board[r][c];
+            if (cell.type === 'mine') {
+                cell.revealed = true;
+                gameActive = false;
+                scoutMode = false;
+                playerPos = { row: r, col: c };
+                refreshAllTiles();
+                playTone('mine');
+                setTimeout(() => {
+                    for (let rr = 0; rr < GRID_SIZE; rr++) {
+                        for (let cc = 0; cc < GRID_SIZE; cc++) {
+                            if (board[rr][cc].type === 'mine') board[rr][cc].revealed = true;
+                        }
+                    }
+                    refreshAllTiles();
+                }, 300);
+                setMessage('<span style="color:#ff6b6b;">💥 MINE! You lost your bet.</span>');
+                showRoundSummary(false);
+                recordRound(false, 0);
+                return;
+            }
+            // Safe tile
+            cell.revealed = true;
+            cell.visited = true;
+            playerPos = { row: r, col: c };
+            safeSteps++;
+            multiplier = computeMultiplier(safeSteps);
+            playTone('step');
+            setTimeout(() => playTone('multiplier'), 150);
+            multiplierDisplay.classList.remove('pulse');
+            void multiplierDisplay.offsetWidth;
+            multiplierDisplay.classList.add('pulse');
+            refreshAllTiles();
+            updateAllStats();
+            updateButtons();
+            checkAchievements();
+        }
+
+        function handleScoutReveal(r, c) {
+            if (!scoutMode || !gameActive) return;
+            const cell = board[r][c];
+            if (cell.revealed) return;
+            scoutMode = false;
+            cell.revealed = true;
+            updateTileDisplay(r, c);
+            const tile = tileElements[r][c];
+            if (tile) {
+                tile.classList.add('scout-reveal');
+                if (cell.type === 'mine') tile.style.background = 'rgba(255,80,80,0.4)';
+            }
+            playTone('scout');
+            setMessage(`<span style="color:${cell.type==='mine'?'#ff6b6b':'#aaffaa'};">🔍 Scout: ${cell.type==='mine'?'MINE!':'Safe coin'}</span>`);
+            setTimeout(() => {
+                if (cell.type !== 'mine' || (cell.type === 'mine' && gameActive)) {
+                    if (!cell.visited && cell.type !== 'mine') cell.revealed = false;
+                    if (cell.type === 'mine' && gameActive) cell.revealed = false;
+                }
+                refreshAllTiles();
+                setMessage(gameActive ? 'Continue exploring...' : '');
+                updateScoutUI();
+            }, 1500);
+            updateScoutUI();
+        }
+
+        function buyScoutCoin() {
+            if (!gameActive) return;
+            if (currentUser.balance < scoutCostCurrent) {
+                setMessage('<span style="color:#ff6b6b;">❌ Not enough GOLD for Scout Coin!</span>');
+                return;
+            }
+            currentUser.balance -= scoutCostCurrent;
+            currentUser.tilePathStats.totalScoutCoins++;
+            currentUser.transactions.unshift({
+                desc: `🔍 Scout Coin purchase -${scoutCostCurrent} GOLD`,
+                amount: -scoutCostCurrent,
+                type: 'withdraw',
+                date: new Date().toISOString()
+            });
+            scoutCoinsUsedThisRound++;
+            const paid = scoutCostCurrent;
+            scoutCostCurrent *= SCOUT_COST_MULTIPLIER;
+            scoutMode = true;
+            saveUser().then(updateBalanceDisplay);
+            updateScoutUI();
+            updateButtons();
+            setMessage(`<span style="color:#b8d4ff;">🔍 Scout mode active! Click any tile to reveal it. (Paid ${paid} GOLD)</span>`);
+            playTone('scout');
+        }
+
+        function cashOut() {
+            if (!gameActive) return;
+            gameActive = false;
+            scoutMode = false;
+            const winAmount = bet * multiplier;
+            currentUser.balance += winAmount;
+            sessionProfit += (winAmount - bet);
+            streak++; // increment streak on successful cashout
+            playTone('cashout');
+            setMessage(`<span style="color:#aaffaa;">💰 Cashed out! ${multiplier.toFixed(3)}× = ${winAmount.toFixed(2)} GOLD</span>`);
+            // Reveal entire board
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    board[r][c].revealed = true;
+                }
+            }
+            refreshAllTiles();
+            updateButtons();
+            showRoundSummary(true);
+            recordRound(true, winAmount);
+            checkAchievements();
+        }
+
+        function showRoundSummary(won) {
+            const profit = won ? (bet * multiplier - bet) : -bet;
+            const html = `
+                <strong>Round Summary</strong><br>
+                Steps: ${safeSteps} | Multiplier: ${multiplier.toFixed(3)}×<br>
+                Bet: ${bet} GOLD | Result: ${won ? 'Win' : 'Loss'}<br>
+                Profit: ${profit >= 0 ? '+' : ''}${profit.toFixed(2)} GOLD
+                ${streak > 0 ? '<br>🔥 Win Streak: ' + streak : ''}
+            `;
+            setSummary(html);
+        }
+
+        function recordRound(won, winAmount) {
+            const totalWager = bet;
+            currentUser.globalStats.totalGames++;
+            currentUser.globalStats.totalWagered += totalWager;
+            currentUser.globalStats.totalWon += winAmount;
+            if (won) {
+                currentUser.globalStats.totalWins++;
+                currentUser.globalStats.currentStreak = (currentUser.globalStats.currentStreak || 0) + 1;
+                if (currentUser.globalStats.currentStreak > currentUser.globalStats.bestStreak)
+                    currentUser.globalStats.bestStreak = currentUser.globalStats.currentStreak;
+                currentUser.tilePathStats.wins++;
+                currentUser.tilePathStats.totalWin += winAmount;
+            } else {
+                currentUser.globalStats.currentStreak = 0;
+                currentUser.tilePathStats.losses++;
+                streak = 0; // reset streak on loss
+            }
+            currentUser.xp = (currentUser.xp || 0) + totalWager * safeSteps;
+            currentUser.gamePlayCount['tile-path'] = (currentUser.gamePlayCount['tile-path'] || 0) + 1;
+            currentUser.tilePathStats.roundsPlayed++;
+            currentUser.tilePathStats.totalBet += totalWager;
+            if (multiplier > currentUser.tilePathStats.bestMultiplier)
+                currentUser.tilePathStats.bestMultiplier = multiplier;
+            if (safeSteps > currentUser.tilePathStats.mostSteps)
+                currentUser.tilePathStats.mostSteps = safeSteps;
+            currentUser.gameOutcomes.unshift({
+                game: 'TilePath',
+                result: won ? 'win' : 'loss',
+                profit: won ? winAmount - totalWager : -totalWager,
+                multiplier,
+                steps: safeSteps,
+                date: new Date().toISOString()
+            });
+            currentUser.transactions.unshift({
+                desc: `🗺️ Tile Path | Bet ${totalWager} → ${won?'Won '+winAmount.toFixed(2):'Mine exploded'}`,
+                amount: won ? winAmount - totalWager : -totalWager,
+                type: won ? 'game_win' : 'game_loss',
+                date: new Date().toISOString()
+            });
+            saveUser().then(updateBalanceDisplay);
+            updateSessionDisplay();
+            resetForNewRound();
+        }
+
+        function checkAchievements() {
+            if (!currentUser.earnedAchievements) currentUser.earnedAchievements = [];
+            let newAch = [];
+            if (safeSteps >= 5 && !currentUser.earnedAchievements.includes('pathfinder')) {
+                currentUser.earnedAchievements.push('pathfinder');
+                newAch.push('🏆 Pathfinder: Cash out after 5+ safe steps!');
+            }
+            if (scoutCoinsUsedThisRound >= 3 && !currentUser.earnedAchievements.includes('scout_master')) {
+                currentUser.earnedAchievements.push('scout_master');
+                newAch.push('🔍 Scout Master: Used 3 Scout Coins in one round!');
+            }
+            if (newAch.length > 0) {
+                saveUser();
+                setMessage(resultMessage.innerHTML + '<br>' + newAch.join('<br>'));
+            }
+        }
+
+        function resetForNewRound() {
+            gameActive = false;
+            scoutMode = false;
+            setTimeout(() => {
+                startBtn.disabled = false;
+                betInput.disabled = false;
+                difficultySelect.disabled = false;
+                cashoutBtn.disabled = true;
+                scoutBtn.disabled = true;
+                cashoutBtn.classList.remove('pulse-btn');
+                if (!gameActive) setMessage('✨ Set bet & start a new round');
+                updateButtons();
+                setSummary('');
+            }, 2500);
+        }
+
+        function startRound() {
+            const b = parseInt(betInput.value);
+            if (isNaN(b) || b < 1) { alert('Enter a valid bet amount!'); return; }
+            if (b > currentUser.balance) { alert('Insufficient balance!'); return; }
+            bet = b;
+            currentDifficulty = difficultySelect.value;
+            currentUser.balance -= bet;
+            sessionProfit -= bet;
+            saveUser().then(updateBalanceDisplay);
+            updateSessionDisplay();
+            generateBoard(currentDifficulty);
+            createTileElements(); // rebuild grid once
+            refreshAllTiles();
+            updateAllStats();
+            updateButtons();
+            startBtn.disabled = true;
+            betInput.disabled = true;
+            difficultySelect.disabled = true;
+            setMessage('👣 Explore adjacent tiles. Watch for mines!');
+            setSummary('');
+            scoutMode = false;
+            updateScoutUI();
+        }
+
+        // ── EVENT HANDLING (delegated) ──
+        gridContainer.addEventListener('click', (e) => {
+            const tile = e.target.closest('.tile');
+            if (!tile) return;
+            const r = parseInt(tile.dataset.row);
+            const c = parseInt(tile.dataset.col);
+            if (isNaN(r) || isNaN(c)) return;
+            if (!gameActive) return;
+
+            if (scoutMode) {
+                handleScoutReveal(r, c);
+                return;
+            }
+
+            const adj = getAdjacent(playerPos.row, playerPos.col);
+            const isAdjacent = adj.some(a => a.row === r && a.col === c);
+            if (!isAdjacent && !(r === playerPos.row && c === playerPos.col)) {
+                // Not adjacent feedback
+                tile.style.animation = 'none';
+                tile.offsetHeight; // trigger reflow
+                tile.style.animation = 'shake 0.4s ease-out';
+                setTimeout(() => tile.style.animation = '', 400);
+                setMessage('<span style="color:#ffaa00;">⚠️ Move to an adjacent tile!</span>');
+                return;
+            }
+            if (r === playerPos.row && c === playerPos.col) return;
+            moveToTile(r, c);
+        });
+
+        startBtn.addEventListener('click', startRound);
+        cashoutBtn.addEventListener('click', cashOut);
+        scoutBtn.addEventListener('click', buyScoutCoin);
+        document.getElementById('soundToggleBtn').addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundToggleBtn').innerHTML = soundEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+            localStorage.setItem('gold_sound_enabled', soundEnabled);
+        });
+        betInput.addEventListener('input', () => {
+            startBtn.disabled = gameActive || parseInt(betInput.value) < 1 || parseInt(betInput.value) > (currentUser?.balance || 0);
+        });
+
+        // ── PARTICLES ──
+        function initParticles() {
+            const container = document.getElementById('particlesContainer');
+            for (let i = 0; i < 22; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.width = p.style.height = (Math.random() * 5 + 2) + 'px';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDelay = Math.random() * 8 + 's';
+                p.style.animationDuration = (Math.random() * 6 + 5) + 's';
+                container.appendChild(p);
+            }
+        }
+
+        async function init() {
+            initParticles();
+            if (!(await loadUser())) return;
+            updateBalanceDisplay();
+            updateSessionDisplay();
+            const savedSound = localStorage.getItem('gold_sound_enabled');
+            if (savedSound === 'false') {
+                soundEnabled = false;
+                document.getElementById('soundToggleBtn').innerHTML = '<i class="fas fa-volume-mute"></i>';
+            }
+            // init empty board
+            board = [];
+            for (let r = 0; r < GRID_SIZE; r++) { board[r] = [];
+                for (let c = 0; c < GRID_SIZE; c++) board[r][c] = { type: 'coin', revealed: false, visited: false }; }
+            playerPos = { row: -1, col: -1 };
+            createTileElements();
+            refreshAllTiles();
+            cashoutBtn.disabled = true;
+            scoutBtn.disabled = true;
+        }
+        init();
+    })();
+</script>
+</body>
+</html>

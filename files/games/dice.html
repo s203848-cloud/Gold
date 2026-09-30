@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GOLD DICE | Predict the roll, multiply your GOLD</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd966;
+            --gold-bright: #ffe484;
+            --gold-deep: #f5b042;
+            --bg-deep: #080706;
+            --bg-card: rgba(20, 18, 16, 0.8);
+            --border-gold: rgba(255, 217, 102, 0.35);
+            --shadow-gold: 0 0 25px rgba(255, 217, 102, 0.15);
+            --danger: #ff6b6b;
+            --success: #4caf50;
+            --text-muted: #9a9484;
+            --radius-xl: 2.2rem;
+            --radius-lg: 1.5rem;
+            --radius-md: 1.2rem;
+            --radius-full: 60px;
+            --transition-fast: 0.15s ease-out;
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #0c0b0a, #030303);
+            color: #f5f0e6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .ambient-particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--gold);
+            opacity: 0;
+            animation: floatUp 8s infinite ease-in;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            20% { opacity: 0.5; transform: scale(1); }
+            50% { transform: translateY(40vh) scale(0.8); opacity: 0.3; }
+            100% { transform: translateY(-20vh) scale(0); opacity: 0; }
+        }
+
+        .game-container {
+            max-width: 850px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 13, 11, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-full);
+            padding: 0.7rem 1.8rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: slideDown 0.6s var(--transition-bounce);
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .back-home {
+            text-decoration: none;
+            color: var(--gold);
+            font-weight: 600;
+            background: rgba(255,217,102,0.1);
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            transition: all 0.3s;
+        }
+        .back-home:hover { background: rgba(255,217,102,0.2); transform: translateX(-3px); }
+
+        .balance-tag {
+            background: rgba(31,28,24,0.9);
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            border: 1px solid rgba(255,217,102,0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: box-shadow 0.3s;
+        }
+        .balance-tag.pulse { animation: balancePulse 0.5s ease-out; }
+        @keyframes balancePulse { 0% { box-shadow: 0 0 0 0 rgba(255,217,102,0.5); } 100% { box-shadow: 0 0 0 20px rgba(255,217,102,0); } }
+
+        .sound-btn { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--gold); transition: transform 0.2s; }
+        .sound-btn:hover { transform: scale(1.1); }
+
+        .game-card {
+            background: linear-gradient(145deg, rgba(28,25,21,0.95), rgba(12,11,9,0.98));
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 1.8rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 30px 45px rgba(0,0,0,0.6), var(--shadow-gold);
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            animation: slideUp 0.6s var(--transition-bounce);
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dice-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1200px;
+            height: 200px;
+            position: relative;
+        }
+
+        .scene { width: 150px; height: 150px; perspective: 800px; transform-style: preserve-3d; }
+        .cube {
+            width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
+            /* Smooth transition when not tumbling */
+            transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+        }
+        .cube.rolling {
+            animation: tumble 0.4s infinite linear;
+            transition: none; /* disable smooth transition during roll */
+        }
+        @keyframes tumble {
+            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            25% { transform: rotateX(180deg) rotateY(90deg) rotateZ(45deg); }
+            50% { transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
+            75% { transform: rotateX(540deg) rotateY(270deg) rotateZ(135deg); }
+            100% { transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg); }
+        }
+
+        .face {
+            position: absolute; width: 150px; height: 150px;
+            background: linear-gradient(145deg, #2c2822, #1a1713); border: 2.5px solid var(--gold);
+            border-radius: 1rem; display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; color: var(--gold-bright);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 0 15px rgba(255,217,102,0.3);
+            backface-visibility: hidden;
+        }
+        .front  { transform: translateZ(75px); }
+        .back   { transform: rotateY(180deg) translateZ(75px); }
+        .right  { transform: rotateY(90deg) translateZ(75px); }
+        .left   { transform: rotateY(-90deg) translateZ(75px); }
+        .top    { transform: rotateX(90deg) translateZ(75px); }
+        .bottom { transform: rotateX(-90deg) translateZ(75px); }
+
+        .multiplier-overlay {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            padding: 0.3rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--gold-bright);
+            border: 1px solid var(--border-gold);
+            z-index: 5;
+            transition: all 0.3s;
+            text-shadow: 0 0 15px rgba(255,217,102,0.5);
+            animation: multiplierPulse 2s ease-in-out infinite;
+        }
+        @keyframes multiplierPulse {
+            0%, 100% { text-shadow: 0 0 10px gold; }
+            50% { text-shadow: 0 0 25px gold; }
+        }
+        .multiplier-overlay.high { color: #ffed4e; text-shadow: 0 0 30px gold; }
+
+        .potential-win {
+            text-align: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--gold);
+            background: rgba(0,0,0,0.4);
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            display: inline-block;
+            margin: 0 auto;
+            transition: color 0.2s;
+        }
+
+        .bet-row { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+        .bet-input {
+            background: #1f1b17;
+            border: 2px solid rgba(255,217,102,0.2);
+            border-radius: var(--radius-full);
+            padding: 0.7rem 1rem;
+            color: white;
+            font-weight: 700;
+            width: 120px;
+            text-align: center;
+            transition: var(--transition-fast);
+            font-size: 1rem;
+            outline: none;
+        }
+        .bet-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(255,217,102,0.1);
+        }
+        .bet-input.invalid {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 4px rgba(255,107,107,0.1);
+        }
+        .bet-input:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .quick-bets { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .quick-bet {
+            background: rgba(255,217,102,0.1);
+            border: 1px solid rgba(255,217,102,0.3);
+            border-radius: 40px;
+            padding: 0.35rem 0.9rem;
+            color: var(--gold);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+        .quick-bet:hover { background: rgba(255,217,102,0.2); transform: scale(1.05); }
+        .quick-bet:disabled { opacity: 0.5; pointer-events: none; }
+
+        .bet-options-label { font-size: 0.8rem; color: #b5afa4; display: flex; align-items: center; gap: 0.5rem; }
+        .bet-options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .bet-option {
+            background: rgba(35,32,28,0.8);
+            border: 1.5px solid #4a433c;
+            border-radius: 1rem;
+            padding: 0.7rem 0.4rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s var(--transition-bounce);
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .bet-option i { font-size: 1.5rem; }
+        .bet-option .option-label { font-size: 0.85rem; }
+        .bet-option .option-multiplier {
+            font-size: 0.7rem;
+            color: #bfb6a4;
+            background: rgba(0,0,0,0.3);
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+            transition: background 0.2s;
+        }
+        .bet-option.selected {
+            background: rgba(255,217,102,0.15);
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(255,217,102,0.4);
+            transform: scale(1.03);
+            color: var(--gold-bright);
+        }
+        .bet-option.selected .option-multiplier { background: rgba(255,217,102,0.3); color: #1a150e; font-weight: 700; }
+        .bet-option:hover:not(.selected) { background: #3a3530; border-color: var(--border-gold); transform: translateY(-3px); }
+
+        .roll-btn {
+            background: linear-gradient(135deg, #f5b042, #ffd966);
+            border: none;
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: var(--radius-full);
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: 0.5px;
+            color: #1a150e;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 5px 0 #a05f15;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .roll-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #a05f15; }
+        .roll-btn:disabled { opacity: 0.6; transform: none; cursor: not-allowed; box-shadow: 0 5px 0 #a05f15; }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            transform: scale(0);
+            animation: rippleEffect 0.6s ease-out;
+            pointer-events: none;
+        }
+        @keyframes rippleEffect { to { transform: scale(4); opacity: 0; } }
+
+        .result-panel {
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-md);
+            padding: 0.8rem 1.2rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 3rem;
+        }
+        .result-panel.win { color: var(--success); text-shadow: 0 0 10px rgba(76,175,80,0.4); }
+        .result-panel.loss { color: var(--danger); text-shadow: 0 0 10px rgba(255,107,107,0.4); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.8rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+        }
+        .stat-cell { text-align: center; }
+        .stat-value { font-weight: 800; font-size: 1.3rem; color: var(--gold); transition: transform 0.2s; }
+        .stat-value.pulse { animation: statPop 0.4s ease-out; }
+        @keyframes statPop { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+        .history-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
+        }
+        .history-badge {
+            background: #2a2520;
+            padding: 0.3rem 0.7rem;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .history-badge.win { color: #7ddf80; }
+        .history-badge.loss { color: #ff8888; }
+
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @media (max-width: 600px) {
+            .scene { width: 120px; height: 120px; }
+            .face { width: 120px; height: 120px; font-size: 2.2rem; }
+            .front, .back, .right, .left, .top, .bottom { transform: translateZ(60px); }
+            .back { transform: rotateY(180deg) translateZ(60px); }
+            .right { transform: rotateY(90deg) translateZ(60px); }
+            .left { transform: rotateY(-90deg) translateZ(60px); }
+            .top { transform: rotateX(90deg) translateZ(60px); }
+            .bottom { transform: rotateX(-90deg) translateZ(60px); }
+            .bet-options-grid { grid-template-columns: repeat(3, 1fr); }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .multiplier-overlay { font-size: 1rem; padding: 0.2rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+    <div class="ambient-particles" id="ambientParticles"></div>
+
+    <div class="game-container">
+        <nav class="top-nav">
+            <a href=".././home.html" class="back-home"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <div class="balance-tag" id="balanceTag">
+                <i class="fas fa-coins"></i> <span id="headerBalance">0</span>
+            </div>
+            <button id="soundToggleBtn" class="sound-btn" aria-label="Toggle sound"><i class="fas fa-volume-up"></i></button>
+        </nav>
+
+        <main class="game-card" id="gameCard">
+            <div class="dice-area">
+                <div class="scene">
+                    <div class="cube" id="cube">
+                        <div class="face front"><i class="fas fa-dice-one"></i></div>
+                        <div class="face back"><i class="fas fa-dice-two"></i></div>
+                        <div class="face right"><i class="fas fa-dice-three"></i></div>
+                        <div class="face left"><i class="fas fa-dice-four"></i></div>
+                        <div class="face top"><i class="fas fa-dice-five"></i></div>
+                        <div class="face bottom"><i class="fas fa-dice-six"></i></div>
+                    </div>
+                </div>
+                <div class="multiplier-overlay" id="multiplierOverlay">1.00x</div>
+            </div>
+
+            <div class="potential-win" id="potentialWinDisplay">Potential win: 0 GOLD</div>
+
+            <div class="bet-row">
+                <label style="color:var(--gold); font-weight:600;"><i class="fas fa-coins"></i> Bet</label>
+                <input type="number" id="betAmount" class="bet-input" value="25" step="1" min="1" aria-label="Bet amount">
+                <div class="quick-bets">
+                    <button class="quick-bet" data-bet="10">+10</button>
+                    <button class="quick-bet" data-bet="25">+25</button>
+                    <button class="quick-bet" data-bet="50">+50</button>
+                    <button class="quick-bet" data-bet="100">+100</button>
+                    <button class="quick-bet" id="halfBetBtn">½</button>
+                    <button class="quick-bet" id="maxBetBtn">MAX</button>
+                </div>
+            </div>
+
+            <div class="bet-options-label"><i class="fas fa-dice-d6"></i> Select your prediction:</div>
+            <div class="bet-options-grid" id="betOptionsContainer"></div>
+
+            <button id="rollBtn" class="roll-btn"><i class="fas fa-dice-d6"></i> ROLL THE DICE</button>
+
+            <div class="result-panel" id="resultMessage"><i class="fas fa-info-circle"></i> Choose your bet and roll!</div>
+
+            <div class="stats-grid">
+                <div class="stat-cell"><div class="stat-value" id="gamesStat">0</div><small>Rounds</small></div>
+                <div class="stat-cell"><div class="stat-value" id="winsStat">0</div><small>Wins</small></div>
+                <div class="stat-cell"><div class="stat-value" id="bestMultStat">1.0x</div><small>Best Multi</small></div>
+                <div class="stat-cell"><div class="stat-value" id="sessionPL">0</div><small>Session P/L</small></div>
+            </div>
+
+            <div class="history-container" id="rollHistoryContainer"><span style="color:#b5afa4;">Recent rolls:</span></div>
+        </main>
+    </div>
+
+    <script>
+        (function() {
+            // ─────────────────────────────────────
+            //  GOLD DICE — ROYAL DICE DUEL (REFACTORED)
+            // ─────────────────────────────────────
+
+            // ---------- AUDIO ENGINE ----------
+            const audio = {
+                ctx: null,
+                enabled: true,
+                init() {
+                    if (!this.ctx && this.enabled) {
+                        try { this.ctx = new(window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+                    }
+                    if (this.ctx?.state === 'suspended') this.ctx.resume();
+                },
+                play(type, freq = 660, dur = 0.2) {
+                    if (!this.enabled) return;
+                    this.init();
+                    if (!this.ctx) return;
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.type = type === 'crash' ? 'sawtooth' : 'sine';
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+                    osc.frequency.value = freq;
+                    osc.start(now);
+                    osc.stop(now + dur);
+                }
+            };
+
+            // ---------- CONFETTI SYSTEM ----------
+            const confetti = {
+                canvas: document.getElementById('confettiCanvas'),
+                ctx: null,
+                particles: [],
+                animFrame: null,
+                startTime: 0,
+                isRunning: false,
+
+                trigger() {
+                    // Stop any existing confetti
+                    if (this.animFrame) cancelAnimationFrame(this.animFrame);
+                    this.canvas.width = window.innerWidth;
+                    this.canvas.height = window.innerHeight;
+                    this.ctx = this.canvas.getContext('2d');
+                    this.particles = [];
+                    const colors = ['#ffd966', '#f5b042', '#ffed4e', '#4caf50', '#ffaa00'];
+                    for (let i = 0; i < 180; i++) {
+                        this.particles.push({
+                            x: Math.random() * this.canvas.width,
+                            y: -20,
+                            size: Math.random() * 6 + 3,
+                            speedY: Math.random() * 6 + 4,
+                            speedX: (Math.random() - 0.5) * 4,
+                            color: colors[Math.floor(Math.random() * colors.length)],
+                            rotation: Math.random() * 360,
+                            rotSpeed: (Math.random() - 0.5) * 12,
+                            shape: Math.random() > 0.5 ? 'rect' : 'diamond'
+                        });
+                    }
+                    this.startTime = performance.now();
+                    this.isRunning = true;
+                    this.animFrame = requestAnimationFrame(this._draw.bind(this));
+                },
+
+                _draw(now) {
+                    if (now - this.startTime > 2600) {
+                        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                        this.isRunning = false;
+                        cancelAnimationFrame(this.animFrame);
+                        return;
+                    }
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    for (const p of this.particles) {
+                        p.y += p.speedY;
+                        p.x += p.speedX;
+                        p.rotation += p.rotSpeed;
+                        this.ctx.save();
+                        this.ctx.translate(p.x, p.y);
+                        this.ctx.rotate(p.rotation * Math.PI / 180);
+                        this.ctx.fillStyle = p.color;
+                        if (p.shape === 'rect') this.ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                        else {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(0, -p.size);
+                            this.ctx.lineTo(p.size / 2, 0);
+                            this.ctx.lineTo(0, p.size);
+                            this.ctx.lineTo(-p.size / 2, 0);
+                            this.ctx.fill();
+                        }
+                        this.ctx.restore();
+                    }
+                    this.animFrame = requestAnimationFrame(this._draw.bind(this));
+                }
+            };
+
+            // ---------- DOM REFERENCES ----------
+            const DOMElements = {
+                cube: document.getElementById('cube'),
+                betInput: document.getElementById('betAmount'),
+                rollBtn: document.getElementById('rollBtn'),
+                resultMsg: document.getElementById('resultMessage'),
+                headerBalance: document.getElementById('headerBalance'),
+                gamesStat: document.getElementById('gamesStat'),
+                winsStat: document.getElementById('winsStat'),
+                bestMultStat: document.getElementById('bestMultStat'),
+                sessionPLSpan: document.getElementById('sessionPL'),
+                multiplierOverlay: document.getElementById('multiplierOverlay'),
+                potentialWinDisplay: document.getElementById('potentialWinDisplay'),
+                rollHistoryContainer: document.getElementById('rollHistoryContainer'),
+                gameCard: document.getElementById('gameCard'),
+                balanceTag: document.getElementById('balanceTag'),
+                betOptionsContainer: document.getElementById('betOptionsContainer'),
+                soundToggleBtn: document.getElementById('soundToggleBtn'),
+                quickBetButtons: document.querySelectorAll('.quick-bet'),
+                halfBetBtn: document.getElementById('halfBetBtn'),
+                maxBetBtn: document.getElementById('maxBetBtn')
+            };
+
+            // ---------- GAME CONSTANTS & BET TYPES ----------
+            const FACE_ROTATIONS = {
+                1: 'rotateX(0deg) rotateY(0deg)',
+                2: 'rotateY(180deg)',
+                3: 'rotateY(-90deg)',
+                4: 'rotateY(90deg)',
+                5: 'rotateX(-90deg)',
+                6: 'rotateX(90deg)'
+            };
+
+            const BET_TYPES = [
+                { id: 'num1', label: '1', icon: 'fa-dice-one', multiplier: 6, condition: r => r === 1 },
+                { id: 'num2', label: '2', icon: 'fa-dice-two', multiplier: 6, condition: r => r === 2 },
+                { id: 'num3', label: '3', icon: 'fa-dice-three', multiplier: 6, condition: r => r === 3 },
+                { id: 'num4', label: '4', icon: 'fa-dice-four', multiplier: 6, condition: r => r === 4 },
+                { id: 'num5', label: '5', icon: 'fa-dice-five', multiplier: 6, condition: r => r === 5 },
+                { id: 'num6', label: '6', icon: 'fa-dice-six', multiplier: 6, condition: r => r === 6 },
+                { id: 'over', label: 'Over 3', icon: 'fa-arrow-up', multiplier: 2, condition: r => r > 3 },
+                { id: 'under', label: 'Under 4', icon: 'fa-arrow-down', multiplier: 2, condition: r => r < 4 },
+                { id: 'even', label: 'Even', icon: 'fa-balance-scale', multiplier: 2, condition: r => r % 2 === 0 },
+                { id: 'odd', label: 'Odd', icon: 'fa-crosshairs', multiplier: 2, condition: r => r % 2 === 1 }
+            ];
+
+            // ---------- GAME STATE ----------
+            let currentUser = null;
+            let selectedBet = BET_TYPES[0];
+            let rolling = false;
+            let sessionProfit = 0;
+            let rollHistory = [];
+
+            // ---------- USER DATA MANAGEMENT ----------
+            function getDefaultUserStats() {
+                return {
+                    globalStats: { totalWagered:0, totalWon:0, totalLosses:0, totalGames:0, currentStreak:0, bestStreak:0, lastGameWin:null, totalWins:0 },
+                    minesStats: { gamesPlayed:0, wins:0, losses:0, totalBet:0, totalPayout:0, bestMultiplier:1.0 },
+                    transactions: [],
+                    gameOutcomes: [],
+                    gamePlayCount: {},
+                    bankBalance: 0,
+                    xp: 0, level: 1, dailyClaims:0, wheelSpins:0, dailyGuessWins:0, giftsSent:0,
+                    avatar: 'fas fa-crown', theme: 'theme-gold', autoTransfer: false, seasonalTheme: true,
+                    earnedAchievements: [],
+                    lastInterestDate: null, lastDailyBonusDate: null, lastWheelSpinDate: null,
+                    dailyBalanceSnapshots: [],
+                    diceStats: { gamesPlayed:0, wins:0, bestMultiplier:1.0, totalBet:0, totalWin:0, biggestWin:0 }
+                };
+            }
+
+            function initializeUserStats(user) {
+                const defaults = getDefaultUserStats();
+                for (const [key, value] of Object.entries(defaults)) {
+                    if (user[key] === undefined) user[key] = value;
+                }
+                // Ensure nested objects exist
+                if (!user.diceStats) user.diceStats = { ...defaults.diceStats };
+                return user;
+            }
+
+            function loadUserFromStorage() {
+                const sessRaw = sessionStorage.getItem('gold_current_user');
+                if (!sessRaw) { window.location.href = '../../sign-in.html'; return false; }
+                let sessionUser;
+                try { sessionUser = JSON.parse(sessRaw); } catch (e) {
+                    sessionStorage.removeItem('gold_current_user');
+                    window.location.href = '../../sign-in.html';
+                    return false;
+                }
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                const user = users[sessionUser.username];
+                if (!user) {
+                    sessionStorage.removeItem('gold_current_user');
+                    window.location.href = '../../sign-in.html';
+                    return false;
+                }
+                currentUser = initializeUserStats(user);
+                return true;
+            }
+
+            async function saveUserData() {
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                users[currentUser.username] = currentUser;
+                localStorage.setItem('gold_users', JSON.stringify(users));
+                const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
+                if (sess) {
+                    sess.balance = currentUser.balance;
+                    sessionStorage.setItem('gold_current_user', JSON.stringify(sess));
+                }
+            }
+
+            // ---------- UI HELPERS ----------
+            function animateNumber(el, start, end, duration) {
+                if (start === end) { el.textContent = end.toLocaleString(); return; }
+                const range = end - start;
+                const startTime = performance.now();
+                function step(now) {
+                    const progress = Math.min((now - startTime) / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    el.textContent = Math.round(start + range * eased).toLocaleString();
+                    if (progress < 1) requestAnimationFrame(step);
+                    else el.textContent = end.toLocaleString();
+                }
+                requestAnimationFrame(step);
+            }
+
+            function updateBalanceDisplay(animate = false) {
+                const balEl = DOMElements.headerBalance;
+                const prev = parseInt(balEl.textContent.replace(/,/g, '')) || 0;
+                const next = currentUser.balance;
+                if (animate && prev !== next) {
+                    animateNumber(balEl, prev, next, 400);
+                    if (next > prev) {
+                        DOMElements.balanceTag.classList.add('pulse');
+                        setTimeout(() => DOMElements.balanceTag.classList.remove('pulse'), 500);
+                    }
+                } else {
+                    balEl.textContent = next.toLocaleString();
+                }
+                validateBetInput();
+            }
+
+            function updateStatsUI() {
+                DOMElements.gamesStat.textContent = currentUser.diceStats?.gamesPlayed || 0;
+                DOMElements.winsStat.textContent = currentUser.diceStats?.wins || 0;
+                DOMElements.bestMultStat.textContent = (currentUser.diceStats?.bestMultiplier || 1.0).toFixed(2) + 'x';
+                const plEl = DOMElements.sessionPLSpan;
+                plEl.textContent = (sessionProfit >= 0 ? '+' : '') + sessionProfit.toFixed(2);
+                plEl.style.color = sessionProfit >= 0 ? 'var(--success)' : 'var(--danger)';
+            }
+
+            function setResultMessage(html, className = '') {
+                const msg = DOMElements.resultMsg;
+                msg.innerHTML = html;
+                msg.className = 'result-panel ' + (className || '');
+            }
+
+            function validateBetInput() {
+                const betVal = parseFloat(DOMElements.betInput.value);
+                const invalid = isNaN(betVal) || betVal <= 0 || betVal > currentUser.balance;
+                DOMElements.betInput.classList.toggle('invalid', invalid);
+                DOMElements.rollBtn.disabled = invalid || rolling;
+                // Also disable quick bet buttons during rolling
+                const quickDisabled = rolling;
+                DOMElements.quickBetButtons.forEach(b => b.disabled = quickDisabled);
+            }
+
+            function getCurrentBet() {
+                const val = parseFloat(DOMElements.betInput.value);
+                if (isNaN(val) || val < 1) return 1;
+                // Ensure integer bet (floor)
+                return Math.max(1, Math.floor(val));
+            }
+
+            function updateBetInput(value) {
+                DOMElements.betInput.value = value;
+                validateBetInput();
+                updatePotentialWin();
+            }
+
+            function updatePotentialWin() {
+                const bet = getCurrentBet();
+                const mult = selectedBet ? selectedBet.multiplier : 1;
+                const win = Math.floor(bet * mult);
+                DOMElements.potentialWinDisplay.innerHTML = `<i class="fas fa-trophy"></i> Potential win: <strong>${win}</strong> GOLD`;
+                DOMElements.multiplierOverlay.textContent = mult.toFixed(2) + 'x';
+                DOMElements.multiplierOverlay.classList.toggle('high', mult >= 6);
+            }
+
+            function addRippleEffect(e, btn) {
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = e.clientX - rect.left - size / 2 + 'px';
+                ripple.style.top = e.clientY - rect.top - size / 2 + 'px';
+                btn.appendChild(ripple);
+                ripple.addEventListener('animationend', () => ripple.remove());
+            }
+
+            // ---------- HISTORY DISPLAY ----------
+            function addRollHistory(rolled, multiplier, won) {
+                rollHistory.unshift({ rolled, multiplier, won, time: Date.now() });
+                if (rollHistory.length > 12) rollHistory.pop();
+                renderHistory();
+            }
+
+            function renderHistory() {
+                DOMElements.rollHistoryContainer.innerHTML = '<span style="color:#b5afa4;">Recent:</span> ' +
+                    rollHistory.map(r =>
+                        `<span class="history-badge ${r.won ? 'win' : 'loss'}">🎲${r.rolled} <span style="font-size:0.7rem;">${r.multiplier}x</span></span>`
+                    ).join('');
+            }
+
+            // ---------- GAME RECORDING ----------
+            function recordGame(isWin, betAmt, winAmt, multiplier, rolled) {
+                const net = winAmt - betAmt;
+                // Global stats
+                currentUser.globalStats.totalWagered += betAmt;
+                currentUser.globalStats.totalWon += winAmt;
+                currentUser.globalStats.totalGames += 1;
+                if (isWin) {
+                    currentUser.globalStats.currentStreak = (currentUser.globalStats.currentStreak || 0) + 1;
+                    if (currentUser.globalStats.currentStreak > (currentUser.globalStats.bestStreak || 0))
+                        currentUser.globalStats.bestStreak = currentUser.globalStats.currentStreak;
+                    currentUser.globalStats.totalWins = (currentUser.globalStats.totalWins || 0) + 1;
+                } else {
+                    currentUser.globalStats.currentStreak = 0;
+                }
+                currentUser.xp = (currentUser.xp || 0) + betAmt;
+
+                // Dice-specific stats
+                const ds = currentUser.diceStats;
+                ds.gamesPlayed = (ds.gamesPlayed || 0) + 1;
+                ds.totalBet = (ds.totalBet || 0) + betAmt;
+                if (isWin) {
+                    ds.wins = (ds.wins || 0) + 1;
+                    ds.totalWin = (ds.totalWin || 0) + winAmt;
+                    if (multiplier > ds.bestMultiplier) ds.bestMultiplier = multiplier;
+                    if (winAmt > ds.biggestWin) ds.biggestWin = winAmt;
+                }
+
+                // Play count
+                currentUser.gamePlayCount['dice'] = (currentUser.gamePlayCount['dice'] || 0) + 1;
+
+                // Game outcomes (keep last 50)
+                currentUser.gameOutcomes.unshift({
+                    game: 'Dice Duel',
+                    result: isWin ? 'win' : 'loss',
+                    profit: net,
+                    multiplier: multiplier,
+                    bet: betAmt,
+                    win: winAmt,
+                    date: new Date().toISOString()
+                });
+                if (currentUser.gameOutcomes.length > 50) currentUser.gameOutcomes.pop();
+
+                // Transactions (keep last 30)
+                currentUser.transactions.unshift({
+                    desc: `🎲 Dice Duel | ${isWin ? `Won ${winAmt}` : `Lost ${betAmt}`} (Prediction: ${selectedBet.label})`,
+                    amount: net,
+                    type: isWin ? 'game_win' : 'game_loss',
+                    date: new Date().toISOString()
+                });
+                if (currentUser.transactions.length > 30) currentUser.transactions.shift();
+
+                saveUserData();
+                updateStatsUI();
+                addRollHistory(rolled, multiplier, isWin);
+            }
+
+            // ---------- ROLLING LOGIC ----------
+            async function performRoll(e) {
+                if (rolling) return;
+                if (!selectedBet) {
+                    setResultMessage('<i class="fas fa-triangle-exclamation"></i> Select a bet type first!');
+                    return;
+                }
+                const bet = getCurrentBet();
+                if (bet > currentUser.balance) {
+                    setResultMessage(`<i class="fas fa-ban"></i> Insufficient balance (${currentUser.balance} GOLD)`);
+                    return;
+                }
+
+                // Start rolling
+                rolling = true;
+                if (e) addRippleEffect(e, DOMElements.rollBtn);
+                audio.play('roll', 700, 0.15);
+                setResultMessage('<i class="fas fa-sync-alt fa-spin"></i> Rolling...', '');
+                DOMElements.rollBtn.disabled = true;
+                DOMElements.betInput.disabled = true;
+                DOMElements.quickBetButtons.forEach(b => b.disabled = true);
+
+                // Deduct bet
+                currentUser.balance -= bet;
+                await saveUserData();
+                updateBalanceDisplay();
+
+                // Animate cube
+                const cube = DOMElements.cube;
+                cube.classList.add('rolling');
+
+                // Generate result after a short delay
+                const result = Math.floor(Math.random() * 6) + 1;
+                const finalRotation = FACE_ROTATIONS[result];
+
+                setTimeout(() => {
+                    // Stop tumbling, apply smooth rotation to final face
+                    cube.classList.remove('rolling');
+                    cube.style.transform = finalRotation;
+                    audio.play('roll', 880, 0.12);
+
+                    // Wait for cube transition (0.6s) then show result
+                    setTimeout(() => {
+                        const isWin = selectedBet.condition(result);
+                        const multiplier = selectedBet.multiplier;
+                        const winAmount = isWin ? Math.floor(bet * multiplier) : 0;
+                        currentUser.balance += winAmount;
+                        const netProfit = winAmount - bet;
+                        sessionProfit += netProfit;
+
+                        recordGame(isWin, bet, winAmount, multiplier, result);
+
+                        // Audio & confetti
+                        if (isWin) {
+                            audio.play('win', 1200, 0.25);
+                            confetti.trigger();
+                            setResultMessage(`<span style="color:#7ddf80;"><i class="fas fa-trophy"></i> WIN! Rolled ${result} → +${winAmount} GOLD (${multiplier}x)</span>`, 'win');
+                            DOMElements.gameCard.style.borderColor = '#4caf50';
+                            DOMElements.gameCard.style.boxShadow = '0 30px 45px rgba(0,0,0,0.6), 0 0 30px rgba(76,175,80,0.5)';
+                        } else {
+                            audio.play('loss', 400, 0.3);
+                            setResultMessage(`<span style="color:#ff8888;"><i class="fas fa-skull"></i> LOSS! Rolled ${result} → -${bet} GOLD</span>`, 'loss');
+                            DOMElements.gameCard.style.borderColor = '#ff6666';
+                            DOMElements.gameCard.style.boxShadow = '0 30px 45px rgba(0,0,0,0.6), 0 0 25px rgba(255,100,100,0.4)';
+                        }
+
+                        // Reset UI state
+                        rolling = false;
+                        DOMElements.rollBtn.disabled = false;
+                        DOMElements.betInput.disabled = false;
+                        validateBetInput(); // re-enables quick bets
+                        updateBalanceDisplay(true);
+
+                        // Flash stats
+                        document.querySelectorAll('.stat-value').forEach(el => {
+                            el.classList.add('pulse');
+                            setTimeout(() => el.classList.remove('pulse'), 400);
+                        });
+
+                        // Remove card flash after delay
+                        setTimeout(() => {
+                            DOMElements.gameCard.style.borderColor = '';
+                            DOMElements.gameCard.style.boxShadow = '';
+                        }, 800);
+                    }, 600); // align with cube transition duration
+                }, 900);
+            }
+
+            // ---------- BET OPTIONS RENDERING ----------
+            function renderBetOptions() {
+                const container = DOMElements.betOptionsContainer;
+                container.innerHTML = '';
+                BET_TYPES.forEach(bet => {
+                    const el = document.createElement('div');
+                    el.className = 'bet-option' + (selectedBet && selectedBet.id === bet.id ? ' selected' : '');
+                    el.innerHTML = `<i class="fas ${bet.icon}"></i><span class="option-label">${bet.label}</span><span class="option-multiplier">${bet.multiplier}x</span>`;
+                    el.addEventListener('click', () => {
+                        if (rolling) return; // ignore during roll
+                        selectedBet = bet;
+                        document.querySelectorAll('.bet-option').forEach(b => b.classList.remove('selected'));
+                        el.classList.add('selected');
+                        updatePotentialWin();
+                        setResultMessage(`<i class="fas fa-check-circle"></i> Bet: ${bet.label} (${bet.multiplier}x)`);
+                    });
+                    container.appendChild(el);
+                });
+            }
+
+            // ---------- EVENT BINDINGS ----------
+            function bindEvents() {
+                DOMElements.rollBtn.addEventListener('click', performRoll);
+
+                DOMElements.betInput.addEventListener('input', () => {
+                    // Force integer display
+                    const intVal = getCurrentBet();
+                    if (DOMElements.betInput.value !== String(intVal)) {
+                        DOMElements.betInput.value = intVal;
+                    }
+                    validateBetInput();
+                    updatePotentialWin();
+                });
+
+                DOMElements.soundToggleBtn.addEventListener('click', () => {
+                    audio.enabled = !audio.enabled;
+                    DOMElements.soundToggleBtn.innerHTML = audio.enabled ?
+                        '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+                    if (audio.enabled) audio.init();
+                    localStorage.setItem('gold_sound_enabled', audio.enabled);
+                });
+
+                // Quick bet buttons
+                DOMElements.quickBetButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        if (rolling) return;
+                        if (btn.id === 'halfBetBtn') {
+                            const current = getCurrentBet();
+                            updateBetInput(Math.max(1, Math.floor(current / 2)));
+                        } else if (btn.id === 'maxBetBtn') {
+                            if (currentUser) updateBetInput(Math.floor(currentUser.balance));
+                        } else {
+                            const add = parseFloat(btn.dataset.bet);
+                            const current = getCurrentBet();
+                            let newVal = current + add;
+                            if (currentUser && newVal > currentUser.balance) newVal = currentUser.balance;
+                            updateBetInput(Math.max(1, Math.floor(newVal)));
+                        }
+                    });
+                });
+            }
+
+            function initAmbientParticles() {
+                const container = document.getElementById('ambientParticles');
+                for (let i = 0; i < 25; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    const size = Math.random() * 4 + 2;
+                    p.style.width = size + 'px';
+                    p.style.height = size + 'px';
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.animationDelay = Math.random() * 8 + 's';
+                    p.style.animationDuration = (Math.random() * 6 + 5) + 's';
+                    container.appendChild(p);
+                }
+            }
+
+            // ---------- INITIALIZATION ----------
+            async function init() {
+                initAmbientParticles();
+                if (!loadUserFromStorage()) return;
+
+                // Sound preference
+                const savedSound = localStorage.getItem('gold_sound_enabled');
+                if (savedSound === 'false') {
+                    audio.enabled = false;
+                    DOMElements.soundToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else {
+                    audio.enabled = true;
+                }
+
+                renderBetOptions();
+                bindEvents();
+
+                // Ensure a bet type is selected (first by default)
+                if (!selectedBet) selectedBet = BET_TYPES[0];
+                const firstOption = document.querySelector('.bet-option');
+                if (firstOption) firstOption.classList.add('selected');
+
+                // Set cube initial rotation
+                DOMElements.cube.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                updatePotentialWin();
+                updateBalanceDisplay();
+                updateStatsUI();
+                validateBetInput();
+            }
+
+            init().catch(err => console.error('Dice init error:', err));
+        })();
+    </script>
+</body>
+</html>

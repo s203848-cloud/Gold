@@ -1,0 +1,2709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>GOLD | BANK HEIST | Rob the bank and steal all the gold!</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd966;
+            --gold-bright: #ffe9a0;
+            --gold-dim: #c9a840;
+            --gold-dark: #8b6914;
+            --gold-glow: rgba(255, 217, 102, 0.4);
+            --gold-glow-strong: rgba(255, 217, 102, 0.7);
+            --bg-deep: #080706;
+            --bg-mid: #100e0b;
+            --bg-card: rgba(16, 14, 11, 0.9);
+            --bg-panel: rgba(20, 17, 13, 0.85);
+            --bg-input: #1a1712;
+            --border-gold: rgba(255, 217, 102, 0.25);
+            --border-active: rgba(255, 217, 102, 0.7);
+            --border-bright: rgba(255, 217, 102, 0.9);
+            --danger: #ff5252;
+            --danger-glow: rgba(255, 82, 82, 0.5);
+            --success: #4caf50;
+            --success-glow: rgba(76, 175, 80, 0.5);
+            --info: #64b5f6;
+            --warning: #ff9800;
+            --text-primary: #f5f0e6;
+            --text-muted: #9a9484;
+            --text-dim: #6b6558;
+            --radius-xl: 2rem;
+            --radius-lg: 1.5rem;
+            --radius-md: 1.2rem;
+            --radius-sm: 0.8rem;
+            --radius-xs: 0.5rem;
+            --transition-fast: 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition-spring: 0.6s cubic-bezier(0.22, 1.2, 0.36, 1);
+            --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+            --shadow-card: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 217, 102, 0.08);
+            --shadow-gold: 0 0 30px var(--gold-glow), 0 0 60px rgba(255, 217, 102, 0.15);
+            --shadow-danger: 0 0 30px var(--danger-glow);
+            --glass-blur: blur(24px) saturate(1.2);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+        }
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(ellipse at 30% 20%, #1a1610 0%, #080604 60%, #020101 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: clamp(0.6rem, 2vw, 1.5rem);
+            position: relative;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Background Effects ── */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.06;
+            animation: orbDrift 20s infinite ease-in-out;
+        }
+        .bg-orb.orb-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--gold);
+            top: -10%;
+            left: -15%;
+            animation-delay: 0s;
+        }
+        .bg-orb.orb-2 {
+            width: 400px;
+            height: 400px;
+            background: #ff8c42;
+            bottom: -15%;
+            right: -10%;
+            animation-delay: -8s;
+            animation-duration: 24s;
+        }
+        .bg-orb.orb-3 {
+            width: 350px;
+            height: 350px;
+            background: var(--gold-dim);
+            top: 40%;
+            left: 50%;
+            animation-delay: -14s;
+            animation-duration: 18s;
+        }
+        @keyframes orbDrift {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(60px, -40px) scale(1.15);
+            }
+            50% {
+                transform: translate(-30px, 50px) scale(0.9);
+            }
+            75% {
+                transform: translate(-50px, -30px) scale(1.1);
+            }
+        }
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: floatUp 6s infinite ease-in;
+            opacity: 0;
+        }
+        .particle:nth-child(odd) {
+            width: 2px;
+            height: 2px;
+            animation-duration: 8s;
+        }
+        .particle:nth-child(3n) {
+            width: 4px;
+            height: 4px;
+            animation-duration: 5s;
+            background: #ffe9a0;
+        }
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.9;
+                transform: scale(1.3);
+            }
+            30% {
+                opacity: 0.5;
+                transform: translateY(-120px) translateX(25px) scale(1);
+            }
+            60% {
+                transform: translateY(-300px) translateX(-20px) scale(0.5);
+                opacity: 0.1;
+            }
+            100% {
+                transform: translateY(-550px) translateX(15px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* ── Game Wrapper ── */
+        .game-wrapper {
+            max-width: 720px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* ── Navigation Bar ── */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(14, 12, 9, 0.85);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 60px;
+            padding: 0.6rem 1.2rem;
+            border: 1px solid var(--border-gold);
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .back-home {
+            text-decoration: none;
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 0.85rem;
+            background: rgba(255, 217, 102, 0.08);
+            padding: 0.45rem 1rem;
+            border-radius: 40px;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+        .back-home:hover {
+            background: rgba(255, 217, 102, 0.18);
+            border-color: var(--border-gold);
+            transform: translateX(-3px);
+            box-shadow: 0 0 15px rgba(255, 217, 102, 0.1);
+        }
+        .balance-tag {
+            background: rgba(24, 21, 16, 0.9);
+            padding: 0.35rem 1.1rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 217, 102, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: 0.3px;
+        }
+        .balance-tag i {
+            color: var(--gold);
+            font-size: 0.85rem;
+        }
+        .nav-actions {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+        }
+        .sound-btn,
+        .heat-indicator {
+            background: rgba(24, 21, 16, 0.7);
+            border: 1px solid rgba(255, 217, 102, 0.2);
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: var(--gold);
+            transition: var(--transition-fast);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sound-btn:hover,
+        .heat-indicator:hover {
+            background: rgba(255, 217, 102, 0.15);
+            border-color: var(--border-active);
+        }
+        .heat-indicator {
+            position: relative;
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: default;
+        }
+        .heat-indicator.heat-wanted {
+            border-color: var(--danger);
+            color: var(--danger);
+            animation: heatPulse 1.5s infinite;
+            box-shadow: 0 0 15px var(--danger-glow);
+        }
+        @keyframes heatPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 10px var(--danger-glow);
+            }
+            50% {
+                box-shadow: 0 0 25px var(--danger-glow), 0 0 40px rgba(255, 82, 82, 0.3);
+            }
+        }
+
+        /* ── Main Game Card ── */
+        .game-card {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: var(--radius-xl);
+            padding: clamp(1.2rem, 3vw, 2rem);
+            border: 1px solid var(--border-gold);
+            box-shadow: var(--shadow-card);
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 217, 102, 0.5), transparent);
+            pointer-events: none;
+        }
+        .game-title {
+            text-align: center;
+            font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px var(--gold-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+        }
+        .game-title .icon-mask {
+            display: inline-block;
+            animation: maskBob 2s infinite ease-in-out;
+        }
+        @keyframes maskBob {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        /* ── Difficulty Selector ── */
+        .difficulty-row {
+            display: flex;
+            gap: 0.7rem;
+            justify-content: center;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .difficulty-btn {
+            background: rgba(16, 14, 10, 0.8);
+            border: 2px solid var(--border-gold);
+            border-radius: 60px;
+            padding: 0.55rem 1.2rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            color: #bbb;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            flex: 1;
+            min-width: 100px;
+            max-width: 180px;
+        }
+        .difficulty-btn:hover {
+            border-color: rgba(255, 217, 102, 0.5);
+            background: rgba(255, 217, 102, 0.06);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        .difficulty-btn.selected {
+            border-color: var(--border-bright);
+            background: rgba(255, 217, 102, 0.14);
+            color: var(--gold);
+            box-shadow: var(--shadow-gold);
+            animation: selectedGlow 2s infinite ease-in-out;
+        }
+        @keyframes selectedGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 15px var(--gold-glow);
+            }
+            50% {
+                box-shadow: 0 0 30px var(--gold-glow-strong), 0 0 50px rgba(255, 217, 102, 0.2);
+            }
+        }
+        .difficulty-mult {
+            font-size: 0.7rem;
+            color: var(--gold);
+            display: block;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        .difficulty-risk {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        /* ── Bet Controls ── */
+        .bet-row {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0.8rem 0;
+        }
+        .bet-row label {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        .bet-input {
+            background: var(--bg-input);
+            border: 2px solid rgba(255, 217, 102, 0.2);
+            border-radius: 60px;
+            padding: 0.65rem 1.1rem;
+            color: #fff;
+            font-weight: 700;
+            width: 130px;
+            text-align: center;
+            font-size: 1rem;
+            outline: none;
+            transition: all var(--transition-smooth);
+            font-family: var(--font-mono);
+        }
+        .bet-input:focus {
+            border-color: var(--border-active);
+            box-shadow: 0 0 0 4px rgba(255, 217, 102, 0.08);
+            background: #1f1b15;
+        }
+        .bet-quick-btns {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .bet-quick-btn {
+            background: rgba(255, 217, 102, 0.08);
+            border: 1px solid rgba(255, 217, 102, 0.2);
+            border-radius: 30px;
+            padding: 0.3rem 0.7rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--gold);
+            transition: var(--transition-fast);
+        }
+        .bet-quick-btn:hover {
+            background: rgba(255, 217, 102, 0.2);
+            border-color: var(--border-active);
+        }
+        .nugget-check {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            justify-content: center;
+            margin: 0.8rem 0;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px dashed rgba(255, 217, 102, 0.2);
+            transition: var(--transition-smooth);
+        }
+        .nugget-check:hover {
+            border-color: rgba(255, 217, 102, 0.5);
+            background: rgba(255, 217, 102, 0.04);
+        }
+        .nugget-check label {
+            color: var(--gold);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .nugget-check input[type="checkbox"] {
+            accent-color: var(--gold);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* ── Start Button ── */
+        .start-btn {
+            width: 100%;
+            border: none;
+            border-radius: 60px;
+            background: linear-gradient(135deg, #e8a830, #ffd966, #f5c04a);
+            color: #1a140c;
+            font-weight: 900;
+            font-size: 1.1rem;
+            padding: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            box-shadow: 0 6px 0 #8b5e14, 0 8px 25px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .start-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .start-btn:hover::after {
+            opacity: 1;
+        }
+        .start-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 #8b5e14, 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        .start-btn:disabled {
+            opacity: 0.4;
+            transform: none;
+            cursor: not-allowed;
+            filter: grayscale(30%);
+            box-shadow: 0 3px 0 #5a3d0e;
+        }
+
+        /* ── Stage Container ── */
+        .stage-container {
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: var(--radius-lg);
+            padding: clamp(1rem, 3vw, 1.8rem);
+            margin-top: 1.2rem;
+            text-align: center;
+            border: 1px solid rgba(255, 217, 102, 0.15);
+            position: relative;
+            overflow: hidden;
+            animation: stageEnter 0.4s var(--transition-spring);
+        }
+        @keyframes stageEnter {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .stage-title {
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .stage-progress {
+            display: flex;
+            gap: 0.4rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .stage-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 217, 102, 0.2);
+            transition: var(--transition-smooth);
+        }
+        .stage-dot.completed {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success-glow);
+        }
+        .stage-dot.active {
+            background: var(--gold);
+            box-shadow: 0 0 12px var(--gold-glow);
+            animation: dotPulse 1s infinite;
+        }
+        .stage-dot.failed {
+            background: var(--danger);
+            box-shadow: 0 0 8px var(--danger-glow);
+        }
+        @keyframes dotPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 8px var(--gold-glow);
+            }
+            50% {
+                box-shadow: 0 0 20px var(--gold-glow-strong);
+            }
+        }
+
+        /* ── Stage-specific styles ── */
+        .wire-panel {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .wire-btn {
+            background: #1f1b15;
+            border: 2px solid #444;
+            border-radius: 20px;
+            padding: 0.9rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            min-width: 90px;
+        }
+        .wire-btn i {
+            font-size: 1.6rem;
+            color: #999;
+            transition: color 0.2s;
+        }
+        .wire-btn:hover {
+            transform: scale(1.06);
+            border-color: var(--gold);
+            background: #2a241c;
+            box-shadow: 0 0 20px rgba(255, 217, 102, 0.15);
+        }
+        .wire-btn:active {
+            transform: scale(0.94);
+            transition: 0.05s;
+        }
+        .wire-btn.wrong-flash {
+            animation: shake 0.5s;
+            border-color: var(--danger) !important;
+            background: #3a1010 !important;
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-8px);
+            }
+            40% {
+                transform: translateX(8px);
+            }
+            60% {
+                transform: translateX(-5px);
+            }
+            80% {
+                transform: translateX(5px);
+            }
+        }
+        .memory-display {
+            background: #00000066;
+            padding: 1rem;
+            border-radius: 20px;
+            font-size: 2.2rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            letter-spacing: 10px;
+            margin-bottom: 1rem;
+            transition: opacity 0.4s;
+            color: var(--gold-bright);
+            text-shadow: 0 0 15px var(--gold-glow);
+        }
+        .digit-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.6rem;
+            max-width: 300px;
+            margin: 1rem auto;
+        }
+        .digit-btn {
+            background: #1f1b15;
+            border: 1px solid var(--border-gold);
+            border-radius: 18px;
+            padding: 0.65rem;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.1s;
+            color: #ddd;
+            font-family: var(--font-mono);
+        }
+        .digit-btn:hover {
+            background: #3a3228;
+            transform: scale(1.08);
+            border-color: var(--border-active);
+        }
+        .digit-btn:active {
+            background: var(--gold-dim);
+            color: #1a150e;
+            transform: scale(0.9);
+        }
+        .digit-btn.correct-press {
+            background: var(--success) !important;
+            color: #fff !important;
+            box-shadow: 0 0 15px var(--success-glow);
+        }
+        .digit-btn.wrong-press {
+            background: var(--danger) !important;
+            animation: shake 0.4s;
+        }
+
+        /* ── Bag / Escape Stage ── */
+        .bag-control {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 2rem;
+            padding: 1.2rem;
+            margin: 0.8rem 0;
+            border: 1px solid rgba(255, 217, 102, 0.1);
+        }
+        .bag-counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 0.8rem 0;
+        }
+        .bag-counter button {
+            background: var(--gold-dim);
+            border: none;
+            font-size: 1.6rem;
+            font-weight: 700;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            color: #1a150e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+        .bag-counter button:active {
+            transform: scale(0.9);
+            background: var(--gold);
+        }
+        .bag-count {
+            font-size: 2.2rem;
+            font-weight: 900;
+            background: #1a1712;
+            padding: 0.2rem 1.4rem;
+            border-radius: 40px;
+            min-width: 70px;
+            display: inline-block;
+            border: 2px solid rgba(255, 217, 102, 0.4);
+            font-family: var(--font-mono);
+            color: var(--gold-bright);
+        }
+        .multiplier-preview {
+            background: #15120e;
+            border-radius: 20px;
+            padding: 0.8rem;
+            margin: 0.7rem 0;
+            font-weight: 500;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 217, 102, 0.1);
+        }
+        .risk-bar {
+            height: 10px;
+            background: #2a221a;
+            border-radius: 20px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+        .risk-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff9800, var(--danger));
+            transition: width 0.3s var(--transition-smooth);
+            border-radius: 20px;
+        }
+        .risk-fill.dangerous {
+            animation: riskPulse 0.8s infinite;
+        }
+        @keyframes riskPulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+        .escape-btn {
+            background: linear-gradient(135deg, #2c7a47, #3e9e5c);
+            border: none;
+            border-radius: 60px;
+            padding: 0.75rem 2rem;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 0.8rem;
+            width: 100%;
+            color: #fff;
+            transition: var(--transition-smooth);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 0 #1a4d2a;
+        }
+        .escape-btn:hover {
+            background: linear-gradient(135deg, #348a50, #4db868);
+            transform: scale(1.02);
+            box-shadow: 0 6px 0 #1a4d2a, 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        .escape-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #1a4d2a;
+        }
+
+        /* ── Result Messages ── */
+        .result-msg {
+            margin-top: 0.8rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            min-height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+        .result-msg.success {
+            color: var(--success);
+            text-shadow: 0 0 10px var(--success-glow);
+        }
+        .result-msg.failure {
+            color: var(--danger);
+            text-shadow: 0 0 10px var(--danger-glow);
+        }
+
+        /* ── Reset Button ── */
+        .reset-heist-btn {
+            background: rgba(255, 217, 102, 0.1);
+            border: 1px solid var(--border-gold);
+            border-radius: 60px;
+            padding: 0.6rem 1.5rem;
+            color: var(--gold);
+            cursor: pointer;
+            margin-top: 0.8rem;
+            width: 100%;
+            font-weight: 700;
+            transition: var(--transition-smooth);
+            letter-spacing: 1px;
+        }
+        .reset-heist-btn:hover {
+            background: rgba(255, 217, 102, 0.25);
+            border-color: var(--border-active);
+            box-shadow: 0 0 15px rgba(255, 217, 102, 0.1);
+        }
+
+        /* ── Combo & Bonus Display ── */
+        .combo-display {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ff6d00, #ff9800);
+            color: #fff;
+            border-radius: 50px;
+            padding: 0.3rem 0.7rem;
+            font-weight: 900;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            animation: comboPop 0.4s var(--transition-bounce);
+            pointer-events: none;
+            z-index: 5;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.5);
+        }
+        @keyframes comboPop {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* ── Toast Notifications ── */
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(30px);
+            background: #1c1814;
+            border-left: 4px solid var(--gold);
+            padding: 12px 22px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 2000;
+            opacity: 0;
+            transition: all var(--transition-smooth);
+            pointer-events: none;
+            white-space: nowrap;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            max-width: 90vw;
+            text-align: center;
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast-msg.error {
+            border-left-color: var(--danger);
+            box-shadow: 0 10px 30px rgba(255, 82, 82, 0.2);
+        }
+        .toast-msg.loot {
+            border-left-color: #9b59b6;
+            box-shadow: 0 10px 30px rgba(155, 89, 182, 0.3);
+        }
+
+        /* ── Cinematic Overlay ── */
+        .cinematic-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .cinematic-overlay.active {
+            opacity: 1;
+        }
+        .cinematic-text {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--gold);
+            letter-spacing: 4px;
+            text-shadow: 0 0 40px var(--gold-glow-strong);
+            animation: cinematicIn 0.6s var(--transition-spring);
+            text-align: center;
+        }
+        @keyframes cinematicIn {
+            from {
+                transform: scale(0.3);
+                opacity: 0;
+                filter: blur(10px);
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+                filter: blur(0);
+            }
+        }
+
+        /* ── Vault Door Animation ── */
+        .vault-door-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: radial-gradient(circle, #3a3028 0%, #1a1610 70%, #0a0806 100%);
+            border: 6px solid #4a3f35;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+        .vault-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gold-dim);
+            border-radius: 50%;
+            animation: vaultSpin 2s linear infinite;
+            position: relative;
+        }
+        .vault-spinner::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background: var(--gold);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+        @keyframes vaultSpin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .vault-open {
+            animation: vaultBurst 0.5s ease-out forwards;
+        }
+        @keyframes vaultBurst {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.3);
+                border-color: var(--gold);
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* ── Loot Popup ── */
+        .loot-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: var(--bg-panel);
+            border: 2px solid #9b59b6;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            z-index: 1800;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(155, 89, 182, 0.4);
+            transition: transform 0.4s var(--transition-bounce);
+            pointer-events: auto;
+        }
+        .loot-popup.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .loot-rarity-common {
+            border-color: #888;
+            box-shadow: 0 0 30px rgba(136, 136, 136, 0.3);
+        }
+        .loot-rarity-rare {
+            border-color: #4caf50;
+            box-shadow: 0 0 40px rgba(76, 175, 80, 0.4);
+        }
+        .loot-rarity-epic {
+            border-color: #9b59b6;
+            box-shadow: 0 0 50px rgba(155, 89, 182, 0.5);
+        }
+        .loot-rarity-legendary {
+            border-color: #ff9800;
+            box-shadow: 0 0 60px rgba(255, 152, 0, 0.6);
+        }
+        .loot-rarity-mythic {
+            border-color: #ffd966;
+            box-shadow: 0 0 80px rgba(255, 217, 102, 0.7);
+            animation: mythicGlow 1s infinite;
+        }
+        @keyframes mythicGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 60px rgba(255, 217, 102, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 100px rgba(255, 217, 102, 0.9), 0 0 150px rgba(255, 200, 50, 0.4);
+            }
+        }
+
+        /* ── Mobile Responsive ── */
+        @media (max-width: 600px) {
+            .game-card {
+                padding: 1rem;
+                border-radius: var(--radius-lg);
+            }
+            .difficulty-btn {
+                padding: 0.45rem 0.8rem;
+                font-size: 0.75rem;
+                min-width: 70px;
+                flex: 1;
+            }
+            .wire-btn {
+                padding: 0.7rem 1rem;
+                font-size: 0.9rem;
+                min-width: 70px;
+            }
+            .bag-counter button {
+                width: 38px;
+                height: 38px;
+                font-size: 1.3rem;
+            }
+            .bag-count {
+                font-size: 1.6rem;
+                padding: 0.15rem 1rem;
+            }
+            .game-title {
+                font-size: 1.2rem;
+                letter-spacing: 1px;
+            }
+            .nav-bar {
+                padding: 0.5rem 0.8rem;
+                gap: 0.4rem;
+            }
+            .back-home {
+                font-size: 0.75rem;
+                padding: 0.35rem 0.7rem;
+            }
+            .balance-tag {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.8rem;
+            }
+            .toast-msg {
+                font-size: 0.75rem;
+                padding: 10px 16px;
+                bottom: 10px;
+            }
+            .cinematic-text {
+                font-size: 1.3rem;
+                letter-spacing: 2px;
+            }
+            .loot-popup {
+                padding: 1rem;
+                width: 85vw;
+            }
+        }
+        @media (max-width: 380px) {
+            .difficulty-row {
+                gap: 0.4rem;
+            }
+            .difficulty-btn {
+                padding: 0.4rem 0.5rem;
+                font-size: 0.7rem;
+            }
+            .wire-panel {
+                gap: 0.5rem;
+            }
+            .wire-btn {
+                padding: 0.5rem 0.7rem;
+                font-size: 0.75rem;
+                min-width: 55px;
+                border-radius: 14px;
+            }
+            .digit-grid {
+                gap: 0.4rem;
+                max-width: 240px;
+            }
+            .digit-btn {
+                padding: 0.5rem;
+                font-size: 1rem;
+                border-radius: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Background Effects ── -->
+    <div class="bg-layer" aria-hidden="true">
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2"></div>
+        <div class="bg-orb orb-3"></div>
+        <div id="particlesContainer"></div>
+    </div>
+
+    <!-- ── Cinematic Overlay ── -->
+    <div class="cinematic-overlay" id="cinematicOverlay">
+        <div class="cinematic-text" id="cinematicText"></div>
+    </div>
+
+    <!-- ── Loot Popup ── -->
+    <div class="loot-popup" id="lootPopup" style="display:none;">
+        <div id="lootContent"></div>
+        <button id="lootCloseBtn" style="margin-top:1rem;background:var(--gold-dim);border:none;padding:0.5rem 1.5rem;border-radius:30px;font-weight:700;cursor:pointer;color:#1a150e;">COLLECT</button>
+    </div>
+
+    <!-- ── Game Wrapper ── -->
+    <div class="game-wrapper">
+        <!-- Nav Bar -->
+        <div class="nav-bar">
+            <a href=".././home.html" class="back-home"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <div class="balance-tag"><i class="fas fa-coins"></i> <span id="balanceDisplay">0</span></div>
+            <div class="nav-actions">
+                <div class="heat-indicator" id="heatIndicator" title="Heat Level">🔥 <span id="heatLevel">0</span></div>
+                <button id="soundToggle" class="sound-btn" aria-label="Toggle Sound"><i class="fas fa-volume-up"></i></button>
+            </div>
+        </div>
+
+        <!-- Game Card -->
+        <div class="game-card" id="gameCard">
+            <div class="game-title">
+                <span class="icon-mask"><i class="fas fa-mask"></i></span> BANK HEIST
+                <span class="icon-mask" style="animation-delay:0.5s;"><i class="fas fa-gem"></i></span>
+            </div>
+
+            <!-- Rank Badge -->
+            <div style="text-align:center;margin-bottom:0.8rem;" id="rankDisplay">
+                <span style="font-size:0.75rem;color:var(--text-muted);background:rgba(255,217,102,0.08);padding:0.25rem 0.8rem;border-radius:30px;letter-spacing:1px;" id="rankBadge">🔰 ROOKIE</span>
+            </div>
+
+            <!-- Difficulty -->
+            <div class="difficulty-row" id="difficultyRow">
+                <div class="difficulty-btn" data-mult="1.5" data-name="Small Branch" data-risk="Low">
+                    🏦 SMALL BRANCH<span class="difficulty-mult">1.5×</span><span class="difficulty-risk">Low Risk</span>
+                </div>
+                <div class="difficulty-btn" data-mult="3.0" data-name="City Bank" data-risk="Medium">
+                    🌆 CITY BANK<span class="difficulty-mult">3.0×</span><span class="difficulty-risk">Med Risk</span>
+                </div>
+                <div class="difficulty-btn" data-mult="6.0" data-name="Central Reserve" data-risk="High">
+                    🏛️ CENTRAL RESERVE<span class="difficulty-mult">6.0×</span><span class="difficulty-risk">High Risk</span>
+                </div>
+            </div>
+
+            <!-- Bet -->
+            <div class="bet-row">
+                <label><i class="fas fa-coins"></i> BET</label>
+                <input type="number" id="betAmount" class="bet-input" value="50" step="10" min="10" max="999999">
+            </div>
+            <div class="bet-quick-btns">
+                <button class="bet-quick-btn" data-bet="25">25</button>
+                <button class="bet-quick-btn" data-bet="50">50</button>
+                <button class="bet-quick-btn" data-bet="100">100</button>
+                <button class="bet-quick-btn" data-bet="250">250</button>
+                <button class="bet-quick-btn" data-bet="500">500</button>
+                <button class="bet-quick-btn" data-bet="1000">1K</button>
+                <button class="bet-quick-btn" data-bet="5000">5K</button>
+            </div>
+            <div class="nugget-check">
+                <input type="checkbox" id="nuggetCheckbox">
+                <label for="nuggetCheckbox">✨ GOLD NUGGET (+10% bet) — +25% final payout ✨</label>
+            </div>
+
+            <!-- Start Button -->
+            <button id="startHeistBtn" class="start-btn"><i class="fas fa-fingerprint"></i> PLAN HEIST</button>
+
+            <!-- Stage Container -->
+            <div id="stageContainer" style="display: none;">
+                <div class="stage-progress" id="stageProgress">
+                    <div class="stage-dot" data-stage="1"></div>
+                    <div class="stage-dot" data-stage="2"></div>
+                    <div class="stage-dot" data-stage="3"></div>
+                </div>
+                <div class="stage-container">
+                    <div class="stage-title" id="stageTitle">🔪 INFILTRATION</div>
+                    <div id="stageContent"></div>
+                    <div id="stageResult" class="result-msg"></div>
+                </div>
+                <button id="resetHeistBtn" class="reset-heist-btn" style="display: none;">
+                    <i class="fas fa-undo-alt"></i> NEW HEIST
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toastMsg" class="toast-msg"></div>
+
+    <script>
+        (function() {
+            // ═══════════════════════════════════════
+            //  GOLD BANK HEIST · Elite Vault Run
+            //  Production-Quality Casino Minigame
+            // ═══════════════════════════════════════
+
+            // ── Audio Engine ──
+            class AudioEngine {
+                constructor() {
+                    this.ctx = null;
+                    this.enabled = true;
+                    this.initialized = false;
+                }
+                init() {
+                    if (this.initialized || !this.enabled) return;
+                    try {
+                        this.ctx = new(window.AudioContext || window.webkitAudioContext)();
+                        this.initialized = true;
+                    } catch (e) { /* silent */ }
+                }
+                play(type) {
+                    if (!this.enabled || !this.ctx) return;
+                    try {
+                        const now = this.ctx.currentTime;
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        const tones = {
+                            click: { type: 'sine', freq: 880, dur: 0.12, vol: 0.07 },
+                            stageClear: { type: 'triangle', freq: 660, dur: 0.35, vol: 0.1,
+                                ramp: 1200 },
+                            win: { type: 'square', freq: 523, dur: 0.5, vol: 0.12, ramp: 1047 },
+                            bigWin: { type: 'square', freq: 440, dur: 0.7, vol: 0.14, ramp: 1320 },
+                            fail: { type: 'sawtooth', freq: 180, dur: 0.45, vol: 0.1, ramp: 60 },
+                            alarm: { type: 'sawtooth', freq: 200, dur: 0.6, vol: 0.08, ramp: 400 },
+                            heartbeat: { type: 'sine', freq: 50, dur: 0.3, vol: 0.15, ramp: 30 },
+                            loot: { type: 'triangle', freq: 880, dur: 0.4, vol: 0.1, ramp: 1760 },
+                            siren: { type: 'sawtooth', freq: 300, dur: 0.8, vol: 0.06, ramp: 600 },
+                            tension: { type: 'sine', freq: 100, dur: 0.25, vol: 0.08 },
+                        };
+                        const t = tones[type] || tones.click;
+                        osc.type = t.type;
+                        osc.frequency.setValueAtTime(t.freq, now);
+                        if (t.ramp) osc.frequency.exponentialRampToValueAtTime(t.ramp, now + t.dur);
+                        gain.gain.setValueAtTime(t.vol, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + t.dur);
+                        osc.start(now);
+                        osc.stop(now + t.dur + 0.05);
+                    } catch (e) { /* silent */ }
+                }
+                toggle() {
+                    this.enabled = !this.enabled;
+                    if (this.enabled) this.init();
+                    return this.enabled;
+                }
+            }
+
+            // ── Haptic Feedback ──
+            function haptic(type = 'light') {
+                if (!navigator.vibrate) return;
+                const patterns = { light: [10], medium: [20], heavy: [40], double: [15, 30, 15],
+                    success: [20, 40, 20, 40, 30], failure: [50, 30, 80] };
+                const p = patterns[type] || patterns.light;
+                try { navigator.vibrate(p); } catch (e) { /* silent */ }
+            }
+
+            // ── Toast System ──
+            function showToast(msg, type = '') {
+                const t = document.getElementById('toastMsg');
+                t.textContent = msg;
+                t.classList.remove('show', 'error', 'loot');
+                if (type === 'error') t.classList.add('error');
+                if (type === 'loot') t.classList.add('loot');
+                void t.offsetWidth;
+                t.classList.add('show');
+                clearTimeout(t._timeout);
+                t._timeout = setTimeout(() => t.classList.remove('show'), 3000);
+            }
+
+            // ── Cinematic Overlay ──
+            function showCinematic(text, duration = 1200) {
+                const overlay = document.getElementById('cinematicOverlay');
+                const textEl = document.getElementById('cinematicText');
+                textEl.textContent = text;
+                overlay.classList.add('active');
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        overlay.classList.remove('active');
+                        setTimeout(resolve, 300);
+                    }, duration);
+                });
+            }
+
+            // ── User Data Manager ──
+            class UserManager {
+                constructor() {
+                    this.user = null;
+                    this.usersCache = null;
+                }
+                getUsers() {
+                    if (this.usersCache) return this.usersCache;
+                    try {
+                        this.usersCache = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                    } catch (e) {
+                        this.usersCache = {};
+                    }
+                    return this.usersCache;
+                }
+                saveUsers(users) {
+                    try {
+                        localStorage.setItem('gold_users', JSON.stringify(users));
+                        this.usersCache = users;
+                    } catch (e) {
+                        showToast('Storage error. Clear some data.', 'error');
+                    }
+                }
+                loadUser() {
+                    const sess = sessionStorage.getItem('gold_current_user');
+                    if (!sess) { window.location.href = '../../sign-in.html'; return false; }
+                    let su;
+                    try { su = JSON.parse(sess); } catch (e) { window.location.href =
+                        '../../sign-in.html'; return false; }
+                    const users = this.getUsers();
+                    let user = users[su.username];
+                    if (!user) {
+                        sessionStorage.removeItem('gold_current_user');
+                        window.location.href = '../../sign-in.html';
+                        return false;
+                    }
+                    // Initialize extended properties
+                    if (!user.bankHeistStats) user.bankHeistStats = this.defaultHeistStats();
+                    if (!user.bankHeistUpgrades) user.bankHeistUpgrades = this.defaultUpgrades();
+                    if (!user.bankHeistInventory) user.bankHeistInventory = [];
+                    if (!user.bankHeistHeat) user.bankHeistHeat = 0;
+                    if (!user.bankHeistRank) user.bankHeistRank = { rank: 'Rookie', xp: 0,
+                        prestigeLevel: 0 };
+                    if (!user.bankHeistMissions) user.bankHeistMissions = this.defaultMissions();
+                    if (!user.bankHeistAchievements) user.bankHeistAchievements = [];
+                    if (!user.unlockedAvatars) user.unlockedAvatars = [];
+                    if (!user.earnedAchievements) user.earnedAchievements = [];
+                    if (!user.gamePlayCount) user.gamePlayCount = {};
+                    if (!user.gameOutcomes) user.gameOutcomes = [];
+                    if (!user.transactions) user.transactions = [];
+                    if (!user.globalStats) user.globalStats = { totalWagered: 0, totalWon: 0,
+                        totalGames: 0, totalWins: 0, currentStreak: 0, bestStreak: 0 };
+                    if (!user.xp) user.xp = 0;
+                    this.user = user;
+                    return true;
+                }
+                defaultHeistStats() {
+                    return {
+                        wins: 0,
+                        losses: 0,
+                        totalBet: 0,
+                        totalWin: 0,
+                        bestMultiplier: 1,
+                        consecutiveWins: 0,
+                        maxConsecutiveWins: 0,
+                        perfectHeists: 0,
+                        silentHeists: 0,
+                        totalLootCollected: 0,
+                    };
+                }
+                defaultUpgrades() {
+                    return {
+                        fasterHacking: 0,
+                        betterEscape: 0,
+                        reducedAlarm: 0,
+                        extraRetry: 0,
+                        bonusPayout: 0,
+                    };
+                }
+                defaultMissions() {
+                    return {
+                        daily: { id: 'daily_' + new Date().toDateString(), progress: 0, target: 3,
+                            reward: 200, claimed: false, desc: 'Complete 3 heists today' },
+                        weekly: { id: 'weekly_' + this.getWeekId(), progress: 0, target: 15,
+                            reward: 1500, claimed: false, desc: 'Complete 15 heists this week' },
+                    };
+                }
+                getWeekId() {
+                    const d = new Date();
+                    const start = new Date(d.getFullYear(), 0, 1);
+                    return 'W' + Math.ceil(((d - start) / 86400000 + start.getDay() + 1) / 7) + '_' + d
+                        .getFullYear();
+                }
+                async save() {
+                    const users = this.getUsers();
+                    users[this.user.username] = this.user;
+                    this.saveUsers(users);
+                    const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
+                    if (sess) { sess.balance = this.user.balance;
+                        sessionStorage.setItem('gold_current_user', JSON.stringify(sess)); }
+                }
+                updateBalanceUI() {
+                    document.getElementById('balanceDisplay').textContent = this.user.balance
+                        .toLocaleString();
+                }
+                addTransaction(desc, amount, type) {
+                    this.user.transactions.unshift({ desc, amount, type, date: new Date()
+                    .toISOString() });
+                    if (this.user.transactions.length > 150) this.user.transactions.pop();
+                }
+            }
+
+            // ── Loot System ──
+            const LOOT_TABLE = [
+                { name: 'Copper Coin', rarity: 'common', icon: '🪙', weight: 45, value: 10,
+                    type: 'currency' },
+                { name: 'Silver Bar', rarity: 'common', icon: '🔩', weight: 25, value: 25,
+                type: 'currency' },
+                { name: 'Gold Flake', rarity: 'rare', icon: '✨', weight: 15, value: 75, type: 'currency' },
+                { name: 'Ruby Gem', rarity: 'rare', icon: '💎', weight: 8, value: 200, type: 'currency' },
+                { name: 'Sapphire', rarity: 'epic', icon: '🔷', weight: 4, value: 500, type: 'currency' },
+                { name: 'Diamond', rarity: 'epic', icon: '💠', weight: 2, value: 1500, type: 'currency' },
+                { name: 'Gold Mask', rarity: 'legendary', icon: '🎭', weight: 0.7, value: 5000,
+                    type: 'cosmetic', cosmeticId: 'gold-mask' },
+                { name: 'Crown Jewel', rarity: 'legendary', icon: '👑', weight: 0.2, value: 10000,
+                    type: 'currency' },
+                { name: 'Mythic Vault Key', rarity: 'mythic', icon: '🗝️', weight: 0.08, value: 50000,
+                    type: 'cosmetic', cosmeticId: 'vault-key' },
+                { name: 'Golden Ticket', rarity: 'mythic', icon: '🎫', weight: 0.02, value: 100000,
+                    type: 'jackpot' },
+            ];
+
+            function rollLoot(luckBonus = 0) {
+                const totalWeight = LOOT_TABLE.reduce((s, l) => s + l.weight, 0);
+                let roll = Math.random() * totalWeight;
+                // Luck bonus slightly shifts the roll
+                roll -= luckBonus * (totalWeight * 0.03);
+                roll = Math.max(0, roll);
+                let cumulative = 0;
+                for (const loot of LOOT_TABLE) {
+                    cumulative += loot.weight;
+                    if (roll <= cumulative) return { ...loot };
+                }
+                return { ...LOOT_TABLE[0] };
+            }
+
+            function showLootPopup(lootItem, callback) {
+                const popup = document.getElementById('lootPopup');
+                const content = document.getElementById('lootContent');
+                const rarityClass = 'loot-rarity-' + lootItem.rarity;
+                popup.className = 'loot-popup show ' + rarityClass;
+                content.innerHTML = `
+                    <div style="font-size:3rem;">${lootItem.icon}</div>
+                    <div style="font-weight:900;font-size:1.2rem;margin:0.5rem 0;text-transform:uppercase;letter-spacing:2px;">
+                        ${lootItem.rarity.toUpperCase()} LOOT!
+                    </div>
+                    <div style="font-weight:700;">${lootItem.name}</div>
+                    <div style="color:var(--gold);font-weight:800;margin-top:0.3rem;">
+                        ${lootItem.type === 'currency' ? '+' + lootItem.value + ' GOLD' : 'SPECIAL ITEM!'}
+                    </div>
+                `;
+                popup.style.display = 'block';
+                document.getElementById('lootCloseBtn').onclick = () => {
+                    popup.style.display = 'none';
+                    popup.classList.remove('show');
+                    if (callback) callback(lootItem);
+                };
+                haptic('success');
+            }
+
+            // ── Random Events ──
+            const RANDOM_EVENTS = [
+                { id: 'inside_man', name: '🕵️ Inside Man!', desc: 'A contact disables one security layer!',
+                    effect: 'reduceRisk', value: 0.15, weight: 8 },
+                { id: 'security_malfunction', name: '🔧 Security Malfunction!',
+                    desc: 'Cameras flicker — risk reduced!', effect: 'reduceRisk', value: 0.2, weight: 6 },
+                { id: 'hidden_vault', name: '🏚️ Hidden Vault Found!',
+                    desc: 'Extra loot opportunity — +bonus multiplier!', effect: 'bonusMult', value: 0.5,
+                    weight: 5 },
+                { id: 'double_guards', name: '🚨 Double Guards!', desc: 'Extra patrol — risk increased!',
+                    effect: 'increaseRisk', value: 0.18, weight: 7 },
+                { id: 'gold_explosion', name: '💥 GOLD EXPLOSION!',
+                    desc: 'A vault malfunction scatters gold everywhere!', effect: 'jackpotChance', value: 0.15,
+                    weight: 2 },
+                { id: 'smooth_sailing', name: '🌊 Smooth Sailing', desc: 'Everything goes according to plan.',
+                    effect: 'none', value: 0, weight: 20 },
+            ];
+
+            function rollRandomEvent() {
+                const totalWeight = RANDOM_EVENTS.reduce((s, e) => s + e.weight, 0);
+                let roll = Math.random() * totalWeight;
+                let cumulative = 0;
+                for (const evt of RANDOM_EVENTS) {
+                    cumulative += evt.weight;
+                    if (roll <= cumulative) return evt;
+                }
+                return RANDOM_EVENTS[RANDOM_EVENTS.length - 1];
+            }
+
+            // ── Stage Definitions ──
+            const STAGE_POOL = {
+                infiltration: [
+                    { id: 'wire_cut', name: '🔪 CUT THE WIRE',
+                        desc: 'Cut the correct wire to disable the alarm system.', icon: 'fa-bolt',
+                        difficulty: 'easy' },
+                    { id: 'keycard_match', name: '🪪 KEYCARD MATCH',
+                        desc: 'Match the keycard pattern to unlock the door.', icon: 'fa-id-card',
+                        difficulty: 'easy' },
+                    { id: 'lockpick', name: '🔓 LOCKPICK TIMING',
+                        desc: 'Time the lockpick to the sweet spot.', icon: 'fa-lock', difficulty: 'medium' },
+                    { id: 'fingerprint', name: '👆 FINGERPRINT SCAN',
+                        desc: 'Replicate the fingerprint sequence.', icon: 'fa-fingerprint',
+                        difficulty: 'medium' },
+                ],
+                vault: [
+                    { id: 'safe_crack', name: '🔐 CRACK THE SAFE',
+                        desc: 'Memorize and enter the 4-digit code.', icon: 'fa-shield-halved',
+                        difficulty: 'medium' },
+                    { id: 'laser_dodge', name: '🔴 LASER DODGE',
+                        desc: 'Navigate through laser beams — choose safe paths.', icon: 'fa-wave-square',
+                        difficulty: 'hard' },
+                    { id: 'thermal_sensor', name: '🌡️ THERMAL SENSOR',
+                        desc: 'Stay cool — match the thermal pattern.', icon: 'fa-temperature-high',
+                        difficulty: 'medium' },
+                    { id: 'camera_avoid', name: '📸 CAMERA AVOIDANCE',
+                        desc: 'Time your moves when cameras are facing away.', icon: 'fa-video',
+                        difficulty: 'hard' },
+                ],
+                escape: [
+                    { id: 'grab_bags', name: '💰 GRAB THE GOLD',
+                        desc: 'Load up bags and escape before guards arrive!', icon: 'fa-sack-dollar',
+                        difficulty: 'varies' },
+                    { id: 'timed_vault', name: '⏱️ TIMED VAULT ROTATION',
+                        desc: 'The vault rotates — grab what you can before it seals!', icon: 'fa-rotate',
+                        difficulty: 'hard' },
+                ],
+            };
+
+            function pickStage(poolKey) {
+                const pool = STAGE_POOL[poolKey];
+                return pool[Math.floor(Math.random() * pool.length)];
+            }
+
+            // ═══════════════════════════════════════
+            //  MAIN GAME ENGINE
+            // ═══════════════════════════════════════
+            class BankHeistGame {
+                constructor(userManager, audioEngine) {
+                    this.um = userManager;
+                    this.audio = audioEngine;
+                    this.state = this.defaultState();
+                    this.stageData = {};
+                    this.comboMultiplier = 1;
+                    this.stagesCompletedCleanly = 0;
+                    this.currentEvent = null;
+                    this.bindUI();
+                    this.updateHeatDisplay();
+                    this.updateRankDisplay();
+                    this.createParticles();
+                }
+
+                defaultState() {
+                    return {
+                        active: false,
+                        currentStage: 0,
+                        totalStages: 3,
+                        difficulty: null,
+                        difficultyMult: 1.5,
+                        baseBet: 0,
+                        nugget: false,
+                        totalCost: 0,
+                        selectedStages: [],
+                        stageResults: [],
+                        eventTriggered: false,
+                    };
+                }
+
+                // ── UI Binding ──
+                bindUI() {
+                    // Difficulty buttons
+                    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            if (this.state.active) return;
+                            document.querySelectorAll('.difficulty-btn').forEach(b => b
+                                .classList.remove('selected'));
+                            btn.classList.add('selected');
+                            haptic('light');
+                        });
+                    });
+                    // Select default difficulty
+                    const firstDiff = document.querySelector('.difficulty-btn');
+                    if (firstDiff) firstDiff.classList.add('selected');
+
+                    // Quick bet buttons
+                    document.querySelectorAll('.bet-quick-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            if (this.state.active) return;
+                            const bet = parseInt(btn.dataset.bet);
+                            document.getElementById('betAmount').value = bet;
+                            haptic('light');
+                        });
+                    });
+
+                    // Start button
+                    document.getElementById('startHeistBtn').addEventListener('click', () => this
+                        .startHeist());
+
+                    // Reset button
+                    document.getElementById('resetHeistBtn').addEventListener('click', () => this
+                        .resetHeist());
+
+                    // Sound toggle
+                    document.getElementById('soundToggle').addEventListener('click', () => {
+                        const enabled = this.audio.toggle();
+                        document.getElementById('soundToggle').innerHTML = enabled ?
+                            '<i class="fas fa-volume-up"></i>' :
+                            '<i class="fas fa-volume-mute"></i>';
+                        localStorage.setItem('gold_sound_enabled', enabled);
+                        haptic('light');
+                    });
+
+                    // Bet input validation
+                    document.getElementById('betAmount').addEventListener('input', function() {
+                        let val = parseInt(this.value);
+                        if (isNaN(val) || val < 1) this.value = 10;
+                    });
+
+                    // Keyboard shortcuts
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' && !this.state.active) this.startHeist();
+                        if (e.key === 'Escape' && this.state.active) this
+                    .resetHeist();
+                    });
+                }
+
+                // ── Heat Level ──
+                getHeatLevel() {
+                    return this.um.user?.bankHeistHeat || 0;
+                }
+                increaseHeat(amount = 1) {
+                    if (!this.um.user) return;
+                    this.um.user.bankHeistHeat = Math.min(10, (this.um.user.bankHeistHeat || 0) + amount);
+                    this.updateHeatDisplay();
+                }
+                decreaseHeat(amount = 1) {
+                    if (!this.um.user) return;
+                    this.um.user.bankHeistHeat = Math.max(0, (this.um.user.bankHeistHeat || 0) - amount);
+                    this.updateHeatDisplay();
+                }
+                updateHeatDisplay() {
+                    const heat = this.getHeatLevel();
+                    const el = document.getElementById('heatLevel');
+                    const indicator = document.getElementById('heatIndicator');
+                    el.textContent = heat;
+                    if (heat >= 7) {
+                        indicator.classList.add('heat-wanted');
+                        indicator.title = '🔥 MOST WANTED — High risk, high rewards!';
+                    } else {
+                        indicator.classList.remove('heat-wanted');
+                        indicator.title = 'Heat Level: ' + heat;
+                    }
+                }
+
+                // ── Rank System ──
+                getRankInfo() {
+                    const xp = this.um.user?.bankHeistRank?.xp || 0;
+                    const prestige = this.um.user?.bankHeistRank?.prestigeLevel || 0;
+                    const ranks = [
+                        { name: 'Rookie', minXp: 0, icon: '🔰', color: '#888' },
+                        { name: 'Crew Member', minXp: 500, icon: '👤', color: '#aaa' },
+                        { name: 'Specialist', minXp: 2000, icon: '🎯', color: '#4caf50' },
+                        { name: 'Mastermind', minXp: 8000, icon: '🧠', color: '#ff9800' },
+                        { name: 'Kingpin', minXp: 25000, icon: '👑', color: '#ffd966' },
+                    ];
+                    let rank = ranks[0];
+                    for (let i = ranks.length - 1; i >= 0; i--) {
+                        if (xp >= ranks[i].minXp) { rank = ranks[i]; break; }
+                    }
+                    const nextRank = ranks[ranks.indexOf(rank) + 1] || null;
+                    const progress = nextRank ? ((xp - rank.minXp) / (nextRank.minXp - rank.minXp) * 100) :
+                        100;
+                    return { ...rank, prestige, progress, nextRank, totalXp: xp };
+                }
+                updateRankDisplay() {
+                    const info = this.getRankInfo();
+                    const badge = document.getElementById('rankBadge');
+                    const prestigeStr = info.prestige > 0 ? ` · P${info.prestige}` : '';
+                    badge.textContent = `${info.icon} ${info.name.toUpperCase()}${prestigeStr}`;
+                    badge.style.color = info.color;
+                }
+                addRankXp(amount) {
+                    if (!this.um.user) return;
+                    if (!this.um.user.bankHeistRank) this.um.user.bankHeistRank = { rank: 'Rookie', xp: 0,
+                        prestigeLevel: 0 };
+                    const oldRank = this.getRankInfo().name;
+                    this.um.user.bankHeistRank.xp = (this.um.user.bankHeistRank.xp || 0) + amount;
+                    const newRank = this.getRankInfo().name;
+                    if (newRank !== oldRank) {
+                        showToast(`🎉 RANK UP! ${newRank.toUpperCase()}!`, '');
+                        this.audio.play('bigWin');
+                        this.showCinematicBriefly('RANK UP!');
+                    }
+                    this.updateRankDisplay();
+                }
+
+                // ── Prestige ──
+                checkPrestige() {
+                    const info = this.getRankInfo();
+                    if (info.name === 'Kingpin' && info.totalXp >= 35000 && info.prestige < 5) {
+                        if (confirm(
+                                `🌟 PRESTIGE AVAILABLE!\n\nReset your rank to Rookie for prestige level ${info.prestige + 1}?\nYou'll keep your inventory and get a permanent +5% payout bonus.\n\nCurrent XP: ${info.totalXp}`
+                                )) {
+                            this.um.user.bankHeistRank = { rank: 'Rookie', xp: 0, prestigeLevel: info.prestige +
+                                1 };
+                            if (!this.um.user.bankHeistUpgrades) this.um.user.bankHeistUpgrades = {};
+                            this.um.user.bankHeistUpgrades.bonusPayout = (this.um.user.bankHeistUpgrades
+                                .bonusPayout || 0) + 5;
+                            this.um.save();
+                            this.updateRankDisplay();
+                            showToast(`🌟 PRESTIGE ${info.prestige + 1}! +5% permanent payout bonus!`, '');
+                            this.audio.play('bigWin');
+                        }
+                    }
+                }
+
+                // ── Missions ──
+                updateMissions() {
+                    if (!this.um.user) return;
+                    if (!this.um.user.bankHeistMissions) this.um.user.bankHeistMissions = this.um
+                    .defaultMissions();
+                    const missions = this.um.user.bankHeistMissions;
+                    // Daily
+                    const todayId = 'daily_' + new Date().toDateString();
+                    if (missions.daily.id !== todayId) {
+                        missions.daily = { id: todayId, progress: 0, target: 3, reward: 200, claimed: false,
+                            desc: 'Complete 3 heists today' };
+                    }
+                    missions.daily.progress = Math.min(missions.daily.target, missions.daily.progress + 1);
+                    if (missions.daily.progress >= missions.daily.target && !missions.daily.claimed) {
+                        missions.daily.claimed = true;
+                        this.um.user.balance += missions.daily.reward;
+                        showToast(`📋 DAILY MISSION COMPLETE! +${missions.daily.reward} GOLD`, '');
+                        this.audio.play('win');
+                    }
+                    // Weekly
+                    const weekId = 'weekly_' + this.um.getWeekId();
+                    if (missions.weekly.id !== weekId) {
+                        missions.weekly = { id: weekId, progress: 0, target: 15, reward: 1500, claimed: false,
+                            desc: 'Complete 15 heists this week' };
+                    }
+                    missions.weekly.progress = Math.min(missions.weekly.target, missions.weekly.progress + 1);
+                    if (missions.weekly.progress >= missions.weekly.target && !missions.weekly.claimed) {
+                        missions.weekly.claimed = true;
+                        this.um.user.balance += missions.weekly.reward;
+                        showToast(`📋 WEEKLY CHALLENGE COMPLETE! +${missions.weekly.reward} GOLD`, '');
+                        this.audio.play('bigWin');
+                    }
+                }
+
+                // ── Particle Effects ──
+                createParticles() {
+                    const container = document.getElementById('particlesContainer');
+                    if (!container) return;
+                    container.innerHTML = '';
+                    for (let i = 0; i < 40; i++) {
+                        const p = document.createElement('div');
+                        p.className = 'particle';
+                        p.style.left = Math.random() * 100 + '%';
+                        p.style.bottom = -(Math.random() * 40 + 5) + '%';
+                        p.style.animationDelay = Math.random() * 10 + 's';
+                        p.style.animationDuration = (Math.random() * 7 + 4) + 's';
+                        container.appendChild(p);
+                    }
+                }
+
+                // ── Cinematic Helper ──
+                async showCinematicBriefly(text) {
+                    await showCinematic(text, 1000);
+                }
+
+                // ── Start Heist ──
+                async startHeist() {
+                    if (this.state.active) return;
+                    if (!this.um.user) { showToast('Please sign in first.', 'error'); return; }
+
+                    const betInput = document.getElementById('betAmount');
+                    let baseBet = parseInt(betInput.value);
+                    if (isNaN(baseBet) || baseBet < 1) { showToast('Invalid bet amount.', 'error'); return; }
+                    baseBet = Math.floor(Math.abs(baseBet));
+
+                    const nugget = document.getElementById('nuggetCheckbox').checked;
+                    const surcharge = nugget ? Math.floor(baseBet * 0.1) : 0;
+                    const totalCost = baseBet + surcharge;
+
+                    if (totalCost > this.um.user.balance) {
+                        showToast(`Insufficient balance. Need ${totalCost.toLocaleString()} GOLD.`, 'error');
+                        return;
+                    }
+
+                    const selectedDiff = document.querySelector('.difficulty-btn.selected');
+                    if (!selectedDiff) { showToast('Select a difficulty first.', 'error'); return; }
+                    const mult = parseFloat(selectedDiff.dataset.mult);
+                    if (isNaN(mult)) return;
+
+                    // Apply heat modifier
+                    const heat = this.getHeatLevel();
+                    const heatRiskBonus = heat * 0.02;
+                    const heatRewardBonus = heat * 0.05;
+
+                    // Deduct cost
+                    this.um.user.balance -= totalCost;
+                    await this.um.save();
+                    this.um.updateBalanceUI();
+
+                    // Pick stages randomly
+                    const stage1 = pickStage('infiltration');
+                    const stage2 = pickStage('vault');
+                    const stage3 = pickStage('escape');
+
+                    this.state = {
+                        active: true,
+                        currentStage: 1,
+                        totalStages: 3,
+                        difficulty: selectedDiff.dataset.name,
+                        difficultyMult: mult,
+                        baseBet: baseBet,
+                        nugget: nugget,
+                        totalCost: totalCost,
+                        selectedStages: [stage1, stage2, stage3],
+                        stageResults: [],
+                        eventTriggered: false,
+                        heatRiskBonus: heatRiskBonus,
+                        heatRewardBonus: heatRewardBonus,
+                    };
+                    this.comboMultiplier = 1;
+                    this.stagesCompletedCleanly = 0;
+                    this.currentEvent = null;
+
+                    document.getElementById('startHeistBtn').disabled = true;
+                    document.getElementById('stageContainer').style.display = 'block';
+                    document.getElementById('resetHeistBtn').style.display = 'none';
+                    document.getElementById('stageResult').innerHTML = '';
+                    document.getElementById('stageResult').className = 'result-msg';
+
+                    // Update stage dots
+                    this.updateStageDots();
+
+                    // Cinematic intro
+                    await showCinematic('🏦 ' + this.state.difficulty.toUpperCase(), 1000);
+                    this.audio.play('tension');
+                    this.showStage(1);
+                }
+
+                updateStageDots() {
+                    const dots = document.querySelectorAll('.stage-dot');
+                    dots.forEach((dot, i) => {
+                        dot.classList.remove('completed', 'active', 'failed');
+                        const stageNum = i + 1;
+                        if (stageNum < this.state.currentStage) dot.classList.add('completed');
+                        if (stageNum === this.state.currentStage) dot.classList.add('active');
+                        if (this.state.stageResults[i] === false) dot.classList.add('failed');
+                    });
+                }
+
+                // ── Show Stage ──
+                showStage(stageNum) {
+                    if (!this.state.active) return;
+                    this.state.currentStage = stageNum;
+                    this.updateStageDots();
+
+                    const stageInfo = this.state.selectedStages[stageNum - 1];
+                    const stageTitle = document.getElementById('stageTitle');
+                    const contentDiv = document.getElementById('stageContent');
+                    const resultDiv = document.getElementById('stageResult');
+                    resultDiv.innerHTML = '';
+                    resultDiv.className = 'result-msg';
+
+                    stageTitle.innerHTML =
+                        `${stageInfo.icon} ${stageInfo.name} <span style="font-size:0.7rem;color:var(--text-muted);">(${stageNum}/${this.state.totalStages})</span>`;
+
+                    // Roll random event on stage 2
+                    if (stageNum === 2 && !this.state.eventTriggered) {
+                        this.currentEvent = rollRandomEvent();
+                        this.state.eventTriggered = true;
+                        if (this.currentEvent.effect !== 'none') {
+                            showToast(this.currentEvent.name + ' ' + this.currentEvent.desc, '');
+                        }
+                    }
+
+                    // Dispatch to stage handler
+                    switch (stageInfo.id) {
+                        case 'wire_cut':
+                            this.buildWireCutStage(contentDiv, resultDiv);
+                            break;
+                        case 'keycard_match':
+                            this.buildKeycardMatchStage(contentDiv, resultDiv);
+                            break;
+                        case 'lockpick':
+                            this.buildLockpickStage(contentDiv, resultDiv);
+                            break;
+                        case 'fingerprint':
+                            this.buildFingerprintStage(contentDiv, resultDiv);
+                            break;
+                        case 'safe_crack':
+                            this.buildSafeCrackStage(contentDiv, resultDiv);
+                            break;
+                        case 'laser_dodge':
+                            this.buildLaserDodgeStage(contentDiv, resultDiv);
+                            break;
+                        case 'thermal_sensor':
+                            this.buildThermalStage(contentDiv, resultDiv);
+                            break;
+                        case 'camera_avoid':
+                            this.buildCameraAvoidStage(contentDiv, resultDiv);
+                            break;
+                        case 'grab_bags':
+                            this.buildGrabBagsStage(contentDiv, resultDiv);
+                            break;
+                        case 'timed_vault':
+                            this.buildTimedVaultStage(contentDiv, resultDiv);
+                            break;
+                        default:
+                            this.buildWireCutStage(contentDiv, resultDiv);
+                    }
+                }
+
+                // ── Stage: Wire Cut ──
+                buildWireCutStage(contentDiv, resultDiv) {
+                    const wireColors = ['RED', 'BLUE', 'GREEN', 'YELLOW'];
+                    const correctIdx = Math.floor(Math.random() * wireColors.length);
+                    this.stageData = { correctIdx, type: 'wire_cut' };
+                    contentDiv.innerHTML = `
+                        <p style="margin-bottom:1rem;color:var(--text-muted);">⚠️ One wire disables the alarm. Choose wisely...</p>
+                        <div class="wire-panel">
+                            ${wireColors.map((color, idx) => `
+                                <button class="wire-btn" data-wire="${idx}">
+                                    <i class="fas fa-bolt" style="color:${color.toLowerCase()};"></i>
+                                    ${color} WIRE
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                    contentDiv.querySelectorAll('.wire-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            if (!this.state.active) return;
+                            const idx = parseInt(btn.dataset.wire);
+                            if (idx === correctIdx) {
+                                this.handleStageSuccess(resultDiv, '✅ Wire cut! Alarm disabled.',
+                                    'stageClear');
+                            } else {
+                                btn.classList.add('wrong-flash');
+                                this.handleStageFailure(resultDiv,
+                                    '💥 WRONG WIRE! Alarm triggered!');
+                            }
+                        });
+                    });
+                }
+
+                // ── Stage: Keycard Match ──
+                buildKeycardMatchStage(contentDiv, resultDiv) {
+                    const pattern = Array.from({ length: 4 }, () => Math.floor(Math.random() * 4));
+                    const symbols = ['🔴', '🔵', '🟢', '🟡'];
+                    this.stageData = { pattern, playerPos: 0, type: 'keycard_match' };
+                    contentDiv.innerHTML = `
+                        <p style="margin-bottom:0.8rem;color:var(--text-muted);">🪪 Match the keycard pattern:</p>
+                        <div style="font-size:2rem;letter-spacing:8px;margin-bottom:1rem;" id="keycardPattern">
+                            ${pattern.map(i => symbols[i]).join(' ')}
+                        </div>
+                        <p style="font-size:0.8rem;color:var(--text-muted);" id="keycardProgress">Tap symbols in order...</p>
+                        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;" id="keycardButtons">
+                            ${symbols.map((s, i) => `
+                                <button class="wire-btn" data-symbol="${i}" style="min-width:60px;padding:0.7rem 1rem;">
+                                    <span style="font-size:1.8rem;">${s}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                    const progressEl = document.getElementById('keycardProgress');
+                    contentDiv.querySelectorAll('[data-symbol]').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            if (!this.state.active) return;
+                            const sym = parseInt(btn.dataset.symbol);
+                            if (sym === this.stageData.pattern[this.stageData.playerPos]) {
+                                this.stageData.playerPos++;
+                                this.audio.play('click');
+                                haptic('light');
+                                if (this.stageData.playerPos >= 4) {
+                                    this.handleStageSuccess(resultDiv,
+                                        '✅ Keycard matched! Door unlocked.',
+                                        'stageClear');
+                                } else {
+                                    progressEl.textContent =
+                                        `Correct! ${this.stageData.playerPos}/4 matched...`;
+                                }
+                            } else {
+                                this.handleStageFailure(resultDiv,
+                                    '❌ Wrong symbol! Security alert!');
+                            }
+                        });
+                    });
+                }
+
+                // ── Stage: Lockpick ──
+                buildLockpickStage(contentDiv, resultDiv) {
+                    const sweetSpot = 40 + Math.floor(Math.random() * 40);
+                    this.stageData = { sweetSpot, type: 'lockpick' };
+                    contentDiv.innerHTML = `
+                        <p style="margin-bottom:0.8rem;color:var(--text-muted);">🔓 Time the lockpick to the sweet spot:</p>
+                        <div style="background:#1a1712;border-radius:20px;height:30px;position:relative;overflow:hidden;margin:1rem 0;border:1px solid rgba(255,217,102,0.2);">
+                            <div id="lockpickMarker" style="position:absolute;width:12px;height:100%;background:var(--gold);border-radius:3px;left:${sweetSpot}%;transform:translateX(-50%);box-shadow:0 0 10px var(--gold-glow);"></div>
+                            <div id="lockpickSweeper" style="position:absolute;width:6px;height:100%;background:#ff5252;border-radius:3px;left:0%;animation:lockpickSweep 2s infinite ease-in-out;box-shadow:0 0 8px rgba(255,82,82,0.5);"></div>
+                        </div>
+                        <style>@keyframes lockpickSweep{0%,100%{left:5%;}50%{left:90%;}}</style>
+                        <button id="lockpickBtn" class="escape-btn" style="width:auto;padding:0.7rem 2rem;">🔓 PICK NOW!</button>
+                        <p style="font-size:0.7rem;color:var(--text-muted);margin-top:0.5rem;">Tap when the red marker aligns with the gold zone</p>
+                    `;
+                    document.getElementById('lockpickBtn').addEventListener('click', () => {
+                        if (!this.state.active) return;
+                        const sweeper = document.getElementById('lockpickSweeper');
+                        const computedLeft = parseFloat(getComputedStyle(sweeper).left);
+                        const parentWidth = sweeper.parentElement.offsetWidth;
+                        const sweeperPercent = (computedLeft / parentWidth) * 100;
+                        const distance = Math.abs(sweeperPercent - this.stageData.sweetSpot);
+                        if (distance < 8) {
+                            this.handleStageSuccess(resultDiv,
+                                '✅ Perfect pick! Lock opens smoothly.', 'stageClear');
+                        } else if (distance < 18) {
+                            this.handleStageSuccess(resultDiv,
+                                '✅ Lock picked! Not perfect but it worked.', 'stageClear');
+                        } else {
+                            this.handleStageFailure(resultDiv, '💥 Missed! Lock jammed — alarm sounds!');
+                        }
+                    });
+                }
+
+                // ── Stage: Fingerprint ──
+                buildFingerprintStage(contentDiv, resultDiv) {
+                    const seq = Array.from({ length: 3 }, () => Math.floor(Math.random() * 4) + 1);
+                    this.stageData = { seq, playerPos: 0, type: 'fingerprint' };
+                    const fingerNames = ['', 'Thumb', 'Index', 'Middle', 'Ring'];
+                    contentDiv.innerHTML = `
+                        <p style="margin-bottom:0.8rem;color:var(--text-muted);">👆 Replicate the fingerprint sequence:</p>
+                        <div style="font-size:1.4rem;letter-spacing:6px;margin-bottom:1rem;font-weight:800;color:var(--gold-bright);" id="fpSequence">
+                            ${seq.map(i => fingerNames[i]).join(' → ')}
+                        </div>
+                        <div style="display:flex;gap:0.7rem;justify-content:center;flex-wrap:wrap;" id="fpButtons">
+                            ${[1,2,3,4].map(i => `
+                                <button class="wire-btn" data-finger="${i}" style="min-width:70px;padding:0.6rem 1rem;">
+                                    ${['','👍','👆','🖕','💍'][i]}<br><small>${fingerNames[i]}</small>
+                                </button>
+                            `).join('')}
+                        </div>
+                        <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.5rem;" id="fpProgress">Tap the first finger...</p>
+                    `;
+                    const progEl = document.getElementById('fpProgress');
+                    contentDiv.querySelectorAll('[data-finger]').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            if (!this.state.active) return;
+                            const finger = parseInt(btn.dataset.finger);
+                            if (finger === this.stageData.seq[this.stageData.playerPos]) {
+                                this.stageData.playerPos++;
+                                this.audio.play('click');
+                                haptic('light');
+                                if (this.stageData.playerPos >= 3) {
+                                    this.handleStageSuccess(resultDiv,
+                                        '✅ Fingerprint accepted! Access granted.',
+                                        'stageClear');
+                                } else {
+                                    progEl.textContent =
+                                        `Good! Now tap finger ${this.stageData.playerPos + 1} of 3...`;
+                                }
+                            } else {
+                                this.handleStageFailure(resultDiv,
+                                    '❌ Wrong fingerprint! Biometric lock engaged.');
+                            }
+                        });
+                    });
+                }
+
+                // ── Stage: Safe Crack ──
+                buildSafeCrackStage(contentDiv, resultDiv) {
+                    const seq = Array.from({ length: 4 }, () => Math.floor(Math.random() * 10));
+                    this.stageData = { seq, playerPos: 0, type: 'safe_crack' };
+                    contentDiv.innerHTML = `
+                        <div class="vault-door-container" id="vaultDoor">
+                            <div class="vault-spinner"></div>
+                        </div>
+                        <div class="memory-display" id="memDisplay">${seq.join(' ')}</div>
+                        <p style="margin-bottom:1rem;color:var(--text-muted);">🔒 Memorize the code...</p>
+                        <div id="memDigits" style="display:none;" class="digit-grid"></div>
+                    `;
+                    const memDiv = document.getElementById('memDisplay');
+                    setTimeout(() => {
+                        if (!this.state.active) return;
+                        if (memDiv) memDiv.style.opacity = '0';
+                        setTimeout(() => {
+                            if (!this.state.active) return;
+                            const gridDiv = document.getElementById('memDigits');
+                            if (gridDiv) {
+                                gridDiv.style.display = 'grid';
+                                gridDiv.innerHTML = '';
+                                for (let i = 0; i <= 9; i++) {
+                                    const btn = document.createElement('button');
+                                    btn.textContent = i;
+                                    btn.classList.add('digit-btn');
+                                    btn.dataset.digit = i;
+                                    btn.addEventListener('click', () => {
+                                        if (!this.state.active) return;
+                                        const digit = parseInt(btn.dataset
+                                            .digit);
+                                        if (digit === this.stageData.seq[this
+                                                .stageData.playerPos
+                                            ]) {
+                                            this.stageData.playerPos++;
+                                            btn.classList.add(
+                                            'correct-press');
+                                            this.audio.play('click');
+                                            haptic('light');
+                                            if (this.stageData.playerPos >=
+                                                4) {
+                                                const vaultDoor = document
+                                                    .getElementById(
+                                                        'vaultDoor');
+                                                if (vaultDoor) vaultDoor
+                                                    .classList.add(
+                                                        'vault-open');
+                                                this.handleStageSuccess(
+                                                    resultDiv,
+                                                    '✅ Vault cracked open! Moving to escape...',
+                                                    'stageClear');
+                                            }
+                                        } else {
+                                            btn.classList.add('wrong-press');
+                                            this.handleStageFailure(
+                                                resultDiv,
+                                                '💥 Wrong digit! Security lockdown initiated.'
+                                                );
+                                        }
+                                    });
+                                    gridDiv.appendChild(btn);
+                                }
+                            }
+                        }, 200);
+                    }, 2200);
+                }
+
+                // ── Stage: Laser Dodge ──
+                buildLaserDodgeStage(contentDiv, resultDiv) {
+                    const safePaths = [Math.floor(Math.random() * 3)];
+                    this.stageData = { safePaths, type: 'laser_dodge' };
+                    const pathNames = ['Crawl Under', 'Slide Through Middle', 'Jump Over'];
+                    contentDiv.innerHTML = `
+                        <p style="margin-bottom:0.8rem;color:var(--text-muted);">🔴 Navigate the laser grid — choose a path:</p>
+                        <div style="font-size:3rem;margin:0.5rem 0;">🔴🔴🔴</div>
+                        <div style="display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;">
+                            ${pathNames.map((name, i) => `
+                                <button class="wire-btn" data-path="${i}" style="min-width:100px;">
+                                    <i class="fas fa-${i===0?'person-walking':i===1?'arrows-left-right':'person-running'}"></i>
+                                    ${name}
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                    contentDiv.querySelectorAll('[data-path]').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            if (!this.state.active) return;
+                            const path = parseInt(btn.dataset.path);
+                            if (path === safePaths[0]) {
+                                this.handleStageSuccess(resultDiv,
+                                    '✅ Clean pass through the lasers!', 'stageClear');
+                            } else {
+                                this.handleStageFailure(resultDiv,
+                                    '🔴 LASER TRIPPED! Alarms blaring!');
+                            }
+                        });
+                    });
+                }
+
+                // ── Stage: Thermal Sensor ──
+                buildThermalStage(contentDiv, resultDiv) {
+                    const targetTemp = 35 + Math.floor(Math.random() * 30);
+                    this.stageData = { targetTemp, type: 'thermal' };
+                    contentDiv.innerHTML = `
+                        <p style="margin-bottom:0.8rem;color:var(--text-muted);">🌡️ Match the thermal signature: <strong>${targetTemp}°C</strong></p>
+                        <input type="range" id="thermalSlider" min="20" max="80" value="50" style="width:80%;accent-color:var(--gold);">
+                        <div style="font-size:1.5rem;font-weight:800;color:var(--gold-bright);" id="thermalValue">50°C</div>
+                        <button id="thermalConfirm" class="escape-btn" style="width:auto;padding:0.6rem 1.5rem;margin-top:0.5rem;">🌡️ CONFIRM TEMP</button>
+                    `;
+                    const slider = document.getElementById('thermalSlider');
+                    const valDisplay = document.getElementById('thermalValue');
+                    slider.addEventListener('input', () => {
+                        valDisplay.textContent = slider.value + '°C';
+                    });
+                    document.getElementById('thermalConfirm').addEventListener('click', () => {
+                        if (!this.state.active) return;
+                        const diff = Math.abs(parseInt(slider.value) - targetTemp);
+                        if (diff <= 3) {
+                            this.handleStageSuccess(resultDiv,
+                                '✅ Thermal signature matched! Sensors bypassed.',
+                                'stageClear');
+                        } else if (diff <= 8) {
+                            this.handleStageSuccess(resultDiv,
+                                '⚠️ Close enough — sensors momentarily confused. Go!',
+                                'stageClear');
+                        } else {
+                            this.handleStageFailure(resultDiv,
+                                '🔥 Thermal spike detected! Security alerted!');
+                        }
+                    });
+                }
+
+                // ── Stage: Camera Avoidance ──
+                buildCameraAvoidStage(contentDiv, resultDiv) {
+                    const safeWindows = [Math.floor(Math.random() * 4)];
+                    this.stageData = { safeWindows, type: 'camera_avoid' };
+                    const windows = ['North Hall', 'East Wing', 'South Corridor', 'West Entrance'];
+                    contentDiv.innerHTML = `
+                        <p style="margin-bottom:0.8rem;color:var(--text-muted);">📸 Cameras are rotating — pick the safe moment:</p>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;max-width:350px;margin:0 auto;">
+                            ${windows.map((w, i) => `
+                                <button class="wire-btn" data-window="${i}" style="min-width:80px;padding:0.7rem;">
+                                    <i class="fas fa-camera"></i> ${w}
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                    contentDiv.querySelectorAll('[data-window]').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            if (!this.state.active) return;
+                            const win = parseInt(btn.dataset.window);
+                            if (win === safeWindows[0]) {
+                                this.handleStageSuccess(resultDiv,
+                                    '✅ Slipped past while cameras were away!',
+                                    'stageClear');
+                            } else {
+                                this.handleStageFailure(resultDiv,
+                                    '📸 SPOTTED! Camera caught your movement!');
+                            }
+                        });
+                    });
+                }
+
+                // ── Stage: Grab Bags (Escape) ──
+                buildGrabBagsStage(contentDiv, resultDiv) {
+                    const diffMult = this.state.difficultyMult;
+                    let bagValue, riskPerBag;
+                    if (diffMult <= 1.5) { bagValue = 0.5;
+                        riskPerBag = 0.12; } else if (diffMult <= 3.0) { bagValue = 1.5;
+                        riskPerBag = 0.20; } else { bagValue = 2.5;
+                        riskPerBag = 0.28; }
+
+                    // Apply event modifiers
+                    if (this.currentEvent && this.currentEvent.effect === 'reduceRisk') riskPerBag *= (1 - this
+                        .currentEvent.value);
+                    if (this.currentEvent && this.currentEvent.effect === 'increaseRisk') riskPerBag *= (1 + this
+                        .currentEvent.value);
+                    riskPerBag += this.state.heatRiskBonus;
+
+                    let selectedBags = 0;
+                    const maxBags = 5;
+                    this.stageData = { bagValue, riskPerBag, selectedBags, maxBags, type: 'grab_bags' };
+
+                    const renderUI = () => {
+                        const extraMult = selectedBags * bagValue;
+                        const totalBaseMult = this.state.difficultyMult + extraMult + (this.currentEvent
+                            ?.effect === 'bonusMult' ? this.currentEvent.value : 0);
+                        const nuggetBonus = this.state.nugget ? 1.25 : 1;
+                        const heatBonus = 1 + this.state.heatRewardBonus;
+                        const finalPayoutMult = totalBaseMult * nuggetBonus * heatBonus;
+                        const catchChance = Math.min(0.94, selectedBags * riskPerBag);
+                        const isDangerous = catchChance > 0.6;
+
+                        contentDiv.innerHTML = `
+                            <div class="bag-control">
+                                <div style="font-weight:700;"><i class="fas fa-sack-dollar"></i> HOW MANY BAGS?</div>
+                                <div class="bag-counter">
+                                    <button id="bagDec">−</button>
+                                    <span class="bag-count">${selectedBags}</span>
+                                    <button id="bagInc">+</button>
+                                </div>
+                                <div class="multiplier-preview">
+                                    <div>📦 Each bag: <strong>+${bagValue.toFixed(1)}×</strong></div>
+                                    <div>✨ Total: <strong class="glow-text">${totalBaseMult.toFixed(2)}×</strong>${this.state.nugget?' (nugget +25% → '+(totalBaseMult*nuggetBonus).toFixed(2)+'×)':''}${heatBonus>1?' 🔥Heat +'+(heatBonus-1)*100+'%':''}</div>
+                                    <div>💰 Payout: <strong>${Math.floor(this.state.baseBet * finalPayoutMult).toLocaleString()} GOLD</strong></div>
+                                </div>
+                                <div>⚠️ CATCH RISK: <span style="color:${isDangerous?'var(--danger)':'var(--warning)'};font-weight:800;">${(catchChance*100).toFixed(0)}%</span></div>
+                                <div class="risk-bar"><div class="risk-fill${isDangerous?' dangerous':''}" style="width:${catchChance*100}%;"></div></div>
+                                <button id="escapeFinalBtn" class="escape-btn"><i class="fas fa-running"></i> ESCAPE WITH ${selectedBags} BAG${selectedBags!==1?'S':''}</button>
+                            </div>
+                        `;
+                        document.getElementById('bagDec').addEventListener('click', () => {
+                            if (selectedBags > 0) { selectedBags--;
+                                this.stageData.selectedBags = selectedBags;
+                                renderUI();
+                                haptic('light'); }
+                        });
+                        document.getElementById('bagInc').addEventListener('click', () => {
+                            if (selectedBags < maxBags) { selectedBags++;
+                                this.stageData.selectedBags = selectedBags;
+                                renderUI();
+                                haptic('light'); }
+                        });
+                        document.getElementById('escapeFinalBtn').addEventListener('click', () => {
+                            if (!this.state.active) return;
+                            const catchProb = Math.min(0.94, selectedBags * riskPerBag);
+                            const roll = Math.random();
+                            // Jackpot check
+                            const jackpotChance = (this.currentEvent?.effect ===
+                                'jackpotChance') ? this.currentEvent.value : 0.01;
+                            if (roll < jackpotChance && selectedBags >= 3) {
+                                this.handleJackpot(resultDiv, extraMult);
+                                return;
+                            }
+                            if (roll < catchProb) {
+                                this.handleStageFailure(resultDiv,
+                                    '🚔 GUARDS CAUGHT YOU! Bags too heavy...', true);
+                            } else {
+                                this.handleStageSuccess(resultDiv,
+                                    `🏃‍♂️ ESCAPED! ${selectedBags} bag${selectedBags!==1?'s':''} secured! +${extraMult.toFixed(1)}× bonus.`,
+                                    'win', extraMult);
+                            }
+                        });
+                    };
+                    renderUI();
+                }
+
+                // ── Stage: Timed Vault ──
+                buildTimedVaultStage(contentDiv, resultDiv) {
+                    let timeLeft = 5;
+                    this.stageData = { timeLeft, type: 'timed_vault' };
+                    const renderUI = () => {
+                        contentDiv.innerHTML = `
+                            <div class="vault-door-container">
+                                <div class="vault-spinner" style="animation-duration:1s;"></div>
+                            </div>
+                            <p style="font-weight:800;color:var(--danger);font-size:1.3rem;" id="timerDisplay">⏱️ ${timeLeft}s</p>
+                            <p style="color:var(--text-muted);">The vault is sealing! Grab what you can!</p>
+                            <button id="grabNowBtn" class="escape-btn">💰 GRAB NOW!</button>
+                        `;
+                        document.getElementById('grabNowBtn').addEventListener('click', () => {
+                            if (!this.state.active) return;
+                            const bonusMult = timeLeft * 0.3;
+                            if (timeLeft >= 3) {
+                                this.handleStageSuccess(resultDiv,
+                                    `✅ Grabbed with ${timeLeft}s to spare! +${bonusMult.toFixed(1)}× bonus.`,
+                                    'stageClear', bonusMult);
+                            } else if (timeLeft >= 1) {
+                                this.handleStageSuccess(resultDiv,
+                                    `⚠️ Close call! Grabbed at ${timeLeft}s. +${bonusMult.toFixed(1)}×.`,
+                                    'stageClear', bonusMult);
+                            } else {
+                                this.handleStageFailure(resultDiv,
+                                    '💥 Too late! Vault sealed shut!');
+                            }
+                        });
+                    };
+                    renderUI();
+                    const timer = setInterval(() => {
+                        if (!this.state.active) { clearInterval(timer); return; }
+                        timeLeft--;
+                        this.stageData.timeLeft = timeLeft;
+                        const display = document.getElementById('timerDisplay');
+                        if (display) display.textContent = '⏱️ ' + timeLeft + 's';
+                        if (timeLeft <= 0) {
+                            clearInterval(timer);
+                            this.handleStageFailure(resultDiv,
+                            '💥 TIME RAN OUT! Vault sealed!');
+                        }
+                        if (timeLeft <= 2 && display) display.style.color = 'var(--danger)';
+                    }, 1000);
+                    this._vaultTimer = timer;
+                }
+
+                // ── Stage Success Handler ──
+                handleStageSuccess(resultDiv, message, audioType = 'stageClear', bonusMult = 0) {
+                    if (!this.state.active) return;
+                    this.stagesCompletedCleanly++;
+                    this.comboMultiplier = 1 + (this.stagesCompletedCleanly * 0.15);
+                    resultDiv.innerHTML = `<span style="color:var(--success);">${message}</span>`;
+                    resultDiv.className = 'result-msg success';
+                    this.audio.play(audioType);
+                    haptic('success');
+                    this.state.stageResults.push(true);
+
+                    if (this.state.currentStage >= this.state.totalStages) {
+                        this.endHeist(true, bonusMult);
+                    } else {
+                        setTimeout(() => this.showStage(this.state.currentStage + 1), 900);
+                    }
+                }
+
+                // ── Stage Failure Handler ──
+                handleStageFailure(resultDiv, message, isEscape = false) {
+                    if (!this.state.active) return;
+                    resultDiv.innerHTML = `<span style="color:var(--danger);">${message}</span>`;
+                    resultDiv.className = 'result-msg failure';
+                    this.audio.play('fail');
+                    haptic('failure');
+                    this.state.stageResults.push(false);
+                    this.updateStageDots();
+                    if (isEscape) {
+                        this.endHeist(false, 0);
+                    } else {
+                        this.endHeist(false, 0);
+                    }
+                }
+
+                // ── Jackpot Handler ──
+                handleJackpot(resultDiv, extraMult) {
+                    if (!this.state.active) return;
+                    const jackpotMult = this.state.difficultyMult * 3 + extraMult;
+                    resultDiv.innerHTML =
+                        `<span style="color:var(--gold-bright);font-size:1.2rem;">🎰 JACKPOT! GOLD EXPLOSION! 🎰</span>`;
+                    resultDiv.className = 'result-msg success';
+                    this.audio.play('bigWin');
+                    haptic('heavy');
+                    this.showCinematicBriefly('💰 JACKPOT! 💰');
+                    this.endHeist(true, jackpotMult, true);
+                }
+
+                // ── End Heist ──
+                async endHeist(win, extraBagMult = 0, isJackpot = false) {
+                    if (!this.state.active) return;
+                    if (this._vaultTimer) clearInterval(this._vaultTimer);
+
+                    const stats = this.um.user.bankHeistStats;
+                    const baseMult = this.state.difficultyMult;
+                    const finalExtra = extraBagMult || 0;
+                    const eventBonus = (this.currentEvent?.effect === 'bonusMult') ? this.currentEvent.value :
+                    0;
+                    let totalBaseMult = baseMult + finalExtra + eventBonus;
+                    const nuggetFactor = this.state.nugget ? 1.25 : 1;
+                    const heatBonus = 1 + this.state.heatRewardBonus;
+                    const comboBonus = win ? this.comboMultiplier : 1;
+                    const finalWinAmount = win ? Math.floor(this.state.baseBet * totalBaseMult * nuggetFactor *
+                        heatBonus * comboBonus) : 0;
+                    const netProfit = win ? (finalWinAmount - this.state.totalCost) : (-this.state.totalCost);
+
+                    // Update stats
+                    stats.totalBet += this.state.totalCost;
+                    if (win) {
+                        stats.wins++;
+                        stats.totalWin += finalWinAmount;
+                        stats.consecutiveWins = (stats.consecutiveWins || 0) + 1;
+                        if (stats.consecutiveWins > (stats.maxConsecutiveWins || 0)) stats
+                            .maxConsecutiveWins = stats.consecutiveWins;
+                        if (this.stagesCompletedCleanly >= 3) stats.perfectHeists = (stats.perfectHeists || 0) +
+                            1;
+                        if (this.stagesCompletedCleanly >= 3 && extraBagMult === 0) stats.silentHeists = (stats
+                            .silentHeists || 0) + 1;
+                        this.um.user.balance += finalWinAmount;
+                        this.um.addTransaction(
+                            `🏆 HEIST WIN (${this.state.difficulty}) +${finalWinAmount} GOLD`,
+                            finalWinAmount, 'game_win');
+                        showToast(
+                            `💰 ESCAPE SUCCESS! +${finalWinAmount.toLocaleString()} GOLD (${totalBaseMult.toFixed(2)}×)`,
+                            '');
+                        this.audio.play('win');
+                        this.increaseHeat(win ? 1 : 0);
+                        this.addRankXp(Math.floor(this.state.totalCost * 1.5));
+                    } else {
+                        stats.losses++;
+                        stats.consecutiveWins = 0;
+                        this.um.addTransaction(
+                            `💀 HEIST LOSS (${this.state.difficulty}) -${this.state.totalCost} GOLD`, -this
+                            .state.totalCost, 'game_loss');
+                        showToast(`💔 CAUGHT! Lost ${this.state.totalCost.toLocaleString()} GOLD`, 'error');
+                        this.audio.play('fail');
+                        this.decreaseHeat(0.5);
+                        this.addRankXp(Math.floor(this.state.totalCost * 0.3));
+                    }
+
+                    // Global stats
+                    this.um.user.globalStats.totalWagered += this.state.totalCost;
+                    this.um.user.globalStats.totalWon += win ? finalWinAmount : 0;
+                    this.um.user.globalStats.totalGames++;
+                    if (win) {
+                        this.um.user.globalStats.totalWins++;
+                        this.um.user.globalStats.currentStreak = (this.um.user.globalStats.currentStreak || 0) +
+                            1;
+                        if (this.um.user.globalStats.currentStreak > (this.um.user.globalStats.bestStreak || 0))
+                            this.um.user.globalStats.bestStreak = this.um.user.globalStats.currentStreak;
+                    } else {
+                        this.um.user.globalStats.currentStreak = 0;
+                    }
+
+                    // Game outcomes
+                    this.um.user.gamePlayCount['bank-heist'] = (this.um.user.gamePlayCount['bank-heist'] || 0) +
+                        1;
+                    this.um.user.gameOutcomes.unshift({
+                        game: 'Bank Heist',
+                        result: win ? 'win' : 'loss',
+                        profit: netProfit,
+                        multiplier: totalBaseMult,
+                        bet: this.state.baseBet,
+                        difficulty: this.state.difficulty,
+                        nugget: this.state.nugget,
+                        jackpot: isJackpot,
+                        date: new Date().toISOString(),
+                    });
+                    if (this.um.user.gameOutcomes.length > 80) this.um.user.gameOutcomes.pop();
+
+                    // Track best multiplier
+                    if (totalBaseMult > (stats.bestMultiplier || 1)) stats.bestMultiplier = totalBaseMult;
+
+                    // Missions
+                    this.updateMissions();
+
+                    // Loot roll on win
+                    if (win && Math.random() < 0.35) {
+                        const luckBonus = this.stagesCompletedCleanly;
+                        const loot = rollLoot(luckBonus);
+                        stats.totalLootCollected = (stats.totalLootCollected || 0) + 1;
+                        if (loot.type === 'currency') {
+                            this.um.user.balance += loot.value;
+                            showToast(`${loot.icon} LOOT: ${loot.name} (+${loot.value} GOLD)!`, 'loot');
+                        }
+                        if (!this.um.user.bankHeistInventory) this.um.user.bankHeistInventory = [];
+                        this.um.user.bankHeistInventory.push({ ...loot, date: new Date().toISOString() });
+                        if (this.um.user.bankHeistInventory.length > 200) this.um.user.bankHeistInventory
+                            .shift();
+                        showLootPopup(loot, (collectedLoot) => {
+                            if (collectedLoot.type === 'cosmetic' && collectedLoot.cosmeticId &&
+                                !this.um.user.unlockedAvatars.includes(collectedLoot.cosmeticId)) {
+                                this.um.user.unlockedAvatars.push(collectedLoot.cosmeticId);
+                                showToast(
+                                    `🎭 COSMETIC UNLOCKED: ${collectedLoot.name}!`,
+                                    'loot');
+                            }
+                        });
+                    }
+
+                    // Check achievements
+                    this.checkAchievements(totalBaseMult);
+                    this.checkPrestige();
+
+                    await this.um.save();
+                    this.um.updateBalanceUI();
+                    this.updateHeatDisplay();
+                    this.updateRankDisplay();
+
+                    // Display result
+                    this.state.active = false;
+                    document.getElementById('startHeistBtn').disabled = false;
+                    document.getElementById('resetHeistBtn').style.display = 'block';
+                    document.getElementById('stageContent').innerHTML = win ?
+                        `<div style="text-align:center;padding:1rem;">
+                                <i class="fas fa-trophy" style="font-size:3.5rem;color:var(--gold);animation:maskBob 1s infinite ease-in-out;"></i>
+                                <p style="font-size:1.2rem;font-weight:800;margin-top:0.5rem;">🎉 HEIST TRIUMPH! 🎉</p>
+                                <p>Net: <span style="color:${netProfit>=0?'var(--success)':'var(--danger)'};font-weight:800;">${netProfit>=0?'+'+netProfit.toLocaleString():netProfit.toLocaleString()}</span> GOLD</p>
+                                <p>Multiplier: <span class="glow-text">${totalBaseMult.toFixed(2)}×</span>${isJackpot?' 🎰 JACKPOT!':''}</p>
+                                ${this.comboMultiplier>1?`<p style="color:var(--warning);">🔥 Combo: ${this.comboMultiplier.toFixed(2)}×</p>`:''}
+                            </div>` :
+                        `<div style="text-align:center;padding:1rem;">
+                                <i class="fas fa-handcuffs" style="font-size:3rem;color:#ff8888;"></i>
+                                <p style="font-weight:800;">🚨 ARRESTED!</p>
+                                <p>Lost ${this.state.totalCost.toLocaleString()} GOLD</p>
+                            </div>`;
+                    document.getElementById('stageResult').innerHTML = '';
+                    document.getElementById('stageResult').className = 'result-msg';
+                    const consec = stats.consecutiveWins;
+                    if (consec >= 2) document.getElementById('stageTitle').innerHTML =
+                        `🔥 HEIST STREAK: ${consec} 🔥`;
+                    this.updateStageDots();
+                }
+
+                // ── Achievements ──
+                checkAchievements(usedMultiplier) {
+                    const stats = this.um.user.bankHeistStats;
+                    const achievements = this.um.user.bankHeistAchievements || [];
+                    const earned = this.um.user.earnedAchievements || [];
+
+                    const checkAndAward = (id, condition, name, reward) => {
+                        if (!achievements.includes(id) && condition) {
+                            achievements.push(id);
+                            earned.push(id);
+                            this.um.user.bankHeistAchievements = achievements;
+                            this.um.user.earnedAchievements = earned;
+                            this.um.user.balance += reward;
+                            showToast(`🏆 ACHIEVEMENT: ${name}! (+${reward} GOLD)`, '');
+                            this.audio.play('bigWin');
+                        }
+                    };
+
+                    checkAndAward('first_heist', stats.wins >= 1, 'First Heist', 100);
+                    checkAndAward('streak_3', stats.consecutiveWins >= 3, 'Hot Streak (3 wins)', 500);
+                    checkAndAward('streak_5', stats.consecutiveWins >= 5, 'Unstoppable (5 wins)', 2000);
+                    checkAndAward('big_score', usedMultiplier >= 8, 'Big Score (8×+)', 1000);
+                    checkAndAward('perfect_heist', stats.perfectHeists >= 1, 'Perfect Heist', 800);
+                    checkAndAward('high_roller', stats.totalBet >= 50000, 'High Roller', 3000);
+                    checkAndAward('jackpot_hit', stats.totalLootCollected >= 10, 'Loot Hunter', 1500);
+
+                    if (stats.consecutiveWins >= 3 && !this.um.user.unlockedAvatars.includes('gold-mask')) {
+                        this.um.user.unlockedAvatars.push('gold-mask');
+                        showToast('🎭 UNLOCKED: Gold Mask avatar!', 'loot');
+                    }
+                }
+
+                // ── Reset Heist ──
+                resetHeist() {
+                    if (this.state.active) return;
+                    if (this._vaultTimer) clearInterval(this._vaultTimer);
+                    document.getElementById('stageContainer').style.display = 'none';
+                    document.getElementById('startHeistBtn').disabled = false;
+                    document.getElementById('stageContent').innerHTML = '';
+                    document.getElementById('stageResult').innerHTML = '';
+                    document.getElementById('stageResult').className = 'result-msg';
+                    this.state = this.defaultState();
+                    this.stageData = {};
+                    this.comboMultiplier = 1;
+                    this.stagesCompletedCleanly = 0;
+                    this.currentEvent = null;
+                    this.updateStageDots();
+                }
+            }
+
+            // ═══════════════════════════════════════
+            //  INITIALIZATION
+            // ═══════════════════════════════════════
+            async function init() {
+                const audioEngine = new AudioEngine();
+                const userManager = new UserManager();
+
+                // Sound preference
+                const soundPref = localStorage.getItem('gold_sound_enabled');
+                if (soundPref === 'false') {
+                    audioEngine.enabled = false;
+                    document.getElementById('soundToggle').innerHTML =
+                    '<i class="fas fa-volume-mute"></i>';
+                }
+
+                // Load user
+                if (!userManager.loadUser()) return;
+                userManager.updateBalanceUI();
+
+                // Initialize audio on interaction
+                const unlockAudio = () => {
+                    audioEngine.init();
+                    document.body.removeEventListener('click', unlockAudio);
+                    document.body.removeEventListener('touchstart', unlockAudio);
+                };
+                document.body.addEventListener('click', unlockAudio);
+                document.body.addEventListener('touchstart', unlockAudio);
+
+                // Start game
+                const game = new BankHeistGame(userManager, audioEngine);
+
+                // Expose for debugging (remove in production)
+                // window.__heistGame = game;
+
+                // Handle page visibility for timer cleanup
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden && game._vaultTimer) {
+                        clearInterval(game._vaultTimer);
+                    }
+                });
+            }
+
+            // Start
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>

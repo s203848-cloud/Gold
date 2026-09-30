@@ -1,0 +1,2623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GOLD CARD MATCH | Flip cards, find pairs. More pairs, more gold, Avoid the bombs.</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd966;
+            --gold-bright: #ffed4e;
+            --gold-deep: #f5b042;
+            --bg-deep: #0a0908;
+            --card-bg: rgba(20, 18, 16, 0.75);
+            --border-gold: rgba(255, 217, 102, 0.4);
+            --shadow-gold: 0 0 30px rgba(255, 217, 102, 0.2);
+            --radius-lg: 2rem;
+            --radius-md: 1.5rem;
+            --radius-full: 60px;
+            --transition-fast: 0.15s ease-out;
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --theme-accent: #ffd966;
+            --theme-accent2: #f5b042;
+            --theme-bg-glow: rgba(255, 217, 102, 0.15);
+            --theme-card-back-1: #2a2218;
+            --theme-card-back-2: #1a150e;
+            --theme-name: 'Royal Gold';
+            --danger-color: #ff4444;
+            --shield-color: #4da6ff;
+            --double-color: #ff69b4;
+            --freeze-color: #00e5ff;
+            --peek-color: #b388ff;
+            --rush-color: #ffab00;
+        }
+        /* ── BOARD THEME VARIABLES ── */
+        .theme-royal-gold {
+            --theme-accent: #ffd966;
+            --theme-accent2: #f5b042;
+            --theme-bg-glow: rgba(255, 217, 102, 0.15);
+            --theme-card-back-1: #2a2218;
+            --theme-card-back-2: #1a150e;
+            --theme-name: 'Royal Gold';
+        }
+        .theme-crimson-inferno {
+            --theme-accent: #ff6b4a;
+            --theme-accent2: #ff2d20;
+            --theme-bg-glow: rgba(255, 80, 60, 0.2);
+            --theme-card-back-1: #2a1015;
+            --theme-card-back-2: #1a080c;
+            --theme-name: 'Crimson Inferno';
+        }
+        .theme-emerald-vault {
+            --theme-accent: #50fa7b;
+            --theme-accent2: #00c853;
+            --theme-bg-glow: rgba(80, 250, 123, 0.18);
+            --theme-card-back-1: #0a2418;
+            --theme-card-back-2: #051a0e;
+            --theme-name: 'Emerald Vault';
+        }
+        .theme-void-casino {
+            --theme-accent: #bd93f9;
+            --theme-accent2: #8b5cf6;
+            --theme-bg-glow: rgba(189, 147, 249, 0.2);
+            --theme-card-back-1: #1a1028;
+            --theme-card-back-2: #0d0818;
+            --theme-name: 'Void Casino';
+        }
+        .theme-cyber-diamond {
+            --theme-accent: #00e5ff;
+            --theme-accent2: #0091ea;
+            --theme-bg-glow: rgba(0, 229, 255, 0.2);
+            --theme-card-back-1: #0a1a28;
+            --theme-card-back-2: #051020;
+            --theme-name: 'Cyber Diamond';
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #0c0b0a 0%, #030202 100%);
+            color: #f5f0e6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 1.5rem;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 0.8s ease;
+        }
+        /* ── AMBIENT FLOATING CARDS BG ── */
+        .ambient-cards-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.25;
+        }
+        .floating-amb-card {
+            position: absolute;
+            width: 40px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--theme-card-back-1), var(--theme-card-back-2));
+            border: 1px solid var(--border-gold);
+            border-radius: 6px;
+            animation: floatAmbCard 12s infinite ease-in-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            opacity: 0.5;
+        }
+        @keyframes floatAmbCard {
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.35;
+            }
+            25% {
+                transform: translateY(-60px) rotate(8deg);
+                opacity: 0.55;
+            }
+            50% {
+                transform: translateY(-20px) rotate(-5deg);
+                opacity: 0.4;
+            }
+            75% {
+                transform: translateY(-80px) rotate(3deg);
+                opacity: 0.5;
+            }
+        }
+        /* ── PARTICLES ── */
+        .particles-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .particle {
+            position: absolute;
+            background: var(--theme-accent);
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatUp 7s infinite ease-in;
+            box-shadow: 0 0 6px var(--theme-accent);
+        }
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) scale(0);
+                opacity: 0;
+            }
+            12% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            45% {
+                transform: translateY(35vh) scale(0.5);
+                opacity: 0.25;
+            }
+            100% {
+                transform: translateY(-25vh) scale(0);
+                opacity: 0;
+            }
+        }
+        /* ── SPARK BURST ── */
+        .spark-burst {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            animation: sparkPop 0.7s ease-out forwards;
+        }
+        .spark-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--gold-bright);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--gold-bright);
+        }
+        @keyframes sparkPop {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+        /* ── GAME CONTAINER ── */
+        .game-container {
+            max-width: 780px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            position: relative;
+            z-index: 1;
+        }
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 13, 11, 0.88);
+            backdrop-filter: blur(16px);
+            border-radius: var(--radius-full);
+            padding: 0.55rem 1.4rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            transition: all 0.4s ease;
+        }
+        .top-nav.danger-pulse {
+            border-color: var(--danger-color) !important;
+            box-shadow: 0 0 25px rgba(255, 68, 68, 0.4) !important;
+        }
+        .back-home {
+            text-decoration: none;
+            color: var(--theme-accent);
+            font-weight: 600;
+            background: rgba(255, 217, 102, 0.1);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .back-home:hover {
+            background: var(--theme-bg-glow);
+            box-shadow: 0 0 20px var(--theme-bg-glow);
+        }
+        .balance-tag {
+            background: rgba(31, 28, 24, 0.9);
+            padding: 0.35rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 217, 102, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: box-shadow 0.3s;
+            position: relative;
+        }
+        .balance-tag.pulse {
+            animation: balancePulse 0.5s ease-out;
+        }
+        .balance-tag.mega-pulse {
+            animation: megaBalancePulse 0.8s ease-out;
+        }
+        @keyframes balancePulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 217, 102, 0.5);
+            }
+            100% {
+                box-shadow: 0 0 0 20px rgba(255, 217, 102, 0);
+            }
+        }
+        @keyframes megaBalancePulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 217, 102, 1);
+                transform: scale(1.08);
+            }
+            60% {
+                box-shadow: 0 0 40px 10px rgba(255, 237, 78, 0.8);
+                transform: scale(1.04);
+            }
+            100% {
+                box-shadow: 0 0 0 60px rgba(255, 217, 102, 0);
+                transform: scale(1);
+            }
+        }
+        .sound-btn,
+        .theme-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--theme-accent);
+            transition: transform 0.2s, color 0.3s;
+            padding: 0.3rem;
+        }
+        .sound-btn:hover,
+        .theme-btn:hover {
+            transform: scale(1.15);
+            color: var(--gold-bright);
+        }
+        /* ── MAIN CARD ── */
+        .main-card {
+            background: linear-gradient(145deg, rgba(25, 22, 19, 0.95) 0%, rgba(12, 10, 8, 0.98) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: 1.2rem 1.2rem 1.4rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), var(--shadow-gold);
+            text-align: center;
+            animation: fadeInUp 0.5s ease-out;
+            transition: border-color 0.5s, box-shadow 0.5s;
+            position: relative;
+            overflow: visible;
+        }
+        .main-card.danger-zone {
+            border-color: rgba(255, 68, 68, 0.7) !important;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.35), 0 30px 50px rgba(0, 0, 0, 0.6) !important;
+            animation: dangerGlow 0.5s ease-in-out infinite;
+        }
+        @keyframes dangerGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 30px rgba(255, 0, 0, 0.25);
+            }
+            50% {
+                box-shadow: 0 0 55px rgba(255, 0, 0, 0.55);
+            }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* ── DIFFICULTY ── */
+        .difficulty-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.4rem;
+            margin-bottom: 0.4rem;
+        }
+        .diff-btn {
+            border: 1px solid rgba(255, 217, 102, 0.35);
+            background: rgba(20, 17, 14, 0.8);
+            color: #c4b998;
+            border-radius: 30px;
+            padding: 0.4rem 0.85rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+        }
+        .diff-btn:hover:not(:disabled) {
+            background: var(--theme-bg-glow);
+            color: var(--theme-accent);
+            border-color: var(--theme-accent);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px var(--theme-bg-glow);
+        }
+        .diff-btn.active {
+            background: linear-gradient(135deg, rgba(245, 176, 66, 0.35), rgba(255, 217, 102, 0.25));
+            color: var(--gold-bright);
+            border-color: var(--theme-accent);
+            font-weight: 700;
+            box-shadow: 0 0 18px rgba(255, 217, 102, 0.3);
+            text-shadow: 0 0 12px rgba(255, 217, 102, 0.4);
+        }
+        .diff-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .diff-label-sm {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            display: block;
+            line-height: 1;
+        }
+        /* ── MULTIPLIER SHOWCASE ── */
+        .multiplier-showcase {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 0.2rem;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--gold-bright);
+            text-shadow: 0 0 30px rgba(255, 217, 102, 0.6);
+            min-height: 3.5rem;
+            flex-wrap: wrap;
+        }
+        .multiplier-showcase .current-mult {
+            transition: color 0.3s, text-shadow 0.3s;
+            font-family: 'Orbitron', 'Inter', sans-serif;
+        }
+        .multiplier-showcase .current-mult.high {
+            color: #ffed4e;
+            text-shadow: 0 0 40px gold;
+            animation: multiGlow 0.8s ease-in-out infinite alternate;
+        }
+        .multiplier-showcase .current-mult.mythic {
+            color: #fff;
+            text-shadow: 0 0 60px #ffed4e, 0 0 100px #ff8c00, 0 0 140px #ff4500;
+            animation: mythicGlow 0.4s ease-in-out infinite alternate;
+        }
+        @keyframes multiGlow {
+            from {
+                text-shadow: 0 0 25px rgba(255, 217, 102, 0.6);
+            }
+            to {
+                text-shadow: 0 0 50px rgba(255, 237, 78, 1), 0 0 80px rgba(255, 180, 40, 0.7);
+            }
+        }
+        @keyframes mythicGlow {
+            from {
+                text-shadow: 0 0 40px #ffed4e, 0 0 80px #ff8c00;
+            }
+            to {
+                text-shadow: 0 0 80px #fff, 0 0 150px #ffed4e, 0 0 200px #ff4500;
+            }
+        }
+        .multiplier-showcase .lock-icon {
+            font-size: 1.3rem;
+            color: var(--theme-accent);
+            opacity: 0.7;
+        }
+        .multiplier-showcase .max-mult {
+            font-size: 1.1rem;
+            font-weight: 700;
+            opacity: 0.8;
+            color: #c4b998;
+        }
+        .multiplier-showcase .max-mult span {
+            color: var(--gold-bright);
+            font-weight: 800;
+        }
+        .multiplier-progress {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            margin: 0.3rem auto;
+            width: 80%;
+            overflow: hidden;
+        }
+        .multiplier-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--theme-accent2), var(--theme-accent));
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px var(--theme-accent);
+        }
+        .multiplier-progress-fill.near-max {
+            background: linear-gradient(90deg, #ff8c00, #ffed4e);
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.7);
+            animation: progressPulse 0.6s ease-in-out infinite;
+        }
+        @keyframes progressPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 15px rgba(255, 140, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 200, 40, 0.9);
+            }
+        }
+        /* ── STREAK DISPLAY ── */
+        .streak-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--theme-accent);
+            min-height: 1.5rem;
+            transition: all 0.3s;
+        }
+        .streak-display.on-fire {
+            color: #ff8c00;
+            text-shadow: 0 0 15px #ff8c00;
+            animation: firePulse 0.5s ease-in-out infinite alternate;
+        }
+        @keyframes firePulse {
+            from {
+                text-shadow: 0 0 10px #ff8c00;
+            }
+            to {
+                text-shadow: 0 0 25px #ff4500, 0 0 40px #ff8c00;
+            }
+        }
+        /* ── DANGER METER ── */
+        .danger-meter-container {
+            width: 70%;
+            margin: 0 auto;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .danger-meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffaa00, #ff4444);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+        }
+        .danger-meter-fill.critical {
+            animation: dangerMeterPulse 0.3s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
+        }
+        @keyframes dangerMeterPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 12px rgba(255, 0, 0, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 28px rgba(255, 0, 0, 1);
+            }
+        }
+        /* ── CARDS GRID ── */
+        .cards-grid {
+            display: grid;
+            gap: 0.5rem;
+            margin: 0.6rem 0;
+            perspective: 900px;
+            justify-content: center;
+        }
+        .card {
+            aspect-ratio: 1 / 1;
+            position: relative;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+            border-radius: 0.6rem;
+            will-change: transform;
+            min-width: 32px;
+            min-height: 32px;
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .card.matched {
+            pointer-events: none;
+            opacity: 0.8;
+            animation: matchGlow 0.6s ease-out;
+        }
+        .card.matched-golden {
+            animation: goldenMatch 0.8s ease-out;
+        }
+        @keyframes matchGlow {
+            0% {
+                box-shadow: 0 0 0 rgba(76, 175, 80, 0);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(76, 175, 80, 0.7);
+            }
+            100% {
+                box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+            }
+        }
+        @keyframes goldenMatch {
+            0% {
+                box-shadow: 0 0 0 rgba(255, 217, 102, 0);
+                transform: rotateY(180deg) scale(1);
+            }
+            40% {
+                box-shadow: 0 0 50px rgba(255, 217, 102, 1), 0 0 100px rgba(255, 180, 40, 0.8);
+                transform: rotateY(180deg) scale(1.15);
+            }
+            100% {
+                box-shadow: 0 0 15px rgba(255, 217, 102, 0.5);
+                transform: rotateY(180deg) scale(1);
+            }
+        }
+        .card-face {
+            position: absolute;
+            inset: 0;
+            border-radius: 0.6rem;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border-gold);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+            transition: box-shadow 0.3s, border-color 0.3s;
+        }
+        .card-back {
+            background: linear-gradient(135deg, var(--theme-card-back-1), var(--theme-card-back-2));
+            background-image: repeating-linear-gradient(45deg, rgba(255, 217, 102, 0.12) 0px, rgba(255, 217, 102, 0.12) 2px,
+                    transparent 2px, transparent 8px);
+            color: var(--theme-accent);
+        }
+        .card-front {
+            background: radial-gradient(circle at 30% 30%, #3a3222, #1a1712);
+            transform: rotateY(180deg);
+        }
+        .card-front i {
+            filter: drop-shadow(0 0 8px rgba(255, 217, 102, 0.7));
+            transition: filter 0.3s;
+        }
+        .card.special-card .card-front {
+            background: radial-gradient(circle at 30% 30%, #3a2840, #1a1220);
+            border-color: rgba(189, 147, 249, 0.6);
+        }
+        .card.special-card .card-front i {
+            filter: drop-shadow(0 0 14px rgba(189, 147, 249, 0.9));
+            animation: specialPulse 0.8s ease-in-out infinite alternate;
+        }
+        @keyframes specialPulse {
+            from {
+                filter: drop-shadow(0 0 10px rgba(200, 160, 255, 0.7));
+            }
+            to {
+                filter: drop-shadow(0 0 22px rgba(200, 160, 255, 1));
+            }
+        }
+        .bomb-card .card-front {
+            color: #ff6b6b;
+        }
+        .card:not(.flipped):not(.matched):hover {
+            transform: scale(1.07);
+            box-shadow: 0 0 22px var(--theme-bg-glow);
+            border-color: var(--theme-accent);
+            z-index: 2;
+        }
+        .card:not(.flipped):not(.matched):hover .card-back {
+            border-color: var(--theme-accent);
+            box-shadow: 0 0 18px var(--theme-bg-glow);
+        }
+        /* ── SPECIAL CARD GLOW TRAILS ── */
+        .card.glow-trail {
+            animation: glowTrail 0.6s ease-out;
+        }
+        @keyframes glowTrail {
+            0% {
+                box-shadow: 0 0 0 rgba(255, 217, 102, 0), 0 0 0 rgba(255, 180, 40, 0);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 217, 102, 1), 0 0 80px rgba(255, 180, 40, 0.7);
+            }
+            100% {
+                box-shadow: 0 0 8px rgba(255, 217, 102, 0.3), 0 0 15px rgba(255, 180, 40, 0.2);
+            }
+        }
+        /* ── EXPLOSION OVERLAY ── */
+        .explosion-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle, rgba(255, 30, 0, 0.5) 0%, rgba(255, 0, 0, 0.25) 40%, transparent 70%);
+            z-index: 999;
+            pointer-events: none;
+            animation: explosionFlash 0.7s ease-out forwards;
+        }
+        @keyframes explosionFlash {
+            0% {
+                opacity: 1;
+                transform: scale(0.8);
+                filter: blur(0px);
+            }
+            30% {
+                opacity: 1;
+                filter: blur(4px);
+                transform: scale(1.05);
+            }
+            100% {
+                opacity: 0;
+                filter: blur(12px);
+                transform: scale(1.3);
+            }
+        }
+        .screen-shake {
+            animation: screenShake 0.5s ease-out;
+        }
+        @keyframes screenShake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            12% {
+                transform: translateX(-10px) translateY(3px);
+            }
+            25% {
+                transform: translateX(10px) translateY(-3px);
+            }
+            37% {
+                transform: translateX(-7px);
+            }
+            50% {
+                transform: translateX(7px);
+            }
+            62% {
+                transform: translateX(-4px);
+            }
+            75% {
+                transform: translateX(4px);
+            }
+            87% {
+                transform: translateX(-1px);
+            }
+        }
+        /* ── CASHOUT SEQUENCE ── */
+        .cashout-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: cashoutFade 2s ease-out forwards;
+        }
+        @keyframes cashoutFade {
+            0% {
+                opacity: 0;
+            }
+            15% {
+                opacity: 1;
+            }
+            85% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+        .cashout-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: #ffed4e;
+            text-shadow: 0 0 60px gold, 0 0 120px #ff8c00;
+            animation: cashoutPop 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 9999;
+        }
+        @keyframes cashoutPop {
+            0% {
+                transform: scale(0.2);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .coin-rain {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9997;
+        }
+        .coin-particle {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: coinFall 2.5s ease-in forwards;
+            color: var(--gold-bright);
+        }
+        @keyframes coinFall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        /* ── NOTIFICATION TOAST ── */
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: rgba(20, 16, 10, 0.95);
+            border: 1px solid var(--border-gold);
+            border-radius: 16px;
+            padding: 0.8rem 1.2rem;
+            font-weight: 600;
+            color: var(--gold-bright);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            animation: toastIn 0.4s ease-out, toastOut 0.3s ease-in 2.5s forwards;
+            max-width: 350px;
+            backdrop-filter: blur(10px);
+        }
+        @keyframes toastIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes toastOut {
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+        /* ── BET ROW ── */
+        .bet-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+        .bet-input {
+            background: #0f0d0b;
+            border: 2px solid var(--theme-accent);
+            border-radius: 40px;
+            padding: 0.5rem 0.8rem;
+            width: 110px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--theme-accent);
+            font-size: 1rem;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            transition: 0.2s;
+        }
+        .bet-input:focus {
+            box-shadow: 0 0 0 4px var(--theme-bg-glow);
+        }
+        .bet-input.invalid {
+            border-color: #ff6b6b;
+        }
+        /* ── BUTTONS ── */
+        .btn {
+            border: none;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 1.2rem;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:active {
+            transform: translateY(2px);
+        }
+        .btn-outline {
+            background: rgba(255, 217, 102, 0.1);
+            border: 1px solid var(--border-gold);
+            color: var(--theme-accent);
+        }
+        .btn-outline:hover {
+            background: var(--theme-bg-glow);
+            box-shadow: 0 0 20px var(--theme-bg-glow);
+        }
+        .btn-play {
+            background: linear-gradient(135deg, #f5b042, #ffd966);
+            color: #1a150e;
+            box-shadow: 0 4px 0 #a05f15;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+        }
+        .btn-play:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #a05f15, 0 0 25px rgba(255, 217, 102, 0.4);
+        }
+        .btn-collect {
+            background: linear-gradient(135deg, #4caf50, #81c784);
+            color: #1a150e;
+            box-shadow: 0 4px 0 #2e7d32;
+            animation: collectPulse 1.5s ease-in-out infinite;
+            font-weight: 800;
+        }
+        @keyframes collectPulse {
+            0%,
+            100% {
+                box-shadow: 0 4px 0 #2e7d32, 0 0 10px rgba(76, 175, 80, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 0 #2e7d32, 0 0 28px rgba(76, 175, 80, 0.8);
+            }
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            transform: none;
+            box-shadow: none;
+        }
+        /* ── RESULT AREA ── */
+        .result-area {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 0.7rem;
+            font-weight: 600;
+            min-height: 3rem;
+            margin: 0.5rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .winnings-display {
+            font-size: 1.05rem;
+            color: var(--gold-bright);
+            background: rgba(255, 217, 102, 0.08);
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            display: inline-block;
+            margin: 0.3rem;
+            transition: transform 0.2s;
+        }
+        .winnings-display.pulse {
+            transform: scale(1.06);
+            box-shadow: 0 0 20px rgba(255, 217, 102, 0.4);
+        }
+        .big-mult {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--gold-bright);
+            text-shadow: 0 0 20px rgba(255, 217, 102, 0.8);
+            animation: multiPop 0.4s ease-out;
+            font-family: 'Orbitron', sans-serif;
+        }
+        @keyframes multiPop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            80% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        /* ── CONFETTI CANVAS ── */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        /* ── THEME SELECTOR ── */
+        .theme-mini-row {
+            display: flex;
+            gap: 0.3rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 0.3rem;
+        }
+        .theme-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        .theme-dot:hover {
+            transform: scale(1.25);
+            border-color: #fff;
+        }
+        .theme-dot.active-theme {
+            border-color: #fff;
+            box-shadow: 0 0 16px rgba(255, 255, 255, 0.6);
+        }
+        /* ── RESPONSIVE ── */
+        @media (max-width: 600px) {
+            .cards-grid {
+                gap: 0.35rem;
+            }
+            .multiplier-showcase {
+                font-size: 1.7rem;
+                gap: 0.4rem;
+            }
+            .multiplier-showcase .max-mult {
+                font-size: 0.8rem;
+            }
+            .diff-btn {
+                padding: 0.3rem 0.55rem;
+                font-size: 0.68rem;
+            }
+            .game-container {
+                gap: 0.4rem;
+            }
+            .main-card {
+                padding: 0.9rem 0.7rem 1.1rem;
+            }
+            .top-nav {
+                padding: 0.45rem 0.9rem;
+                gap: 0.25rem;
+            }
+            .cashout-text {
+                font-size: 2rem;
+            }
+        }
+        @media (max-width: 400px) {
+            .cards-grid {
+                gap: 0.28rem;
+            }
+            .multiplier-showcase {
+                font-size: 1.3rem;
+            }
+            .diff-btn {
+                padding: 0.22rem 0.45rem;
+                font-size: 0.6rem;
+                border-radius: 20px;
+            }
+            .card {
+                border-radius: 0.4rem;
+            }
+            .card-face {
+                border-radius: 0.4rem;
+            }
+        }
+        @media (min-width: 1400px) {
+            .game-container {
+                max-width: 900px;
+            }
+            .cards-grid {
+                gap: 0.65rem;
+            }
+        }
+        /* ── REDUCED MOTION ── */
+        @media (prefers-reduced-motion: reduce) {
+            .particle,
+            .floating-amb-card {
+                animation: none !important;
+                display: none;
+            }
+            .card {
+                transition: transform 0.2s ease !important;
+            }
+            .multiplier-showcase .current-mult.high,
+            .multiplier-showcase .current-mult.mythic {
+                animation: none !important;
+            }
+            .btn-collect {
+                animation: none !important;
+            }
+            .danger-meter-fill.critical {
+                animation: none !important;
+            }
+            .main-card.danger-zone {
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="theme-royal-gold">
+    <canvas id="confettiCanvas"></canvas>
+    <div class="particles-container" id="particlesContainer"></div>
+    <div class="ambient-cards-layer" id="ambientCardsLayer"></div>
+    <div id="explosionOverlay" style="display:none;"></div>
+    <div id="cashoutOverlay" style="display:none;"></div>
+    <div id="notificationContainer" style="position:fixed;top:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:8px;"></div>
+
+    <div class="game-container" id="gameContainer">
+        <div class="top-nav" id="topNav">
+            <a href=".././home.html" class="back-home"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <div class="balance-tag" id="balanceTag"><i class="fas fa-coins"></i> <span id="headerBalance">0</span> GOLD</div>
+            <button id="soundToggleBtn" class="sound-btn"><i class="fas fa-volume-up"></i></button>
+            <button id="themeCycleBtn" class="theme-btn" title="Change Theme"><i class="fas fa-palette"></i></button>
+        </div>
+
+        <div class="main-card" id="mainCard">
+            <h2 style="color:var(--theme-accent);margin-bottom:0.1rem;font-family:'Orbitron',sans-serif;letter-spacing:0.04em;">
+                <i class="fas fa-clone"></i> CARD MATCH
+            </h2>
+            <div class="theme-mini-row" id="themeMiniRow">
+                <span class="theme-dot active-theme" data-theme="royal-gold" style="background:linear-gradient(135deg,#ffd966,#f5b042);" title="Royal Gold"></span>
+                <span class="theme-dot" data-theme="crimson-inferno" style="background:linear-gradient(135deg,#ff6b4a,#ff2d20);" title="Crimson Inferno"></span>
+                <span class="theme-dot" data-theme="emerald-vault" style="background:linear-gradient(135deg,#50fa7b,#00c853);" title="Emerald Vault"></span>
+                <span class="theme-dot" data-theme="void-casino" style="background:linear-gradient(135deg,#bd93f9,#8b5cf6);" title="Void Casino"></span>
+                <span class="theme-dot" data-theme="cyber-diamond" style="background:linear-gradient(135deg,#00e5ff,#0091ea);" title="Cyber Diamond"></span>
+            </div>
+
+            <div class="difficulty-row" id="difficultyRow">
+                <button class="diff-btn active" data-diff="easy">🟢 Easy<span class="diff-label-sm">4×4 · 2x</span></button>
+                <button class="diff-btn" data-diff="medium">🟡 Medium<span class="diff-label-sm">5×4 · 2.5x</span></button>
+                <button class="diff-btn" data-diff="hard">🟠 Hard<span class="diff-label-sm">6×4 · 3x</span></button>
+                <button class="diff-btn" data-diff="expert">🔴 Expert<span class="diff-label-sm">6×6 · 4x</span></button>
+                <button class="diff-btn" data-diff="impossible">💀 Impossible<span class="diff-label-sm">8×8 · 5x</span></button>
+            </div>
+
+            <div class="multiplier-showcase" id="multiplierShowcase">
+                <span class="current-mult" id="currentMultiplierDisplay">1x</span>
+                <i class="fas fa-lock lock-icon"></i>
+                <span class="max-mult">Max: <span id="targetMultiplierDisplay">64x</span></span>
+            </div>
+            <div class="multiplier-progress">
+                <div class="multiplier-progress-fill" id="multiplierProgressFill"></div>
+            </div>
+            <div class="streak-display" id="streakDisplay">
+                <span id="streakText"></span>
+            </div>
+            <div class="danger-meter-container" id="dangerMeterContainer">
+                <div class="danger-meter-fill" id="dangerMeterFill"></div>
+            </div>
+
+            <div class="cards-grid" id="cardsGrid"></div>
+
+            <div class="winnings-display" id="winningsDisplay">💰 Current win: 0 GOLD</div>
+
+            <div class="bet-row">
+                <span style="color:var(--theme-accent);font-weight:600;">BET</span>
+                <input type="number" id="betAmount" class="bet-input" value="50" step="5" min="1">
+                <button id="playBtn" class="btn btn-play"><i class="fas fa-play"></i> PLAY</button>
+            </div>
+
+            <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
+                <button id="collectBtn" class="btn btn-collect" style="display:none;"><i class="fas fa-hand-holding-usd"></i> COLLECT & CASHOUT</button>
+                <button id="peekBtn" class="btn btn-outline" style="display:none;"><i class="fas fa-eye"></i> PEEK</button>
+            </div>
+
+            <div class="result-area" id="resultArea">
+                <span id="resultMessage">✨ Place bet and play</span>
+                <div id="bigWinDisplay" style="display:none;" class="big-mult"></div>
+                <div id="sessionProfitDisplay" style="font-size:0.85rem;color:#b5afa4;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ═══════════════════════════════════════
+            //  GOLD CARD MATCH | Memory & Risk
+            //  Premium Casino Edition v2.0
+            // ═══════════════════════════════════════
+
+            // ── AUDIO ENGINE (Enhanced Layered Sound Design) ──
+            let audioCtx = null;
+            let soundEnabled = true;
+            let masterGain = null;
+            let heartbeatInterval = null;
+            let heartbeatActive = false;
+
+            function initAudio() {
+                if (!audioCtx && soundEnabled) {
+                    audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                    masterGain = audioCtx.createGain();
+                    masterGain.gain.value = 0.25;
+                    masterGain.connect(audioCtx.destination);
+                }
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            }
+
+            function playTone(type, intensity = 1) {
+                if (!soundEnabled) return;
+                try {
+                    initAudio();
+                    if (!audioCtx || !masterGain) return;
+                    const now = audioCtx.currentTime;
+                    const createOsc = (freq, waveType = 'sine') => {
+                        const o = audioCtx.createOscillator();
+                        o.type = waveType;
+                        o.frequency.value = freq;
+                        return o;
+                    };
+                    const createGain = (vol, decayTime) => {
+                        const g = audioCtx.createGain();
+                        g.gain.setValueAtTime(vol * intensity, now);
+                        g.gain.exponentialRampToValueAtTime(0.0001, now + decayTime);
+                        return g;
+                    };
+
+                    switch (type) {
+                        case 'flip': {
+                            const o = createOsc(600 + Math.random() * 200, 'sine');
+                            const g = createGain(0.08, 0.12);
+                            o.connect(g).connect(masterGain);
+                            o.start(now);
+                            o.stop(now + 0.1);
+                            break;
+                        }
+                        case 'match': {
+                            const o1 = createOsc(880, 'sine');
+                            const o2 = createOsc(1320, 'sine');
+                            const g = createGain(0.06, 0.25);
+                            o1.connect(g);
+                            o2.connect(g);
+                            g.connect(masterGain);
+                            o1.start(now);
+                            o2.start(now + 0.04);
+                            o1.stop(now + 0.22);
+                            o2.stop(now + 0.24);
+                            break;
+                        }
+                        case 'golden_match': {
+                            const notes = [880, 1100, 1320, 1760];
+                            notes.forEach((f, i) => {
+                                const o = createOsc(f, 'sine');
+                                const g = createGain(0.07, 0.4);
+                                o.connect(g).connect(masterGain);
+                                o.start(now + i * 0.06);
+                                o.stop(now + i * 0.06 + 0.3);
+                            });
+                            break;
+                        }
+                        case 'bomb': {
+                            const o = createOsc(80, 'sawtooth');
+                            const g = audioCtx.createGain();
+                            g.gain.setValueAtTime(0.2 * intensity, now);
+                            g.gain.linearRampToValueAtTime(0.3, now + 0.1);
+                            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+                            o.connect(g).connect(masterGain);
+                            o.start(now);
+                            o.stop(now + 0.7);
+                            const noise = createOsc(40, 'square');
+                            const gn = createGain(0.06, 0.5);
+                            noise.connect(gn).connect(masterGain);
+                            noise.start(now);
+                            noise.stop(now + 0.5);
+                            break;
+                        }
+                        case 'win': {
+                            const melody = [880, 1100, 1320, 1760, 2200];
+                            melody.forEach((f, i) => {
+                                const o = createOsc(f, 'sine');
+                                const g = createGain(0.08, 0.5);
+                                o.connect(g).connect(masterGain);
+                                o.start(now + i * 0.08);
+                                o.stop(now + i * 0.08 + 0.4);
+                            });
+                            break;
+                        }
+                        case 'collect': {
+                            const o1 = createOsc(800, 'sine');
+                            const o2 = createOsc(1200, 'triangle');
+                            const g = createGain(0.09, 0.35);
+                            o1.connect(g);
+                            o2.connect(g);
+                            g.connect(masterGain);
+                            o1.start(now);
+                            o2.start(now + 0.05);
+                            o1.stop(now + 0.35);
+                            o2.stop(now + 0.4);
+                            break;
+                        }
+                        case 'jackpot': {
+                            const fanfare = [523, 659, 784, 1047, 1319, 1568];
+                            fanfare.forEach((f, i) => {
+                                const o = createOsc(f, 'sine');
+                                const g = createGain(0.1, 0.8);
+                                o.connect(g).connect(masterGain);
+                                o.start(now + i * 0.1);
+                                o.stop(now + i * 0.1 + 0.6);
+                            });
+                            break;
+                        }
+                        case 'heartbeat': {
+                            const o = createOsc(55, 'sine');
+                            const g = audioCtx.createGain();
+                            g.gain.setValueAtTime(0.04, now);
+                            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+                            o.connect(g).connect(masterGain);
+                            o.start(now);
+                            o.stop(now + 0.25);
+                            break;
+                        }
+                        case 'special_reveal': {
+                            const o = createOsc(1500, 'sine');
+                            o.frequency.linearRampToValueAtTime(2400, now + 0.3);
+                            const g = createGain(0.06, 0.4);
+                            o.connect(g).connect(masterGain);
+                            o.start(now);
+                            o.stop(now + 0.35);
+                            break;
+                        }
+                        case 'shield_activate': {
+                            const o = createOsc(600, 'triangle');
+                            o.frequency.linearRampToValueAtTime(900, now + 0.2);
+                            const g = createGain(0.07, 0.3);
+                            o.connect(g).connect(masterGain);
+                            o.start(now);
+                            o.stop(now + 0.3);
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                } catch (e) { /* audio context may not be available */ }
+            }
+
+            function startHeartbeat() {
+                if (heartbeatActive || !soundEnabled) return;
+                heartbeatActive = true;
+                heartbeatInterval = setInterval(() => playTone('heartbeat', 0.7), 600);
+            }
+
+            function stopHeartbeat() {
+                heartbeatActive = false;
+                if (heartbeatInterval) clearInterval(heartbeatInterval);
+                heartbeatInterval = null;
+            }
+
+            // ── VFX ENGINE (Particles, Sparks, Coin Rain, Confetti) ──
+            function triggerConfetti(intensity = 1) {
+                const canvas = document.getElementById('confettiCanvas');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                const ctx = canvas.getContext('2d');
+                const particles = [];
+                const colors = ['#ffd966', '#f5b042', '#ffed4e', '#4caf50', '#ffaa00', '#fff', '#ff6b6b', '#bd93f9'];
+                const count = Math.floor(200 * intensity);
+                for (let i = 0; i < count; i++) particles.push({
+                    x: Math.random() * canvas.width,
+                    y: -30 - Math.random() * 120,
+                    size: Math.random() * 7 + 3,
+                    speedY: Math.random() * 6 + 5,
+                    speedX: (Math.random() - 0.5) * 8,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    rotSpeed: (Math.random() - 0.5) * 14,
+                    opacity: 1,
+                    shape: Math.random() > 0.5 ? 'rect' : 'star',
+                    wobble: Math.random() * 3
+                });
+                let frame;
+                const start = performance.now();
+                const duration = 3000 * intensity;
+
+                function draw(now) {
+                    const elapsed = now - start;
+                    if (elapsed > duration) { ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        cancelAnimationFrame(frame); return; }
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    particles.forEach(p => {
+                        p.y += p.speedY;
+                        p.x += p.speedX + Math.sin(elapsed * 0.003 + p.wobble) * 1.5;
+                        p.rotation += p.rotSpeed;
+                        p.opacity = Math.max(0, 1 - elapsed / duration);
+                        ctx.save();
+                        ctx.globalAlpha = p.opacity;
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rotation * Math.PI / 180);
+                        ctx.fillStyle = p.color;
+                        if (p.shape === 'star') {
+                            ctx.beginPath();
+                            for (let i = 0; i < 5; i++) {
+                                const a = i * 72 * Math.PI / 180;
+                                const x1 = Math.cos(a) * p.size / 2,
+                                    y1 = Math.sin(a) * p.size / 2;
+                                if (i === 0) ctx.moveTo(x1, y1);
+                                else ctx.lineTo(x1, y1);
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+                        } else ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                        ctx.restore();
+                    });
+                    frame = requestAnimationFrame(draw);
+                }
+                frame = requestAnimationFrame(draw);
+            }
+
+            function triggerSparkBurst(x, y, count = 20) {
+                const container = document.createElement('div');
+                container.className = 'spark-burst';
+                container.style.left = x + 'px';
+                container.style.top = y + 'px';
+                for (let i = 0; i < count; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'spark-dot';
+                    const angle = (Math.PI * 2 * i) / count;
+                    const dist = 30 + Math.random() * 50;
+                    dot.style.transform = `translate(${Math.cos(angle)*dist}px,${Math.sin(angle)*dist}px)`;
+                    dot.style.animationDelay = Math.random() * 0.2 + 's';
+                    container.appendChild(dot);
+                }
+                document.body.appendChild(container);
+                setTimeout(() => container.remove(), 800);
+            }
+
+            function triggerExplosionEffect() {
+                const overlay = document.getElementById('explosionOverlay');
+                overlay.style.display = 'block';
+                overlay.classList.add('explosion-overlay');
+                document.getElementById('gameContainer').classList.add('screen-shake');
+                const mainCard = document.getElementById('mainCard');
+                mainCard.classList.add('danger-zone');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    overlay.classList.remove('explosion-overlay');
+                    document.getElementById('gameContainer').classList.remove('screen-shake');
+                    mainCard.classList.remove('danger-zone');
+                }, 700);
+            }
+
+            function triggerCashoutSequence(amount, multiplier) {
+                const overlay = document.getElementById('cashoutOverlay');
+                overlay.style.display = 'flex';
+                overlay.classList.add('cashout-overlay');
+                overlay.innerHTML =
+                    `<span class="cashout-text">💰 ${multiplier}<br><small style="font-size:1.2rem;">${amount.toFixed(2)} GOLD</small></span>`;
+                // Coin rain
+                const coinContainer = document.createElement('div');
+                coinContainer.className = 'coin-rain';
+                coinContainer.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9997;';
+                for (let i = 0; i < 60; i++) {
+                    const coin = document.createElement('span');
+                    coin.className = 'coin-particle';
+                    coin.textContent = ['🪙', '✨', '💎', '⭐', '🪙'][Math.floor(Math.random() * 5)];
+                    coin.style.left = Math.random() * 100 + '%';
+                    coin.style.animationDelay = Math.random() * 1.5 + 's';
+                    coin.style.fontSize = (Math.random() * 2 + 1) + 'rem';
+                    coinContainer.appendChild(coin);
+                }
+                document.body.appendChild(coinContainer);
+                playTone('jackpot', 1.5);
+                triggerConfetti(2);
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    overlay.innerHTML = '';
+                    coinContainer.remove();
+                }, 2800);
+            }
+
+            function showNotification(message, icon = '🔔') {
+                const container = document.getElementById('notificationContainer');
+                const toast = document.createElement('div');
+                toast.className = 'notification-toast';
+                toast.innerHTML = `${icon} ${message}`;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+
+            // ── DIFFICULTY CONFIG ──
+            const DIFFICULTIES = {
+                easy: { name: 'Easy', gridCols: 4, gridRows: 4, pairs: 6, bombs: 4, baseMultiplier: 2, label: '4×4',
+                    emoji: '🟢', specialCardChance: 0.15, maxSpecials: 1 },
+                medium: { name: 'Medium', gridCols: 5, gridRows: 4, pairs: 8, bombs: 4, baseMultiplier: 2.5,
+                    label: '5×4', emoji: '🟡', specialCardChance: 0.2, maxSpecials: 2 },
+                hard: { name: 'Hard', gridCols: 6, gridRows: 4, pairs: 9, bombs: 6, baseMultiplier: 3, label: '6×4',
+                    emoji: '🟠', specialCardChance: 0.22, maxSpecials: 2 },
+                expert: { name: 'Expert', gridCols: 6, gridRows: 6, pairs: 13, bombs: 10, baseMultiplier: 4,
+                    label: '6×6', emoji: '🔴', specialCardChance: 0.25, maxSpecials: 3 },
+                impossible: { name: 'Impossible', gridCols: 8, gridRows: 8, pairs: 22, bombs: 20, baseMultiplier: 5,
+                    label: '8×8', emoji: '💀', specialCardChance: 0.28, maxSpecials: 4 }
+            };
+
+            // ── SPECIAL CARD TYPES ──
+            const SPECIAL_TYPES = {
+                shield: { name: 'Shield', icon: 'fa-shield-halved', color: '#4da6ff', rarity: 'Rare',
+                    desc: 'Protects from one bomb' },
+                double: { name: 'Double', icon: 'fa-angles-up', color: '#ff69b4', rarity: 'Epic',
+                    desc: 'Doubles current winnings' },
+                freeze: { name: 'Freeze', icon: 'fa-snowflake', color: '#00e5ff', rarity: 'Rare',
+                desc: 'Slows danger effects' },
+                luckyPeek: { name: 'Lucky Peek', icon: 'fa-eye', color: '#b388ff', rarity: 'Epic',
+                    desc: 'Reveals random cards briefly' },
+                goldRush: { name: 'Gold Rush', icon: 'fa-bolt', color: '#ffab00', rarity: 'Legendary',
+                    desc: 'Multiplier boost on next match' }
+            };
+
+            // ── SYMBOLS ──
+            const SYMBOLS = [
+                'fa-gem', 'fa-crown', 'fa-star', 'fa-heart', 'fa-moon', 'fa-bolt',
+                'fa-sun', 'fa-fire', 'fa-apple-alt', 'fa-fish', 'fa-feather',
+                'fa-leaf', 'fa-skull', 'fa-ghost', 'fa-dragon', 'fa-paw',
+                'fa-hippo', 'fa-otter', 'fa-spider', 'fa-dove', 'fa-cat',
+                'fa-dog', 'fa-crow', 'fa-wand-sparkles', 'fa-hat-wizard', 'fa-meteor'
+            ];
+
+            // ── BOARD THEMES ──
+            const THEMES = ['royal-gold', 'crimson-inferno', 'emerald-vault', 'void-casino', 'cyber-diamond'];
+            let currentTheme = 'royal-gold';
+
+            // ── STATE ──
+            let currentUser = null;
+            let sessionProfit = 0;
+            let bet = 50;
+            let gameActive = false;
+            let canFlip = true;
+            let cards = [];
+            let flippedIndices = [];
+            let pairsFound = 0;
+            let winnings = 0;
+            let currentDifficulty = 'easy';
+            let comboStreak = 0;
+            let bestComboStreak = 0;
+            let perfectRunActive = true;
+            let shieldActive = false;
+            let goldRushActive = false;
+            let goldRushMultiplier = 1;
+            let frozenUntil = 0;
+            let peekAvailable = false;
+            let dangerLevel = 0;
+            let nearMissCount = 0;
+            let totalBombsOnBoard = 0;
+            let revealedBombPositions = new Set();
+            let jackpotChance = 0.005;
+            let achievements = [];
+            let dailyRewardClaimed = false;
+
+            // ── DOM REFS ──
+            const cardsGrid = document.getElementById('cardsGrid');
+            const betInput = document.getElementById('betAmount');
+            const playBtn = document.getElementById('playBtn');
+            const collectBtn = document.getElementById('collectBtn');
+            const peekBtn = document.getElementById('peekBtn');
+            const resultMessage = document.getElementById('resultMessage');
+            const bigWinDisplay = document.getElementById('bigWinDisplay');
+            const sessionDisplay = document.getElementById('sessionProfitDisplay');
+            const winningsDisplay = document.getElementById('winningsDisplay');
+            const currentMultiDisplay = document.getElementById('currentMultiplierDisplay');
+            const targetMultiDisplay = document.getElementById('targetMultiplierDisplay');
+            const multiplierProgressFill = document.getElementById('multiplierProgressFill');
+            const balanceTag = document.getElementById('balanceTag');
+            const difficultyRow = document.getElementById('difficultyRow');
+            const streakDisplay = document.getElementById('streakDisplay');
+            const streakText = document.getElementById('streakText');
+            const dangerMeterFill = document.getElementById('dangerMeterFill');
+            const dangerMeterContainer = document.getElementById('dangerMeterContainer');
+            const mainCard = document.getElementById('mainCard');
+            const topNav = document.getElementById('topNav');
+
+            function getDiffConfig() { return DIFFICULTIES[currentDifficulty]; }
+
+            function getTotalCards() { const d = getDiffConfig(); return d.pairs * 2 + d.bombs; }
+
+            function getMaxMultiplier() {
+                const d = getDiffConfig();
+                if (d.pairs === 0) return d.baseMultiplier;
+                return d.baseMultiplier * Math.pow(2, d.pairs - 1);
+            }
+
+            function getCurrentMultiplier() {
+                if (pairsFound === 0) return goldRushActive ? goldRushMultiplier : 1;
+                const d = getDiffConfig();
+                const base = d.baseMultiplier * Math.pow(2, pairsFound - 1);
+                return goldRushActive ? base * goldRushMultiplier : base;
+            }
+
+            function formatMultiplier(val) {
+                if (val >= 1e9) return (val / 1e9).toFixed(1) + 'Bx';
+                if (val >= 1e6) return (val / 1e6).toFixed(1) + 'Mx';
+                if (val >= 1e4) return Math.round(val).toLocaleString() + 'x';
+                if (Number.isInteger(val)) return val + 'x';
+                return val.toFixed(1) + 'x';
+            }
+
+            // ── USER DATA ──
+            function initializeUserStats(user) {
+                const defaults = {
+                    globalStats: { totalWagered: 0, totalWon: 0, totalLosses: 0, totalGames: 0, currentStreak: 0,
+                        bestStreak: 0, lastGameWin: null, totalWins: 0 },
+                    transactions: [],
+                    gameOutcomes: [],
+                    gamePlayCount: {},
+                    bankBalance: 0,
+                    balance: 1000,
+                    xp: 0,
+                    level: 1,
+                    avatar: 'fas fa-crown',
+                    theme: 'royal-gold',
+                    autoTransfer: false,
+                    earnedAchievements: [],
+                    dailyBalanceSnapshots: [],
+                    cardMatchStats: { gamesPlayed: 0, totalBet: 0, totalWin: 0, biggestWin: 0, pairsFound: 0,
+                        bombsHit: 0, bestCombo: 0, perfectRuns: 0, specialsFound: 0, jackpotsHit: 0 },
+                    unlockedThemes: ['royal-gold'],
+                    lastDailyReward: null,
+                    prestigeLevel: 0,
+                    prestigeBoosts: { xpBoost: 0, goldBoost: 0 }
+                };
+                for (const [k, v] of Object.entries(defaults)) {
+                    if (user[k] === undefined) user[k] = v;
+                }
+                if (!user.cardMatchStats) user.cardMatchStats = { ...defaults.cardMatchStats };
+                if (!user.unlockedThemes) user.unlockedThemes = ['royal-gold'];
+                if (!user.prestigeBoosts) user.prestigeBoosts = { xpBoost: 0, goldBoost: 0 };
+                if (!user.level) user.level = 1;
+                if (!user.prestigeLevel) user.prestigeLevel = 0;
+                return user;
+            }
+            async function loadUser() {
+                const sess = sessionStorage.getItem('gold_current_user');
+                if (!sess) { window.location.href = '../../sign-in.html'; return false; }
+                const sessionUser = JSON.parse(sess);
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                const user = users[sessionUser.username];
+                if (!user) { sessionStorage.removeItem('gold_current_user');
+                    window.location.href = '../../sign-in.html'; return false; }
+                currentUser = initializeUserStats(user);
+                if (currentUser.balance === undefined || currentUser.balance === 0) currentUser.balance = 1000;
+                sessionUser.balance = currentUser.balance;
+                sessionStorage.setItem('gold_current_user', JSON.stringify(sessionUser));
+                // Load saved theme
+                if (currentUser.theme && THEMES.includes(currentUser.theme)) {
+                    currentTheme = currentUser.theme;
+                }
+                applyTheme(currentTheme);
+                // Check daily reward
+                checkDailyReward();
+                return true;
+            }
+            async function saveUser() {
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                currentUser.theme = currentTheme;
+                users[currentUser.username] = currentUser;
+                localStorage.setItem('gold_users', JSON.stringify(users));
+                const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
+                if (sess) { sess.balance = currentUser.balance;
+                    sessionStorage.setItem('gold_current_user', JSON.stringify(sess)); }
+            }
+
+            function updateBalanceDisplay() {
+                const balEl = document.getElementById('headerBalance');
+                const prev = parseInt(balEl.textContent.replace(/,/g, '')) || 0;
+                const next = currentUser.balance;
+                if (prev !== next) {
+                    animateNumber(balEl, prev, next, 400);
+                    if (next > prev) {
+                        balanceTag.classList.add(next - prev > 500 ? 'mega-pulse' : 'pulse');
+                        setTimeout(() => {
+                            balanceTag.classList.remove('pulse', 'mega-pulse');
+                        }, 600);
+                    }
+                } else balEl.textContent = next.toLocaleString();
+                validateBet();
+            }
+
+            function animateNumber(el, start, end, duration) {
+                if (start === end) { el.textContent = end.toLocaleString(); return; }
+                const range = end - start;
+                const startTime = performance.now();
+
+                function step(now) {
+                    const progress = Math.min((now - startTime) / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    el.textContent = Math.round(start + range * eased).toLocaleString();
+                    if (progress < 1) requestAnimationFrame(step);
+                    else el.textContent = end.toLocaleString();
+                }
+                requestAnimationFrame(step);
+            }
+
+            function validateBet() {
+                const b = parseFloat(betInput.value);
+                const invalid = b <= 0 || b > (currentUser?.balance || 0);
+                betInput.classList.toggle('invalid', invalid);
+                playBtn.disabled = gameActive || invalid;
+            }
+
+            function checkDailyReward() {
+                const today = new Date().toDateString();
+                if (currentUser.lastDailyReward === today) {
+                    dailyRewardClaimed = true;
+                } else {
+                    dailyRewardClaimed = false;
+                    // Auto-claim daily reward on first load of the day
+                    if (currentUser.lastDailyReward !== today && currentUser.lastDailyReward !== null) {
+                        claimDailyReward();
+                    }
+                }
+            }
+
+            function claimDailyReward() {
+                const today = new Date().toDateString();
+                if (currentUser.lastDailyReward === today) return;
+                const reward = 25 + Math.floor(Math.random() * 50) + (currentUser.prestigeBoosts?.goldBoost || 0) * 10;
+                currentUser.balance += reward;
+                currentUser.lastDailyReward = today;
+                dailyRewardClaimed = true;
+                saveUser().then(() => updateBalanceDisplay());
+                showNotification(`Daily Reward: +${reward} GOLD! 🎁`, '📅');
+                triggerConfetti(0.5);
+            }
+
+            // ── THEME SYSTEM ──
+            function applyTheme(themeName) {
+                currentTheme = themeName;
+                document.body.className = '';
+                document.body.classList.add('theme-' + themeName);
+                updateThemeDots();
+                if (currentUser) {
+                    currentUser.theme = themeName;
+                    saveUser();
+                }
+            }
+
+            function cycleTheme() {
+                const currentIdx = THEMES.indexOf(currentTheme);
+                const nextIdx = (currentIdx + 1) % THEMES.length;
+                const nextTheme = THEMES[nextIdx];
+                // Check if unlocked
+                if (currentUser?.unlockedThemes?.includes(nextTheme) || nextTheme === 'royal-gold') {
+                    applyTheme(nextTheme);
+                    showNotification(`Theme: ${nextTheme.replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase())}`, '🎨');
+                } else {
+                    // Try to unlock
+                    if (currentUser && currentUser.cardMatchStats.gamesPlayed >= 10 * (nextIdx + 1)) {
+                        currentUser.unlockedThemes.push(nextTheme);
+                        applyTheme(nextTheme);
+                        showNotification(`Theme Unlocked: ${nextTheme.replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase())}!`,
+                            '🔓');
+                    } else {
+                        showNotification(
+                            `Locked! Play ${10*(nextIdx+1)} games to unlock.`,
+                            '🔒');
+                    }
+                }
+            }
+
+            function updateThemeDots() {
+                const dots = document.querySelectorAll('.theme-dot');
+                dots.forEach(dot => {
+                    const theme = dot.dataset.theme;
+                    dot.classList.toggle('active-theme', theme === currentTheme);
+                });
+            }
+
+            // ── CARDS ──
+            function generateCards() {
+                const d = getDiffConfig();
+                let deck = [];
+                // Symbol pairs
+                for (let i = 0; i < d.pairs; i++) {
+                    deck.push({ type: 'symbol', symbolIndex: i, matched: false, flipped: false, bomb: false,
+                        specialType: null });
+                    deck.push({ type: 'symbol', symbolIndex: i, matched: false, flipped: false, bomb: false,
+                        specialType: null });
+                }
+                // Bombs
+                for (let i = 0; i < d.bombs; i++) {
+                    deck.push({ type: 'bomb', matched: false, flipped: false, bomb: true, specialType: null });
+                }
+                totalBombsOnBoard = d.bombs;
+                // Inject special cards (replace random non-bomb cards)
+                const specialCount = Math.min(d.maxSpecials, Math.floor(Math.random() * d.maxSpecials + 1));
+                const nonBombIndices = [];
+                deck.forEach((card, idx) => { if (!card.bomb) nonBombIndices.push(idx); });
+                // Shuffle non-bomb indices
+                for (let i = nonBombIndices.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [nonBombIndices[i], nonBombIndices[j]] = [nonBombIndices[j], nonBombIndices[i]];
+                }
+                const specialKeys = Object.keys(SPECIAL_TYPES);
+                for (let i = 0; i < Math.min(specialCount, nonBombIndices.length); i++) {
+                    if (Math.random() < d.specialCardChance) {
+                        const idx = nonBombIndices[i];
+                        const sType = specialKeys[Math.floor(Math.random() * specialKeys.length)];
+                        deck[idx].specialType = sType;
+                        deck[idx].type = 'special';
+                    }
+                }
+                // Shuffle entire deck
+                for (let i = deck.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [deck[i], deck[j]] = [deck[j], deck[i]];
+                }
+                // Track bomb positions
+                revealedBombPositions = new Set();
+                deck.forEach((card, idx) => { if (card.bomb) revealedBombPositions.add(idx); });
+                return deck;
+            }
+
+            function renderCards() {
+                const d = getDiffConfig();
+                cardsGrid.style.gridTemplateColumns = `repeat(${d.gridCols}, 1fr)`;
+                cardsGrid.innerHTML = '';
+                const iconSize = d.gridCols >= 8 ? '0.85rem' : d.gridCols >= 6 ? '1.2rem' : d.gridCols >= 5 ? '1.4rem' :
+                    '1.7rem';
+                const backIconSize = d.gridCols >= 8 ? '0.7rem' : d.gridCols >= 6 ? '0.9rem' : d.gridCols >= 5 ? '1.1rem' :
+                    '1.4rem';
+                cards.forEach((card, index) => {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card';
+                    if (card.flipped) cardDiv.classList.add('flipped');
+                    if (card.matched) cardDiv.classList.add('matched');
+                    if (card.bomb) cardDiv.classList.add('bomb-card');
+                    if (card.specialType) cardDiv.classList.add('special-card');
+                    cardDiv.dataset.index = index;
+                    let frontContent = '';
+                    if (card.bomb) {
+                        frontContent = '<i class="fas fa-bomb" style="color:#ff6b6b;"></i>';
+                    } else if (card.specialType && card.flipped) {
+                        const sInfo = SPECIAL_TYPES[card.specialType];
+                        frontContent =
+                            `<i class="fas ${sInfo.icon}" style="color:${sInfo.color};font-size:${parseFloat(iconSize)*1.3}rem;"></i>`;
+                    } else if (card.specialType && !card.flipped) {
+                        frontContent =
+                            `<i class="fas ${SYMBOLS[card.symbolIndex] || 'fa-star'}" style="color:var(--theme-accent);"></i>`;
+                    } else {
+                        frontContent =
+                            `<i class="fas ${SYMBOLS[card.symbolIndex] || 'fa-star'}" style="color:var(--theme-accent);"></i>`;
+                    }
+                    cardDiv.innerHTML = `
+                    <div class="card-face card-back" style="font-size:${backIconSize};"><i class="fas fa-question"></i></div>
+                    <div class="card-face card-front" style="font-size:${iconSize};">${frontContent}</div>
+                `;
+                    cardDiv.addEventListener('click', () => handleCardClick(index));
+                    // Touch support
+                    cardDiv.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        handleCardClick(index);
+                    });
+                    cardsGrid.appendChild(cardDiv);
+                });
+            }
+
+            function updateCardVisual(index) {
+                const cardDiv = cardsGrid.querySelector(`[data-index="${index}"]`);
+                if (!cardDiv) return;
+                cardDiv.classList.toggle('flipped', cards[index].flipped);
+                cardDiv.classList.toggle('matched', cards[index].matched);
+                if (cards[index].specialType && cards[index].flipped) {
+                    cardDiv.classList.add('special-card');
+                    cardDiv.classList.add('glow-trail');
+                    setTimeout(() => cardDiv.classList.remove('glow-trail'), 600);
+                }
+                if (cards[index].matched && cards[index].specialType) {
+                    cardDiv.classList.add('matched-golden');
+                }
+                // Update front face for special cards
+                if (cards[index].flipped && cards[index].specialType) {
+                    const frontFace = cardDiv.querySelector('.card-front');
+                    if (frontFace) {
+                        const sInfo = SPECIAL_TYPES[cards[index].specialType];
+                        const d = getDiffConfig();
+                        const iconSize = d.gridCols >= 8 ? '0.85rem' : d.gridCols >= 6 ? '1.2rem' : '1.7rem';
+                        frontFace.innerHTML =
+                            `<i class="fas ${sInfo.icon}" style="color:${sInfo.color};font-size:${parseFloat(iconSize)*1.3}rem;filter:drop-shadow(0 0 14px ${sInfo.color});"></i>`;
+                    }
+                }
+            }
+
+            // ── DANGER METER ──
+            function updateDangerMeter() {
+                const d = getDiffConfig();
+                const totalCards = getTotalCards();
+                const flippedCount = cards.filter(c => c.flipped && !c.matched && !c.bomb).length;
+                const bombProximity = totalBombsOnBoard / Math.max(1, totalCards - flippedCount - pairsFound * 2);
+                dangerLevel = Math.min(100, bombProximity * 100 * 3 + flippedCount * 2);
+                dangerMeterFill.style.width = dangerLevel + '%';
+                if (dangerLevel > 70) {
+                    dangerMeterFill.classList.add('critical');
+                    mainCard.classList.add('danger-zone');
+                    topNav.classList.add('danger-pulse');
+                    startHeartbeat();
+                } else {
+                    dangerMeterFill.classList.remove('critical');
+                    mainCard.classList.remove('danger-zone');
+                    topNav.classList.remove('danger-pulse');
+                    stopHeartbeat();
+                }
+            }
+
+            // ── MULTIPLIER UI ──
+            function updateMultiplierDisplay() {
+                const d = getDiffConfig();
+                const currentMult = getCurrentMultiplier();
+                const maxMult = getMaxMultiplier();
+                currentMultiDisplay.textContent = formatMultiplier(currentMult);
+                const highThreshold = Math.ceil(d.pairs * 0.5);
+                currentMultiDisplay.classList.toggle('high', pairsFound >= highThreshold && pairsFound < d.pairs);
+                currentMultiDisplay.classList.toggle('mythic', pairsFound >= d.pairs - 1 && d.pairs > 2 && pairsFound < d
+                    .pairs);
+                targetMultiDisplay.textContent = formatMultiplier(maxMult);
+                const progress = d.pairs > 0 ? (pairsFound / d.pairs) * 100 : 0;
+                multiplierProgressFill.style.width = progress + '%';
+                multiplierProgressFill.classList.toggle('near-max', pairsFound >= d.pairs - 1 && d.pairs > 1 && pairsFound < d
+                    .pairs);
+                // Update streak display
+                if (comboStreak >= 3) {
+                    streakText.textContent = `🔥 ${comboStreak} STREAK! +${comboStreak*5}% XP`;
+                    streakDisplay.classList.toggle('on-fire', comboStreak >= 5);
+                } else if (comboStreak > 0) {
+                    streakText.textContent = `✨ ${comboStreak} streak`;
+                    streakDisplay.classList.remove('on-fire');
+                } else {
+                    streakText.textContent = '';
+                    streakDisplay.classList.remove('on-fire');
+                }
+            }
+
+            function updateMaxMultiplierDisplay() {
+                targetMultiDisplay.textContent = formatMultiplier(getMaxMultiplier());
+            }
+
+            function pulseWinnings() {
+                winningsDisplay.classList.add('pulse');
+                setTimeout(() => winningsDisplay.classList.remove('pulse'), 250);
+            }
+
+            // ── DIFFICULTY SELECTION ──
+            function setDifficulty(diffKey) {
+                if (gameActive) return;
+                if (!DIFFICULTIES[diffKey]) return;
+                currentDifficulty = diffKey;
+                updateDifficultyButtons();
+                updateMaxMultiplierDisplay();
+                updateMultiplierDisplay();
+                resetGameState();
+                cardsGrid.innerHTML = '';
+                cardsGrid.style.gridTemplateColumns = `repeat(${getDiffConfig().gridCols}, 1fr)`;
+                multiplierProgressFill.style.width = '0%';
+                multiplierProgressFill.classList.remove('near-max');
+                currentMultiDisplay.textContent = '1x';
+                currentMultiDisplay.classList.remove('high', 'mythic');
+                dangerMeterFill.style.width = '0%';
+                dangerMeterFill.classList.remove('critical');
+                mainCard.classList.remove('danger-zone');
+                topNav.classList.remove('danger-pulse');
+                stopHeartbeat();
+                streakText.textContent = '';
+                streakDisplay.classList.remove('on-fire');
+                peekBtn.style.display = 'none';
+                validateBet();
+            }
+
+            function resetGameState() {
+                cards = [];
+                pairsFound = 0;
+                winnings = 0;
+                flippedIndices = [];
+                gameActive = false;
+                canFlip = true;
+                comboStreak = 0;
+                perfectRunActive = true;
+                shieldActive = false;
+                goldRushActive = false;
+                goldRushMultiplier = 1;
+                frozenUntil = 0;
+                peekAvailable = false;
+                dangerLevel = 0;
+                nearMissCount = 0;
+                updateWinningsDisplay();
+                updateSessionDisplay();
+                collectBtn.style.display = 'none';
+                peekBtn.style.display = 'none';
+                bigWinDisplay.style.display = 'none';
+                resultMessage.innerHTML = '✨ Place bet and play';
+                playBtn.disabled = false;
+                betInput.disabled = false;
+                updateMultiplierDisplay();
+                updateDangerMeter();
+            }
+
+            function updateDifficultyButtons() {
+                const buttons = difficultyRow.querySelectorAll('.diff-btn');
+                buttons.forEach(btn => {
+                    const diff = btn.dataset.diff;
+                    btn.classList.toggle('active', diff === currentDifficulty);
+                    btn.disabled = gameActive;
+                });
+            }
+
+            difficultyRow.addEventListener('click', (e) => {
+                const btn = e.target.closest('.diff-btn');
+                if (!btn || gameActive) return;
+                const diff = btn.dataset.diff;
+                if (diff && diff !== currentDifficulty) setDifficulty(diff);
+            });
+
+            // ── GAME FLOW ──
+            function startGame() {
+                bet = parseFloat(betInput.value);
+                if (isNaN(bet) || bet <= 0) bet = 50;
+                bet = Math.floor(bet * 100) / 100;
+                if (bet < 1) bet = 1;
+                if (bet > currentUser.balance) {
+                    resultMessage.textContent = '❌ Insufficient balance!';
+                    shakeElement(betInput);
+                    return;
+                }
+                currentUser.balance -= bet;
+                saveUser().then(() => updateBalanceDisplay());
+                sessionProfit -= bet;
+                cards = generateCards();
+                pairsFound = 0;
+                winnings = 0;
+                flippedIndices = [];
+                gameActive = true;
+                canFlip = true;
+                comboStreak = 0;
+                perfectRunActive = true;
+                shieldActive = false;
+                goldRushActive = false;
+                goldRushMultiplier = 1;
+                frozenUntil = 0;
+                peekAvailable = false;
+                dangerLevel = 0;
+                nearMissCount = 0;
+                totalBombsOnBoard = getDiffConfig().bombs;
+                revealedBombPositions = new Set();
+                cards.forEach((c, i) => { if (c.bomb) revealedBombPositions.add(i); });
+
+                renderCards();
+                updateWinningsDisplay();
+                updateMultiplierDisplay();
+                updateDangerMeter();
+                updateDifficultyButtons();
+                resultMessage.innerHTML = '🔍 Find pairs, avoid bombs!';
+                bigWinDisplay.style.display = 'none';
+                collectBtn.style.display = 'none';
+                peekBtn.style.display = 'none';
+                playBtn.disabled = true;
+                betInput.disabled = true;
+                mainCard.classList.remove('danger-zone');
+                topNav.classList.remove('danger-pulse');
+                stopHeartbeat();
+                streakText.textContent = '';
+                streakDisplay.classList.remove('on-fire');
+                dangerMeterFill.style.width = '0%';
+                dangerMeterFill.classList.remove('critical');
+                playTone('flip', 0.6);
+            }
+
+            function handleCardClick(index) {
+                if (!gameActive || !canFlip) return;
+                if (frozenUntil > Date.now()) {
+                    resultMessage.innerHTML = '❄️ Board is frozen! Wait...';
+                    return;
+                }
+                const card = cards[index];
+                if (card.flipped || card.matched) return;
+                card.flipped = true;
+                updateCardVisual(index);
+                flippedIndices.push(index);
+                playTone('flip');
+                updateDangerMeter();
+                // Near-miss detection: check if adjacent to bomb
+                checkNearMiss(index);
+                if (flippedIndices.length === 2) {
+                    canFlip = false;
+                    const delay = frozenUntil > Date.now() ? 1000 : 450;
+                    setTimeout(() => evaluateTwoCards(), delay);
+                }
+            }
+
+            function checkNearMiss(index) {
+                const d = getDiffConfig();
+                const cols = d.gridCols;
+                const row = Math.floor(index / cols);
+                const col = index % cols;
+                const adjacentIndices = [];
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        if (dr === 0 && dc === 0) continue;
+                        const nr = row + dr;
+                        const nc = col + dc;
+                        if (nr >= 0 && nr < d.gridRows && nc >= 0 && nc < cols) {
+                            adjacentIndices.push(nr * cols + nc);
+                        }
+                    }
+                }
+                const nearBomb = adjacentIndices.some(ai => cards[ai] && cards[ai].bomb && !cards[ai].flipped);
+                if (nearBomb && !cards[index].bomb) {
+                    nearMissCount++;
+                    dangerLevel = Math.min(100, dangerLevel + 15);
+                    updateDangerMeter();
+                    if (nearMissCount >= 3) startHeartbeat();
+                }
+            }
+
+            function evaluateTwoCards() {
+                const [idx1, idx2] = flippedIndices;
+                const card1 = cards[idx1];
+                const card2 = cards[idx2];
+                const d = getDiffConfig();
+
+                // ── SPECIAL CARD HANDLING ──
+                const specialsInFlip = [];
+                if (card1.specialType) specialsInFlip.push({ card: card1, index: idx1 });
+                if (card2.specialType) specialsInFlip.push({ card: card2, index: idx2 });
+
+                // Process special cards that are revealed (even if not matched)
+                for (const sp of specialsInFlip) {
+                    processSpecialCard(sp.card, sp.index);
+                }
+
+                // ── BOMB CHECK ──
+                if (card1.bomb || card2.bomb) {
+                    if (shieldActive) {
+                        // Shield protects
+                        shieldActive = false;
+                        const bombIdx = card1.bomb ? idx1 : idx2;
+                        cards[bombIdx].matched = true;
+                        cards[bombIdx].flipped = true;
+                        updateCardVisual(bombIdx);
+                        playTone('shield_activate');
+                        resultMessage.innerHTML = '🛡️ SHIELD BLOCKED A BOMB! You\'re safe.';
+                        showNotification('Shield absorbed a bomb! 🛡️', '🛡️');
+                        flippedIndices = [];
+                        canFlip = true;
+                        updateDangerMeter();
+                        if (pairsFound > 0) collectBtn.style.display = 'inline-flex';
+                        return;
+                    }
+                    // Bomb explodes
+                    gameActive = false;
+                    canFlip = false;
+                    playTone('bomb', 1.5);
+                    triggerExplosionEffect();
+                    comboStreak = 0;
+                    perfectRunActive = false;
+                    resultMessage.innerHTML =
+                        '<span style="color:#ff6b6b;font-size:1.2rem;">💣 BOMB! You lost your bet.</span>';
+                    bigWinDisplay.style.display = 'none';
+                    revealAllCards();
+                    recordGame(false, 0);
+                    stopHeartbeat();
+                    resetAfterDelay();
+                    return;
+                }
+
+                // ── MATCH CHECK ──
+                const isSymbolMatch = card1.type === 'symbol' && card2.type === 'symbol' && card1.symbolIndex === card2
+                    .symbolIndex;
+                const isSpecialMatch = card1.specialType && card2.specialType && card1.specialType === card2.specialType;
+                const isValidMatch = isSymbolMatch || (card1.specialType && card2.specialType && isSpecialMatch) || (
+                    isSymbolMatch && (card1.specialType || card2.specialType));
+
+                if (isSymbolMatch || (card1.type !== 'bomb' && card2.type !== 'bomb' && card1.symbolIndex === card2
+                        .symbolIndex)) {
+                    // Successful match
+                    card1.matched = true;
+                    card2.matched = true;
+                    pairsFound++;
+                    comboStreak++;
+                    if (comboStreak > bestComboStreak) bestComboStreak = comboStreak;
+                    if (comboStreak > (currentUser.cardMatchStats.bestCombo || 0)) {
+                        currentUser.cardMatchStats.bestCombo = comboStreak;
+                    }
+                    winnings = getCurrentMultiplier() * bet;
+                    // Jackpot check (rare huge payout)
+                    let jackpotTriggered = false;
+                    if (pairsFound >= d.pairs - 1 && Math.random() < jackpotChance && comboStreak >= 3) {
+                        jackpotTriggered = true;
+                        winnings *= (5 + Math.floor(Math.random() * 15));
+                        currentUser.cardMatchStats.jackpotsHit = (currentUser.cardMatchStats.jackpotsHit || 0) + 1;
+                    }
+                    playTone(comboStreak >= 4 ? 'golden_match' : 'match');
+                    if (jackpotTriggered) playTone('jackpot', 1.8);
+                    updateWinningsDisplay();
+                    pulseWinnings();
+                    updateMultiplierDisplay();
+                    updateCardVisual(idx1);
+                    updateCardVisual(idx2);
+                    // Spark burst at card positions
+                    const cardEl1 = cardsGrid.querySelector(`[data-index="${idx1}"]`);
+                    const cardEl2 = cardsGrid.querySelector(`[data-index="${idx2}"]`);
+                    if (cardEl1) {
+                        const rect = cardEl1.getBoundingClientRect();
+                        triggerSparkBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 12);
+                    }
+                    if (cardEl2 && idx1 !== idx2) {
+                        const rect = cardEl2.getBoundingClientRect();
+                        triggerSparkBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 12);
+                    }
+                    flippedIndices = [];
+                    canFlip = true;
+                    dangerLevel = Math.max(0, dangerLevel - 8);
+                    updateDangerMeter();
+                    if (pairsFound > 0) collectBtn.style.display = 'inline-flex';
+                    // Check for peek availability
+                    if (comboStreak >= 3 && !peekAvailable && pairsFound < d.pairs) {
+                        peekAvailable = true;
+                        peekBtn.style.display = 'inline-flex';
+                    }
+                    if (pairsFound === d.pairs) {
+                        // All pairs found!
+                        gameActive = false;
+                        perfectRunActive = true;
+                        playTone('win', 1.3);
+                        triggerConfetti(1.5);
+                        if (jackpotTriggered) triggerCashoutSequence(winnings, formatMultiplier(getCurrentMultiplier()));
+                        resultMessage.innerHTML =
+                            '<span style="color:#aaffaa;font-size:1.1rem;">🎉 ALL PAIRS FOUND! Perfect!</span>';
+                        bigWinDisplay.style.display = 'block';
+                        bigWinDisplay.textContent = formatMultiplier(getCurrentMultiplier());
+                        if (perfectRunActive) {
+                            currentUser.cardMatchStats.perfectRuns = (currentUser.cardMatchStats.perfectRuns || 0) + 1;
+                            showNotification('PERFECT RUN! 🏆 Extra XP awarded!', '🏆');
+                        }
+                        cashoutWinnings();
+                        stopHeartbeat();
+                    } else {
+                        const nextMult = getCurrentMultiplier() * 2;
+                        resultMessage.innerHTML =
+                            `✅ Pair! <b>${formatMultiplier(getCurrentMultiplier())}</b> · Next: ${formatMultiplier(nextMult)}. Collect or keep going!`;
+                        if (jackpotTriggered) {
+                            showNotification('🎰 JACKPOT TRIGGERED! Massive payout!', '🎰');
+                        }
+                    }
+                } else {
+                    // No match – flip back
+                    comboStreak = 0;
+                    perfectRunActive = false;
+                    playTone('flip', 0.5);
+                    updateMultiplierDisplay();
+                    setTimeout(() => {
+                        card1.flipped = false;
+                        card2.flipped = false;
+                        updateCardVisual(idx1);
+                        updateCardVisual(idx2);
+                        flippedIndices = [];
+                        canFlip = true;
+                        updateDangerMeter();
+                    }, 750);
+                }
+            }
+
+            function processSpecialCard(card, index) {
+                if (!card.specialType) return;
+                const sType = card.specialType;
+                playTone('special_reveal');
+                currentUser.cardMatchStats.specialsFound = (currentUser.cardMatchStats.specialsFound || 0) + 1;
+                switch (sType) {
+                    case 'shield':
+                        shieldActive = true;
+                        showNotification('🛡️ Shield Activated! Next bomb is blocked.', '🛡️');
+                        resultMessage.innerHTML = '🛡️ SHIELD found! You\'re protected from one bomb.';
+                        break;
+                    case 'double':
+                        winnings *= 2;
+                        updateWinningsDisplay();
+                        pulseWinnings();
+                        showNotification('💎 DOUBLE! Winnings multiplied by 2!', '💎');
+                        resultMessage.innerHTML = '💎 DOUBLE CARD! Current winnings doubled!';
+                        break;
+                    case 'freeze':
+                        frozenUntil = Date.now() + 4000;
+                        dangerLevel = Math.max(0, dangerLevel - 30);
+                        updateDangerMeter();
+                        stopHeartbeat();
+                        showNotification('❄️ FREEZE! Danger reduced, bombs slowed.', '❄️');
+                        resultMessage.innerHTML = '❄️ Board frozen! Danger reduced for 4 seconds.';
+                        break;
+                    case 'luckyPeek':
+                        revealRandomCards(3);
+                        showNotification('👁️ LUCKY PEEK! Random cards revealed briefly.', '👁️');
+                        resultMessage.innerHTML = '👁️ Peek! Some cards revealed temporarily.';
+                        break;
+                    case 'goldRush':
+                        goldRushActive = true;
+                        goldRushMultiplier = 2 + Math.floor(Math.random() * 3);
+                        showNotification(`⚡ GOLD RUSH! Next match gets ${goldRushMultiplier}x boost!`, '⚡');
+                        resultMessage.innerHTML = `⚡ GOLD RUSH! ${goldRushMultiplier}x multiplier on next match!`;
+                        break;
+                }
+                // Special card is consumed (treated as matched/flipped for cleanup)
+                card.specialType = null;
+                updateCardVisual(index);
+            }
+
+            function revealRandomCards(count) {
+                const unrevealed = [];
+                cards.forEach((card, idx) => {
+                    if (!card.flipped && !card.matched) unrevealed.push(idx);
+                });
+                const toReveal = [];
+                for (let i = 0; i < Math.min(count, unrevealed.length); i++) {
+                    const randIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+                    if (!toReveal.includes(randIdx)) toReveal.push(randIdx);
+                }
+                toReveal.forEach(idx => {
+                    cards[idx].flipped = true;
+                    updateCardVisual(idx);
+                });
+                // Hide after delay
+                setTimeout(() => {
+                    toReveal.forEach(idx => {
+                        if (!cards[idx].matched) {
+                            cards[idx].flipped = false;
+                            updateCardVisual(idx);
+                        }
+                    });
+                }, 1500);
+            }
+
+            function revealAllCards() {
+                cards.forEach(card => { card.flipped = true; });
+                for (let i = 0; i < cards.length; i++) updateCardVisual(i);
+            }
+
+            function cashoutWinnings() {
+                if (!gameActive && winnings === 0 && pairsFound === 0) return;
+                const winAmount = winnings > 0 ? winnings : (pairsFound > 0 ? getCurrentMultiplier() * bet : 0);
+                const actualWin = winAmount > 0 ? winAmount : 0;
+                if (actualWin > 0) {
+                    currentUser.balance += actualWin;
+                    sessionProfit += actualWin;
+                    // XP bonus from combos
+                    const xpBonus = Math.floor(actualWin * 0.1 * (1 + comboStreak * 0.05) * (1 + (currentUser
+                        .prestigeBoosts?.xpBoost || 0) * 0.1));
+                    currentUser.xp = (currentUser.xp || 0) + xpBonus;
+                    // Level up check
+                    const newLevel = Math.floor(Math.sqrt(currentUser.xp / 100)) + 1;
+                    if (newLevel > (currentUser.level || 1)) {
+                        currentUser.level = newLevel;
+                        showNotification(`🎖️ Level Up! You're now Level ${newLevel}!`, '🎖️');
+                        triggerConfetti(0.8);
+                    }
+                    recordGame(true, actualWin);
+                    if (actualWin >= bet * 10) {
+                        triggerCashoutSequence(actualWin, formatMultiplier(actualWin / bet));
+                    } else if (actualWin >= bet * 5) {
+                        triggerConfetti(1.2);
+                        playTone('collect', 1.2);
+                    } else {
+                        playTone('collect');
+                    }
+                }
+                saveUser().then(() => updateBalanceDisplay());
+                updateSessionDisplay();
+                winnings = 0;
+                updateWinningsDisplay();
+                collectBtn.style.display = 'none';
+                peekBtn.style.display = 'none';
+                gameActive = false;
+                betInput.disabled = false;
+                playBtn.disabled = false;
+                updateDifficultyButtons();
+                validateBet();
+                updateMultiplierDisplay();
+                updateDangerMeter();
+                stopHeartbeat();
+                // Check achievements
+                checkAchievements();
+            }
+
+            function collectManually() {
+                if (!gameActive || pairsFound === 0) return;
+                const d = getDiffConfig();
+                const winAmount = getCurrentMultiplier() * bet;
+                winnings = winAmount;
+                cashoutWinnings();
+                resultMessage.innerHTML =
+                    `<span style="color:#aaffaa;">💰 Cashed out: ${winAmount.toFixed(2)} GOLD (${formatMultiplier(getCurrentMultiplier())})</span>`;
+                bigWinDisplay.style.display = 'block';
+                bigWinDisplay.textContent = formatMultiplier(getCurrentMultiplier());
+                triggerConfetti(1);
+                revealAllCards();
+                resetAfterDelay();
+            }
+
+            function resetAfterDelay() {
+                setTimeout(() => {
+                    if (!gameActive) {
+                        betInput.disabled = false;
+                        playBtn.disabled = false;
+                        updateDifficultyButtons();
+                        validateBet();
+                        resultMessage.innerHTML = '✨ Place bet and play';
+                        bigWinDisplay.style.display = 'none';
+                        collectBtn.style.display = 'none';
+                        peekBtn.style.display = 'none';
+                        multiplierProgressFill.style.width = '0%';
+                        multiplierProgressFill.classList.remove('near-max');
+                        currentMultiDisplay.textContent = '1x';
+                        currentMultiDisplay.classList.remove('high', 'mythic');
+                        dangerMeterFill.style.width = '0%';
+                        dangerMeterFill.classList.remove('critical');
+                        mainCard.classList.remove('danger-zone');
+                        topNav.classList.remove('danger-pulse');
+                        stopHeartbeat();
+                        streakText.textContent = '';
+                        streakDisplay.classList.remove('on-fire');
+                        comboStreak = 0;
+                        shieldActive = false;
+                        goldRushActive = false;
+                        goldRushMultiplier = 1;
+                        frozenUntil = 0;
+                        peekAvailable = false;
+                    }
+                }, 2500);
+            }
+
+            function recordGame(won, winAmount) {
+                const net = winAmount - bet;
+                currentUser.globalStats.totalGames++;
+                currentUser.globalStats.totalWagered += bet;
+                currentUser.globalStats.totalWon += winAmount;
+                if (net > 0) {
+                    currentUser.globalStats.currentStreak = (currentUser.globalStats.currentStreak || 0) + 1;
+                    if (currentUser.globalStats.currentStreak > currentUser.globalStats.bestStreak) currentUser.globalStats
+                        .bestStreak = currentUser.globalStats.currentStreak;
+                    currentUser.globalStats.totalWins = (currentUser.globalStats.totalWins || 0) + 1;
+                } else if (net < 0) {
+                    currentUser.globalStats.currentStreak = 0;
+                }
+                const xpGain = Math.floor(bet * (won ? 1.5 : 0.3) * (1 + comboStreak * 0.05));
+                currentUser.xp = (currentUser.xp || 0) + xpGain;
+                currentUser.gamePlayCount['card-match'] = (currentUser.gamePlayCount['card-match'] || 0) + 1;
+                const cs = currentUser.cardMatchStats;
+                cs.gamesPlayed++;
+                cs.totalBet += bet;
+                cs.totalWin += winAmount;
+                if (winAmount > cs.biggestWin) cs.biggestWin = winAmount;
+                cs.pairsFound += pairsFound;
+                if (!won) cs.bombsHit++;
+                if (comboStreak > (cs.bestCombo || 0)) cs.bestCombo = comboStreak;
+                currentUser.gameOutcomes.unshift({
+                    game: 'CardMatch',
+                    result: net > 0 ? 'win' : (net < 0 ? 'loss' : 'push'),
+                    profit: net,
+                    multiplier: winAmount > 0 ? winAmount / bet : 0,
+                    bet,
+                    win: winAmount,
+                    difficulty: currentDifficulty,
+                    pairsFound: pairsFound,
+                    comboStreak: comboStreak,
+                    perfectRun: perfectRunActive && pairsFound === getDiffConfig().pairs,
+                    date: new Date().toISOString()
+                });
+                if (currentUser.gameOutcomes.length > 50) currentUser.gameOutcomes.pop();
+                currentUser.transactions.unshift({
+                    desc: `🃏 CardMatch [${getDiffConfig().label}] | Bet ${bet} → ${winAmount>0?'Won '+winAmount.toFixed(2):'Bombed'} | Streak: ${comboStreak}`,
+                    amount: net,
+                    type: net > 0 ? 'game_win' : 'game_loss',
+                    date: new Date().toISOString()
+                });
+                if (currentUser.transactions.length > 30) currentUser.transactions.shift();
+                // Prestige check
+                if (currentUser.level >= 50 && currentUser.prestigeLevel === 0) {
+                    currentUser.prestigeLevel = 1;
+                    currentUser.prestigeBoosts = { xpBoost: 1, goldBoost: 1 };
+                    currentUser.level = 1;
+                    currentUser.xp = 0;
+                    showNotification('🌟 PRESTIGE! You\'ve ascended! Permanent boosts unlocked!', '🌟');
+                    triggerConfetti(2);
+                    playTone('jackpot', 2);
+                }
+                saveUser();
+            }
+
+            function checkAchievements() {
+                const cs = currentUser.cardMatchStats;
+                const newAchievements = [];
+                const achievementDefs = [
+                    { id: 'first_win', name: 'First Win', desc: 'Win your first game', check: () => cs.totalWin > 0,
+                        icon: '🏅' },
+                    { id: '10_games', name: 'Card Shark', desc: 'Play 10 games', check: () => cs.gamesPlayed >= 10,
+                        icon: '🃏' },
+                    { id: 'big_win_500', name: 'High Roller', desc: 'Win 500+ GOLD in one game', check: () => cs
+                            .biggestWin >= 500, icon: '💎' },
+                    { id: 'combo_5', name: 'On Fire', desc: 'Get a 5+ combo streak', check: () => cs.bestCombo >= 5,
+                        icon: '🔥' },
+                    { id: 'perfect_run', name: 'Flawless', desc: 'Complete a perfect run', check: () => cs
+                            .perfectRuns > 0, icon: '🏆' },
+                    { id: 'specials_10', name: 'Specialist', desc: 'Find 10 special cards', check: () => cs
+                            .specialsFound >= 10, icon: '✨' },
+                    { id: 'jackpot', name: 'Jackpot!', desc: 'Hit a jackpot', check: () => (cs.jackpotsHit || 0) > 0,
+                        icon: '🎰' },
+                ];
+                achievementDefs.forEach(ach => {
+                    if (!currentUser.earnedAchievements.includes(ach.id) && ach.check()) {
+                        currentUser.earnedAchievements.push(ach.id);
+                        newAchievements.push(ach);
+                    }
+                });
+                newAchievements.forEach(ach => {
+                    showNotification(`${ach.icon} Achievement: ${ach.name} - ${ach.desc}`, ach.icon);
+                });
+                if (newAchievements.length > 0) saveUser();
+            }
+
+            function updateWinningsDisplay() {
+                winningsDisplay.textContent = `💰 Current win: ${winnings.toFixed(2)} GOLD`;
+            }
+
+            function updateSessionDisplay() {
+                sessionDisplay.textContent =
+                    `📊 Session P/L: ${sessionProfit>=0?'+':''}${sessionProfit.toFixed(2)} GOLD | Level ${currentUser?.level||1}`;
+            }
+
+            function shakeElement(el) {
+                el.style.animation = 'none';
+                el.offsetHeight;
+                el.style.animation = 'screenShake 0.4s ease-out';
+                setTimeout(() => el.style.animation = '', 400);
+            }
+
+            // ── AMBIENT PARTICLES & FLOATING CARDS ──
+            function initParticles() {
+                const container = document.getElementById('particlesContainer');
+                container.innerHTML = '';
+                for (let i = 0; i < 35; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    const size = Math.random() * 6 + 2;
+                    p.style.width = p.style.height = size + 'px';
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.animationDelay = Math.random() * 9 + 's';
+                    p.style.animationDuration = (Math.random() * 7 + 5) + 's';
+                    container.appendChild(p);
+                }
+            }
+
+            function initAmbientCards() {
+                const layer = document.getElementById('ambientCardsLayer');
+                layer.innerHTML = '';
+                for (let i = 0; i < 8; i++) {
+                    const card = document.createElement('div');
+                    card.className = 'floating-amb-card';
+                    card.style.left = Math.random() * 90 + '%';
+                    card.style.top = Math.random() * 90 + '%';
+                    card.style.animationDelay = Math.random() * 12 + 's';
+                    card.style.animationDuration = (Math.random() * 10 + 8) + 's';
+                    card.style.width = (Math.random() * 30 + 20) + 'px';
+                    card.style.height = (Math.random() * 40 + 28) + 'px';
+                    layer.appendChild(card);
+                }
+            }
+
+            // ── EVENT BINDINGS ──
+            playBtn.addEventListener('click', startGame);
+            collectBtn.addEventListener('click', collectManually);
+            peekBtn.addEventListener('click', () => {
+                if (peekAvailable && gameActive) {
+                    revealRandomCards(4);
+                    peekAvailable = false;
+                    peekBtn.style.display = 'none';
+                    playTone('special_reveal');
+                }
+            });
+            betInput.addEventListener('input', validateBet);
+            document.getElementById('soundToggleBtn').addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                document.getElementById('soundToggleBtn').innerHTML = soundEnabled ?
+                    '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+                localStorage.setItem('gold_sound_enabled', soundEnabled);
+                if (!soundEnabled) stopHeartbeat();
+            });
+            document.getElementById('themeCycleBtn').addEventListener('click', cycleTheme);
+            // Theme dot clicks
+            document.getElementById('themeMiniRow').addEventListener('click', (e) => {
+                const dot = e.target.closest('.theme-dot');
+                if (!dot || gameActive) return;
+                const theme = dot.dataset.theme;
+                if (theme && (currentUser?.unlockedThemes?.includes(theme) || theme === 'royal-gold')) {
+                    applyTheme(theme);
+                    showNotification(
+                        `Theme: ${theme.replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase())}`, '🎨');
+                } else if (theme && currentUser && currentUser.cardMatchStats.gamesPlayed >= 10 * (THEMES.indexOf(
+                        theme) + 1)) {
+                    currentUser.unlockedThemes.push(theme);
+                    applyTheme(theme);
+                    saveUser();
+                    showNotification(
+                        `Theme Unlocked: ${theme.replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase())}!`, '🔓');
+                } else if (theme) {
+                    showNotification(`Locked! Play more games to unlock.`, '🔒');
+                }
+            });
+            window.addEventListener('focus', async () => {
+                if (currentUser) { await loadUser();
+                    updateBalanceDisplay();
+                    updateSessionDisplay(); }
+            });
+            window.addEventListener('resize', () => {
+                if (gameActive) renderCards();
+            });
+            // Keyboard shortcut for collect
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'c' && gameActive && pairsFound > 0 && collectBtn.style.display !== 'none') {
+                    collectManually();
+                }
+                if (e.key === 'Enter' && !gameActive && !playBtn.disabled) {
+                    startGame();
+                }
+            });
+
+            // ── INIT ──
+            async function init() {
+                initParticles();
+                initAmbientCards();
+                if (!(await loadUser())) return;
+                updateBalanceDisplay();
+                updateSessionDisplay();
+                validateBet();
+                updateMultiplierDisplay();
+                updateMaxMultiplierDisplay();
+                updateDifficultyButtons();
+                updateDangerMeter();
+                cardsGrid.style.gridTemplateColumns = `repeat(${getDiffConfig().gridCols}, 1fr)`;
+                const savedSound = localStorage.getItem('gold_sound_enabled');
+                if (savedSound === 'false') {
+                    soundEnabled = false;
+                    document.getElementById('soundToggleBtn').innerHTML = '<i class="fas fa-volume-mute"></i>';
+                }
+                // Show welcome back if returning
+                if (currentUser.cardMatchStats.gamesPlayed > 0) {
+                    setTimeout(() => {
+                        showNotification(
+                            `Welcome back! ${currentUser.cardMatchStats.gamesPlayed} games played · Best combo: ${currentUser.cardMatchStats.bestCombo||0}`,
+                            '👋');
+                    }, 800);
+                }
+                // Auto-claim daily if not claimed
+                if (!dailyRewardClaimed) claimDailyReward();
+                updateThemeDots();
+            }
+            init();
+
+            console.log('🃏 GOLD CARD MATCH v2.0 | Premium Casino Edition');
+            console.log('   Systems: Audio | VFX | Streaks | Specials | Themes | Danger | Achievements | Prestige');
+            console.log('   Ready. Place your bet and play!');
+        })();
+    </script>
+</body>
+</html>

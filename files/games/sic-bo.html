@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>GOLD SIC BO | Guess the number, win the prize.</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd966;
+            --gold-bright: #ffe484;
+            --gold-deep: #f5b042;
+            --bg-deep: #0a0908;
+            --card-bg: rgba(20, 18, 16, 0.78);
+            --border-gold: rgba(255, 217, 102, 0.4);
+            --border-gold-strong: rgba(255, 217, 102, 0.65);
+            --shadow-gold: 0 0 35px rgba(255, 217, 102, 0.18);
+            --shadow-gold-strong: 0 0 50px rgba(255, 217, 102, 0.35);
+            --radius-xl: 2rem;
+            --radius-lg: 1.5rem;
+            --radius-md: 1rem;
+            --radius-sm: 0.8rem;
+            --radius-full: 60px;
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --glass-bg: rgba(18, 15, 11, 0.72);
+            --glass-blur: 18px;
+            --neon-gold: 0 0 20px rgba(255, 217, 102, 0.6), 0 0 40px rgba(255, 180, 40, 0.3);
+            --danger: #ff6b6b;
+            --success: #4caf50;
+            --text-muted: #9a9484;
+            --color-hot: #ff4444;
+            --color-warm: #ff8800;
+            --color-cool: #4488ff;
+            --color-cold: #2244cc;
+            --color-freezing: #111188;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #0c0b0a 0%, #020101 100%);
+            color: #f5f0e6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body.reduced-motion * {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+        }
+        .particles-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--gold);
+            opacity: 0;
+            animation: floatUp var(--dur, 7s) infinite ease-in;
+            animation-delay: var(--delay, 0s);
+            box-shadow: 0 0 6px rgba(255, 217, 102, 0.5);
+        }
+        .particle:nth-child(odd) {
+            background: var(--gold-bright);
+        }
+        .particle:nth-child(3n) {
+            background: var(--gold-deep);
+            box-shadow: 0 0 10px rgba(245, 176, 66, 0.6);
+        }
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            12% {
+                opacity: 0.6;
+                transform: scale(1.1);
+            }
+            45% {
+                transform: translateY(35vh) translateX(25px) scale(0.5);
+                opacity: 0.18;
+            }
+            100% {
+                transform: translateY(-25vh) translateX(-15px) scale(0);
+                opacity: 0;
+            }
+        }
+        .game-container {
+            max-width: 780px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-radius: var(--radius-full);
+            padding: 0.6rem 1.5rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+            animation: slideDown 0.6s var(--transition-bounce);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-22px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .back-home {
+            text-decoration: none;
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 0.9rem;
+            background: rgba(255, 217, 102, 0.1);
+            padding: 0.4rem 1.1rem;
+            border-radius: 40px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+        .back-home:hover {
+            background: rgba(255, 217, 102, 0.2);
+            border-color: rgba(255, 217, 102, 0.4);
+            transform: translateX(-3px);
+        }
+        .balance-tag {
+            background: rgba(28, 24, 18, 0.9);
+            padding: 0.35rem 1.1rem;
+            border-radius: 40px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 217, 102, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: box-shadow 0.3s;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+        .balance-tag i {
+            color: var(--gold-bright);
+            font-size: 1rem;
+        }
+        .balance-tag.pulse {
+            animation: balancePulse 0.5s ease-out;
+        }
+        @keyframes balancePulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 217, 102, 0.55);
+            }
+            100% {
+                box-shadow: 0 0 0 22px rgba(255, 217, 102, 0);
+            }
+        }
+        .sound-btn {
+            background: rgba(255, 217, 102, 0.08);
+            border: 1px solid rgba(255, 217, 102, 0.25);
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--gold-bright);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .sound-btn:hover {
+            background: rgba(255, 217, 102, 0.2);
+            border-color: rgba(255, 217, 102, 0.5);
+            transform: scale(1.08);
+        }
+        .main-card {
+            background: linear-gradient(160deg, rgba(26, 22, 17, 0.94) 0%, rgba(10, 8, 5, 0.97) 100%);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem 1.3rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 30px 55px rgba(0, 0, 0, 0.6), var(--shadow-gold), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+            animation: fadeInUp 0.5s ease-out;
+            position: relative;
+        }
+        .main-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: var(--radius-xl);
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 217, 102, 0.35), transparent 40%, transparent 60%, rgba(255,
+                        217, 102, 0.2));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .main-card>* {
+            position: relative;
+            z-index: 1;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(22px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .game-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gold-bright);
+            letter-spacing: 0.04em;
+            text-shadow: 0 2px 14px rgba(255, 200, 60, 0.5);
+            text-align: center;
+            margin-bottom: 0.15rem;
+        }
+        .game-subtitle {
+            font-size: 0.78rem;
+            color: #bfb6a4;
+            text-align: center;
+            margin-bottom: 0.6rem;
+        }
+        .diff-selector {
+            display: flex;
+            gap: 0.4rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 0.7rem;
+        }
+        .diff-btn {
+            background: rgba(20, 18, 16, 0.7);
+            border: 2px solid rgba(255, 217, 102, 0.3);
+            border-radius: 30px;
+            padding: 0.4rem 1rem;
+            font-weight: 700;
+            color: #ccc;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            font-size: 0.75rem;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+        .diff-btn:hover {
+            border-color: var(--border-gold-strong);
+            background: rgba(255, 217, 102, 0.1);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .diff-btn.selected {
+            border-color: var(--gold) !important;
+            background: rgba(255, 217, 102, 0.18) !important;
+            color: var(--gold) !important;
+            box-shadow: 0 0 18px rgba(255, 217, 102, 0.3);
+        }
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-full);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .money-display {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .shop-btn {
+            background: rgba(255, 217, 102, 0.1);
+            border: 1px solid var(--border-gold);
+            color: var(--gold);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .shop-btn:hover {
+            background: rgba(255, 217, 102, 0.2);
+            transform: translateY(-2px);
+        }
+        .history-screen {
+            height: 200px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 1.2rem;
+            padding: 0.8rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 0.8rem;
+            font-size: 0.82rem;
+        }
+        .guess-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            animation: rowSlideIn 0.3s ease-out;
+        }
+        @keyframes rowSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .guess-number {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .guess-feedback {
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .correct-glow {
+            color: #ffd966 !important;
+            text-shadow: 0 0 16px rgba(255, 217, 102, 0.9);
+            font-weight: 800 !important;
+            animation: glowPulse 0.7s ease-in-out infinite alternate;
+        }
+        @keyframes glowPulse {
+            from {
+                text-shadow: 0 0 6px rgba(255, 217, 102, 0.5);
+            }
+            to {
+                text-shadow: 0 0 22px rgba(255, 217, 102, 1);
+            }
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .guess-input-row {
+            display: flex;
+            gap: 0.4rem;
+        }
+        .guess-input {
+            flex: 1;
+            background: #0f0d0b;
+            border: 2px solid var(--border-gold);
+            border-radius: 40px;
+            padding: 0.6rem 1.1rem;
+            color: var(--gold-bright);
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: 0.2s;
+            min-width: 0;
+        }
+        .guess-input:focus {
+            border-color: var(--gold-bright);
+            box-shadow: 0 0 0 4px rgba(255, 217, 102, 0.1);
+        }
+        .guess-input:disabled {
+            opacity: 0.5;
+        }
+        .btn-guess {
+            background: linear-gradient(135deg, #f5b042, #ffd966);
+            color: #1a150e;
+            border: none;
+            border-radius: 40px;
+            padding: 0.6rem 1.6rem;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.15s;
+            box-shadow: 0 4px 0 #a05f15;
+            white-space: nowrap;
+            letter-spacing: 0.03em;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-guess:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 0 #a05f15, 0 8px 24px rgba(255, 180, 40, 0.45);
+        }
+        .btn-guess:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #a05f15;
+        }
+        .btn-guess:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(30%);
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(0);
+            animation: rippleEffect 0.6s ease-out;
+            pointer-events: none;
+        }
+        @keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        .bet-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 40px;
+            padding: 0.4rem 0.9rem;
+            border: 1px solid rgba(255, 217, 102, 0.2);
+        }
+        .bet-label {
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            white-space: nowrap;
+        }
+        .bet-input {
+            width: 80px;
+            background: #0f0d0b;
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            padding: 0.4rem;
+            text-align: center;
+            color: var(--gold-bright);
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+        }
+        .bet-input:focus {
+            outline: none;
+            border-color: var(--gold-bright);
+        }
+        .quick-bet {
+            background: rgba(255, 217, 102, 0.08);
+            border: 1px solid rgba(255, 217, 102, 0.28);
+            border-radius: 25px;
+            padding: 0.25rem 0.6rem;
+            color: var(--gold);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 0.7rem;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+        .quick-bet:hover {
+            background: rgba(255, 217, 102, 0.2);
+            transform: scale(1.05);
+        }
+        .payout-display {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 700;
+            color: var(--gold-bright);
+            background: rgba(255, 217, 102, 0.08);
+            border: 1px solid rgba(255, 217, 102, 0.2);
+            font-size: 0.78rem;
+            white-space: nowrap;
+        }
+        .powerups-row {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .powerup-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 217, 102, 0.06);
+            border: 2px solid rgba(255, 217, 102, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .powerup-icon:hover {
+            background: rgba(255, 217, 102, 0.18);
+            transform: scale(1.12);
+            border-color: var(--border-gold-strong);
+        }
+        .powerup-icon.active {
+            border-color: var(--gold-bright);
+            box-shadow: 0 0 16px rgba(255, 217, 102, 0.4);
+            animation: activePowerupPulse 1.5s infinite;
+        }
+        @keyframes activePowerupPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 10px rgba(255, 217, 102, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 24px rgba(255, 217, 102, 0.6);
+            }
+        }
+        .powerup-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #c0392b;
+            color: #fff;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            pointer-events: none;
+        }
+        .powerup-label {
+            font-size: 0.65rem;
+            color: #bfb6a4;
+            text-align: center;
+            margin-top: 2px;
+            max-width: 40px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .distance-bar {
+            height: 10px;
+            border-radius: 10px;
+            margin-top: 0.2rem;
+            transition: background-color 0.3s, width 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .distance-bar-inner {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.4s ease, background 0.4s ease;
+        }
+        .color-key {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            justify-content: center;
+            margin-top: 0.4rem;
+            font-size: 0.65rem;
+            color: #bfb6a4;
+        }
+        .color-key span {
+            padding: 0.15rem 0.5rem;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .streak-indicator {
+            display: inline-block;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            animation: streakGlow 1s infinite;
+        }
+        @keyframes streakGlow {
+            0%,
+            100% {
+                filter: brightness(1);
+            }
+            50% {
+                filter: brightness(1.4);
+            }
+        }
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.25s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: linear-gradient(160deg, rgba(26, 22, 17, 0.97), rgba(10, 8, 5, 0.98));
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            max-width: 520px;
+            width: 92%;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 25px 55px rgba(0, 0, 0, 0.7), var(--shadow-gold);
+            text-align: center;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-content h3 {
+            color: var(--gold-bright);
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 0.8rem;
+        }
+        .modal-close {
+            position: absolute;
+            top: 0.6rem;
+            right: 0.9rem;
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 1.3rem;
+            cursor: pointer;
+            z-index: 5;
+        }
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.6rem;
+            margin: 0.8rem 0;
+        }
+        .shop-item {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0.8rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+        }
+        .shop-item:hover {
+            border-color: var(--border-gold);
+            background: rgba(255, 217, 102, 0.08);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 180, 40, 0.15);
+        }
+        .shop-item.owned {
+            border-color: rgba(76, 175, 80, 0.5);
+            background: rgba(76, 175, 80, 0.06);
+        }
+        .shop-item-title {
+            font-weight: 700;
+            color: var(--gold-bright);
+            font-size: 0.85rem;
+        }
+        .shop-item-price {
+            color: #aaffaa;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .shop-item-desc {
+            font-size: 0.7rem;
+            color: #bfb6a4;
+            margin-top: 0.2rem;
+        }
+        .shop-item-rarity {
+            display: inline-block;
+            padding: 0.1rem 0.4rem;
+            border-radius: 10px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            margin-top: 0.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .rarity-common {
+            background: rgba(176, 160, 144, 0.3);
+            color: #c5b9a8;
+        }
+        .rarity-rare {
+            background: rgba(91, 155, 213, 0.3);
+            color: #8cc8ff;
+        }
+        .rarity-epic {
+            background: rgba(168, 85, 247, 0.3);
+            color: #c49dff;
+        }
+        .rarity-legendary {
+            background: rgba(245, 158, 11, 0.3);
+            color: #ffc944;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-gold);
+            color: var(--gold);
+            padding: 0.45rem 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+        .btn-outline:hover {
+            background: rgba(255, 217, 102, 0.15);
+        }
+        .btn-close {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+            color: #ffaaaa;
+            padding: 0.45rem 1.3rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            margin-top: 0.6rem;
+            transition: 0.2s;
+        }
+        .btn-close:hover {
+            background: rgba(255, 107, 107, 0.35);
+        }
+        .toast-container {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+        .toast {
+            background: rgba(20, 16, 10, 0.9);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border-gold);
+            border-radius: 1rem;
+            padding: 0.6rem 1.1rem;
+            color: #f5f0e6;
+            font-weight: 600;
+            font-size: 0.8rem;
+            animation: toastIn 0.4s ease-out, toastOut 0.3s ease-in 2.6s forwards;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            max-width: 300px;
+            pointer-events: auto;
+        }
+        @keyframes toastIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes toastOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .stats-mini {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            font-size: 0.68rem;
+            color: #9a9484;
+            margin-top: 0.3rem;
+        }
+        .stats-mini span {
+            background: rgba(255, 217, 102, 0.04);
+            padding: 0.15rem 0.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 217, 102, 0.1);
+        }
+        .rank-badge {
+            display: inline-block;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            background: rgba(255, 217, 102, 0.15);
+            color: var(--gold);
+            border: 1px solid rgba(255, 217, 102, 0.3);
+        }
+        @media (max-width: 500px) {
+            .guess-input {
+                font-size: 1rem;
+                padding: 0.5rem 0.7rem;
+            }
+            .history-screen {
+                height: 150px;
+                font-size: 0.72rem;
+            }
+            .btn-guess {
+                padding: 0.5rem 1.2rem;
+                font-size: 0.85rem;
+            }
+            .diff-btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.7rem;
+            }
+            .powerup-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 0.9rem;
+            }
+            .main-card {
+                padding: 1rem 0.7rem;
+                border-radius: 1.3rem;
+            }
+            .game-title {
+                font-size: 1.2rem;
+            }
+            .top-nav {
+                padding: 0.5rem 1rem;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+    <div class="particles-container" id="particlesContainer"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="game-container">
+        <!-- TOP NAV -->
+        <div class="top-nav">
+            <a href=".././home.html" class="back-home"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <div class="balance-tag" id="balanceTag">
+                <i class="fas fa-coins"></i> <span id="headerBalance">0</span> GOLD
+            </div>
+            <button id="soundToggleBtn" class="sound-btn" title="Toggle Sound"><i class="fas fa-volume-up"></i></button>
+        </div>
+
+        <!-- MAIN CARD -->
+        <div class="main-card" id="mainCard">
+            <div class="game-title"><i class="fas fa-brain"></i> SIC BO</div>
+            <div class="game-subtitle">Guess the number • <span id="rangeDisplay">1–100</span></div>
+
+            <!-- DIFFICULTY SELECTOR -->
+            <div class="diff-selector" id="diffSelector">
+                <button class="diff-btn" data-diff="easy">🌿 Easy 1–50</button>
+                <button class="diff-btn selected" data-diff="medium">⚡ Medium 1–100</button>
+                <button class="diff-btn" data-diff="hard">🔥 Hard 1–250</button>
+                <button class="diff-btn" data-diff="nightmare">💀 Nightmare 1–500</button>
+            </div>
+
+            <!-- STATS BAR -->
+            <div class="stats-bar">
+                <div class="money-display"><i class="fas fa-coins"></i> <span id="walletDisplay">0</span> GOLD</div>
+                <span id="streakBadge" class="streak-indicator" style="display:none;">🔥 Streak: <span id="streakCount">0</span></span>
+                <span class="rank-badge" id="rankBadge">🥉 Bronze</span>
+                <button class="shop-btn" id="shopBtn"><i class="fas fa-store"></i> Shop</button>
+            </div>
+
+            <!-- HISTORY SCREEN -->
+            <div class="history-screen" id="historyScreen">
+                <div style="color:#bfb6a4;text-align:center;">Make your first guess!</div>
+            </div>
+
+            <!-- DISTANCE BAR -->
+            <div class="distance-bar" id="distanceBar">
+                <div class="distance-bar-inner" id="distanceBarInner" style="width:0%;"></div>
+            </div>
+            <div class="color-key">
+                <span style="color:var(--color-freezing);">❄️ Freezing</span>
+                <span style="color:var(--color-cold);">💧 Cold</span>
+                <span style="color:var(--color-cool);">🌊 Cool</span>
+                <span style="color:var(--color-warm);">☀️ Warm</span>
+                <span style="color:var(--color-hot);">🔥 Hot</span>
+                <span style="color:#ffd966;">✨ Match!</span>
+            </div>
+
+            <!-- CONTROLS -->
+            <div class="controls" style="margin-top:0.5rem;">
+                <div class="guess-input-row">
+                    <input type="number" id="guessInput" class="guess-input" placeholder="1-100" min="1" max="100" aria-label="Your guess">
+                    <button class="btn-guess" id="guessBtn"><i class="fas fa-question-circle"></i> GUESS</button>
+                </div>
+
+                <div class="bet-row">
+                    <span class="bet-label"><i class="fas fa-coins"></i> BET</span>
+                    <input type="number" id="betAmount" class="bet-input" value="10" min="2" step="1" aria-label="Bet amount">
+                    <button class="quick-bet" data-bet="5">+5</button>
+                    <button class="quick-bet" data-bet="25">+25</button>
+                    <button class="quick-bet" id="halfBetBtn">½</button>
+                    <button class="quick-bet" id="maxBetBtn">MAX</button>
+                    <div class="payout-display">💰 Payout: <span id="payoutDisplay">50</span></div>
+                </div>
+
+                <div class="powerups-row" id="powerupsRow">
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div class="powerup-icon" id="hintIcon" title="Hint">💡<span class="powerup-badge" id="hintBadge" style="display:none;">0</span></div>
+                        <span class="powerup-label">Hint</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div class="powerup-icon" id="multiplierIcon" title="2x Multiplier">✨<span class="powerup-badge" id="multiplierBadge" style="display:none;">0</span></div>
+                        <span class="powerup-label">2x Boost</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div class="powerup-icon" id="rangeIcon" title="Odd/Even">🔍<span class="powerup-badge" id="rangeBadge" style="display:none;">0</span></div>
+                        <span class="powerup-label">Parity</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div class="powerup-icon" id="freezeIcon" title="Freeze Time">❄️<span class="powerup-badge" id="freezeBadge" style="display:none;">0</span></div>
+                        <span class="powerup-label">Freeze</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div class="powerup-icon" id="scannerIcon" title="Heat Scanner">🌡️<span class="powerup-badge" id="scannerBadge" style="display:none;">0</span></div>
+                        <span class="powerup-label">Scanner</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MINI STATS -->
+            <div class="stats-mini" style="margin-top:0.6rem;">
+                <span>🎮 <strong id="gamesCount">0</strong> games</span>
+                <span>🏆 <strong id="winsCount">0</strong> wins</span>
+                <span>💎 <strong id="bestWinDisplay">0</strong> best</span>
+                <span>📈 RTP <strong id="rtpDisplay">0%</strong></span>
+                <span>⭐ Lvl <strong id="levelDisplay">1</strong></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHOP MODAL -->
+    <div class="modal-overlay" id="shopModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeShopModal">&times;</button>
+            <h3><i class="fas fa-store"></i> Power-Up Emporium</h3>
+            <div class="shop-items" id="shopItemsContainer">
+                <!-- Dynamically populated -->
+            </div>
+            <button class="btn-close" id="closeShopBtn2">Close Shop</button>
+        </div>
+    </div>
+
+    <!-- HINT PUZZLE MODAL -->
+    <div class="modal-overlay" id="hintModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeHintModal">&times;</button>
+            <h3>🧩 Solve for Hint</h3>
+            <p style="font-size:1.4rem;margin:0.8rem 0;color:var(--gold-bright);" id="hintProblem"></p>
+            <input type="number" id="hintAnswer" class="guess-input" placeholder="Your answer" style="width:100%;margin-bottom:0.8rem;">
+            <button class="btn-guess" id="submitHintBtn" style="width:100%;">Submit Answer</button>
+            <button class="btn-close" id="closeHintBtn2" style="margin-top:0.4rem;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- STATS MODAL -->
+    <div class="modal-overlay" id="statsModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeStatsModal">&times;</button>
+            <h3><i class="fas fa-chart-bar"></i> Statistics Dashboard</h3>
+            <div id="statsContent" style="font-size:0.8rem;line-height:1.8;text-align:left;"></div>
+            <button class="btn-close" id="closeStatsBtn2">Close</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            /* ═══════════════════════════════════════════════
+               GOLD SIC BO · PREMIUM CASINO EDITION
+               Fully overhauled & polished
+               ═══════════════════════════════════════════════ */
+
+            // ──────────────── AUDIO ENGINE ────────────────
+            class AudioEngine {
+                constructor() {
+                    this.ctx = null;
+                    this.masterGain = null;
+                    this.musicGain = null;
+                    this.sfxGain = null;
+                    this.soundEnabled = true;
+                    this.masterVolume = 0.8;
+                    this.musicVolume = 0.35;
+                    this.sfxVolume = 0.85;
+                    this.initialized = false;
+                }
+                async init() {
+                    if (this.initialized) return;
+                    try {
+                        this.ctx = new(window.AudioContext || window.webkitAudioContext)();
+                        this.masterGain = this.ctx.createGain();
+                        this.masterGain.gain.value = this.masterVolume;
+                        this.masterGain.connect(this.ctx.destination);
+                        this.musicGain = this.ctx.createGain();
+                        this.musicGain.gain.value = this.musicVolume;
+                        this.musicGain.connect(this.masterGain);
+                        this.sfxGain = this.ctx.createGain();
+                        this.sfxGain.gain.value = this.sfxVolume;
+                        this.sfxGain.connect(this.masterGain);
+                        this.initialized = true;
+                    } catch (e) { /* silent */ }
+                }
+                async resume() {
+                    if (!this.ctx || !this.soundEnabled) return;
+                    if (this.ctx.state === 'suspended') await this.ctx.resume();
+                }
+                setMaster(v) { this.masterVolume = v; if (this.masterGain) this.masterGain.gain.value = v; }
+                setSFX(v) { this.sfxVolume = v; if (this.sfxGain) this.sfxGain.gain.value = v; }
+                play(type) {
+                    if (!this.soundEnabled || !this.initialized) return;
+                    this.resume();
+                    const now = this.ctx.currentTime;
+                    const dest = this.sfxGain;
+                    const mk = (f, tw = 'sine', st = now, d = 0.15, v = 0.08) => {
+                        const o = this.ctx.createOscillator(),
+                            g = this.ctx.createGain();
+                        o.connect(g);
+                        g.connect(dest);
+                        o.type = tw;
+                        o.frequency.value = f;
+                        g.gain.setValueAtTime(v, st);
+                        g.gain.exponentialRampToValueAtTime(0.0001, st + d);
+                        o.start(st);
+                        o.stop(st + d);
+                    };
+                    switch (type) {
+                        case 'guess':
+                            mk(420 + Math.random() * 80, 'sine', now, 0.1, 0.05);
+                            break;
+                        case 'correct':
+                            mk(880, 'sine', now, 0.4, 0.09);
+                            mk(1100, 'sine', now + 0.08, 0.35, 0.07);
+                            mk(1320, 'sine', now + 0.16, 0.3, 0.05);
+                            break;
+                        case 'jackpot':
+                            for (let i = 0; i < 5; i++) mk(500 + i * 180, 'sine', now + i * 0.07, 0.5, 0.07);
+                            break;
+                        case 'lose':
+                            mk(250, 'sawtooth', now, 0.3, 0.04);
+                            break;
+                        case 'click':
+                            mk(600, 'sine', now, 0.04, 0.03);
+                            break;
+                        case 'buy':
+                            mk(750, 'triangle', now, 0.18, 0.06);
+                            break;
+                        case 'powerup':
+                            mk(900, 'sine', now, 0.15, 0.05);
+                            mk(1100, 'sine', now + 0.06, 0.12, 0.04);
+                            break;
+                        case 'nearmiss':
+                            mk(500, 'sine', now, 0.2, 0.05);
+                            mk(520, 'sine', now + 0.05, 0.18, 0.04);
+                            break;
+                    }
+                }
+                destroy() { if (this.ctx) { this.ctx.close().catch(() => {});
+                        this.ctx = null; }
+                    this.initialized = false; }
+            }
+            const audio = new AudioEngine();
+
+            // ──────────────── TOAST SYSTEM ────────────────
+            function showToast(msg, icon = '✨') {
+                const c = document.getElementById('toastContainer');
+                const t = document.createElement('div');
+                t.className = 'toast';
+                t.innerHTML = `${icon} ${msg}`;
+                c.appendChild(t);
+                setTimeout(() => t.remove(), 3000);
+            }
+
+            // ──────────────── CONFETTI ────────────────
+            function triggerConfetti(intensity = 'normal') {
+                const canvas = document.getElementById('confettiCanvas');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                const ctx = canvas.getContext('2d');
+                const particles = [];
+                const count = intensity === 'jackpot' ? 350 : 150;
+                const colors = ['#ffd966', '#f5b042', '#ffed4e', '#4caf50', '#ffaa00', '#ff6b6b', '#fff', '#ffe484'];
+                for (let i = 0; i < count; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: -30 - Math.random() * 200,
+                        size: Math.random() * 8 + 3,
+                        speedY: Math.random() * 8 + 5,
+                        speedX: (Math.random() - 0.5) * 7,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        rot: Math.random() * 360,
+                        rotSpeed: (Math.random() - 0.5) * 14,
+                        shape: Math.random() > 0.5 ? 'star' : 'rect',
+                        opacity: 1,
+                    });
+                }
+                let start = performance.now();
+                let frame;
+
+                function draw(now) {
+                    const elapsed = now - start;
+                    if (elapsed > 3000) { ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        cancelAnimationFrame(frame); return; }
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    particles.forEach(p => {
+                        p.y += p.speedY;
+                        p.x += p.speedX + Math.sin(now * 0.004) * 1.5;
+                        p.rot += p.rotSpeed;
+                        p.speedY += 0.05;
+                        p.opacity = Math.max(0, 1 - elapsed / 3000);
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rot * Math.PI / 180);
+                        ctx.globalAlpha = p.opacity;
+                        ctx.fillStyle = p.color;
+                        if (p.shape === 'star') {
+                            ctx.beginPath();
+                            for (let i = 0; i < 5; i++) {
+                                const a = (i * 72 - 90) * Math.PI / 180;
+                                const x1 = Math.cos(a) * p.size / 2,
+                                    y1 = Math.sin(a) * p.size / 2;
+                                i === 0 ? ctx.moveTo(x1, y1) : ctx.lineTo(x1, y1);
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+                        } else ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                        ctx.restore();
+                    });
+                    frame = requestAnimationFrame(draw);
+                }
+                frame = requestAnimationFrame(draw);
+            }
+
+            // ──────────────── SCREEN SHAKE ────────────────
+            function screenShake(intensity = 4) {
+                const card = document.getElementById('mainCard');
+                const orig = card.style.transform || '';
+                const shakes = 5;
+                for (let i = 0; i < shakes; i++) {
+                    setTimeout(() => {
+                        card.style.transform =
+                            `translate(${(Math.random()-0.5)*intensity*2}px,${(Math.random()-0.5)*intensity*2}px)`;
+                    }, i * 25);
+                }
+                setTimeout(() => { card.style.transform = orig; }, shakes * 25 + 30);
+            }
+
+            // ──────────────── DOM REFS ────────────────
+            const $ = (s) => document.querySelector(s);
+            const $$ = (s) => document.querySelectorAll(s);
+            const dom = {
+                guessInput: $('#guessInput'),
+                guessBtn: $('#guessBtn'),
+                betInput: $('#betAmount'),
+                payoutDisplay: $('#payoutDisplay'),
+                historyScreen: $('#historyScreen'),
+                distanceBar: $('#distanceBar'),
+                distanceBarInner: $('#distanceBarInner'),
+                shopBtn: $('#shopBtn'),
+                shopModal: $('#shopModal'),
+                hintModal: $('#hintModal'),
+                hintProblem: $('#hintProblem'),
+                hintAnswer: $('#hintAnswer'),
+                submitHintBtn: $('#submitHintBtn'),
+                headerBalance: $('#headerBalance'),
+                walletDisplay: $('#walletDisplay'),
+                balanceTag: $('#balanceTag'),
+                rangeDisplay: $('#rangeDisplay'),
+                streakBadge: $('#streakBadge'),
+                streakCount: $('#streakCount'),
+                rankBadge: $('#rankBadge'),
+                gamesCount: $('#gamesCount'),
+                winsCount: $('#winsCount'),
+                bestWinDisplay: $('#bestWinDisplay'),
+                rtpDisplay: $('#rtpDisplay'),
+                levelDisplay: $('#levelDisplay'),
+                soundBtn: $('#soundToggleBtn'),
+                mainCard: $('#mainCard'),
+                hintBadge: $('#hintBadge'),
+                multiplierBadge: $('#multiplierBadge'),
+                rangeBadge: $('#rangeBadge'),
+                freezeBadge: $('#freezeBadge'),
+                scannerBadge: $('#scannerBadge'),
+                shopItemsContainer: $('#shopItemsContainer'),
+                statsModal: $('#statsModal'),
+                statsContent: $('#statsContent'),
+            };
+
+            // ──────────────── USER DATA ────────────────
+            let currentUser = null;
+            let sessionProfit = 0;
+            let sessionTotalBet = 0;
+            let sessionTotalWin = 0;
+
+            function initUserStats(u) {
+                const def = {
+                    globalStats: { totalWagered: 0, totalWon: 0, totalLosses: 0, totalGames: 0,
+                        currentStreak: 0, bestStreak: 0, totalWins: 0 },
+                    transactions: [],
+                    gameOutcomes: [],
+                    gamePlayCount: {},
+                    balance: 0,
+                    xp: 0,
+                    level: 1,
+                    prestige: 0,
+                    avatar: 'fas fa-crown',
+                    theme: 'theme-gold',
+                    earnedAchievements: [],
+                    sicboStats: { gamesPlayed: 0, wins: 0, totalBet: 0, totalWin: 0, bestWin: 0,
+                        bestStreak: 0, currentStreak: 0, hintsUsed: 0, multipliersUsed: 0, rangeRevealsUsed: 0,
+                        nearMisses: 0, jackpots: 0 },
+                    sicboPowerups: { hints: 0, multipliers: 0, rangeReveals: 0, freeze: 0, scanner: 0 },
+                    sicboSettings: { difficulty: 'medium', soundEnabled: true },
+                    lastDailyReward: null,
+                    dailyStreak: 0,
+                };
+                for (const k in def) { if (u[k] === undefined) u[k] = def[k]; }
+                if (!u.sicboStats) u.sicboStats = { ...def.sicboStats };
+                if (!u.sicboPowerups) u.sicboPowerups = { ...def.sicboPowerups };
+                if (!u.sicboSettings) u.sicboSettings = { ...def.sicboSettings };
+                return u;
+            }
+
+            async function loadUser() {
+                const sess = sessionStorage.getItem('gold_current_user');
+                if (!sess) { window.location.href = '../../sign-in.html'; return false; }
+                const su = JSON.parse(sess);
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                let user = users[su.username];
+                if (!user) { sessionStorage.removeItem('gold_current_user');
+                    window.location.href = '../../sign-in.html'; return false; }
+                currentUser = initUserStats(user);
+                su.balance = currentUser.balance;
+                sessionStorage.setItem('gold_current_user', JSON.stringify(su));
+                return true;
+            }
+
+            async function saveUser() {
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                users[currentUser.username] = currentUser;
+                localStorage.setItem('gold_users', JSON.stringify(users));
+                const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
+                if (sess) { sess.balance = currentUser.balance;
+                    sessionStorage.setItem('gold_current_user', JSON.stringify(sess)); }
+            }
+
+            function updateBalanceDisplay() {
+                const el = dom.headerBalance;
+                const prev = parseInt(el.textContent.replace(/,/g, '')) || 0;
+                const next = currentUser.balance;
+                if (prev !== next) {
+                    animateNumber(el, prev, next, 400);
+                    if (next > prev) { dom.balanceTag.classList.add('pulse');
+                        setTimeout(() => dom.balanceTag.classList.remove('pulse'), 500); }
+                } else el.textContent = next.toLocaleString();
+                dom.walletDisplay.textContent = currentUser.balance.toLocaleString();
+                validateBet();
+            }
+
+            function animateNumber(el, start, end, dur) {
+                if (start === end) { el.textContent = end.toLocaleString(); return; }
+                const range = end - start,
+                    st = performance.now();
+
+                function step(now) {
+                    const p = Math.min((now - st) / dur, 1),
+                        eased = 1 - Math.pow(1 - p, 3);
+                    el.textContent = Math.round(start + range * eased).toLocaleString();
+                    if (p < 1) requestAnimationFrame(step);
+                    else el.textContent = end.toLocaleString();
+                }
+                requestAnimationFrame(step);
+            }
+
+            function updateStatsDisplay() {
+                const s = currentUser.sicboStats;
+                dom.gamesCount.textContent = s.gamesPlayed || 0;
+                dom.winsCount.textContent = s.wins || 0;
+                dom.bestWinDisplay.textContent = (s.bestWin || 0).toLocaleString();
+                const rtp = s.totalBet > 0 ? ((s.totalWin / s.totalBet) * 100).toFixed(1) : '0.0';
+                dom.rtpDisplay.textContent = rtp + '%';
+                dom.levelDisplay.textContent = currentUser.level || 1;
+                updateRankBadge();
+                updateStreakDisplay();
+            }
+
+            function updateRankBadge() {
+                const lvl = currentUser.level || 1;
+                let rank, icon;
+                if (lvl >= 50) { rank = 'Royal';
+                    icon = '👑'; } else if (lvl >= 35) { rank = 'Diamond';
+                    icon = '💎'; } else if (lvl >= 20) { rank = 'Platinum';
+                    icon = '🔷'; } else if (lvl >= 10) { rank = 'Gold';
+                    icon = '🥇'; } else if (lvl >= 5) { rank = 'Silver';
+                    icon = '🥈'; } else { rank = 'Bronze';
+                    icon = '🥉'; }
+                dom.rankBadge.textContent = `${icon} ${rank}`;
+            }
+
+            function updateStreakDisplay() {
+                const streak = currentUser.sicboStats.currentStreak || 0;
+                if (streak >= 2) {
+                    dom.streakBadge.style.display = 'inline-block';
+                    dom.streakCount.textContent = streak;
+                    dom.streakBadge.style.background = streak >= 5 ? 'rgba(255,180,40,0.3)' : streak >= 3 ?
+                        'rgba(255,180,40,0.18)' : 'rgba(255,180,40,0.1)';
+                } else {
+                    dom.streakBadge.style.display = 'none';
+                }
+            }
+
+            function validateBet() {
+                const b = parseFloat(dom.betInput.value);
+                const invalid = b > 0 && b > (currentUser?.balance || 0);
+                dom.betInput.classList.toggle('invalid', invalid);
+            }
+
+            // ──────────────── GAME STATE ────────────────
+            const DIFFICULTIES = {
+                easy: { range: 50, label: '1–50', costPerGuess: 1, basePayout: 30, payoutDecay: 3, bonusStart: 30 },
+                medium: { range: 100, label: '1–100', costPerGuess: 2, basePayout: 50, payoutDecay: 5, bonusStart: 50 },
+                hard: { range: 250, label: '1–250', costPerGuess: 3, basePayout: 80, payoutDecay: 7, bonusStart: 80 },
+                nightmare: { range: 500, label: '1–500', costPerGuess: 5, basePayout: 150, payoutDecay: 10,
+                    bonusStart: 150 },
+            };
+
+            let gameState = {
+                difficulty: 'medium',
+                targetNumber: 0,
+                guesses: [],
+                currentBet: 10,
+                pendingMultiplier: false,
+                pendingFreeze: false,
+                gameActive: true,
+                hintAnswerExpected: 0,
+                comboCount: 0,
+            };
+
+            function getDiffConfig() { return DIFFICULTIES[gameState.difficulty]; }
+
+            function newRound() {
+                const cfg = getDiffConfig();
+                gameState.targetNumber = Math.floor(Math.random() * cfg.range) + 1;
+                gameState.guesses = [];
+                gameState.pendingMultiplier = false;
+                gameState.pendingFreeze = false;
+                gameState.gameActive = true;
+                gameState.comboCount = 0;
+                dom.guessInput.max = cfg.range;
+                dom.guessInput.placeholder = `1-${cfg.range}`;
+                dom.rangeDisplay.textContent = cfg.label;
+                dom.guessInput.disabled = false;
+                dom.guessBtn.disabled = false;
+                updateHistoryScreen();
+                updateDistanceBar();
+                updatePayoutDisplay();
+                dom.guessInput.value = '';
+                dom.guessInput.focus();
+            }
+
+            function updatePayoutDisplay() {
+                const cfg = getDiffConfig();
+                const guessesMade = gameState.guesses.length;
+                let payout = Math.max(cfg.basePayout - (guessesMade * cfg.payoutDecay), cfg.payoutDecay);
+                if (guessesMade < 10) payout += Math.max(0, cfg.bonusStart - guessesMade * (cfg.bonusStart / 10));
+                if (gameState.pendingMultiplier || currentUser.sicboPowerups.multipliers > 0) payout *= 2;
+                dom.payoutDisplay.textContent = Math.floor(payout);
+            }
+
+            function calculatePayout() {
+                const cfg = getDiffConfig();
+                const guessesMade = gameState.guesses.length;
+                let payout = Math.max(cfg.basePayout - (guessesMade * cfg.payoutDecay), cfg.payoutDecay);
+                if (guessesMade < 10) payout += Math.max(0, cfg.bonusStart - guessesMade * (cfg.bonusStart / 10));
+                return Math.floor(payout);
+            }
+
+            function getDistanceColor(distance, maxRange) {
+                const ratio = distance / maxRange;
+                if (ratio < 0.02) return '#ffd966';
+                if (ratio < 0.06) return '#ff4444';
+                if (ratio < 0.16) return '#ff8800';
+                if (ratio < 0.35) return '#4488ff';
+                if (ratio < 0.55) return '#2244cc';
+                return '#111188';
+            }
+
+            function getFeedbackText(distance, maxRange) {
+                const ratio = distance / maxRange;
+                if (ratio < 0.02) return '🔥 Burning!';
+                if (ratio < 0.06) return '☀️ Hot';
+                if (ratio < 0.16) return '🌤️ Warm';
+                if (ratio < 0.35) return '🌊 Cool';
+                if (ratio < 0.55) return '💧 Cold';
+                return '❄️ Freezing';
+            }
+
+            function updateHistoryScreen() {
+                if (gameState.guesses.length === 0) {
+                    dom.historyScreen.innerHTML =
+                    '<div style="color:#bfb6a4;text-align:center;">Make your first guess!</div>';
+                    return;
+                }
+                const cfg = getDiffConfig();
+                dom.historyScreen.innerHTML = gameState.guesses.map(g => {
+                    const dist = Math.abs(gameState.targetNumber - g.number);
+                    const color = g.correct ? '#ffd966' : getDistanceColor(dist, cfg.range);
+                    const fb = g.correct ? '🎯 CORRECT!' : getFeedbackText(dist, cfg.range);
+                    const cls = g.correct ? 'correct-glow' : '';
+                    return `<div class="guess-row">
+                    <span class="guess-number ${cls}" style="color:${color};">${g.number}</span>
+                    <span class="guess-feedback" style="color:${color};">${fb}</span>
+                  </div>`;
+                }).join('');
+                dom.historyScreen.scrollTop = dom.historyScreen.scrollHeight;
+            }
+
+            function updateDistanceBar() {
+                if (gameState.guesses.length === 0) {
+                    dom.distanceBarInner.style.width = '0%';
+                    dom.distanceBarInner.style.background = 'transparent';
+                    return;
+                }
+                const cfg = getDiffConfig();
+                const last = gameState.guesses[gameState.guesses.length - 1];
+                const dist = Math.abs(gameState.targetNumber - last.number);
+                const pct = Math.max(0, 100 - (dist / cfg.range) * 100);
+                dom.distanceBarInner.style.width = pct + '%';
+                dom.distanceBarInner.style.background = getDistanceColor(dist, cfg.range);
+            }
+
+            function updatePowerupBadges() {
+                const p = currentUser.sicboPowerups;
+                const setBadge = (el, val) => { if (val > 0) { el.style.display = 'flex';
+                        el.textContent = val; } else el.style.display = 'none'; };
+                setBadge(dom.hintBadge, p.hints);
+                setBadge(dom.multiplierBadge, p.multipliers);
+                setBadge(dom.rangeBadge, p.rangeReveals);
+                setBadge(dom.freezeBadge, p.freeze);
+                setBadge(dom.scannerBadge, p.scanner);
+                ['hintIcon', 'multiplierIcon', 'rangeIcon', 'freezeIcon', 'scannerIcon'].forEach(id => {
+                    const el = document.getElementById(id);
+                    const key = id.replace('Icon', '').replace('multiplier', 'multipliers').replace('range',
+                        'rangeReveals');
+                    el.classList.toggle('active', p[key] > 0);
+                });
+            }
+
+            function addRipple(e, btn) {
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = e.clientX - rect.left - size / 2 + 'px';
+                ripple.style.top = e.clientY - rect.top - size / 2 + 'px';
+                btn.appendChild(ripple);
+                ripple.addEventListener('animationend', () => ripple.remove());
+            }
+
+            // ──────────────── GAME LOGIC ────────────────
+            function makeGuess() {
+                if (!gameState.gameActive) return;
+                const cfg = getDiffConfig();
+                const guessValue = parseInt(dom.guessInput.value);
+                if (isNaN(guessValue) || guessValue < 1 || guessValue > cfg.range) {
+                    showToast(`Enter a number between 1 and ${cfg.range}`, '⚠️');
+                    dom.guessInput.classList.add('invalid');
+                    setTimeout(() => dom.guessInput.classList.remove('invalid'), 400);
+                    return;
+                }
+                const costPerGuess = gameState.pendingFreeze ? 0 : cfg.costPerGuess;
+                if (costPerGuess > 0 && currentUser.balance < costPerGuess) {
+                    showToast('Insufficient GOLD for a guess!', '❌');
+                    return;
+                }
+                if (costPerGuess > 0) {
+                    currentUser.balance -= costPerGuess;
+                    sessionTotalBet += costPerGuess;
+                    currentUser.sicboStats.totalBet += costPerGuess;
+                    currentUser.globalStats.totalWagered += costPerGuess;
+                }
+                gameState.pendingFreeze = false;
+                const correct = guessValue === gameState.targetNumber;
+                const dist = Math.abs(gameState.targetNumber - guessValue);
+                gameState.guesses.push({ number: guessValue, correct, distance: dist });
+
+                if (correct) {
+                    audio.play('correct');
+                    let winAmount = gameState.currentBet + calculatePayout();
+                    if (gameState.pendingMultiplier || currentUser.sicboPowerups.multipliers > 0) {
+                        if (currentUser.sicboPowerups.multipliers > 0) {
+                            currentUser.sicboPowerups.multipliers--;
+                            audio.play('powerup');
+                        }
+                        winAmount *= 2;
+                        gameState.pendingMultiplier = false;
+                    }
+                    // Streak bonus
+                    const streak = (currentUser.sicboStats.currentStreak || 0) + 1;
+                    if (streak >= 3) winAmount = Math.floor(winAmount * (1 + streak * 0.1));
+                    if (streak >= 5) { audio.play('jackpot');
+                        triggerConfetti('jackpot');
+                        screenShake(6);
+                        currentUser.sicboStats.jackpots++;
+                        showToast(`JACKPOT! Streak ${streak} · Won ${winAmount} GOLD!`, '💎'); } else if (winAmount >=
+                        gameState.currentBet * 5) {
+                        triggerConfetti('normal');
+                        screenShake(3);
+                        showToast(`Big Win! +${winAmount} GOLD`, '🎉');
+                    }
+                    currentUser.balance += winAmount;
+                    sessionTotalWin += winAmount;
+                    currentUser.sicboStats.wins++;
+                    currentUser.sicboStats.totalWin += winAmount;
+                    if (winAmount > currentUser.sicboStats.bestWin) currentUser.sicboStats.bestWin = winAmount;
+                    currentUser.sicboStats.currentStreak++;
+                    if (currentUser.sicboStats.currentStreak > currentUser.sicboStats.bestStreak)
+                        currentUser.sicboStats.bestStreak = currentUser.sicboStats.currentStreak;
+                    currentUser.globalStats.totalWins++;
+                    currentUser.globalStats.totalWon += winAmount;
+                    currentUser.globalStats.currentStreak = (currentUser.globalStats.currentStreak || 0) + 1;
+                    if (currentUser.globalStats.currentStreak > (currentUser.globalStats.bestStreak || 0))
+                        currentUser.globalStats.bestStreak = currentUser.globalStats.currentStreak;
+                    currentUser.globalStats.totalGames++;
+                    currentUser.sicboStats.gamesPlayed++;
+                    currentUser.xp = (currentUser.xp || 0) + Math.floor(winAmount * 0.5);
+                    checkLevelUp();
+                    checkAchievements(true, winAmount);
+                    recordTransaction(true, winAmount);
+                    gameState.gameActive = false;
+                    dom.guessInput.disabled = true;
+                    dom.guessBtn.disabled = true;
+                } else {
+                    audio.play(dist < cfg.range * 0.05 ? 'nearmiss' : 'guess');
+                    if (dist <= 3) { currentUser.sicboStats.nearMisses++;
+                        gameState.comboCount++; }
+                    if (dist <= 2 && Math.random() < 0.3) showToast('So close! Near miss bonus!', '🎯');
+                    currentUser.sicboStats.currentStreak = 0;
+                    currentUser.globalStats.currentStreak = 0;
+                    currentUser.globalStats.totalGames++;
+                    currentUser.sicboStats.gamesPlayed++;
+                    recordTransaction(false, -costPerGuess);
+                }
+                updateHistoryScreen();
+                updateDistanceBar();
+                updatePayoutDisplay();
+                updatePowerupBadges();
+                updateStreakDisplay();
+                saveUser().then(() => updateBalanceDisplay());
+                updateStatsDisplay();
+                dom.guessInput.value = '';
+                if (gameState.gameActive) dom.guessInput.focus();
+                if (!gameState.gameActive) {
+                    setTimeout(() => {
+                        showToast(`The number was ${gameState.targetNumber}. New round!`, '🔄');
+                        newRound();
+                        updatePowerupBadges();
+                        updateStatsDisplay();
+                    }, 1800);
+                }
+            }
+
+            function recordTransaction(isWin, amount) {
+                currentUser.gamePlayCount['sic-bo'] = (currentUser.gamePlayCount['sic-bo'] || 0) + 1;
+                currentUser.gameOutcomes.unshift({
+                    game: 'SicBo',
+                    result: isWin ? 'win' : 'loss',
+                    profit: amount,
+                    date: new Date().toISOString(),
+                });
+                if (currentUser.gameOutcomes.length > 50) currentUser.gameOutcomes.pop();
+                currentUser.transactions.unshift({
+                    desc: `🎲 Sic Bo | ${isWin?'Won '+amount:'Lost '+Math.abs(amount)} GOLD`,
+                    amount: amount,
+                    type: isWin ? 'game_win' : 'game_loss',
+                    date: new Date().toISOString(),
+                });
+                if (currentUser.transactions.length > 30) currentUser.transactions.shift();
+            }
+
+            function checkLevelUp() {
+                const xpNeeded = Math.floor(100 * Math.pow(1.5, (currentUser.level || 1) - 1));
+                if ((currentUser.xp || 0) >= xpNeeded) {
+                    currentUser.xp -= xpNeeded;
+                    currentUser.level = (currentUser.level || 1) + 1;
+                    showToast(`Level Up! Now level ${currentUser.level}!`, '⬆️');
+                    updateRankBadge();
+                }
+            }
+
+            function checkAchievements(isWin, winAmount) {
+                const earned = currentUser.earnedAchievements || [];
+                if (isWin && winAmount >= 5000 && !earned.includes('sicbo_whale')) {
+                    earned.push('sicbo_whale');
+                    showToast('Achievement: Sic Bo Whale! 5000+ GOLD win', '🐋');
+                }
+                if (currentUser.sicboStats.wins >= 20 && !earned.includes('sicbo_pro')) {
+                    earned.push('sicbo_pro');
+                    showToast('Achievement: Sic Bo Pro! 20 wins', '🎲');
+                }
+                if ((currentUser.sicboStats.currentStreak || 0) >= 5 && !earned.includes('sicbo_streak5')) {
+                    earned.push('sicbo_streak5');
+                    showToast('Achievement: Hot Streak! 5 wins in a row', '🔥');
+                }
+                if (currentUser.sicboStats.nearMisses >= 10 && !earned.includes('sicbo_nearmiss')) {
+                    earned.push('sicbo_nearmiss');
+                    showToast('Achievement: Close Call! 10 near-misses', '🎯');
+                }
+                currentUser.earnedAchievements = earned;
+            }
+
+            // ──────────────── POWERUP ACTIONS ────────────────
+            function useHint() {
+                if (currentUser.sicboPowerups.hints <= 0) { showToast('No hints available! Buy some in the shop.',
+                        '💡'); return; }
+                dom.hintModal.classList.add('active');
+                const n1 = Math.floor(Math.random() * 12) + 1;
+                const n2 = Math.floor(Math.random() * 12) + 1;
+                const ops = ['+', '-', '*'];
+                const op = ops[Math.floor(Math.random() * ops.length)];
+                let answer;
+                switch (op) { case '+':
+                        answer = n1 + n2;
+                        break; case '-':
+                        answer = n1 - n2;
+                        break; case '*':
+                        answer = n1 * n2;
+                        break; }
+                gameState.hintAnswerExpected = answer;
+                dom.hintProblem.textContent = `${n1} ${op} ${n2} = ?`;
+                dom.hintAnswer.value = '';
+            }
+
+            function submitHintAnswer() {
+                const answer = parseInt(dom.hintAnswer.value);
+                if (isNaN(answer)) { showToast('Enter a valid number', '⚠️'); return; }
+                if (answer === gameState.hintAnswerExpected) {
+                    currentUser.sicboPowerups.hints--;
+                    currentUser.sicboStats.hintsUsed++;
+                    dom.hintModal.classList.remove('active');
+                    const cfg = getDiffConfig();
+                    const margin = Math.ceil(cfg.range * 0.07);
+                    const lower = Math.max(1, gameState.targetNumber - margin);
+                    const upper = Math.min(cfg.range, gameState.targetNumber + margin);
+                    showToast(`💡 The number is near ${Math.floor((lower+upper)/2)} (range: ${lower}-${upper})`, '💡');
+                    audio.play('powerup');
+                } else { showToast('Incorrect answer! Try again.', '❌'); }
+                updatePowerupBadges();
+                saveUser();
+            }
+
+            function useMultiplier() {
+                if (currentUser.sicboPowerups.multipliers <= 0) { showToast('No multipliers available!',
+                    '✨'); return; }
+                gameState.pendingMultiplier = true;
+                audio.play('powerup');
+                updatePayoutDisplay();
+                showToast('✨ 2x Multiplier ready! Next correct guess pays double.', '✨');
+            }
+
+            function useRangeReveal() {
+                if (currentUser.sicboPowerups.rangeReveals <= 0) { showToast('No parity reveals available!',
+                        '🔍'); return; }
+                currentUser.sicboPowerups.rangeReveals--;
+                currentUser.sicboStats.rangeRevealsUsed++;
+                audio.play('powerup');
+                updatePowerupBadges();
+                saveUser();
+                showToast(gameState.targetNumber % 2 === 0 ? '🔍 The number is EVEN.' : '🔍 The number is ODD.', '🔍');
+            }
+
+            function useFreeze() {
+                if (currentUser.sicboPowerups.freeze <= 0) { showToast('No freeze charges available!', '❄️'); return; }
+                currentUser.sicboPowerups.freeze--;
+                gameState.pendingFreeze = true;
+                audio.play('powerup');
+                updatePowerupBadges();
+                saveUser();
+                showToast('❄️ Freeze active! Next guess costs 0 GOLD.', '❄️');
+            }
+
+            function useScanner() {
+                if (currentUser.sicboPowerups.scanner <= 0) { showToast('No scanner charges available!',
+                    '🌡️'); return; }
+                currentUser.sicboPowerups.scanner--;
+                currentUser.sicboStats.rangeRevealsUsed++;
+                const cfg = getDiffConfig();
+                const dist = Math.abs(gameState.targetNumber - (gameState.guesses.length > 0 ? gameState.guesses[
+                    gameState.guesses.length - 1].number : Math.floor(cfg.range / 2)));
+                const ratio = dist / cfg.range;
+                let heat;
+                if (ratio < 0.05) heat = '🔥 SUPER HOT';
+                else if (ratio < 0.15) heat = '☀️ Hot';
+                else if (ratio < 0.3) heat = '🌤️ Warm';
+                else if (ratio < 0.5) heat = '🌊 Cool';
+                else heat = '❄️ Cold';
+                audio.play('powerup');
+                updatePowerupBadges();
+                saveUser();
+                showToast(`🌡️ Scanner: You are ${heat} (distance: ~${dist})`, '🌡️');
+            }
+
+            // ──────────────── SHOP SYSTEM ────────────────
+            const SHOP_ITEMS = [
+                { id: 'hints', name: '💡 Hint', desc: 'Solve a puzzle to reveal a range hint', price: 25,
+                rarity: 'common', key: 'hints' },
+                { id: 'multipliers', name: '✨ 2x Boost', desc: 'Next correct guess pays double', price: 50,
+                    rarity: 'rare', key: 'multipliers' },
+                { id: 'rangeReveals', name: '🔍 Parity Scan', desc: 'Reveals if the number is odd or even',
+                    price: 75, rarity: 'rare', key: 'rangeReveals' },
+                { id: 'freeze', name: '❄️ Freeze Time', desc: 'One free guess (no GOLD cost)', price: 100,
+                    rarity: 'epic', key: 'freeze' },
+                { id: 'scanner', name: '🌡️ Heat Scanner', desc: 'Shows approximate distance to target',
+                    price: 150, rarity: 'epic', key: 'scanner' },
+            ];
+
+            function openShop() {
+                dom.shopItemsContainer.innerHTML = SHOP_ITEMS.map(item => {
+                    const owned = currentUser.sicboPowerups[item.key] || 0;
+                    return `<div class="shop-item${owned>0?' owned':''}" data-item="${item.id}">
+                <div class="shop-item-title">${item.name}</div>
+                <div class="shop-item-price">💰 ${item.price} GOLD</div>
+                <div class="shop-item-desc">${item.desc}</div>
+                <div class="shop-item-rarity rarity-${item.rarity}">${item.rarity}</div>
+                ${owned>0?`<div style="font-size:0.65rem;color:#aaffaa;margin-top:2px;">Owned: ${owned}</div>`:''}
+              </div>`;
+                }).join('');
+                dom.shopModal.classList.add('active');
+                // Bind click events
+                $$('.shop-item').forEach(el => {
+                    el.addEventListener('click', () => {
+                        const itemId = el.dataset.item;
+                        const item = SHOP_ITEMS.find(i => i.id === itemId);
+                        if (item) buyItem(item);
+                    });
+                });
+            }
+
+            function buyItem(item) {
+                if (currentUser.balance < item.price) { showToast('Not enough GOLD!', '❌'); return; }
+                currentUser.balance -= item.price;
+                currentUser.sicboPowerups[item.key] = (currentUser.sicboPowerups[item.key] || 0) + 1;
+                audio.play('buy');
+                updateBalanceDisplay();
+                updatePowerupBadges();
+                saveUser();
+                showToast(`Purchased ${item.name}! (${currentUser.sicboPowerups[item.key]} owned)`, '🛒');
+                openShop(); // Refresh shop view
+            }
+
+            // ──────────────── EVENT BINDINGS ────────────────
+            dom.guessBtn.addEventListener('click', (e) => { addRipple(e, dom.guessBtn);
+                audio.play('click');
+                makeGuess(); });
+            dom.guessInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') makeGuess(); });
+            dom.betInput.addEventListener('input', validateBet);
+            dom.betInput.addEventListener('change', () => { gameState.currentBet = Math.max(2, parseInt(dom.betInput
+                    .value) || 10);
+                updatePayoutDisplay();
+                audio.play('click'); });
+
+            $$('.quick-bet').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (btn.id === 'halfBetBtn') {
+                        const cv = parseFloat(dom.betInput.value) || 10;
+                        dom.betInput.value = Math.max(2, Math.floor(cv / 2));
+                    } else if (btn.id === 'maxBetBtn') {
+                        dom.betInput.value = Math.max(2, Math.floor(currentUser.balance));
+                    } else {
+                        const add = parseFloat(btn.dataset.bet);
+                        dom.betInput.value = Math.max(2, (parseFloat(dom.betInput.value) || 10) + add);
+                    }
+                    gameState.currentBet = parseInt(dom.betInput.value);
+                    updatePayoutDisplay();
+                    audio.play('click');
+                });
+            });
+
+            dom.shopBtn.addEventListener('click', () => { audio.play('click');
+                openShop(); });
+            $('#closeShopModal').addEventListener('click', () => dom.shopModal.classList.remove('active'));
+            $('#closeShopBtn2').addEventListener('click', () => dom.shopModal.classList.remove('active'));
+            $('#closeHintModal').addEventListener('click', () => dom.hintModal.classList.remove('active'));
+            $('#closeHintBtn2').addEventListener('click', () => dom.hintModal.classList.remove('active'));
+            dom.submitHintBtn.addEventListener('click', submitHintAnswer);
+            dom.hintAnswer.addEventListener('keypress', (e) => { if (e.key === 'Enter') submitHintAnswer(); });
+
+            document.getElementById('hintIcon').addEventListener('click', useHint);
+            document.getElementById('multiplierIcon').addEventListener('click', useMultiplier);
+            document.getElementById('rangeIcon').addEventListener('click', useRangeReveal);
+            document.getElementById('freezeIcon').addEventListener('click', useFreeze);
+            document.getElementById('scannerIcon').addEventListener('click', useScanner);
+
+            dom.soundBtn.addEventListener('click', () => {
+                audio.soundEnabled = !audio.soundEnabled;
+                dom.soundBtn.innerHTML = audio.soundEnabled ? '<i class="fas fa-volume-up"></i>' :
+                    '<i class="fas fa-volume-mute"></i>';
+                localStorage.setItem('gold_sound_enabled', audio.soundEnabled);
+            });
+
+            // Difficulty buttons
+            $$('.diff-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (gameState.guesses.length > 0 && gameState.gameActive) {
+                        showToast('Finish the current round first!', '⚠️');
+                        return;
+                    }
+                    $$('.diff-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    gameState.difficulty = btn.dataset.diff;
+                    currentUser.sicboSettings.difficulty = gameState.difficulty;
+                    saveUser();
+                    newRound();
+                    updatePowerupBadges();
+                    audio.play('click');
+                    showToast(`Difficulty: ${btn.textContent.trim()}`, '🎯');
+                });
+            });
+
+            // Modal close on overlay click
+            [dom.shopModal, dom.hintModal, dom.statsModal].forEach(m => {
+                m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove(
+                        'active'); });
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Enter' && document.activeElement === dom.guessInput && gameState.gameActive) {
+                    makeGuess();
+                }
+                if (e.code === 'KeyH' && e.ctrlKey && gameState.gameActive) useHint();
+                if (e.code === 'KeyM' && e.ctrlKey && gameState.gameActive) useMultiplier();
+                if (e.code === 'KeyS' && e.ctrlKey) { e.preventDefault();
+                    openShop(); }
+                if (e.code === 'Escape') {
+                    [dom.shopModal, dom.hintModal, dom.statsModal].forEach(m => m.classList.remove(
+                    'active'));
+                }
+            });
+
+            // Stats button (click on rank badge)
+            dom.rankBadge.addEventListener('click', () => {
+                const s = currentUser.sicboStats;
+                const gs = currentUser.globalStats;
+                const rtp = s.totalBet > 0 ? ((s.totalWin / s.totalBet) * 100).toFixed(1) : '0.0';
+                dom.statsContent.innerHTML = `
+            <p>🎮 Games: <strong>${s.gamesPlayed}</strong></p>
+            <p>🏆 Wins: <strong>${s.wins}</strong></p>
+            <p>💎 Best Win: <strong>${s.bestWin.toLocaleString()} GOLD</strong></p>
+            <p>📈 RTP: <strong>${rtp}%</strong></p>
+            <p>🔥 Best Streak: <strong>${s.bestStreak}</strong></p>
+            <p>🎯 Near-Misses: <strong>${s.nearMisses}</strong></p>
+            <p>💣 Jackpots: <strong>${s.jackpots}</strong></p>
+            <p>💡 Hints Used: <strong>${s.hintsUsed}</strong></p>
+            <p>✨ Multipliers Used: <strong>${s.multipliersUsed}</strong></p>
+            <p>⭐ Level: <strong>${currentUser.level||1}</strong> | XP: <strong>${currentUser.xp||0}</strong></p>
+            <p>👑 Prestige: <strong>${currentUser.prestige||0}</strong></p>
+          `;
+                dom.statsModal.classList.add('active');
+            });
+            $('#closeStatsModal').addEventListener('click', () => dom.statsModal.classList.remove('active'));
+            $('#closeStatsBtn2').addEventListener('click', () => dom.statsModal.classList.remove('active'));
+
+            // ──────────────── PARTICLES ────────────────
+            function initParticles() {
+                const c = document.getElementById('particlesContainer');
+                for (let i = 0; i < 30; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    const size = Math.random() * 5 + 2;
+                    p.style.width = p.style.height = size + 'px';
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.setProperty('--delay', Math.random() * 8 + 's');
+                    p.style.setProperty('--dur', (Math.random() * 6 + 5) + 's');
+                    c.appendChild(p);
+                }
+            }
+
+            // ──────────────── INIT ────────────────
+            async function init() {
+                initParticles();
+                if (!(await loadUser())) return;
+                // Restore settings
+                if (currentUser.sicboSettings.difficulty) {
+                    gameState.difficulty = currentUser.sicboSettings.difficulty;
+                    $$('.diff-btn').forEach(b => b.classList.remove('selected'));
+                    const activeBtn = document.querySelector(`.diff-btn[data-diff="${gameState.difficulty}"]`);
+                    if (activeBtn) activeBtn.classList.add('selected');
+                }
+                const savedSound = localStorage.getItem('gold_sound_enabled');
+                if (savedSound === 'false') {
+                    audio.soundEnabled = false;
+                    dom.soundBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                }
+                gameState.currentBet = parseInt(dom.betInput.value) || 10;
+                updateBalanceDisplay();
+                updateStatsDisplay();
+                updatePowerupBadges();
+                newRound();
+                updatePayoutDisplay();
+                await audio.init();
+                document.body.addEventListener('click', () => audio.init(), { once: true });
+                document.body.addEventListener('touchstart', () => audio.init(), { once: true });
+                dom.guessInput.focus();
+            }
+
+            init();
+
+            // Cleanup
+            window.addEventListener('beforeunload', () => { audio.destroy(); });
+
+            console.log('%c🎲 GOLD SIC BO %c| Premium Casino Edition %cLoaded',
+                'color:#ffd966;font-size:1.1rem;', 'color:#f5f0e6;', 'color:#aaffaa;');
+        })();
+    </script>
+</body>
+</html>

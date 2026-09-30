@@ -1,0 +1,2100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>WHEEL | Stake Originals Style</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #F5B042;
+            --gold-bright: #ffe478;
+            --gold-deep: #b89830;
+            --bg-deep: #0a0908;
+            --card-bg: rgba(12, 10, 10, 0.75);
+            --border-gold: rgba(245, 176, 66, 0.35);
+            --border-gold-strong: rgba(245, 176, 66, 0.6);
+            --shadow-card: 0 25px 40px rgba(0, 0, 0, 0.6);
+            --shadow-gold: 0 0 30px rgba(245, 176, 66, 0.15);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --radius-full: 50px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-mono: 'Inter', monospace;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            font-size: 16px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(ellipse at 40% 30%, #0e0c08 0%, #050505 60%, #000000 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
+            color: #e8e4dc;
+            padding: clamp(0.5rem, 1.5vw, 1rem);
+            padding-bottom: calc(clamp(0.5rem, 1.5vw, 1rem) + var(--safe-bottom));
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+        canvas#particleCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.7;
+        }
+        .game-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        /* ── TOP BAR ─────────────────────── */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: var(--radius-full);
+            padding: 0.45rem 1.4rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        .back-link {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(245, 176, 66, 0.08);
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .back-link:hover {
+            background: rgba(245, 176, 66, 0.18);
+            color: var(--gold-bright);
+        }
+        .balance-chip {
+            background: #1a1712;
+            border: 1px solid var(--border-gold);
+            border-radius: 40px;
+            padding: 0.3rem 1rem;
+            font-weight: 800;
+            font-size: 0.82rem;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+            letter-spacing: -0.3px;
+        }
+        .jackpot-badge {
+            background: linear-gradient(135deg, #e63946, #f77f00);
+            color: #fff;
+            font-weight: 800;
+            border-radius: 40px;
+            padding: 0.25rem 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.72rem;
+            white-space: nowrap;
+            box-shadow: 0 0 16px rgba(230, 57, 70, 0.35);
+            animation: jackpotPulse 2s ease-in-out infinite;
+        }
+        @keyframes jackpotPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 16px rgba(230, 57, 70, 0.35);
+            }
+            50% {
+                box-shadow: 0 0 28px rgba(247, 127, 0, 0.55);
+            }
+        }
+        .sound-toggle {
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 0.3rem;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sound-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(245, 176, 66, 0.1);
+        }
+        .sound-toggle:active {
+            transform: scale(0.9);
+        }
+
+        /* ── MAIN LAYOUT ────────────────── */
+        .main-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .wheel-panel {
+            flex: 1.6;
+            min-width: 280px;
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-gold);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+        .wheel-panel::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(245, 176, 66, 0.3), transparent);
+            pointer-events: none;
+        }
+        .wheel-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1/1;
+            margin: 0.2rem 0;
+        }
+        canvas#wheelCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: filter 0.3s;
+            will-change: transform;
+        }
+        canvas#wheelCanvas.spinning {
+            filter: brightness(1.12) saturate(1.15);
+        }
+        canvas#wheelCanvas:active:not(.spinning) {
+            transform: scale(0.96);
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.7));
+            pointer-events: none;
+            transition: transform 0.08s;
+        }
+        .wheel-pointer.bounce {
+            animation: pointerBounce 0.35s ease;
+        }
+        @keyframes pointerBounce {
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            35% {
+                transform: translateX(-50%) translateY(7px);
+            }
+            65% {
+                transform: translateX(-50%) translateY(-3px);
+            }
+        }
+        .betting-panel {
+            flex: 3;
+            min-width: 320px;
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-gold);
+            padding: 1rem;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+        .betting-panel::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(245, 176, 66, 0.3), transparent);
+            pointer-events: none;
+        }
+
+        /* ── INPUT GROUP ────────────────── */
+        .input-group {
+            background: rgba(0, 0, 0, 0.28);
+            border-radius: var(--radius-lg);
+            padding: 0.6rem 0.8rem;
+            margin-bottom: 0.7rem;
+            border: 1px solid rgba(245, 176, 66, 0.1);
+            transition: var(--transition);
+        }
+        .input-group:focus-within {
+            border-color: var(--border-gold-strong);
+            box-shadow: 0 0 14px rgba(245, 176, 66, 0.06);
+        }
+        .input-label {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: #8a8278;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .bet-control {
+            display: flex;
+            gap: 0.35rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .bet-input {
+            background: #1b1712;
+            border: 2px solid rgba(245, 176, 66, 0.2);
+            border-radius: var(--radius-full);
+            padding: 0.35rem 0.55rem;
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            width: 90px;
+            text-align: center;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: var(--font-mono);
+        }
+        .bet-input:focus {
+            border-color: var(--gold);
+            outline: none;
+            box-shadow: 0 0 12px rgba(245, 176, 66, 0.15);
+        }
+        .bet-input.invalid {
+            border-color: #ff5252;
+            animation: shakeInput 0.3s ease;
+        }
+        @keyframes shakeInput {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            75% {
+                transform: translateX(5px);
+            }
+        }
+        .preset-btn {
+            background: rgba(245, 176, 66, 0.06);
+            border: 1px solid rgba(245, 176, 66, 0.2);
+            border-radius: 24px;
+            padding: 0.2rem 0.65rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            color: #b8b2a6;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .preset-btn:hover {
+            background: rgba(245, 176, 66, 0.18);
+            color: #fff;
+            border-color: var(--border-gold-strong);
+        }
+        .preset-btn:active {
+            transform: scale(0.9);
+            background: rgba(245, 176, 66, 0.28);
+        }
+        .preset-btn.max-btn {
+            background: rgba(255, 82, 82, 0.1);
+            border-color: rgba(255, 82, 82, 0.25);
+            color: #ff8a8a;
+        }
+
+        /* ── CHIPS GRID ──────────────────── */
+        .segment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+            gap: 0.45rem;
+            margin: 0.6rem 0;
+            max-height: 240px;
+            overflow-y: auto;
+            padding-right: 4px;
+            scroll-behavior: smooth;
+        }
+        .segment-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+        .segment-grid::-webkit-scrollbar-thumb {
+            background: rgba(245, 176, 66, 0.2);
+            border-radius: 4px;
+        }
+        .chip-option {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(245, 176, 66, 0.15);
+            border-radius: var(--radius-md);
+            padding: 0.4rem 0.3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+            position: relative;
+            gap: 0.15rem;
+        }
+        .chip-option:hover {
+            border-color: var(--border-gold-strong);
+            background: rgba(245, 176, 66, 0.08);
+            transform: translateY(-2px);
+        }
+        .chip-option:active {
+            transform: scale(0.92);
+        }
+        .chip-option.selected {
+            background: rgba(245, 176, 66, 0.2);
+            border-color: var(--gold);
+            box-shadow: 0 0 18px rgba(245, 176, 66, 0.3);
+            animation: selectedGlow 2s ease-in-out infinite;
+        }
+        @keyframes selectedGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 18px rgba(245, 176, 66, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 28px rgba(245, 176, 66, 0.5);
+            }
+        }
+        .chip-option.win-flash {
+            animation: chipWinFlash 0.7s ease;
+            border-color: #4caf50 !important;
+            box-shadow: 0 0 28px rgba(76, 175, 80, 0.55) !important;
+        }
+        @keyframes chipWinFlash {
+            0%,
+            100% {
+                background: rgba(0, 0, 0, 0.5);
+            }
+            40% {
+                background: rgba(76, 175, 80, 0.4);
+            }
+        }
+        .chip-mult {
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--gold-bright);
+            letter-spacing: -0.5px;
+        }
+        .chip-label {
+            font-size: 0.58rem;
+            color: #8a8278;
+            text-transform: uppercase;
+        }
+        .chip-bet-indicator {
+            font-size: 0.55rem;
+            color: #a5d6a7;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* ── BUTTONS ────────────────────── */
+        .action-buttons {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+            margin: 0.7rem 0;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.55rem 1.5rem;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            font-size: 0.8rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            letter-spacing: -0.2px;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:active {
+            transform: scale(0.93);
+        }
+        .btn-spin {
+            background: linear-gradient(135deg, #c8960c, #e8b830, #f5d060);
+            color: #1a1510;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            font-size: 0.88rem;
+            padding: 0.6rem 2rem;
+            font-weight: 800;
+        }
+        .btn-spin:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.02);
+            filter: brightness(1.08);
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45), 0 0 35px rgba(245, 176, 66, 0.25);
+        }
+        .btn-spin.spinning-anim {
+            animation: spinBtnPulse 0.5s ease-in-out infinite;
+        }
+        @keyframes spinBtnPulse {
+            0%,
+            100% {
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 30px rgba(245, 176, 66, 0.5), 0 0 50px rgba(245, 176, 66, 0.3);
+            }
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid rgba(245, 176, 66, 0.4);
+            color: #d5cec4;
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(245, 176, 66, 0.7);
+        }
+        .btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none !important;
+            filter: grayscale(0.25);
+        }
+        .btn-auto {
+            background: rgba(100, 149, 237, 0.15);
+            border: 1px solid rgba(100, 149, 237, 0.4);
+            color: #b8d4ff;
+        }
+        .btn-auto:hover {
+            background: rgba(100, 149, 237, 0.28);
+        }
+        .btn-auto.active {
+            background: rgba(255, 152, 0, 0.25);
+            border-color: rgba(255, 152, 0, 0.6);
+            color: #ffcc80;
+            animation: autoActivePulse 1s ease-in-out infinite;
+        }
+        @keyframes autoActivePulse {
+            0%,
+            100% {
+                box-shadow: 0 0 8px rgba(255, 152, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+            }
+        }
+
+        /* ── RESULT PANEL ──────────────── */
+        .result-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-md);
+            padding: 0.6rem 0.8rem;
+            text-align: center;
+            margin: 0.5rem 0;
+            font-weight: 700;
+            font-size: 0.78rem;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+        .result-panel.win {
+            background: rgba(76, 175, 80, 0.14);
+            border-color: rgba(76, 175, 80, 0.45);
+            color: #a5d6a7;
+        }
+        .result-panel.loss {
+            background: rgba(255, 82, 82, 0.09);
+            border-color: rgba(255, 82, 82, 0.3);
+            color: #ef9a9a;
+        }
+        .result-panel.jackpot {
+            background: rgba(255, 140, 66, 0.2);
+            border-color: rgba(255, 140, 66, 0.55);
+            animation: jackpotResultGlow 0.5s ease-in-out 4;
+        }
+        @keyframes jackpotResultGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 18px rgba(255, 140, 66, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 45px rgba(255, 200, 50, 0.7);
+            }
+        }
+
+        /* ── STATS ROW ──────────────────── */
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin: 0.4rem 0;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.35rem 0.6rem;
+            border-radius: var(--radius-sm);
+            flex: 1;
+            text-align: center;
+            min-width: 55px;
+            font-size: 0.65rem;
+            letter-spacing: -0.2px;
+            border: 1px solid rgba(245, 176, 66, 0.08);
+        }
+        .stat-card strong {
+            display: block;
+            font-size: 0.82rem;
+            color: var(--gold);
+            margin-top: 2px;
+        }
+        .session-reset {
+            font-size: 0.6rem;
+            background: none;
+            border: 1px solid rgba(245, 176, 66, 0.2);
+            color: #8a8278;
+            padding: 0.2rem 0.55rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .session-reset:hover {
+            background: rgba(255, 82, 82, 0.12);
+            color: #ff5252;
+        }
+
+        /* ── HISTORY MARQUEE ────────────── */
+        .history-marquee {
+            display: flex;
+            gap: 0.3rem;
+            overflow-x: auto;
+            padding: 0.3rem 0;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .history-marquee::-webkit-scrollbar {
+            height: 3px;
+        }
+        .history-marquee::-webkit-scrollbar-thumb {
+            background: rgba(245, 176, 66, 0.2);
+            border-radius: 3px;
+        }
+        .history-dot {
+            min-width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.6rem;
+            flex-shrink: 0;
+        }
+        .history-dot.win {
+            background: rgba(76, 175, 80, 0.3);
+            color: #a5d6a7;
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+        .history-dot.loss {
+            background: rgba(255, 82, 82, 0.2);
+            color: #ef9a9a;
+            border: 1px solid rgba(255, 82, 82, 0.35);
+        }
+        .history-dot.jackpot {
+            background: rgba(255, 140, 66, 0.35);
+            color: #ffcc80;
+            border: 1px solid rgba(255, 140, 66, 0.6);
+        }
+
+        /* ── AUTO-SPIN MODAL ────────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9990;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-dialog {
+            background: #1a1712;
+            border: 1px solid var(--border-gold-strong);
+            border-radius: var(--radius-xl);
+            padding: 1.2rem;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+            text-align: center;
+        }
+        .modal-dialog h3 {
+            color: var(--gold-bright);
+            margin-bottom: 0.8rem;
+        }
+        .modal-input {
+            background: #0f0d0b;
+            border: 2px solid rgba(245, 176, 66, 0.3);
+            border-radius: 25px;
+            padding: 0.4rem 0.7rem;
+            color: #fff;
+            font-weight: 700;
+            width: 80px;
+            text-align: center;
+            font-family: var(--font-mono);
+        }
+        .modal-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+            flex-wrap: wrap;
+        }
+        .modal-row label {
+            font-size: 0.75rem;
+            color: #b8b2a6;
+        }
+
+        /* ── JACKPOT OVERLAY ────────────── */
+        .jackpot-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .jackpot-overlay.active {
+            opacity: 1;
+            animation: jackpotScreen 1.8s ease-out;
+        }
+        @keyframes jackpotScreen {
+            0% {
+                background: rgba(255, 200, 50, 0.55);
+            }
+            100% {
+                background: rgba(255, 200, 50, 0);
+            }
+        }
+        .jackpot-text {
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 60px rgba(255, 200, 50, 0.9), 0 0 120px rgba(255, 150, 0, 0.6);
+            animation: jackpotTextPop 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes jackpotTextPop {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.15);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* ── PROVABLY FAIR ──────────────── */
+        .pf-toggle {
+            font-size: 0.6rem;
+            color: var(--gold);
+            cursor: pointer;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            margin-top: 0.3rem;
+        }
+        .pf-info {
+            display: none;
+            font-size: 0.55rem;
+            color: #8a8278;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem;
+            margin-top: 0.4rem;
+            text-align: left;
+            word-break: break-all;
+            font-family: var(--font-mono);
+        }
+        .pf-info.show {
+            display: block;
+        }
+
+        /* ── RTP BADGE ──────────────────── */
+        .rtp-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(245, 176, 66, 0.06);
+            border-radius: 18px;
+            padding: 0.18rem 0.6rem;
+            font-size: 0.58rem;
+            color: #8a8278;
+            letter-spacing: 1px;
+            cursor: help;
+        }
+
+        /* ── RESPONSIVE ─────────────────── */
+        @media (max-width: 768px) {
+            .main-row {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            .wheel-panel {
+                min-width: auto;
+                padding: 0.7rem;
+            }
+            .betting-panel {
+                min-width: auto;
+                padding: 0.7rem;
+            }
+            .wheel-wrapper {
+                max-width: 300px;
+            }
+            .segment-grid {
+                grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+                max-height: 180px;
+                gap: 0.3rem;
+            }
+            .btn {
+                padding: 0.45rem 1rem;
+                font-size: 0.7rem;
+            }
+            .btn-spin {
+                padding: 0.5rem 1.3rem;
+                font-size: 0.76rem;
+            }
+            .top-bar {
+                padding: 0.35rem 0.8rem;
+                gap: 0.3rem;
+            }
+            .jackpot-badge {
+                font-size: 0.62rem;
+                padding: 0.18rem 0.6rem;
+            }
+            .balance-chip {
+                font-size: 0.7rem;
+                padding: 0.22rem 0.7rem;
+            }
+            .chip-option {
+                padding: 0.3rem 0.2rem;
+            }
+            .chip-mult {
+                font-size: 0.8rem;
+            }
+        }
+        @media (max-width: 420px) {
+            .wheel-wrapper {
+                max-width: 240px;
+            }
+            .segment-grid {
+                grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+                gap: 0.25rem;
+            }
+            .bet-input {
+                width: 65px;
+                font-size: 0.72rem;
+            }
+            .preset-btn {
+                font-size: 0.55rem;
+                padding: 0.15rem 0.4rem;
+            }
+            .btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.64rem;
+            }
+            .btn-spin {
+                padding: 0.45rem 1rem;
+                font-size: 0.68rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+    <div id="jackpotOverlay" class="jackpot-overlay"><div class="jackpot-text" id="jackpotOverlayText"></div></div>
+    <div class="modal-overlay" id="autoSpinModal">
+        <div class="modal-dialog">
+            <h3>⚙️ Auto-Spin Settings</h3>
+            <div class="modal-row"><label>Number of spins:</label><input type="number" id="autoSpinCount" class="modal-input" value="10" min="1" max="1000"></div>
+            <div class="modal-row"><label><input type="checkbox" id="autoStopWin"> Stop on any win</label></div>
+            <div class="modal-row"><label><input type="checkbox" id="autoStopLoss"> Stop on loss</label></div>
+            <div class="modal-row"><label>Stop if balance &lt;</label><input type="number" id="autoStopBalance" class="modal-input" value="0" min="0"></div>
+            <div style="display:flex;gap:0.6rem;justify-content:center;margin-top:1rem;">
+                <button class="btn btn-spin" id="autoSpinStart">▶ Start Auto-Spin</button>
+                <button class="btn btn-outline" id="autoSpinCancel">Cancel</button>
+            </div>
+            <div id="autoSpinStatus" style="margin-top:0.6rem;font-size:0.7rem;color:#ffcc80;"></div>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <!-- ── TOP BAR ────────────────────── -->
+        <div class="top-bar">
+            <a href="../home.html" class="back-link"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <div class="balance-chip"><i class="fas fa-coins"></i> <span id="balanceDisplay">0</span> GOLD</div>
+            <div class="jackpot-badge"><i class="fas fa-fire"></i> JACKPOT: <span id="jackpotAmount">0</span> GOLD</div>
+            <button id="soundToggle" class="sound-toggle" aria-label="Toggle sound"><i class="fas fa-volume-up"></i></button>
+        </div>
+
+        <!-- ── MAIN ROW ──────────────────── -->
+        <div class="main-row">
+            <!-- WHEEL PANEL -->
+            <div class="wheel-panel" id="wheelPanel">
+                <div class="wheel-wrapper">
+                    <div class="wheel-pointer" id="wheelPointer">
+                        <svg width="26" height="34" viewBox="0 0 26 34"><defs><filter id="pointerShadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.7"/></filter><linearGradient id="ptrGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffe478"/><stop offset="100%" stop-color="#b89830"/></linearGradient></defs><polygon points="13,34 0,0 26,0" fill="url(#ptrGrad)" stroke="#8a6d1c" stroke-width="1.5" filter="url(#pointerShadow)"/><circle cx="13" cy="5" r="4" fill="#ff4444" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                    <canvas id="wheelCanvas" width="500" height="500" aria-label="Fortune wheel"></canvas>
+                </div>
+                <div class="action-buttons">
+                    <button id="spinBtn" class="btn btn-spin"><i class="fas fa-sync-alt"></i> SPIN</button>
+                    <button id="autoSpinBtn" class="btn btn-auto"><i class="fas fa-robot"></i> Auto</button>
+                    <button id="resetBetsBtn" class="btn btn-outline"><i class="fas fa-times-circle"></i> Clear</button>
+                </div>
+                <div class="result-panel" id="spinResult">💰 Select chips & spin!</div>
+                <button class="pf-toggle" id="pfToggle">🔐 Provably Fair ▾</button>
+                <div class="pf-info" id="pfInfo"></div>
+                <div class="rtp-badge" title="House Edge: 5.4% | RTP: 94.6%">📊 RTP ~94.6%</div>
+            </div>
+
+            <!-- BETTING PANEL -->
+            <div class="betting-panel" id="bettingPanel">
+                <div class="input-group">
+                    <div class="input-label"><i class="fas fa-coins"></i> BET PER CHIP</div>
+                    <div class="bet-control">
+                        <input type="number" id="betAmount" class="bet-input" value="10" min="1" step="1" inputmode="numeric" aria-label="Bet amount per chip">
+                        <span class="preset-btn" data-bet="half">½</span>
+                        <span class="preset-btn" data-bet="double">2×</span>
+                        <span class="preset-btn" data-bet="1">1</span>
+                        <span class="preset-btn" data-bet="5">5</span>
+                        <span class="preset-btn" data-bet="10">10</span>
+                        <span class="preset-btn" data-bet="25">25</span>
+                        <span class="preset-btn" data-bet="100">100</span>
+                        <span class="preset-btn max-btn" data-bet="max">MAX</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <div class="input-label"><i class="fas fa-layer-group"></i> SELECT CHIPS <span style="font-weight:400;font-size:0.55rem;">(click to toggle)</span></div>
+                    <div class="segment-grid" id="segmentGrid" role="listbox"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.4rem;margin:0.4rem 0;">
+                    <span style="font-size:0.7rem;color:#b8b2a6;">Total Bet: <strong id="totalStake" style="color:#fff;">0</strong> GOLD</span>
+                    <span style="font-size:0.7rem;color:#b8b2a6;">Max Win: <strong id="maxWinDisplay" style="color:#4caf50;">0</strong> GOLD</span>
+                </div>
+                <div class="history-marquee" id="historyMarquee"></div>
+                <div class="stats-row">
+                    <div class="stat-card">🎲 Spins<strong id="totalSpins">0</strong></div>
+                    <div class="stat-card">🎯 Wins<strong id="winsCount">0</strong></div>
+                    <div class="stat-card">📈 Win Rate<strong id="winRate">0%</strong></div>
+                    <div class="stat-card">💰 P/L<strong id="sessionPL">0</strong> GOLD</div>
+                    <div class="stat-card">🏆 Best<strong id="bestWin">0</strong></div>
+                    <button id="sessionResetBtn" class="session-reset">↺ Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            // ═══════════════════════════════════════════
+            //  CONFIGURATION
+            // ═══════════════════════════════════════════
+            const CONFIG = Object.freeze({
+                STORAGE_KEY_USERS: 'gold_users',
+                STORAGE_KEY_SESSION: 'gold_current_user',
+                STORAGE_KEY_SOUND: 'wof_stake_sound',
+                TOTAL_SEGMENTS: 25,
+                JACKPOT_CONTRIBUTION: 0.02,
+                SPIN_DURATION_MIN: 2600,
+                SPIN_DURATION_MAX: 4000,
+                SPIN_FULL_ROTATIONS: 7,
+                PARTICLE_COUNT: 35,
+                MAX_HISTORY: 30,
+                MAX_TRANSACTIONS: 100,
+                HOUSE_EDGE: 0.054,
+                RTP: 0.946,
+            });
+
+            // Segment definition (25 slots, Stake-like)
+            const SEGMENT_DEFS = [
+                { mult: 0, color: '#5c5c5c', label: '0x', group: 'grey', count: 6 },
+                { mult: 1, color: '#4a90d9', label: '1x', group: 'blue', count: 5 },
+                { mult: 2, color: '#4caf50', label: '2x', group: 'green', count: 4 },
+                { mult: 5, color: '#ff9800', label: '5x', group: 'orange', count: 3 },
+                { mult: 10, color: '#9c27b0', label: '10x', group: 'purple', count: 3 },
+                { mult: 25, color: '#e91e63', label: '25x', group: 'pink', count: 2 },
+                { mult: 100, color: '#f44336', label: '100x', group: 'red', count: 1 },
+                { mult: 500, color: '#ffd700', label: '500x', group: 'jackpot', count: 1 },
+            ];
+
+            function buildSegments() {
+                const segs = [];
+                for (const def of SEGMENT_DEFS) {
+                    for (let i = 0; i < def.count; i++) {
+                        segs.push({ multiplier: def.mult, color: def.color, label: def.label, group: def.group });
+                    }
+                }
+                // Shuffle for natural look
+                for (let i = segs.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));
+                    [segs[i], segs[j]] = [segs[j], segs[i]]; }
+                return segs.slice(0, CONFIG.TOTAL_SEGMENTS);
+            }
+
+            const WHEEL_SEGMENTS = buildSegments();
+
+            // ═══════════════════════════════════════════
+            //  UTILITY HELPERS
+            // ═══════════════════════════════════════════
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+            const formatGold = (n) => Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+            const rand = (min, max) => min + Math.random() * (max - min);
+            const safeJsonParse = (str, fb = {}) => { try { return JSON.parse(str) || fb; } catch { return fb; } };
+
+            // Simple SHA-256 simulation for provably fair display
+            function simpleHash(str) {
+                let h = 0;
+                for (let i = 0; i < str.length; i++) { h = ((h << 5) - h + str.charCodeAt(i)) | 0; }
+                return Math.abs(h).toString(16).padStart(8, '0');
+            }
+
+            // ═══════════════════════════════════════════
+            //  AUDIO MANAGER
+            // ═══════════════════════════════════════════
+            class AudioManager {
+                constructor() {
+                    this._ctx = null;
+                    this._enabled = localStorage.getItem(CONFIG.STORAGE_KEY_SOUND) !== 'false';
+                    this._boundInit = this._initCtx.bind(this);
+                    document.addEventListener('pointerdown', this._boundInit, { once: true });
+                    document.addEventListener('keydown', this._boundInit, { once: true });
+                }
+                _initCtx() {
+                    if (!this._ctx && this._enabled) {
+                        try {
+                            this._ctx = new(window.AudioContext || window.webkitAudioContext)();
+                            if (this._ctx.state === 'suspended') this._ctx.resume();
+                        } catch {}
+                    }
+                }
+                get enabled() { return this._enabled; }
+                toggle() {
+                    this._enabled = !this._enabled;
+                    localStorage.setItem(CONFIG.STORAGE_KEY_SOUND, this._enabled);
+                    if (this._enabled && !this._ctx) this._initCtx();
+                    return this._enabled;
+                }
+                _tone(freq, dur, vol = 0.07, type = 'sine', ramp = true) {
+                    if (!this._enabled || !this._ctx) return;
+                    if (this._ctx.state === 'suspended') this._ctx.resume();
+                    const now = this._ctx.currentTime;
+                    const osc = this._ctx.createOscillator();
+                    const gain = this._ctx.createGain();
+                    osc.type = type;
+                    osc.connect(gain);
+                    gain.connect(this._ctx.destination);
+                    osc.frequency.setValueAtTime(freq, now);
+                    gain.gain.setValueAtTime(vol, now);
+                    if (ramp) gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+                    osc.start(now);
+                    osc.stop(now + dur + 0.01);
+                }
+                play(type) {
+                    switch (type) {
+                        case 'spin':
+                            this._tone(480, 0.4, 0.08, 'sawtooth');
+                            break;
+                        case 'tick':
+                            this._tone(750, 0.03, 0.035, 'sine', false);
+                            break;
+                        case 'win':
+                            this._tone(880, 0.14, 0.09, 'sine');
+                            setTimeout(() => this._tone(1100, 0.14, 0.09, 'sine'), 140);
+                            break;
+                        case 'bigwin':
+                            this._tone(660, 0.18, 0.1, 'sine');
+                            setTimeout(() => this._tone(880, 0.18, 0.1, 'sine'), 180);
+                            setTimeout(() => this._tone(1320, 0.25, 0.12, 'sine'), 360);
+                            break;
+                        case 'jackpot':
+                            for (let i = 0; i < 6; i++) {
+                                setTimeout(() => this._tone(500 + i * 250, 0.2, 0.11, 'sine'), i * 160);
+                            }
+                            break;
+                        case 'lose':
+                            this._tone(260, 0.35, 0.08, 'triangle');
+                            break;
+                        case 'click':
+                            this._tone(1000, 0.04, 0.03, 'sine', false);
+                            break;
+                        case 'select':
+                            this._tone(680, 0.05, 0.035, 'sine', false);
+                            break;
+                    }
+                }
+                destroy() {
+                    document.removeEventListener('pointerdown', this._boundInit);
+                    document.removeEventListener('keydown', this._boundInit);
+                    if (this._ctx) { this._ctx.close().catch(() => {}); }
+                }
+            }
+
+            // ═══════════════════════════════════════════
+            //  USER DATA MANAGER (compatible with Tile Path)
+            // ═══════════════════════════════════════════
+            class UserManager {
+                constructor() { this.user = null;
+                    this._jackpotPool = 0; }
+                async load() {
+                    const sess = safeJsonParse(sessionStorage.getItem(CONFIG.STORAGE_KEY_SESSION), null);
+                    if (!sess) { this._redirect(); return false; }
+                    const users = safeJsonParse(localStorage.getItem(CONFIG.STORAGE_KEY_USERS), {});
+                    let u = users[sess.username];
+                    if (!u) { this._redirect(); return false; }
+                    u.globalStats = u.globalStats || { totalWagered: 0, totalWon: 0, totalGames: 0, totalWins: 0,
+                        currentStreak: 0, bestStreak: 0 };
+                    u.gamePlayCount = u.gamePlayCount || {};
+                    u.gameOutcomes = u.gameOutcomes || [];
+                    u.transactions = u.transactions || [];
+                    u.bankBalance = u.bankBalance ?? 0;
+                    u.xp = u.xp ?? 0;
+                    u.earnedAchievements = u.earnedAchievements || [];
+                    u.wheelStats = u.wheelStats || { spins: 0, wins: 0, totalWagered: 0, totalPayout: 0,
+                        biggestWin: 0, biggestMultiplier: 0, jackpotsHit: 0, jackpotPool: 0, history: [] };
+                    this.user = u;
+                    this._jackpotPool = u.wheelStats.jackpotPool || 0;
+                    this._saveSession();
+                    return true;
+                }
+                _redirect() {
+                    sessionStorage.removeItem(CONFIG.STORAGE_KEY_SESSION);
+                    try { window.location.href = '../../sign-in.html'; } catch {}
+                }
+                _saveSession() {
+                    if (!this.user) return;
+                    sessionStorage.setItem(CONFIG.STORAGE_KEY_SESSION, JSON.stringify({ username: this.user.username,
+                        balance: this.user.balance }));
+                }
+                async save() {
+                    if (!this.user) return;
+                    this.user.wheelStats.jackpotPool = this._jackpotPool;
+                    const users = safeJsonParse(localStorage.getItem(CONFIG.STORAGE_KEY_USERS), {});
+                    users[this.user.username] = this.user;
+                    localStorage.setItem(CONFIG.STORAGE_KEY_USERS, JSON.stringify(users));
+                    this._saveSession();
+                }
+                get balance() { return this.user?.balance ?? 0; }
+                set balance(v) { if (this.user) this.user.balance = Math.max(0, v); }
+                get jackpotPool() { return this._jackpotPool; }
+                set jackpotPool(v) { this._jackpotPool = Math.max(0, v); }
+                get stats() { return this.user?.wheelStats || { spins: 0, wins: 0, totalWagered: 0, totalPayout: 0,
+                        biggestWin: 0, biggestMultiplier: 0, jackpotsHit: 0, history: [] }; }
+                addTransaction(desc, amount, type) {
+                    if (!this.user) return;
+                    this.user.transactions.unshift({ desc, amount, type, date: new Date().toISOString() });
+                    if (this.user.transactions.length > CONFIG.MAX_TRANSACTIONS) this.user.transactions.length = CONFIG
+                        .MAX_TRANSACTIONS;
+                }
+                addHistory(multiplier, won) {
+                    const s = this.stats;
+                    s.history.unshift({ multiplier, won, time: Date.now() });
+                    if (s.history.length > CONFIG.MAX_HISTORY) s.history.length = CONFIG.MAX_HISTORY;
+                }
+                resetSessionStats() {
+                    if (!this.user) return;
+                    const jp = this._jackpotPool;
+                    this.user.wheelStats = { spins: 0, wins: 0, totalWagered: 0, totalPayout: 0, biggestWin: 0,
+                        biggestMultiplier: 0, jackpotsHit: 0, jackpotPool: jp, history: [] };
+                    this.save();
+                }
+                get sessionSummary() {
+                    const s = this.stats;
+                    const profit = (s.totalPayout || 0) - (s.totalWagered || 0);
+                    return {
+                        spins: s.spins || 0,
+                        wins: s.wins || 0,
+                        totalWagered: s.totalWagered || 0,
+                        totalPayout: s.totalPayout || 0,
+                        profit,
+                        biggestWin: s.biggestWin || 0,
+                        biggestMultiplier: s.biggestMultiplier || 0,
+                        jackpotsHit: s.jackpotsHit || 0,
+                        winRate: s.spins > 0 ? ((s.wins / s.spins) * 100).toFixed(1) : '0',
+                        history: s.history || [],
+                    };
+                }
+            }
+
+            // ═══════════════════════════════════════════
+            //  WHEEL ENGINE
+            // ═══════════════════════════════════════════
+            class WheelEngine {
+                constructor(segments) {
+                    this.segments = [...segments];
+                    this._angle = 0;
+                    this._spinning = false;
+                    this._targetAngle = 0;
+                    this._startAngle = 0;
+                    this._startTime = 0;
+                    this._duration = 0;
+                    this._animId = null;
+                    this._onTick = null;
+                    this._onComplete = null;
+                    this._lastTickSeg = -1;
+                }
+                get isSpinning() { return this._spinning; }
+                get angle() { return this._angle; }
+                get anglePerSegment() { return (Math.PI * 2) / this.segments.length; }
+                getLandingSegment() {
+                    const ptrAngle = Math.PI * 1.5;
+                    const eff = ((ptrAngle - this._angle) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+                    const idx = clamp(Math.floor(eff / this.anglePerSegment), 0, this.segments.length - 1);
+                    return { index: idx, segment: this.segments[idx] };
+                }
+                generateOutcome() { return Math.floor(Math.random() * this.segments.length); }
+                spin(targetIdx, duration, onTick, onComplete) {
+                    if (this._spinning) return false;
+                    this._spinning = true;
+                    this._onTick = onTick || null;
+                    this._onComplete = onComplete || null;
+                    this._duration = clamp(duration, CONFIG.SPIN_DURATION_MIN, CONFIG.SPIN_DURATION_MAX);
+                    this._startAngle = this._angle;
+                    this._startTime = performance.now();
+                    this._lastTickSeg = -1;
+                    const fullRots = CONFIG.SPIN_FULL_ROTATIONS + Math.floor(Math.random() * 3);
+                    const segAngle = targetIdx * this.anglePerSegment;
+                    const offset = this.anglePerSegment * rand(0.12, 0.88);
+                    this._targetAngle = this._startAngle + fullRots * Math.PI * 2 + segAngle + offset;
+                    this._animate();
+                    return true;
+                }
+                _animate() {
+                    if (!this._spinning) return;
+                    const elapsed = performance.now() - this._startTime;
+                    const progress = Math.min(1, elapsed / this._duration);
+                    const eased = 1 - Math.pow(1 - progress, 3.5);
+                    const wobble = progress > 0.82 ? Math.sin(progress * 35) * (1 - progress) * 0.018 : 0;
+                    this._angle = this._startAngle + (this._targetAngle - this._startAngle) * (eased + wobble);
+                    const currentSeg = Math.floor(((this._angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) / this
+                        .anglePerSegment);
+                    if (currentSeg !== this._lastTickSeg && progress < 0.88 && this._onTick) {
+                        this._lastTickSeg = currentSeg;
+                        this._onTick(currentSeg);
+                    }
+                    if (progress < 1) {
+                        this._animId = requestAnimationFrame(() => this._animate());
+                    } else {
+                        this._angle = this._targetAngle;
+                        this._spinning = false;
+                        this._animId = null;
+                        if (this._onComplete) this._onComplete(this.getLandingSegment());
+                    }
+                }
+                cancel() {
+                    this._spinning = false;
+                    if (this._animId) { cancelAnimationFrame(this._animId);
+                        this._animId = null; }
+                    this._onTick = null;
+                    this._onComplete = null;
+                }
+                destroy() { this.cancel(); }
+            }
+
+            // ═══════════════════════════════════════════
+            //  WHEEL RENDERER
+            // ═══════════════════════════════════════════
+            class WheelRenderer {
+                constructor(canvasId, segments) {
+                    this._canvas = document.getElementById(canvasId);
+                    this._ctx = this._canvas?.getContext('2d');
+                    this._segments = segments;
+                    this._dpr = Math.min(window.devicePixelRatio || 1, 2);
+                    this._ro = null;
+                    this._init();
+                }
+                _init() {
+                    if (!this._canvas) return;
+                    this._sync();
+                    this._ro = new ResizeObserver(() => this._sync());
+                    this._ro.observe(this._canvas.parentElement || this._canvas);
+                }
+                _sync() {
+                    if (!this._canvas) return;
+                    const rect = this._canvas.getBoundingClientRect();
+                    const size = Math.floor(rect.width);
+                    const px = size * this._dpr;
+                    if (this._canvas.width !== px || this._canvas.height !== px) {
+                        this._canvas.width = px;
+                        this._canvas.height = px;
+                        this._canvas.style.width = size + 'px';
+                        this._canvas.style.height = size + 'px';
+                    }
+                }
+                render(angleRad, highlightIdx = -1, spinning = false) {
+                    if (!this._canvas || !this._ctx) return;
+                    const ctx = this._ctx;
+                    const w = this._canvas.width;
+                    const h = this._canvas.height;
+                    const cx = w / 2;
+                    const cy = h / 2;
+                    const r = Math.min(cx, cy) * 0.88;
+                    const dpr = this._dpr;
+                    ctx.clearRect(0, 0, w, h);
+
+                    // Outer glow
+                    const glowG = ctx.createRadialGradient(cx, cy, r * 0.9, cx, cy, r * 1.08);
+                    glowG.addColorStop(0, 'rgba(245,176,66,0)');
+                    glowG.addColorStop(0.5, spinning ? 'rgba(245,176,66,0.18)' : 'rgba(245,176,66,0.05)');
+                    glowG.addColorStop(1, 'rgba(245,176,66,0)');
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r * 1.08, 0, Math.PI * 2);
+                    ctx.fillStyle = glowG;
+                    ctx.fill();
+
+                    // Outer rim
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r + 3 * dpr, 0, Math.PI * 2);
+                    ctx.strokeStyle = 'rgba(245,176,66,0.35)';
+                    ctx.lineWidth = 2.5 * dpr;
+                    ctx.stroke();
+
+                    const step = (Math.PI * 2) / this._segments.length;
+                    for (let i = 0; i < this._segments.length; i++) {
+                        const start = i * step + angleRad;
+                        const end = start + step;
+                        const seg = this._segments[i];
+                        const isHL = i === highlightIdx;
+
+                        // Segment fill with radial gradient
+                        const midA = start + step / 2;
+                        const mx = cx + Math.cos(midA) * r * 0.5;
+                        const my = cy + Math.sin(midA) * r * 0.5;
+                        const segG = ctx.createRadialGradient(mx, my, r * 0.05, cx, cy, r);
+                        const baseColor = isHL ? this._lighten(seg.color, 50) : seg.color;
+                        segG.addColorStop(0, this._lighten(baseColor, 30));
+                        segG.addColorStop(0.7, baseColor);
+                        segG.addColorStop(1, this._darken(baseColor, 40));
+                        ctx.beginPath();
+                        ctx.moveTo(cx, cy);
+                        ctx.arc(cx, cy, r, start, end);
+                        ctx.closePath();
+                        ctx.fillStyle = segG;
+                        ctx.fill();
+                        ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+                        ctx.lineWidth = 1.2 * dpr;
+                        ctx.stroke();
+
+                        // Inner stroke
+                        ctx.beginPath();
+                        ctx.moveTo(cx, cy);
+                        ctx.arc(cx, cy, r * 0.22, start, end);
+                        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                        ctx.lineWidth = 0.8 * dpr;
+                        ctx.stroke();
+
+                        // Text
+                        ctx.save();
+                        ctx.translate(cx, cy);
+                        ctx.rotate(start + step / 2);
+                        const textR = r * 0.64;
+                        ctx.fillStyle = '#fff';
+                        ctx.font = `bold ${10*dpr}px Inter, sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                        ctx.shadowBlur = 3 * dpr;
+                        ctx.fillText(seg.label, textR, 0);
+                        ctx.shadowBlur = 0;
+                        ctx.restore();
+                    }
+
+                    // Center hub
+                    const hubG = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 0.1);
+                    hubG.addColorStop(0, '#ffe478');
+                    hubG.addColorStop(0.45, '#d4af37');
+                    hubG.addColorStop(1, '#6b4f1a');
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r * 0.1, 0, Math.PI * 2);
+                    ctx.fillStyle = hubG;
+                    ctx.fill();
+                    ctx.strokeStyle = '#3d2e0a';
+                    ctx.lineWidth = 2 * dpr;
+                    ctx.stroke();
+                    // Diamond icon
+                    ctx.fillStyle = '#fff';
+                    ctx.font = `bold ${13*dpr}px Inter`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('◆', cx, cy);
+
+                    // Pulsing ring when idle
+                    if (!spinning) {
+                        const pulse = 0.35 + 0.2 * Math.sin(Date.now() / 1800);
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, r * 0.16, 0, Math.PI * 2);
+                        ctx.strokeStyle = `rgba(245,176,66,${pulse})`;
+                        ctx.lineWidth = 2 * dpr;
+                        ctx.stroke();
+                    }
+                }
+                _lighten(hex, pct) {
+                    const n = parseInt(hex.replace('#', ''), 16);
+                    const r = Math.min(255, (n >> 16) + pct);
+                    const g = Math.min(255, ((n >> 8) & 0xFF) + pct);
+                    const b = Math.min(255, (n & 0xFF) + pct);
+                    return `rgb(${r},${g},${b})`;
+                }
+                _darken(hex, pct) {
+                    const n = parseInt(hex.replace('#', ''), 16);
+                    const r = Math.max(0, (n >> 16) - pct);
+                    const g = Math.max(0, ((n >> 8) & 0xFF) - pct);
+                    const b = Math.max(0, (n & 0xFF) - pct);
+                    return `rgb(${r},${g},${b})`;
+                }
+                destroy() { if (this._ro) this._ro.disconnect(); }
+            }
+
+            // ═══════════════════════════════════════════
+            //  PARTICLE SYSTEM
+            // ═══════════════════════════════════════════
+            class ParticleSystem {
+                constructor(canvasId) {
+                    this._c = document.getElementById(canvasId);
+                    if (!this._c) return;
+                    this._ctx = this._c.getContext('2d');
+                    this._particles = [];
+                    this._animId = null;
+                    this._intensity = 0;
+                    this._resizeBound = this._resize.bind(this);
+                    this._init();
+                }
+                _init() {
+                    this._resize();
+                    this._particles = Array.from({ length: CONFIG.PARTICLE_COUNT }, () => this._create());
+                    window.addEventListener('resize', this._resizeBound);
+                    this._draw();
+                }
+                _create() {
+                    const w = this._c?.width || 800;
+                    const h = this._c?.height || 600;
+                    const isGold = Math.random() < 0.4;
+                    return {
+                        x: Math.random() * w,
+                        y: Math.random() * h,
+                        vx: (Math.random() - 0.5) * 0.35,
+                        vy: (Math.random() - 0.5) * 0.35,
+                        r: Math.random() * 2.2 + 0.6,
+                        alpha: Math.random() * 0.25 + 0.08,
+                        life: Math.random(),
+                        isGold,
+                    };
+                }
+                _resize() {
+                    if (this._c) { this._c.width = window.innerWidth;
+                        this._c.height = window.innerHeight; }
+                }
+                set intensity(v) { this._intensity = clamp(v, 0, 1); }
+                _draw() {
+                    if (!this._c || !this._ctx) return;
+                    const ctx = this._ctx;
+                    const w = this._c.width;
+                    const h = this._c.height;
+                    ctx.clearRect(0, 0, w, h);
+                    const boost = this._intensity;
+                    for (const p of this._particles) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.life += 0.003;
+                        if (p.x < -20) p.x = w + 20;
+                        if (p.x > w + 20) p.x = -20;
+                        if (p.y < -20) p.y = h + 20;
+                        if (p.y > h + 20) p.y = -20;
+                        const flicker = 0.6 + 0.4 * Math.sin(p.life * 2.5);
+                        const alpha = p.alpha * flicker * (1 + boost * 1.5);
+                        const color = p.isGold ? `rgba(245,176,66,${alpha})` :
+                            boost > 0.3 ? `rgba(255,100,80,${alpha})` : `rgba(220,200,160,${alpha})`;
+                        ctx.fillStyle = color;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.r * (1 + boost * 0.5), 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    this._intensity *= 0.95;
+                    this._animId = requestAnimationFrame(() => this._draw());
+                }
+                destroy() {
+                    if (this._animId) cancelAnimationFrame(this._animId);
+                    window.removeEventListener('resize', this._resizeBound);
+                }
+            }
+
+            // ═══════════════════════════════════════════
+            //  CONFETTI SYSTEM
+            // ═══════════════════════════════════════════
+            class Confetti {
+                static fire(intensity = 'normal') {
+                    const c = document.createElement('canvas');
+                    c.style.cssText =
+                        'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9997;';
+                    document.body.appendChild(c);
+                    c.width = window.innerWidth;
+                    c.height = window.innerHeight;
+                    const ctx = c.getContext('2d');
+                    const counts = { low: 60, normal: 180, high: 350, jackpot: 550 };
+                    const count = counts[intensity] || 180;
+                    const parts = [];
+                    const colors = ['#ffd966', '#ffe478', '#ff5252', '#4caf50', '#ff8c42', '#ff69b4', '#ffab40',
+                        '#fff176', '#ff6e40', '#f5b042'
+                    ];
+                    for (let i = 0; i < count; i++) {
+                        parts.push({
+                            x: Math.random() * c.width,
+                            y: -Math.random() * c.height * 0.5,
+                            vx: (Math.random() - 0.5) * 9,
+                            vy: Math.random() * 7 + 2,
+                            s: Math.random() * 6 + 2.5,
+                            col: colors[Math.floor(Math.random() * colors.length)],
+                            rot: Math.random() * 360,
+                            rv: (Math.random() - 0.5) * 14,
+                            grav: 0.07 + Math.random() * 0.07,
+                            life: 1,
+                            decay: 0.0025 + Math.random() * 0.005,
+                        });
+                    }
+                    const st = performance.now();
+                    const maxD = 4200;
+
+                    function draw(ts) {
+                        const el = ts - st;
+                        ctx.clearRect(0, 0, c.width, c.height);
+                        let alive = false;
+                        for (const p of parts) {
+                            p.vy += p.grav;
+                            p.x += p.vx;
+                            p.y += p.vy;
+                            p.rot += p.rv;
+                            p.life -= p.decay;
+                            if (p.life > 0 && p.y < c.height + 60 && el < maxD) {
+                                alive = true;
+                                ctx.save();
+                                ctx.translate(p.x, p.y);
+                                ctx.rotate((p.rot * Math.PI) / 180);
+                                ctx.globalAlpha = Math.max(0, p.life);
+                                ctx.fillStyle = p.col;
+                                ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.55);
+                                ctx.restore();
+                            }
+                        }
+                        if (alive) requestAnimationFrame(draw);
+                        else c.remove();
+                    }
+                    requestAnimationFrame(draw);
+                    setTimeout(() => { if (c.parentNode) c.remove(); }, maxD + 400);
+                }
+            }
+
+            // ═══════════════════════════════════════════
+            //  MAIN UI / GAME CONTROLLER
+            // ═══════════════════════════════════════════
+            class GameController {
+                constructor(userMgr, audio) {
+                    this._user = userMgr;
+                    this._audio = audio;
+                    this._selected = new Set();
+                    this._spinning = false;
+                    this._autoSpinning = false;
+                    this._autoSpinRemaining = 0;
+                    this._autoStopWin = false;
+                    this._autoStopLoss = false;
+                    this._autoStopBalance = 0;
+                    this._resultTimer = null;
+                    this._provablyFair = { clientSeed: this._randSeed(), serverSeed: this._randSeed(), nonce: 0 };
+                    this._dom = this._cacheDom();
+                    this._engine = new WheelEngine(WHEEL_SEGMENTS);
+                    this._renderer = new WheelRenderer('wheelCanvas', WHEEL_SEGMENTS);
+                    this._particles = new ParticleSystem('particleCanvas');
+                    this._bindEvents();
+                    this._renderAll();
+                    this._renderer.render(this._engine.angle);
+                    this._updatePFDisplay();
+                }
+
+                _randSeed() { return Array.from({ length: 16 }, () => Math.random().toString(36)[2] || 'x').join(
+                    ''); }
+
+                _cacheDom() {
+                    const q = (s) => document.querySelector(s);
+                    return {
+                        balance: q('#balanceDisplay'),
+                        betInput: q('#betAmount'),
+                        spinBtn: q('#spinBtn'),
+                        autoSpinBtn: q('#autoSpinBtn'),
+                        resetBetsBtn: q('#resetBetsBtn'),
+                        resultDiv: q('#spinResult'),
+                        segmentGrid: q('#segmentGrid'),
+                        totalStake: q('#totalStake'),
+                        maxWinDisplay: q('#maxWinDisplay'),
+                        totalSpins: q('#totalSpins'),
+                        winsCount: q('#winsCount'),
+                        winRate: q('#winRate'),
+                        sessionPL: q('#sessionPL'),
+                        bestWin: q('#bestWin'),
+                        jackpotSpan: q('#jackpotAmount'),
+                        soundToggle: q('#soundToggle'),
+                        sessionResetBtn: q('#sessionResetBtn'),
+                        wheelCanvas: q('#wheelCanvas'),
+                        wheelPointer: q('#wheelPointer'),
+                        jackpotOverlay: q('#jackpotOverlay'),
+                        jackpotOverlayText: q('#jackpotOverlayText'),
+                        spinBtnIcon: q('#spinBtn i'),
+                        historyMarquee: q('#historyMarquee'),
+                        autoSpinModal: q('#autoSpinModal'),
+                        autoSpinCount: q('#autoSpinCount'),
+                        autoStopWin: q('#autoStopWin'),
+                        autoStopLoss: q('#autoStopLoss'),
+                        autoStopBalance: q('#autoStopBalance'),
+                        autoSpinStart: q('#autoSpinStart'),
+                        autoSpinCancel: q('#autoSpinCancel'),
+                        autoSpinStatus: q('#autoSpinStatus'),
+                        pfToggle: q('#pfToggle'),
+                        pfInfo: q('#pfInfo'),
+                    };
+                }
+
+                _bindEvents() {
+                    const d = this._dom;
+                    d.spinBtn.addEventListener('click', () => this._handleSpin());
+                    d.resetBetsBtn.addEventListener('click', () => this._clearBets());
+                    d.betInput.addEventListener('input', () => this._validateUI());
+                    d.betInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') this._handleSpin(); });
+                    d.soundToggle.addEventListener('click', () => {
+                        const on = this._audio.toggle();
+                        d.soundToggle.innerHTML = on ? '<i class="fas fa-volume-up"></i>' :
+                            '<i class="fas fa-volume-mute"></i>';
+                    });
+                    d.sessionResetBtn.addEventListener('click', () => {
+                        if (confirm('Reset session stats? Balance stays intact.')) { this._user
+                            .resetSessionStats();
+                            this._refreshStats(); }
+                    });
+                    d.wheelCanvas.addEventListener('click', () => { if (!this._spinning) this._handleSpin(); });
+                    // Preset buttons
+                    document.querySelectorAll('.preset-btn[data-bet]').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const val = btn.dataset.bet;
+                            const cur = parseInt(d.betInput.value) || 10;
+                            if (val === 'half') d.betInput.value = Math.max(1, Math.floor(cur / 2));
+                            else if (val === 'double') d.betInput.value = Math.min(100000, cur * 2);
+                            else if (val === 'max') {
+                                const total = this._selected.size || 1;
+                                d.betInput.value = Math.floor(this._user.balance / total) || 1;
+                            } else d.betInput.value = parseInt(val);
+                            this._validateUI();
+                            this._audio.play('click');
+                        });
+                    });
+                    // Auto-spin modal
+                    d.autoSpinBtn.addEventListener('click', () => this._openAutoSpin());
+                    d.autoSpinCancel.addEventListener('click', () => this._closeAutoSpin());
+                    d.autoSpinStart.addEventListener('click', () => this._startAutoSpin());
+                    d.autoSpinModal.addEventListener('click', (e) => { if (e.target === d.autoSpinModal) this
+                            ._closeAutoSpin(); });
+                    // Provably fair
+                    d.pfToggle.addEventListener('click', () => {
+                        d.pfInfo.classList.toggle('show');
+                        d.pfToggle.textContent = d.pfInfo.classList.contains('show') ?
+                            '🔐 Provably Fair ▴' : '🔐 Provably Fair ▾';
+                    });
+                    // Keyboard shortcuts
+                    document.addEventListener('keydown', (e) => {
+                        if (e.target.closest('input') || e.target.closest('select')) return;
+                        switch (e.key.toLowerCase()) {
+                            case ' ':
+                                e.preventDefault();
+                                if (!this._spinning) this._handleSpin();
+                                break;
+                            case 'r':
+                                this._clearBets();
+                                break;
+                            case 'c':
+                                this._clearBets();
+                                break;
+                            case 'a':
+                                this._openAutoSpin();
+                                break;
+                        }
+                    });
+                    // Haptic on mobile
+                    if (navigator.vibrate) {
+                        document.addEventListener('wheelWin', () => navigator.vibrate([30, 50, 30]));
+                        document.addEventListener('wheelJackpot', () => navigator.vibrate([50, 30, 50, 30, 100]));
+                    }
+                }
+
+                _renderAll() {
+                    this._renderChips();
+                    this._updateBetSummary();
+                    this._refreshStats();
+                    this._updateJackpotDisplay();
+                    this._renderHistory();
+                }
+
+                _renderChips() {
+                    const grid = this._dom.segmentGrid;
+                    grid.innerHTML = '';
+                    WHEEL_SEGMENTS.forEach((seg, idx) => {
+                        const div = document.createElement('div');
+                        div.className = 'chip-option';
+                        if (this._selected.has(idx)) div.classList.add('selected');
+                        div.setAttribute('role', 'option');
+                        div.setAttribute('aria-selected', String(this._selected.has(idx)));
+                        const betAmt = parseInt(this._dom.betInput.value) || 0;
+                        div.innerHTML = `
+                            <div class="chip-mult">${seg.label}</div>
+                            <div class="chip-label">${seg.group}</div>
+                            ${this._selected.has(idx) ? `<div class="chip-bet-indicator">BET: ${betAmt} GOLD</div>` : ''}
+                        `;
+                        div.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (this._selected.has(idx)) this._selected.delete(idx);
+                            else this._selected.add(idx);
+                            this._renderChips();
+                            this._updateBetSummary();
+                            this._audio.play('select');
+                        });
+                        grid.appendChild(div);
+                    });
+                }
+
+                _updateBetSummary() {
+                    const betPer = parseInt(this._dom.betInput.value) || 0;
+                    const total = this._selected.size;
+                    const totalStake = total * betPer;
+                    const maxMult = total > 0 ? Math.max(...[...this._selected].map(i => WHEEL_SEGMENTS[i]
+                    .multiplier)) : 0;
+                    const maxWin = totalStake * maxMult;
+                    this._dom.totalStake.textContent = formatGold(totalStake);
+                    this._dom.maxWinDisplay.textContent = formatGold(maxWin);
+                    this._validateUI();
+                }
+
+                _validateUI() {
+                    const betPer = parseInt(this._dom.betInput.value);
+                    const total = this._selected.size;
+                    const totalCost = total * (betPer || 0);
+                    const invalid = isNaN(betPer) || betPer <= 0 || total === 0 || totalCost > this._user.balance;
+                    this._dom.spinBtn.disabled = invalid || this._spinning;
+                    if (invalid && document.activeElement === this._dom.betInput && betPer > 0 && totalCost > this._user
+                        .balance) {
+                        this._dom.betInput.classList.add('invalid');
+                        setTimeout(() => this._dom.betInput.classList.remove('invalid'), 400);
+                    }
+                }
+
+                async _handleSpin() {
+                    if (this._spinning) return;
+                    const betPer = parseInt(this._dom.betInput.value);
+                    const total = this._selected.size;
+                    if (isNaN(betPer) || betPer <= 0 || total === 0) {
+                        this._showResult('⚠️ Select at least one chip and set a valid bet.', true);
+                        return;
+                    }
+                    const totalCost = total * betPer;
+                    if (totalCost > this._user.balance) {
+                        this._showResult(`❌ Insufficient balance. Need ${formatGold(totalCost)} GOLD.`, true);
+                        return;
+                    }
+                    await this._executeSpin(betPer, totalCost, new Set(this._selected));
+                }
+
+                async _executeSpin(betPer, totalCost, selectedSet) {
+                    // Deduct
+                    this._user.balance -= totalCost;
+                    this._user.addTransaction(`Wheel Spin (${selectedSet.size} chips) -${formatGold(totalCost)} GOLD`,
+                        -totalCost, 'withdraw');
+                    const jpContrib = Math.floor(totalCost * CONFIG.JACKPOT_CONTRIBUTION);
+                    this._user.jackpotPool += jpContrib;
+                    await this._user.save();
+                    this._updateBalanceUI();
+
+                    this._spinning = true;
+                    this._dom.spinBtn.disabled = true;
+                    this._dom.spinBtn.classList.add('spinning-anim');
+                    this._dom.wheelCanvas.classList.add('spinning');
+                    this._dom.spinBtnIcon.className = 'fas fa-spinner fa-spin';
+                    this._dom.resultDiv.innerHTML = '🎡 Spinning...';
+                    this._dom.resultDiv.className = 'result-panel';
+                    this._audio.play('spin');
+
+                    const targetIdx = this._engine.generateOutcome();
+                    const duration = rand(CONFIG.SPIN_DURATION_MIN, CONFIG.SPIN_DURATION_MAX);
+                    this._provablyFair.nonce++;
+
+                    this._engine.spin(targetIdx, duration,
+                        () => { this._audio.play('tick');
+                            this._renderer.render(this._engine.angle, -1, true); },
+                        (landing) => this._onSpinComplete(landing, betPer, totalCost, selectedSet, jpContrib)
+                    );
+
+                    const renderLoop = () => {
+                        if (!this._spinning && !this._engine.isSpinning) return;
+                        this._renderer.render(this._engine.angle, -1, this._engine.isSpinning);
+                        if (this._engine.isSpinning || this._spinning) requestAnimationFrame(renderLoop);
+                    };
+                    requestAnimationFrame(renderLoop);
+                }
+
+                async _onSpinComplete(landing, betPer, totalCost, selectedSet, jpContrib) {
+                    const seg = landing.segment;
+                    const landingIdx = landing.index;
+                    let totalWin = 0;
+                    const isJackpotSeg = seg.group === 'jackpot';
+
+                    if (selectedSet.has(landingIdx)) {
+                        if (isJackpotSeg && this._user.jackpotPool > jpContrib) {
+                            totalWin += this._user.jackpotPool;
+                        } else {
+                            totalWin += betPer * seg.multiplier;
+                        }
+                    }
+
+                    const profit = totalWin - totalCost;
+                    const isJackpotWin = isJackpotSeg && totalWin > totalCost * 3;
+
+                    if (totalWin > 0) this._user.balance += totalWin;
+                    if (isJackpotWin && this._user.jackpotPool > 0) {
+                        this._user.jackpotPool = 0;
+                    }
+
+                    // Update stats
+                    const s = this._user.stats;
+                    s.spins++;
+                    s.totalWagered += totalCost;
+                    if (totalWin > 0) {
+                        s.wins++;
+                        s.totalPayout += totalWin;
+                        if (totalWin > s.biggestWin) s.biggestWin = totalWin;
+                        if (seg.multiplier > s.biggestMultiplier) s.biggestMultiplier = seg.multiplier;
+                        if (isJackpotWin) s.jackpotsHit++;
+                    }
+                    this._user.addHistory(seg.multiplier, totalWin > 0);
+                    this._user.user.globalStats.totalWagered += totalCost;
+                    this._user.user.globalStats.totalGames++;
+                    if (totalWin > 0) this._user.user.globalStats.totalWins++;
+                    this._user.user.xp += Math.floor(totalCost * 0.4);
+                    if (!this._user.user.gamePlayCount.wheel) this._user.user.gamePlayCount.wheel = 0;
+                    this._user.user.gamePlayCount.wheel++;
+                    this._user.addTransaction(
+                        totalWin > 0 ?
+                        `Wheel Win: ${seg.label} +${formatGold(totalWin)} GOLD` :
+                        `Wheel Loss: ${seg.label} -${formatGold(totalCost)} GOLD`,
+                        profit,
+                        totalWin > 0 ? 'deposit' : 'withdraw'
+                    );
+                    await this._user.save();
+
+                    // Post-spin UI
+                    this._spinning = false;
+                    this._dom.spinBtn.disabled = false;
+                    this._dom.spinBtn.classList.remove('spinning-anim');
+                    this._dom.wheelCanvas.classList.remove('spinning');
+                    this._dom.spinBtnIcon.className = 'fas fa-sync-alt';
+                    this._renderer.render(this._engine.angle, landingIdx, false);
+                    this._dom.wheelPointer.classList.add('bounce');
+                    setTimeout(() => this._dom.wheelPointer.classList.remove('bounce'), 350);
+                    this._particles.intensity = totalWin > 0 ? 0.7 : 0.15;
+
+                    // Result
+                    let rClass = 'loss';
+                    let rMsg = '';
+                    if (totalWin > 0) {
+                        rClass = isJackpotWin ? 'jackpot' : 'win';
+                        rMsg =
+                            `🎉 <strong>${seg.label}</strong> → +${formatGold(totalWin)} GOLD (${profit>=0?'+':''}${formatGold(profit)})`;
+                        if (isJackpotWin) {
+                            rMsg += ' 🔥 JACKPOT!';
+                            this._triggerJackpot(totalWin);
+                        }
+                        this._audio.play(isJackpotWin ? 'jackpot' : (seg.multiplier >= 25 ? 'bigwin' : 'win'));
+                        Confetti.fire(isJackpotWin ? 'jackpot' : (seg.multiplier >= 25 ? 'high' : 'normal'));
+                        if (navigator.vibrate) navigator.vibrate(isJackpotWin ? [50, 30, 50, 30, 100] : [30, 50,
+                            30
+                        ]);
+                        this._flashChip(landingIdx);
+                    } else {
+                        rMsg = `💔 <strong>${seg.label}</strong> → Lost ${formatGold(totalCost)} GOLD`;
+                        this._audio.play('lose');
+                    }
+                    this._showResult(rMsg, false, rClass);
+                    this._renderAll();
+                    this._validateUI();
+                    this._updatePFDisplay();
+                    this._checkAchievements(seg.multiplier, isJackpotWin);
+
+                    this._clearResultTimer();
+                    this._resultTimer = setTimeout(() => {
+                        if (!this._spinning && !this._autoSpinning) {
+                            this._dom.resultDiv.innerHTML = '💰 Select chips & spin!';
+                            this._dom.resultDiv.className = 'result-panel';
+                        }
+                    }, 3500);
+
+                    // Auto-spin continuation
+                    if (this._autoSpinning && this._autoSpinRemaining > 0) {
+                        const shouldStop = (this._autoStopWin && totalWin > 0) || (this._autoStopLoss && totalWin ===
+                            0) || (this._user.balance < this._autoStopBalance);
+                        if (shouldStop) {
+                            this._stopAutoSpin('Condition met');
+                        } else {
+                            this._autoSpinRemaining--;
+                            this._dom.autoSpinStatus.textContent =
+                                `🔄 Auto-spinning... ${this._autoSpinRemaining} remaining`;
+                            const nextBet = parseInt(this._dom.betInput.value);
+                            const nextTotal = this._selected.size;
+                            const nextCost = nextTotal * nextBet;
+                            if (nextTotal === 0 || nextCost > this._user.balance) {
+                                this._stopAutoSpin(nextTotal === 0 ? 'No chips selected' :
+                                    'Insufficient balance');
+                            } else {
+                                setTimeout(() => this._executeSpin(nextBet, nextCost, new Set(this._selected)),
+                                    800);
+                            }
+                        }
+                    } else if (this._autoSpinning && this._autoSpinRemaining <= 0) {
+                        this._stopAutoSpin('Completed');
+                    }
+                }
+
+                _flashChip(idx) {
+                    const items = this._dom.segmentGrid.querySelectorAll('.chip-option');
+                    if (items[idx]) { items[idx].classList.add('win-flash');
+                        setTimeout(() => items[idx].classList.remove('win-flash'), 900); }
+                }
+
+                _triggerJackpot(amount) {
+                    const overlay = this._dom.jackpotOverlay;
+                    overlay.querySelector('.jackpot-text').textContent = `🎰 ${formatGold(amount)} GOLD!`;
+                    overlay.classList.add('active');
+                    Confetti.fire('jackpot');
+                    setTimeout(() => overlay.classList.remove('active'), 2000);
+                }
+
+                _clearBets() {
+                    this._selected.clear();
+                    this._renderChips();
+                    this._updateBetSummary();
+                    this._showResult('Bets cleared.', false);
+                    this._audio.play('click');
+                }
+
+                _showResult(msg, isErr, extraClass = '') {
+                    const d = this._dom.resultDiv;
+                    d.innerHTML = msg;
+                    d.className = 'result-panel';
+                    if (extraClass) d.classList.add(extraClass);
+                    d.style.color = isErr ? '#ef9a9a' : '';
+                }
+
+                _clearResultTimer() { if (this._resultTimer) { clearTimeout(this._resultTimer);
+                        this._resultTimer = null; } }
+
+                _updateBalanceUI() { this._dom.balance.textContent = formatGold(this._user.balance); }
+                _updateJackpotDisplay() { this._dom.jackpotSpan.textContent = formatGold(this._user.jackpotPool); }
+
+                _refreshStats() {
+                    const sum = this._user.sessionSummary;
+                    this._updateBalanceUI();
+                    this._dom.totalSpins.textContent = sum.spins;
+                    this._dom.winsCount.textContent = sum.wins;
+                    this._dom.winRate.textContent = sum.winRate + '%';
+                    this._dom.sessionPL.textContent = (sum.profit >= 0 ? '+' : '') + formatGold(sum.profit);
+                    this._dom.sessionPL.style.color = sum.profit >= 0 ? '#4caf50' : '#ff5252';
+                    this._dom.bestWin.textContent = formatGold(sum.biggestWin);
+                    this._updateJackpotDisplay();
+                    this._renderHistory();
+                }
+
+                _renderHistory() {
+                    const marquee = this._dom.historyMarquee;
+                    const history = this._user.sessionSummary.history.slice(0, 20);
+                    marquee.innerHTML = history.map(h => {
+                        let cls = h.won ? (h.multiplier >= 100 ? 'jackpot' : 'win') : 'loss';
+                        return `<div class="history-dot ${cls}">${h.multiplier}x</div>`;
+                    }).join('');
+                    if (history.length === 0) marquee.innerHTML =
+                        '<span style="font-size:0.6rem;color:#8a8278;">No spins yet</span>';
+                }
+
+                _updatePFDisplay() {
+                    const pf = this._provablyFair;
+                    const hash = simpleHash(pf.serverSeed + pf.clientSeed + pf.nonce);
+                    this._dom.pfInfo.innerHTML = `
+                        <strong>Provably Fair (Simulated)</strong><br>
+                        Client Seed: ${pf.clientSeed}<br>
+                        Server Seed (hashed): ${simpleHash(pf.serverSeed)}<br>
+                        Nonce: ${pf.nonce}<br>
+                        Last Hash: ${hash}<br>
+                        <small>All outcomes are deterministically generated.</small>
+                    `;
+                }
+
+                _checkAchievements(mult, isJackpot) {
+                    if (!this._user.user.earnedAchievements) this._user.user.earnedAchievements = [];
+                    const achs = this._user.user.earnedAchievements;
+                    const newA = [];
+                    if (mult >= 500 && !achs.includes('wheel_500x')) {
+                        achs.push('wheel_500x');
+                        newA.push('🏆 First 500x Hit!');
+                    }
+                    if (isJackpot && !achs.includes('wheel_jackpot')) {
+                        achs.push('wheel_jackpot');
+                        newA.push('🔥 Jackpot Winner!');
+                    }
+                    if (this._user.stats.spins >= 100 && !achs.includes('wheel_100spins')) {
+                        achs.push('wheel_100spins');
+                        newA.push('💯 100 Spins Milestone! +500 GOLD');
+                        this._user.balance += 500;
+                        this._user.addTransaction('100 Spins Achievement +500 GOLD', 500, 'deposit');
+                    }
+                    if (newA.length > 0) {
+                        this._user.save();
+                        this._showResult(this._dom.resultDiv.innerHTML + '<br>' + newA.join('<br>'), false, 'win');
+                    }
+                }
+
+                // ── AUTO-SPIN ──────────────────
+                _openAutoSpin() {
+                    this._dom.autoSpinModal.classList.add('active');
+                    this._dom.autoSpinCount.value = 10;
+                    this._dom.autoStopWin.checked = false;
+                    this._dom.autoStopLoss.checked = false;
+                    this._dom.autoStopBalance.value = 0;
+                    this._dom.autoSpinStatus.textContent = '';
+                }
+                _closeAutoSpin() { this._dom.autoSpinModal.classList.remove('active'); }
+                _startAutoSpin() {
+                    const count = parseInt(this._dom.autoSpinCount.value) || 10;
+                    if (count < 1 || count > 1000) return;
+                    this._autoSpinRemaining = count;
+                    this._autoStopWin = this._dom.autoStopWin.checked;
+                    this._autoStopLoss = this._dom.autoStopLoss.checked;
+                    this._autoStopBalance = parseInt(this._dom.autoStopBalance.value) || 0;
+                    this._autoSpinning = true;
+                    this._dom.autoSpinBtn.classList.add('active');
+                    this._dom.autoSpinStatus.textContent = `🔄 Auto-spinning... ${count} remaining`;
+                    this._closeAutoSpin();
+                    this._handleSpin();
+                }
+                _stopAutoSpin(reason) {
+                    this._autoSpinning = false;
+                    this._autoSpinRemaining = 0;
+                    this._dom.autoSpinBtn.classList.remove('active');
+                    this._dom.autoSpinStatus.textContent = `⏹ Stopped: ${reason}`;
+                    setTimeout(() => { if (!this._autoSpinning) this._dom.autoSpinStatus.textContent = ''; }, 2500);
+                }
+
+                destroy() {
+                    this._clearResultTimer();
+                    this._engine.destroy();
+                    this._renderer.destroy();
+                    this._particles.destroy();
+                }
+            }
+
+            // ═══════════════════════════════════════════
+            //  INITIALIZATION
+            // ═══════════════════════════════════════════
+            async function init() {
+                const audio = new AudioManager();
+                const userMgr = new UserManager();
+                const loaded = await userMgr.load();
+                if (!loaded) return;
+
+                const game = new GameController(userMgr, audio);
+                const st = document.getElementById('soundToggle');
+                if (st) st.innerHTML = audio.enabled ? '<i class="fas fa-volume-up"></i>' :
+                    '<i class="fas fa-volume-mute"></i>';
+
+                const cleanup = () => { game.destroy();
+                    audio.destroy(); };
+                window.addEventListener('beforeunload', cleanup, { once: true });
+                window.addEventListener('pagehide', cleanup, { once: true });
+            }
+
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+            else init();
+        })();
+    </script>
+</body>
+</html>

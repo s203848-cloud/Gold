@@ -1,0 +1,2127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>SNAKES | Climb the ladder one step at a time. Each step increases your multiplier. But watch out, snakes can bite and send you down to zero.</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #f0c850;
+            --gold-bright: #ffe478;
+            --gold-dim: #b89830;
+            --gold-glow: rgba(240, 200, 80, 0.3);
+            --bg-deep: #050505;
+            --bg-card: rgba(18, 16, 13, 0.88);
+            --border-subtle: rgba(240, 200, 80, 0.12);
+            --border-medium: rgba(240, 200, 80, 0.3);
+            --text-primary: #f2efe8;
+            --text-secondary: #b8b2a6;
+            --text-muted: #7d776c;
+            --danger: #ff5252;
+            --danger-glow: rgba(255, 82, 82, 0.4);
+            --win: #4caf50;
+            --win-glow: rgba(76, 175, 80, 0.35);
+            --warning: #ff9800;
+            --rare: #e040fb;
+            --vip-gold: #ffd700;
+            --vip-diamond: #b9f2ff;
+            --vip-obsidian: #6a3de8;
+            --radius-xl: 26px;
+            --radius-lg: 18px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --radius-full: 60px;
+            --transition-smooth: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-card: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 40px rgba(240, 200, 80, 0.06);
+            --shadow-glow-gold: 0 0 35px rgba(240, 200, 80, 0.22);
+            --font-mono: 'Inter', monospace;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            font-size: 16px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(ellipse at 45% 25%, #100e0a 0%, #030202 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
+            color: var(--text-primary);
+            padding: clamp(0.5rem, 2vw, 1.1rem);
+            padding-bottom: calc(clamp(0.5rem, 2vw, 1.1rem) + var(--safe-bottom));
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            line-height: 1.5;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 22% 28%, rgba(255, 170, 50, 0.04) 0%, transparent 55%),
+                radial-gradient(circle at 72% 62%, rgba(200, 140, 30, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(180, 60, 255, 0.03) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        canvas#particleCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.8;
+        }
+        .game-container {
+            max-width: 1050px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            background: rgba(20, 18, 14, 0.75);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: var(--radius-full);
+            padding: 0.45rem 1.4rem;
+            border: 1px solid var(--border-subtle);
+            transition: var(--transition-fast);
+        }
+        .back-link {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(240, 200, 80, 0.07);
+            padding: 0.28rem 0.9rem;
+            border-radius: 40px;
+            transition: var(--transition-fast);
+            white-space: nowrap;
+        }
+        .back-link:hover {
+            background: rgba(240, 200, 80, 0.18);
+            color: var(--gold-bright);
+        }
+        .balance-chip {
+            background: #1c1914;
+            border: 1px solid var(--border-subtle);
+            border-radius: 40px;
+            padding: 0.28rem 0.9rem;
+            font-weight: 800;
+            font-size: 0.82rem;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+            letter-spacing: -0.3px;
+        }
+        .jackpot-badge {
+            background: linear-gradient(135deg, #ff5252, #ff8c42);
+            color: #fff;
+            font-weight: 800;
+            border-radius: 40px;
+            padding: 0.25rem 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.72rem;
+            white-space: nowrap;
+            box-shadow: 0 0 16px rgba(255, 82, 82, 0.3);
+            animation: jackpot-pulse 2s ease-in-out infinite;
+        }
+        @keyframes jackpot-pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 16px rgba(255, 82, 82, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 140, 66, 0.55);
+            }
+        }
+        .vip-badge {
+            border-radius: 40px;
+            padding: 0.2rem 0.7rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+        .vip-bronze {
+            background: rgba(205, 127, 50, 0.25);
+            color: #cd7f32;
+            border: 1px solid rgba(205, 127, 50, 0.4);
+        }
+        .vip-silver {
+            background: rgba(192, 192, 192, 0.2);
+            color: #c0c0c0;
+            border: 1px solid rgba(192, 192, 192, 0.4);
+        }
+        .vip-gold {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+        }
+        .vip-platinum {
+            background: rgba(229, 228, 226, 0.2);
+            color: #e5e4e2;
+            border: 1px solid rgba(229, 228, 226, 0.4);
+        }
+        .vip-diamond {
+            background: rgba(185, 242, 255, 0.2);
+            color: #b9f2ff;
+            border: 1px solid rgba(185, 242, 255, 0.4);
+        }
+        .vip-obsidian {
+            background: rgba(106, 61, 232, 0.25);
+            color: #b388ff;
+            border: 1px solid rgba(179, 136, 255, 0.4);
+        }
+        .sound-toggle {
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 1.15rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 0.3rem;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sound-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(240, 200, 80, 0.08);
+        }
+        .sound-toggle:active {
+            transform: scale(0.93);
+        }
+        .main-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-subtle);
+            padding: clamp(0.9rem, 2.5vw, 1.5rem);
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+        .main-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(240, 200, 80, 0.2), transparent);
+            pointer-events: none;
+        }
+        .ladder-container {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .steps-panel {
+            flex: 2;
+            min-width: 280px;
+            background: rgba(0, 0, 0, 0.32);
+            border-radius: var(--radius-lg);
+            padding: 0.9rem;
+            border: 1px solid var(--border-subtle);
+            max-height: 580px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        .steps-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+        .steps-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .steps-panel::-webkit-scrollbar-thumb {
+            background: rgba(240, 200, 80, 0.2);
+            border-radius: 4px;
+        }
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .step-item {
+            background: #1f1b16;
+            border-radius: var(--radius-sm);
+            padding: 0.4rem 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #3a332c;
+            transition: all 0.25s;
+            cursor: default;
+            position: relative;
+            min-height: 42px;
+        }
+        .step-item.current {
+            background: #2a241c;
+            border-left-color: var(--gold);
+            box-shadow: 0 0 14px rgba(240, 200, 80, 0.25);
+            animation: current-step-glow 1.5s ease-in-out infinite;
+        }
+        @keyframes current-step-glow {
+            0%,
+            100% {
+                box-shadow: 0 0 14px rgba(240, 200, 80, 0.25);
+            }
+            50% {
+                box-shadow: 0 0 26px rgba(240, 200, 80, 0.5);
+            }
+        }
+        .step-item.cleared {
+            opacity: 0.65;
+            border-left-color: #4caf50;
+            background: #1a1f1a;
+        }
+        .step-item.snake-hit {
+            animation: snake-flash 0.5s ease;
+            border-left-color: #ff5252 !important;
+            background: #2a1515 !important;
+        }
+        @keyframes snake-flash {
+            0%,
+            100% {
+                background: #1f1b16;
+            }
+            40% {
+                background: #3a1010;
+            }
+        }
+        .step-number {
+            font-weight: 800;
+            width: 28px;
+            font-size: 0.85rem;
+        }
+        .step-mult {
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 0.82rem;
+            min-width: 50px;
+        }
+        .step-risk {
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            min-width: 40px;
+            text-align: right;
+        }
+        .bonus-badge {
+            font-size: 0.55rem;
+            background: rgba(76, 175, 80, 0.2);
+            padding: 0.1rem 0.35rem;
+            border-radius: 20px;
+            margin-left: 0.2rem;
+            white-space: nowrap;
+        }
+        .rare-badge {
+            font-size: 0.55rem;
+            background: rgba(224, 64, 251, 0.2);
+            padding: 0.1rem 0.35rem;
+            border-radius: 20px;
+            margin-left: 0.2rem;
+            white-space: nowrap;
+            color: #e040fb;
+        }
+        .info-panel {
+            flex: 1;
+            min-width: 240px;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: var(--radius-lg);
+            padding: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            border: 1px solid var(--border-subtle);
+        }
+        .multiplier-area {
+            text-align: center;
+            padding: 0.3rem 0;
+        }
+        .multiplier-digit {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            color: var(--gold-bright);
+            letter-spacing: -1px;
+            transition: all 0.3s;
+            text-shadow: 0 0 30px rgba(240, 200, 80, 0.4);
+        }
+        .multiplier-digit.danger {
+            color: #ff8c42;
+            text-shadow: 0 0 30px rgba(255, 140, 66, 0.5);
+            animation: pulse-danger 0.6s ease-in-out infinite;
+        }
+        @keyframes pulse-danger {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        .antidote-badge {
+            background: #2e7d32;
+            border-radius: 40px;
+            padding: 0.2rem 0.7rem;
+            font-size: 0.68rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            animation: antidote-glow 2s ease-in-out infinite;
+        }
+        @keyframes antidote-glow {
+            0%,
+            100% {
+                box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+            }
+        }
+        .powerup-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .powerup-btn {
+            background: rgba(240, 200, 80, 0.07);
+            border: 1px solid var(--border-subtle);
+            border-radius: 30px;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            user-select: none;
+            white-space: nowrap;
+            color: var(--text-secondary);
+        }
+        .powerup-btn:hover {
+            background: rgba(240, 200, 80, 0.16);
+            border-color: var(--border-medium);
+            color: #fff;
+        }
+        .powerup-btn.active {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: #4caf50;
+            color: #4caf50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+        }
+        .powerup-btn.owned {
+            background: rgba(240, 200, 80, 0.15);
+            border-color: var(--gold-dim);
+            color: var(--gold);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.55rem 1.3rem;
+            border-radius: var(--radius-full);
+            font-weight: 800;
+            font-size: 0.8rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            letter-spacing: -0.2px;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:active {
+            transform: scale(0.94);
+        }
+        .btn-climb {
+            background: linear-gradient(135deg, #b8860b, #daa520);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+        .btn-climb:hover:not(:disabled) {
+            background: linear-gradient(135deg, #c99718, #e6b800);
+            transform: scale(1.03);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(240, 200, 80, 0.2);
+        }
+        .btn-cashout {
+            background: #2e7d32;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+        .btn-cashout:hover:not(:disabled) {
+            background: #388e3c;
+            transform: scale(1.03);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 25px rgba(76, 175, 80, 0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #e8a830, #f5d060);
+            color: #1a1510;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), 0 0 18px rgba(240, 200, 80, 0.15);
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.07);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border-medium);
+            color: var(--text-primary);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+            filter: grayscale(0.2);
+        }
+        .bet-control {
+            display: flex;
+            gap: 0.35rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .bet-input {
+            background: #1b1712;
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            padding: 0.38rem 0.6rem;
+            width: 95px;
+            text-align: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            transition: border-color 0.2s;
+        }
+        .bet-input:focus {
+            border-color: var(--gold);
+            outline: none;
+            box-shadow: 0 0 10px rgba(240, 200, 80, 0.12);
+        }
+        .preset-sm {
+            background: rgba(240, 200, 80, 0.06);
+            border: 1px solid var(--border-subtle);
+            border-radius: 22px;
+            padding: 0.18rem 0.5rem;
+            font-size: 0.6rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition-fast);
+            white-space: nowrap;
+            user-select: none;
+        }
+        .preset-sm:hover {
+            background: rgba(240, 200, 80, 0.18);
+            color: #fff;
+        }
+        .result-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-md);
+            padding: 0.55rem 0.7rem;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+            letter-spacing: -0.2px;
+            min-height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .result-panel.win {
+            background: rgba(76, 175, 80, 0.14);
+            border-color: rgba(76, 175, 80, 0.4);
+            color: #a5d6a7;
+        }
+        .result-panel.loss {
+            background: rgba(255, 82, 82, 0.1);
+            border-color: rgba(255, 82, 82, 0.35);
+            color: #ef9a9a;
+        }
+        .result-panel.rare {
+            background: rgba(224, 64, 251, 0.12);
+            border-color: rgba(224, 64, 251, 0.4);
+            color: #e0a0ff;
+            animation: rare-glow 0.5s ease-in-out 3;
+        }
+        @keyframes rare-glow {
+            0%,
+            100% {
+                box-shadow: 0 0 15px rgba(224, 64, 251, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 35px rgba(224, 64, 251, 0.5);
+            }
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.6rem;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.022);
+            padding: 0.35rem 0.55rem;
+            border-radius: var(--radius-sm);
+            flex: 1;
+            text-align: center;
+            font-size: 0.65rem;
+            letter-spacing: -0.2px;
+            min-width: 55px;
+        }
+        .stat-card strong {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--gold);
+            margin-top: 2px;
+        }
+        .milestone-note {
+            text-align: center;
+            font-size: 0.64rem;
+            margin-top: 0.4rem;
+            color: var(--gold);
+            letter-spacing: -0.2px;
+        }
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: rgba(20, 16, 10, 0.95);
+            border: 1px solid var(--gold);
+            border-radius: var(--radius-md);
+            padding: 0.6rem 1rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            box-shadow: 0 0 30px rgba(240, 200, 80, 0.4);
+            animation: achievement-in 0.5s ease, achievement-out 0.5s ease 2.5s forwards;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        @keyframes achievement-in {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes achievement-out {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-box {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid var(--border-medium);
+            box-shadow: var(--shadow-card);
+        }
+        .modal-box h3 {
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        .modal-box .choice-btn {
+            padding: 0.4rem 0.9rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border: 1px solid var(--border-medium);
+            background: rgba(240, 200, 80, 0.1);
+            color: #fff;
+            transition: var(--transition-fast);
+            margin: 0.2rem;
+        }
+        .modal-box .choice-btn:hover {
+            background: rgba(240, 200, 80, 0.25);
+            border-color: var(--gold);
+        }
+        .shake {
+            animation: screen-shake 0.5s ease;
+        }
+        @keyframes screen-shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            10% {
+                transform: translateX(-8px);
+            }
+            20% {
+                transform: translateX(8px);
+            }
+            30% {
+                transform: translateX(-6px);
+            }
+            40% {
+                transform: translateX(6px);
+            }
+            50% {
+                transform: translateX(-3px);
+            }
+            60% {
+                transform: translateX(3px);
+            }
+            70% {
+                transform: translateX(-1px);
+            }
+            80% {
+                transform: translateX(1px);
+            }
+        }
+        .floating-text {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10001;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--gold-bright);
+            text-shadow: 0 0 20px rgba(240, 200, 80, 0.7);
+            animation: float-up 1.5s ease-out forwards;
+        }
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-120px) scale(1.4);
+            }
+        }
+        @media (max-width: 750px) {
+            .ladder-container {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            .steps-panel {
+                max-height: 350px;
+            }
+            .step-item {
+                padding: 0.3rem 0.6rem;
+                min-height: 36px;
+            }
+            .step-number {
+                font-size: 0.72rem;
+                width: 22px;
+            }
+            .step-mult {
+                font-size: 0.7rem;
+                min-width: 40px;
+            }
+            .step-risk {
+                font-size: 0.55rem;
+                min-width: 30px;
+            }
+            .btn {
+                padding: 0.45rem 1rem;
+                font-size: 0.7rem;
+            }
+            .multiplier-digit {
+                font-size: 1.8rem;
+            }
+            .top-bar {
+                padding: 0.35rem 0.8rem;
+                gap: 0.3rem;
+            }
+            .jackpot-badge {
+                font-size: 0.6rem;
+                padding: 0.18rem 0.5rem;
+            }
+            .balance-chip {
+                font-size: 0.7rem;
+                padding: 0.22rem 0.6rem;
+            }
+            .vip-badge {
+                font-size: 0.55rem;
+                padding: 0.15rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+    <div class="game-container">
+        <div class="top-bar">
+            <a href="../home.html" class="back-link"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <div class="balance-chip"><i class="fas fa-coins"></i> <span id="balanceDisplay">0</span> GOLD</div>
+            <span id="vipBadge" class="vip-badge vip-bronze">🥉 Bronze</span>
+            <div class="jackpot-badge"><i class="fas fa-trophy"></i> JACKPOT: <span id="jackpotAmount">0</span></div>
+            <button id="soundToggle" class="sound-toggle" aria-label="Toggle sound"><i class="fas fa-volume-up"></i></button>
+        </div>
+        <div class="main-card" id="mainCard">
+            <div class="ladder-container">
+                <div class="steps-panel" id="stepsPanel">
+                    <div style="margin-bottom:0.4rem;font-weight:700;font-size:0.8rem;letter-spacing:1px;">🐍 LADDER STEPS</div>
+                    <div class="step-list" id="stepList"></div>
+                </div>
+                <div class="info-panel">
+                    <div class="multiplier-area">
+                        <div style="font-size:0.6rem;letter-spacing:2px;color:var(--text-muted);">CURRENT MULTIPLIER</div>
+                        <div class="multiplier-digit" id="multiplierDisplay">1.00x</div>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                        <span id="antidoteStatus" style="font-size:0.7rem;">No Antidote</span>
+                        <span id="shieldStatus" style="font-size:0.65rem;color:var(--text-muted);"></span>
+                    </div>
+                    <div>
+                        <div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.2rem;">BET AMOUNT</div>
+                        <div class="bet-control">
+                            <input type="number" id="betAmount" class="bet-input" value="10" min="1" step="1" inputmode="numeric">
+                            <span class="preset-sm" data-bet="half">½</span>
+                            <span class="preset-sm" data-bet="double">2×</span>
+                            <span class="preset-sm" data-bet="10">10</span>
+                            <span class="preset-sm" data-bet="50">50</span>
+                            <span class="preset-sm" data-bet="100">100</span>
+                            <span class="preset-sm" data-bet="max">MAX</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.6rem;color:var(--text-muted);margin-bottom:0.15rem;">POWER-UPS</div>
+                        <div class="powerup-row">
+                            <span class="powerup-btn" id="charmerBtn" data-powerup="charmer">🐍 Charmer (50G)</span>
+                            <span class="powerup-btn" id="bootsBtn" data-powerup="boots">👢 Boots (100G)</span>
+                            <span class="powerup-btn" id="shieldBtn" data-powerup="shield">🛡️ Shield (150G)</span>
+                            <span class="powerup-btn" id="charmBtn" data-powerup="charm">🍀 Charm (200G)</span>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="climbBtn" class="btn btn-climb" disabled><i class="fas fa-arrow-up"></i> Climb</button>
+                        <button id="cashoutBtn" class="btn btn-cashout" disabled><i class="fas fa-hand-holding-usd"></i> Cash Out</button>
+                        <button id="newGameBtn" class="btn btn-primary"><i class="fas fa-play"></i> New Game</button>
+                    </div>
+                    <div class="result-panel" id="resultMessage">🐍 Press New Game to start</div>
+                </div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-card">🎲 Games<strong id="gamesCount">0</strong></div>
+                <div class="stat-card">🏆 Wins<strong id="winsCount">0</strong></div>
+                <div class="stat-card">📈 P/L<strong id="sessionPL">0</strong></div>
+                <div class="stat-card">🏔️ Best Step<strong id="highestStep">0</strong></div>
+                <div class="stat-card">💎 Best Win<strong id="biggestWin">0</strong></div>
+                <div class="stat-card">🎯 Win Rate<strong id="winRate">0%</strong></div>
+            </div>
+            <div class="milestone-note" id="milestoneNote"></div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="doubleModal">
+        <div class="modal-box">
+            <h3>⚡ DOUBLE OR NOTHING</h3>
+            <p style="font-size:0.8rem;">You won <strong id="doubleAmount">0</strong> GOLD.<br>Choose your risk level:</p>
+            <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin:0.8rem 0;">
+                <button class="choice-btn" id="double2x">Double (50%)</button>
+                <button class="choice-btn" id="double3x">Triple (33%)</button>
+                <button class="choice-btn" id="double4x">Quad (25%)</button>
+            </div>
+            <button class="choice-btn" id="doubleDeclineBtn" style="background:rgba(255,82,82,0.2);border-color:#ff5252;">Decline & Keep</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="snakePitModal">
+        <div class="modal-box">
+            <h3>🕳️ SNAKE PIT!</h3>
+            <p style="font-size:0.78rem;">Choose a path to escape:</p>
+            <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;margin:0.8rem 0;">
+                <button class="choice-btn" data-pit="left">⬅️ Left Path</button>
+                <button class="choice-btn" data-pit="center">⬆️ Center Path</button>
+                <button class="choice-btn" data-pit="right">➡️ Right Path</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        (() => {
+            // ══════════════════════════════════════════
+            //  CONFIGURATION
+            // ══════════════════════════════════════════
+            const CONFIG = Object.freeze({
+                STORAGE_KEY_USERS: 'gold_users',
+                STORAGE_KEY_SESSION: 'gold_current_user',
+                STORAGE_KEY_SOUND: 'snakes_sound_v2',
+                STORAGE_KEY_JACKPOT: 'snakes_global_jackpot',
+                STORAGE_KEY_DAILY: 'snakes_daily_data',
+                JACKPOT_CONTRIBUTION: 0.005,
+                MAX_STEP: 15,
+                MILESTONE_SPINS: 10,
+                MILESTONE_REWARD: 500,
+                VIP_LEVELS: { bronze: 0, silver: 500, gold: 2000, platinum: 5000, diamond: 15000, obsidian: 50000 },
+                VIP_NAMES: { bronze: '🥉 Bronze', silver: '🥈 Silver', gold: '🥇 Gold', platinum: '💍 Platinum',
+                    diamond: '💎 Diamond', obsidian: '🌑 Obsidian' },
+                RARE_EVENT_CHANCE: 0.04,
+                BONUS_EVENT_CHANCE_MULT: 1.0,
+            });
+
+            // ══════════════════════════════════════════
+            //  STEP DATA (15 steps)
+            // ══════════════════════════════════════════
+            const STEPS = [
+                { step: 1, multiplier: 1.05, snakeProb: 0.03, bonusChance: 0.08, bonusType: 'antidote',
+                    rareChance: 0.01 },
+                { step: 2, multiplier: 1.15, snakeProb: 0.06, bonusChance: 0.08, bonusType: 'antidote',
+                    rareChance: 0.015 },
+                { step: 3, multiplier: 1.30, snakeProb: 0.09, bonusChance: 0.10, bonusType: 'golden_chest',
+                    rareChance: 0.02 },
+                { step: 4, multiplier: 1.50, snakeProb: 0.13, bonusChance: 0.10, bonusType: 'antidote',
+                    rareChance: 0.025 },
+                { step: 5, multiplier: 1.80, snakeProb: 0.18, bonusChance: 0.12, bonusType: 'snake_egg',
+                    rareChance: 0.03 },
+                { step: 6, multiplier: 2.20, snakeProb: 0.23, bonusChance: 0.12, bonusType: 'fortune_tile',
+                    rareChance: 0.035 },
+                { step: 7, multiplier: 2.80, snakeProb: 0.28, bonusChance: 0.14, bonusType: 'golden_chest',
+                    rareChance: 0.04 },
+                { step: 8, multiplier: 3.50, snakeProb: 0.34, bonusChance: 0.14, bonusType: 'lucky_ladder',
+                    rareChance: 0.045 },
+                { step: 9, multiplier: 4.50, snakeProb: 0.40, bonusChance: 0.16, bonusType: 'snake_egg',
+                    rareChance: 0.05 },
+                { step: 10, multiplier: 6.00, snakeProb: 0.47, bonusChance: 0.16, bonusType: 'fortune_tile',
+                    rareChance: 0.055 },
+                { step: 11, multiplier: 8.00, snakeProb: 0.54, bonusChance: 0.18, bonusType: 'golden_chest',
+                    rareChance: 0.06 },
+                { step: 12, multiplier: 11.00, snakeProb: 0.62, bonusChance: 0.18, bonusType: 'lucky_ladder',
+                    rareChance: 0.07 },
+                { step: 13, multiplier: 15.00, snakeProb: 0.70, bonusChance: 0.20, bonusType: 'snake_egg',
+                    rareChance: 0.08 },
+                { step: 14, multiplier: 22.00, snakeProb: 0.78, bonusChance: 0.20, bonusType: 'fortune_tile',
+                    rareChance: 0.09 },
+                { step: 15, multiplier: 35.00, snakeProb: 0.87, bonusChance: 0.25, bonusType: 'treasure_chamber',
+                    rareChance: 0.12 },
+            ];
+
+            const RARE_EVENTS = ['king_cobra', 'golden_snake', 'snake_pit', 'treasure_chamber', 'ancient_relic'];
+            const BONUS_TYPES = ['antidote', 'golden_chest', 'snake_egg', 'fortune_tile', 'lucky_ladder',
+            'treasure_chamber'];
+            const POWERUP_COSTS = { charmer: 50, boots: 100, shield: 150, charm: 200 };
+
+            // ══════════════════════════════════════════
+            //  UTILITY HELPERS
+            // ══════════════════════════════════════════
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+            const rand = (min, max) => min + Math.random() * (max - min);
+            const safeJson = (str, fb = {}) => { try { return JSON.parse(str) || fb; } catch { return fb; } };
+            const formatGold = (n) => Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+
+            // ══════════════════════════════════════════
+            //  STORAGE MANAGER
+            // ══════════════════════════════════════════
+            class StorageManager {
+                static getUsers() { return safeJson(localStorage.getItem(CONFIG.STORAGE_KEY_USERS), {}); }
+                static saveUsers(u) { try { localStorage.setItem(CONFIG.STORAGE_KEY_USERS, JSON.stringify(u)); } catch {} }
+                static getSession() { return safeJson(sessionStorage.getItem(CONFIG.STORAGE_KEY_SESSION), null); }
+                static setSession(u) { try { sessionStorage.setItem(CONFIG.STORAGE_KEY_SESSION, JSON.stringify({ username: u
+                            .username, balance: u.balance })); } catch {} }
+                static clearSession() { sessionStorage.removeItem(CONFIG.STORAGE_KEY_SESSION); }
+                static getGlobalJackpot() { return parseFloat(localStorage.getItem(CONFIG.STORAGE_KEY_JACKPOT) || '0'); }
+                static setGlobalJackpot(v) { localStorage.setItem(CONFIG.STORAGE_KEY_JACKPOT, v.toString()); }
+                static getDailyData() { return safeJson(localStorage.getItem(CONFIG.STORAGE_KEY_DAILY), { streak: 0,
+                        lastDate: '', claimed: false }); }
+                static setDailyData(d) { localStorage.setItem(CONFIG.STORAGE_KEY_DAILY, JSON.stringify(d)); }
+            }
+
+            // ══════════════════════════════════════════
+            //  AUDIO MANAGER
+            // ══════════════════════════════════════════
+            class AudioManager {
+                constructor() {
+                    this._ctx = null;
+                    this._enabled = localStorage.getItem(CONFIG.STORAGE_KEY_SOUND) !== 'false';
+                    this._bound = this._init.bind(this);
+                    document.addEventListener('pointerdown', this._bound, { once: true });
+                }
+                _init() {
+                    if (!this._ctx && this._enabled) {
+                        try {
+                            this._ctx = new(window.AudioContext || window.webkitAudioContext)();
+                            if (this._ctx.state === 'suspended') this._ctx.resume();
+                        } catch {}
+                    }
+                }
+                get enabled() { return this._enabled; }
+                toggle() {
+                    this._enabled = !this._enabled;
+                    localStorage.setItem(CONFIG.STORAGE_KEY_SOUND, this._enabled);
+                    if (this._enabled && !this._ctx) this._init();
+                    return this._enabled;
+                }
+                _tone(f, d, v = 0.08, t = 'sine') {
+                    if (!this._enabled || !this._ctx) return;
+                    if (this._ctx.state === 'suspended') this._ctx.resume();
+                    const n = this._ctx.currentTime;
+                    const o = this._ctx.createOscillator();
+                    const g = this._ctx.createGain();
+                    o.type = t;
+                    o.connect(g);
+                    g.connect(this._ctx.destination);
+                    o.frequency.setValueAtTime(f, n);
+                    g.gain.setValueAtTime(v, n);
+                    g.gain.exponentialRampToValueAtTime(0.001, n + d);
+                    o.start(n);
+                    o.stop(n + d + 0.01);
+                }
+                play(type) {
+                    switch (type) {
+                        case 'start':
+                            this._tone(500, 0.2, 0.09);
+                            break;
+                        case 'climb':
+                            this._tone(660, 0.08, 0.06);
+                            break;
+                        case 'win':
+                            this._tone(880, 0.12, 0.09);
+                            setTimeout(() => this._tone(1100, 0.12, 0.09), 120);
+                            break;
+                        case 'bigwin':
+                            this._tone(660, 0.15, 0.1);
+                            setTimeout(() => this._tone(880, 0.15, 0.1), 150);
+                            setTimeout(() => this._tone(1320, 0.2, 0.11), 300);
+                            break;
+                        case 'lose':
+                            this._tone(260, 0.35, 0.08, 'sawtooth');
+                            break;
+                        case 'snake':
+                            this._tone(180, 0.4, 0.12, 'sawtooth');
+                            break;
+                        case 'shield':
+                            this._tone(440, 0.12, 0.07);
+                            break;
+                        case 'bonus':
+                            this._tone(1046, 0.15, 0.08);
+                            break;
+                        case 'rare':
+                            for (let i = 0; i < 3; i++) setTimeout(() => this._tone(700 + i * 200, 0.15, 0.08), i *
+                                120);
+                            break;
+                        case 'jackpot':
+                            for (let i = 0; i < 5; i++) setTimeout(() => this._tone(500 + i * 250, 0.2, 0.1), i *
+                                150);
+                            break;
+                        case 'click':
+                            this._tone(900, 0.04, 0.03);
+                            break;
+                        case 'achievement':
+                            this._tone(1200, 0.2, 0.1);
+                            setTimeout(() => this._tone(1600, 0.2, 0.1), 150);
+                            break;
+                    }
+                }
+                destroy() {
+                    document.removeEventListener('pointerdown', this._bound);
+                    if (this._ctx) { this._ctx.close().catch(() => {}); }
+                }
+            }
+
+            // ══════════════════════════════════════════
+            //  USER SESSION
+            // ══════════════════════════════════════════
+            class UserSession {
+                constructor() {
+                    this.user = null;
+                    this._globalJackpot = StorageManager.getGlobalJackpot();
+                }
+                async load() {
+                    const s = StorageManager.getSession();
+                    if (!s) { this._redirect(); return false; }
+                    const users = StorageManager.getUsers();
+                    let u = users[s.username];
+                    if (!u) { this._redirect(); return false; }
+                    u.globalStats = u.globalStats || { totalWagered: 0, totalWon: 0, totalGames: 0, totalWins: 0,
+                        currentStreak: 0, bestStreak: 0, totalLosses: 0 };
+                    u.gamePlayCount = u.gamePlayCount || {};
+                    u.gameOutcomes = u.gameOutcomes || [];
+                    u.transactions = u.transactions || [];
+                    u.bankBalance = u.bankBalance ?? 0;
+                    u.xp = u.xp ?? 0;
+                    u.snakesStats = u.snakesStats || { gamesPlayed: 0, wins: 0, totalWagered: 0, totalPayout: 0,
+                        highestStep: 0, biggestWin: 0, jackpotWins: 0, rareEventsFound: 0, totalClimbs: 0,
+                        bestMultiplier: 1 };
+                    u.earnedAchievements = u.earnedAchievements || [];
+                    u.vipLevel = u.vipLevel || 'bronze';
+                    u.snakesPowerups = u.snakesPowerups || { charmer: 0, boots: 0, shield: 0, charm: 0 };
+                    this.user = u;
+                    StorageManager.setSession(u);
+                    return true;
+                }
+                _redirect() { StorageManager.clearSession(); try { window.location.href =
+                    '../../sign-in.html'; } catch {} }
+                async save() {
+                    const users = StorageManager.getUsers();
+                    users[this.user.username] = this.user;
+                    StorageManager.saveUsers(users);
+                    StorageManager.setSession(this.user);
+                    StorageManager.setGlobalJackpot(this._globalJackpot);
+                }
+                get balance() { return this.user?.balance ?? 0; }
+                set balance(v) { if (this.user) this.user.balance = Math.max(0, v); }
+                get globalJackpot() { return this._globalJackpot; }
+                set globalJackpot(v) { this._globalJackpot = Math.max(0, v); }
+                get vipLevel() {
+                    const xp = this.user?.xp || 0;
+                    const levels = CONFIG.VIP_LEVELS;
+                    if (xp >= levels.obsidian) return 'obsidian';
+                    if (xp >= levels.diamond) return 'diamond';
+                    if (xp >= levels.platinum) return 'platinum';
+                    if (xp >= levels.gold) return 'gold';
+                    if (xp >= levels.silver) return 'silver';
+                    return 'bronze';
+                }
+                get vipName() { return CONFIG.VIP_NAMES[this.vipLevel] || '🥉 Bronze'; }
+                get vipMultiplier() {
+                    const m = { bronze: 1, silver: 1.1, gold: 1.2, platinum: 1.35, diamond: 1.55, obsidian: 1.8 };
+                    return m[this.vipLevel] || 1;
+                }
+                addTransaction(desc, amount, type) {
+                    if (!this.user) return;
+                    this.user.transactions.unshift({ desc, amount, type, date: new Date().toISOString() });
+                    if (this.user.transactions.length > 150) this.user.transactions.length = 150;
+                }
+                get stats() { return this.user?.snakesStats || {}; }
+                get sessionStats() {
+                    const s = this.stats;
+                    const profit = (s.totalPayout || 0) - (s.totalWagered || 0);
+                    return {
+                        games: s.gamesPlayed || 0,
+                        wins: s.wins || 0,
+                        profit,
+                        highestStep: s.highestStep || 0,
+                        biggestWin: s.biggestWin || 0,
+                        winRate: s.gamesPlayed > 0 ? ((s.wins / s.gamesPlayed) * 100).toFixed(1) : '0',
+                        bestMultiplier: s.bestMultiplier || 1,
+                    };
+                }
+                addPowerup(type, qty = 1) {
+                    if (!this.user.snakesPowerups) this.user.snakesPowerups = { charmer: 0, boots: 0, shield: 0,
+                    charm: 0 };
+                    this.user.snakesPowerups[type] = (this.user.snakesPowerups[type] || 0) + qty;
+                }
+                usePowerup(type) {
+                    if (!this.user.snakesPowerups) return false;
+                    if ((this.user.snakesPowerups[type] || 0) > 0) {
+                        this.user.snakesPowerups[type]--;
+                        return true;
+                    }
+                    return false;
+                }
+                getPowerupCount(type) { return this.user?.snakesPowerups?.[type] || 0; }
+            }
+
+            // ══════════════════════════════════════════
+            //  GAME ENGINE
+            // ══════════════════════════════════════════
+            class GameEngine {
+                constructor(userSession, audio) {
+                    this._user = userSession;
+                    this._audio = audio;
+                    this.reset();
+                }
+                reset() {
+                    this.active = false;
+                    this.currentStep = 0;
+                    this.currentMultiplier = 1.0;
+                    this.currentBet = 0;
+                    this.hasAntidote = false;
+                    this.hasCobraShield = false;
+                    this.charmerActive = false;
+                    this.bootsActive = false;
+                    this.charmActive = false;
+                    this.snakePitPending = null;
+                    this.doubleMode = false;
+                    this.doubleMultiplier = 1;
+                    this.totalWageredThisGame = 0;
+                }
+                get isActive() { return this.active; }
+                get stepData() {
+                    return this.currentStep >= 1 && this.currentStep <= CONFIG.MAX_STEP ? STEPS[this.currentStep -
+                        1] : null;
+                }
+                get effectiveSnakeProb() {
+                    const sd = this.stepData;
+                    if (!sd) return 0;
+                    let p = sd.snakeProb;
+                    if (this.charmerActive) p *= 0.5;
+                    return clamp(p, 0.01, 0.95);
+                }
+                get effectiveBonusChance() {
+                    const sd = this.stepData;
+                    if (!sd) return 0;
+                    let c = sd.bonusChance;
+                    if (this.charmActive) c *= 1.8;
+                    return clamp(c, 0, 0.5);
+                }
+                get effectiveRareChance() {
+                    const sd = this.stepData;
+                    if (!sd) return 0;
+                    let r = sd.rareChance;
+                    if (this.charmActive) r *= 1.5;
+                    return clamp(r, 0, 0.2);
+                }
+                async startGame(bet, powerupsActive = {}) {
+                    if (this.active) return false;
+                    if (bet <= 0 || bet > this._user.balance) return false;
+                    let totalCost = bet;
+                    for (const [k, active] of Object.entries(powerupsActive)) {
+                        if (active && this._user.getPowerupCount(k) === 0) totalCost += POWERUP_COSTS[k] || 0;
+                    }
+                    if (totalCost > this._user.balance) return false;
+                    this._user.balance -= totalCost;
+                    this._user.addTransaction(`Snakes game bet ${formatGold(bet)} + powerups`, -totalCost, 'withdraw');
+                    await this._user.save();
+                    this.reset();
+                    this.currentBet = bet;
+                    this.currentStep = 1;
+                    this.currentMultiplier = STEPS[0].multiplier;
+                    this.active = true;
+                    this.totalWageredThisGame = bet;
+                    for (const [k, active] of Object.entries(powerupsActive)) {
+                        if (active && this._user.getPowerupCount(k) > 0) {
+                            this._user.usePowerup(k);
+                            if (k === 'charmer') this.charmerActive = true;
+                            if (k === 'boots') this.bootsActive = true;
+                            if (k === 'shield') this.hasCobraShield = true;
+                            if (k === 'charm') this.charmActive = true;
+                        } else if (active) {
+                            if (k === 'charmer') this.charmerActive = true;
+                            if (k === 'boots') this.bootsActive = true;
+                            if (k === 'shield') this.hasCobraShield = true;
+                            if (k === 'charm') this.charmActive = true;
+                        }
+                    }
+                    // Jackpot contribution
+                    const jpContrib = Math.floor(bet * CONFIG.JACKPOT_CONTRIBUTION);
+                    this._user.globalJackpot += jpContrib;
+                    await this._user.save();
+                    this._audio.play('start');
+                    return true;
+                }
+                processClimb() {
+                    if (!this.active) return null;
+                    const sd = this.stepData;
+                    if (!sd) return this._finishGame(true);
+                    const result = { type: 'climb', snake: false, bonus: null, rare: null, antidoteUsed: false,
+                        cobraShieldUsed: false, bootsSkipped: 0, snakePit: false };
+                    // Snake check
+                    let snakeRoll = Math.random();
+                    let effectiveSnake = this.effectiveSnakeProb;
+                    if (snakeRoll < effectiveSnake) {
+                        if (this.hasAntidote) {
+                            this.hasAntidote = false;
+                            result.antidoteUsed = true;
+                            result.snake = false;
+                        } else if (this.hasCobraShield) {
+                            this.hasCobraShield = false;
+                            result.cobraShieldUsed = true;
+                            result.snake = false;
+                        } else {
+                            result.snake = true;
+                            return result;
+                        }
+                    }
+                    // Safe - advance
+                    let stepsToAdvance = 1;
+                    if (this.bootsActive && Math.random() < 0.3) {
+                        stepsToAdvance = Math.floor(rand(1, 4));
+                        result.bootsSkipped = stepsToAdvance - 1;
+                    }
+                    const newStep = Math.min(this.currentStep + stepsToAdvance, CONFIG.MAX_STEP);
+                    this.currentStep = newStep;
+                    this.currentMultiplier = STEPS[this.currentStep - 1].multiplier;
+                    if (this.doubleMode) this.currentMultiplier *= this.doubleMultiplier;
+                    // Bonus check
+                    const newSd = STEPS[this.currentStep - 1];
+                    const bonusRoll = Math.random();
+                    if (bonusRoll < this.effectiveBonusChance && newSd.bonusType) {
+                        result.bonus = this._processBonus(newSd.bonusType);
+                    }
+                    // Rare event check
+                    const rareRoll = Math.random();
+                    if (rareRoll < this.effectiveRareChance) {
+                        const rareType = RARE_EVENTS[Math.floor(Math.random() * RARE_EVENTS.length)];
+                        result.rare = this._processRare(rareType);
+                    }
+                    if (this.currentStep >= CONFIG.MAX_STEP) {
+                        result.reachedTop = true;
+                    }
+                    return result;
+                }
+                _processBonus(type) {
+                    const bonus = { type, reward: 0, antidote: false, multiplierBoost: 0, extraSteps: 0, message: '' };
+                    switch (type) {
+                        case 'antidote':
+                            this.hasAntidote = true;
+                            bonus.antidote = true;
+                            bonus.message = '💊 Antidote found! Blocks next snake.';
+                            break;
+                        case 'golden_chest':
+                            bonus.reward = Math.floor(rand(50, 300) * this._user.vipMultiplier);
+                            this._user.balance += bonus.reward;
+                            bonus.message = `🎁 Golden Chest! +${formatGold(bonus.reward)} GOLD`;
+                            break;
+                        case 'snake_egg':
+                            const eggRoll = Math.random();
+                            if (eggRoll < 0.4) { bonus.multiplierBoost = rand(0.1, 0.5);
+                                this.currentMultiplier += bonus.multiplierBoost;
+                                bonus.message = '🥚 Snake Egg hatched! Multiplier boost!'; } else if (eggRoll < 0.7) { this
+                                    .hasAntidote = true;
+                                bonus.antidote = true;
+                                bonus.message = '🥚 Snake Egg hatched into Antidote!'; } else { bonus.reward = Math.floor(
+                                    rand(30, 150) * this._user.vipMultiplier);
+                                this._user.balance += bonus.reward;
+                                bonus.message = `🥚 Snake Egg hatched! +${formatGold(bonus.reward)} GOLD`; }
+                            break;
+                        case 'fortune_tile':
+                            const fRoll = Math.random();
+                            if (fRoll < 0.3) { bonus.multiplierBoost = rand(0.5, 2);
+                                this.currentMultiplier += bonus.multiplierBoost;
+                                bonus.message = '🔮 Fortune: Multiplier doubled!'; } else if (fRoll < 0.55) { bonus.reward =
+                                    Math.floor(rand(80, 400) * this._user.vipMultiplier);
+                                this._user.balance += bonus.reward;
+                                bonus.message = `🔮 Fortune: +${formatGold(bonus.reward)} GOLD`; } else if (fRoll < 0.75) {
+                                bonus.extraSteps = Math.floor(rand(1, 3));
+                                this.currentStep = Math.min(this.currentStep + bonus.extraSteps, CONFIG.MAX_STEP);
+                                this.currentMultiplier = STEPS[this.currentStep - 1].multiplier;
+                                if (this.doubleMode) this.currentMultiplier *= this.doubleMultiplier;
+                                bonus.message =
+                                `🔮 Fortune: Skip ${bonus.extraSteps} step(s)!`; } else { this.hasAntidote = true;
+                                bonus.antidote = true;
+                                bonus.message = '🔮 Fortune: Temporary protection!'; }
+                            break;
+                        case 'lucky_ladder':
+                            bonus.extraSteps = Math.floor(rand(1, 3));
+                            this.currentStep = Math.min(this.currentStep + bonus.extraSteps, CONFIG.MAX_STEP);
+                            this.currentMultiplier = STEPS[this.currentStep - 1].multiplier;
+                            if (this.doubleMode) this.currentMultiplier *= this.doubleMultiplier;
+                            bonus.message = `🪜 Lucky Ladder! Auto-climbed ${bonus.extraSteps} step(s)!`;
+                            break;
+                        case 'treasure_chamber':
+                            bonus.reward = Math.floor(rand(500, 2000) * this._user.vipMultiplier);
+                            this._user.balance += bonus.reward;
+                            bonus.message = `🏛️ Treasure Chamber! +${formatGold(bonus.reward)} GOLD!`;
+                            break;
+                    }
+                    this._audio.play('bonus');
+                    return bonus;
+                }
+                _processRare(type) {
+                    const rare = { type, message: '', reward: 0, snakePit: false, instantLoss: false,
+                    survivedKingCobra: false };
+                    switch (type) {
+                        case 'king_cobra':
+                            if (Math.random() < 0.5) {
+                                rare.instantLoss = true;
+                                rare.message = '👑 King Cobra! You were bitten!';
+                            } else {
+                                rare.survivedKingCobra = true;
+                                rare.reward = Math.floor(rand(200, 800) * this._user.vipMultiplier);
+                                this._user.balance += rare.reward;
+                                rare.message =
+                                    `👑 King Cobra! You survived! +${formatGold(rare.reward)} GOLD`;
+                            }
+                            break;
+                        case 'golden_snake':
+                            rare.reward = Math.floor(rand(300, 1500) * this._user.vipMultiplier);
+                            this._user.balance += rare.reward;
+                            rare.message = `🐍✨ Golden Snake! +${formatGold(rare.reward)} GOLD!`;
+                            break;
+                        case 'snake_pit':
+                            rare.snakePit = true;
+                            rare.message = '🕳️ Snake Pit! Choose your path...';
+                            break;
+                        case 'treasure_chamber':
+                            rare.reward = Math.floor(rand(800, 3000) * this._user.vipMultiplier);
+                            this._user.balance += rare.reward;
+                            rare.message = `🏛️ Treasure Chamber! +${formatGold(rare.reward)} GOLD!`;
+                            break;
+                        case 'ancient_relic':
+                            rare.reward = Math.floor(rand(100, 600) * this._user.vipMultiplier);
+                            this._user.balance += rare.reward;
+                            this._user.addPowerup('shield', 1);
+                            rare.message =
+                                `📿 Ancient Relic! +${formatGold(rare.reward)} GOLD + Cobra Shield!`;
+                            break;
+                    }
+                    if (!rare.snakePit) this._audio.play('rare');
+                    const stats = this._user.stats;
+                    stats.rareEventsFound = (stats.rareEventsFound || 0) + 1;
+                    return rare;
+                }
+                _finishGame(won) {
+                    this.active = false;
+                    const stats = this._user.stats;
+                    stats.gamesPlayed++;
+                    stats.totalWagered += this.totalWageredThisGame;
+                    if (won) {
+                        const payout = Math.floor(this.currentBet * this.currentMultiplier);
+                        const profit = payout - this.currentBet;
+                        this._user.balance += payout;
+                        stats.wins++;
+                        stats.totalPayout += payout;
+                        if (this.currentStep > (stats.highestStep || 0)) stats.highestStep = this.currentStep;
+                        if (payout > (stats.biggestWin || 0)) stats.biggestWin = payout;
+                        if (this.currentMultiplier > (stats.bestMultiplier || 1)) stats.bestMultiplier = this
+                            .currentMultiplier;
+                        this._user.user.globalStats.totalWins++;
+                        this._user.user.globalStats.totalWon += payout;
+                        this._user.addTransaction(
+                            `Snakes Win: ${this.currentMultiplier.toFixed(2)}x +${formatGold(payout)} GOLD`,
+                            payout, 'game_win');
+                        this._user.user.globalStats.currentStreak = (this._user.user.globalStats.currentStreak ||
+                            0) + 1;
+                        if (this._user.user.globalStats.currentStreak > (this._user.user.globalStats.bestStreak ||
+                                0))
+                            this._user.user.globalStats.bestStreak = this._user.user.globalStats.currentStreak;
+                    } else {
+                        const loss = this.currentBet;
+                        stats.totalPayout = stats.totalPayout || 0;
+                        this._user.user.globalStats.totalLosses = (this._user.user.globalStats.totalLosses || 0) +
+                            loss;
+                        this._user.user.globalStats.currentStreak = 0;
+                        this._user.addTransaction(`Snakes Loss: -${formatGold(loss)} GOLD`, -loss, 'game_loss');
+                    }
+                    this._user.user.globalStats.totalGames++;
+                    this._user.user.globalStats.totalWagered += this.totalWageredThisGame;
+                    this._user.user.xp += Math.floor(this.totalWageredThisGame * 0.5 * (won ? 1.5 : 0.8));
+                    if (!this._user.user.gamePlayCount.snakes) this._user.user.gamePlayCount.snakes = 0;
+                    this._user.user.gamePlayCount.snakes++;
+                    this._user.user.gameOutcomes.unshift({
+                        game: 'Snakes',
+                        result: won ? 'win' : 'loss',
+                        profit: won ? Math.floor(this.currentBet * this.currentMultiplier) - this.currentBet : -this
+                            .currentBet,
+                        multiplier: this.currentMultiplier,
+                        stepReached: this.currentStep,
+                        bet: this.currentBet,
+                        date: new Date().toISOString(),
+                    });
+                    if (this._user.user.gameOutcomes.length > 100) this._user.user.gameOutcomes.length = 100;
+                    this._user.save();
+                    return { won, multiplier: this.currentMultiplier, step: this.currentStep, payout: won ? Math.floor(
+                            this.currentBet * this.currentMultiplier) : 0 };
+                }
+                cashOut() { return this._finishGame(true); }
+                snakeBite() { return this._finishGame(false); }
+            }
+
+            // ══════════════════════════════════════════
+            //  PARTICLE SYSTEM
+            // ══════════════════════════════════════════
+            class ParticleSystem {
+                constructor(canvasId) {
+                    this._c = document.getElementById(canvasId);
+                    if (!this._c) return;
+                    this._ctx = this._c.getContext('2d');
+                    this._parts = [];
+                    this._animId = null;
+                    this._init();
+                }
+                _init() {
+                    this._resize();
+                    window.addEventListener('resize', () => this._resize());
+                    this._parts = Array.from({ length: 40 }, () => this._makeParticle());
+                    this._draw();
+                }
+                _resize() { if (this._c) { this._c.width = window.innerWidth;
+                        this._c.height = window.innerHeight; } }
+                _makeParticle() {
+                    return { x: Math.random() * (this._c?.width || 800), y: Math.random() * (this._c?.height || 600),
+                        vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35, r: Math.random() * 2 +
+                            0.7, alpha: Math.random() * 0.3 + 0.1, life: Math.random() * 100 };
+                }
+                _draw() {
+                    if (!this._c || !this._ctx) return;
+                    const ctx = this._ctx;
+                    const w = this._c.width;
+                    const h = this._c.height;
+                    ctx.clearRect(0, 0, w, h);
+                    for (const p of this._parts) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.life += 0.01;
+                        if (p.x < -20) p.x = w + 20;
+                        if (p.x > w + 20) p.x = -20;
+                        if (p.y < -20) p.y = h + 20;
+                        if (p.y > h + 20) p.y = -20;
+                        const f = 0.6 + 0.4 * Math.sin(p.life * 2);
+                        ctx.fillStyle = `rgba(240,200,80,${p.alpha * f})`;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    this._animId = requestAnimationFrame(() => this._draw());
+                }
+                destroy() { if (this._animId) cancelAnimationFrame(this._animId); }
+            }
+
+            // ══════════════════════════════════════════
+            //  CONFETTI SYSTEM
+            // ══════════════════════════════════════════
+            class ConfettiSystem {
+                static fire(intensity = 'normal') {
+                    const c = document.createElement('canvas');
+                    c.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;';
+                    document.body.appendChild(c);
+                    c.width = window.innerWidth;
+                    c.height = window.innerHeight;
+                    const ctx = c.getContext('2d');
+                    const counts = { low: 60, normal: 150, high: 300, jackpot: 500 };
+                    const count = counts[intensity] || 150;
+                    const parts = [];
+                    const colors = ['#ffd966', '#ffe478', '#ff5252', '#4caf50', '#ff8c42', '#e040fb', '#ffab40',
+                        '#fff176'
+                    ];
+                    for (let i = 0; i < count; i++) {
+                        parts.push({ x: Math.random() * c.width, y: -Math.random() * c.height * 0.5, vx: (Math.random() -
+                                0.5) * 7, vy: Math.random() * 5 + 2, s: Math.random() * 6 + 2, col: colors[Math.floor(
+                                Math.random() * colors.length)], rot: Math.random() * 360, rv: (Math.random() - 0.5) *
+                                12, life: 1, dec: 0.004 + Math.random() * 0.005 });
+                    }
+                    const start = performance.now();
+                    const maxD = 4000;
+
+                    function draw(ts) {
+                        ctx.clearRect(0, 0, c.width, c.height);
+                        let alive = false;
+                        for (const p of parts) {
+                            p.vy += 0.07;
+                            p.x += p.vx;
+                            p.y += p.vy;
+                            p.rot += p.rv;
+                            p.life -= p.dec;
+                            if (p.life > 0 && p.y < c.height + 50 && ts - start < maxD) {
+                                alive = true;
+                                ctx.save();
+                                ctx.translate(p.x, p.y);
+                                ctx.rotate((p.rot * Math.PI) / 180);
+                                ctx.globalAlpha = Math.max(0, p.life);
+                                ctx.fillStyle = p.col;
+                                ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.5);
+                                ctx.restore();
+                            }
+                        }
+                        if (alive) requestAnimationFrame(draw);
+                        else c.remove();
+                    }
+                    requestAnimationFrame(draw);
+                    setTimeout(() => { if (c.parentNode) c.remove(); }, maxD + 500);
+                }
+            }
+
+            // ══════════════════════════════════════════
+            //  UI MANAGER
+            // ══════════════════════════════════════════
+            class UIManager {
+                constructor(userSession, audio) {
+                    this._user = userSession;
+                    this._audio = audio;
+                    this._engine = new GameEngine(userSession, audio);
+                    this._activePowerups = { charmer: false, boots: false, shield: false, charm: false };
+                    this._resultTimer = null;
+                    this._dom = this._cacheDom();
+                    this._particles = new ParticleSystem('particleCanvas');
+                    this._bindEvents();
+                    this._renderAll();
+                    this._checkDailyReward();
+                }
+                _cacheDom() {
+                    const g = (s) => document.getElementById(s);
+                    return {
+                        balance: g('balanceDisplay'),
+                        betInput: g('betAmount'),
+                        climbBtn: g('climbBtn'),
+                        cashoutBtn: g('cashoutBtn'),
+                        newGameBtn: g('newGameBtn'),
+                        multiplierDisplay: g('multiplierDisplay'),
+                        resultDiv: g('resultMessage'),
+                        antidoteStatus: g('antidoteStatus'),
+                        shieldStatus: g('shieldStatus'),
+                        gamesCount: g('gamesCount'),
+                        winsCount: g('winsCount'),
+                        sessionPL: g('sessionPL'),
+                        highestStep: g('highestStep'),
+                        biggestWin: g('biggestWin'),
+                        winRate: g('winRate'),
+                        milestoneNote: g('milestoneNote'),
+                        stepList: g('stepList'),
+                        soundToggle: g('soundToggle'),
+                        jackpotAmount: g('jackpotAmount'),
+                        vipBadge: g('vipBadge'),
+                        doubleModal: g('doubleModal'),
+                        doubleAmount: g('doubleAmount'),
+                        snakePitModal: g('snakePitModal'),
+                        mainCard: g('mainCard'),
+                        charmerBtn: g('charmerBtn'),
+                        bootsBtn: g('bootsBtn'),
+                        shieldBtn: g('shieldBtn'),
+                        charmBtn: g('charmBtn'),
+                    };
+                }
+                _bindEvents() {
+                    const d = this._dom;
+                    d.newGameBtn.addEventListener('click', () => this._handleNewGame());
+                    d.climbBtn.addEventListener('click', () => this._handleClimb());
+                    d.cashoutBtn.addEventListener('click', () => this._handleCashout());
+                    d.soundToggle.addEventListener('click', () => {
+                        const on = this._audio.toggle();
+                        d.soundToggle.innerHTML = on ? '<i class="fas fa-volume-up"></i>' :
+                            '<i class="fas fa-volume-mute"></i>';
+                    });
+                    d.betInput.addEventListener('input', () => this._updateBetSummary());
+                    document.querySelectorAll('.preset-sm[data-bet]').forEach(b => {
+                        b.addEventListener('click', () => {
+                            const v = b.dataset.bet;
+                            const cur = parseInt(d.betInput.value) || 10;
+                            if (v === 'half') d.betInput.value = Math.max(1, Math.floor(cur / 2));
+                            else if (v === 'double') d.betInput.value = Math.min(100000, cur * 2);
+                            else if (v === 'max') d.betInput.value = Math.floor(this._user.balance) || 1;
+                            else d.betInput.value = parseInt(v);
+                            this._updateBetSummary();
+                            this._audio.play('click');
+                        });
+                    });
+                    ['charmerBtn', 'bootsBtn', 'shieldBtn', 'charmBtn'].forEach(k => {
+                        const el = d[k];
+                        if (!el) return;
+                        const type = el.dataset.powerup;
+                        el.addEventListener('click', () => this._togglePowerup(type));
+                    });
+                    document.getElementById('double2x')?.addEventListener('click', () => this._startDoubleMode(2,
+                        0.5));
+                    document.getElementById('double3x')?.addEventListener('click', () => this._startDoubleMode(3,
+                        0.33));
+                    document.getElementById('double4x')?.addEventListener('click', () => this._startDoubleMode(4,
+                        0.25));
+                    document.getElementById('doubleDeclineBtn')?.addEventListener('click', () => this._declineDouble());
+                    d.snakePitModal.querySelectorAll('.choice-btn[data-pit]').forEach(b => {
+                        b.addEventListener('click', () => this._resolveSnakePit(b.dataset.pit));
+                    });
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === ' ' && !this._engine.isActive && !e.target.closest('input')) {
+                            e.preventDefault();
+                            this._handleNewGame();
+                        }
+                        if (e.key === 'c' && this._engine.isActive && !e.target.closest('input')) {
+                            e.preventDefault();
+                            this._handleCashout();
+                        }
+                    });
+                }
+                _togglePowerup(type) {
+                    if (this._engine.isActive) return;
+                    const count = this._user.getPowerupCount(type);
+                    if (count > 0) {
+                        this._activePowerups[type] = !this._activePowerups[type];
+                    } else {
+                        const cost = POWERUP_COSTS[type] || 0;
+                        if (this._user.balance >= cost + (parseInt(this._dom.betInput.value) || 0)) {
+                            this._activePowerups[type] = !this._activePowerups[type];
+                        } else {
+                            this._showResult('Insufficient balance for power-up.', true);
+                            return;
+                        }
+                    }
+                    this._updatePowerupButtons();
+                    this._audio.play('click');
+                }
+                _updatePowerupButtons() {
+                    const d = this._dom;
+                    ['charmer', 'boots', 'shield', 'charm'].forEach(type => {
+                        const el = d[type + 'Btn'];
+                        if (!el) return;
+                        el.classList.remove('active', 'owned');
+                        if (this._activePowerups[type]) el.classList.add('active');
+                        else if (this._user.getPowerupCount(type) > 0) el.classList.add('owned');
+                    });
+                }
+                async _handleNewGame() {
+                    if (this._engine.isActive) return;
+                    const bet = parseInt(this._dom.betInput.value);
+                    if (isNaN(bet) || bet <= 0) { this._showResult('Enter a valid bet amount.', true); return; }
+                    const started = await this._engine.startGame(bet, this._activePowerups);
+                    if (!started) { this._showResult('Insufficient balance for bet + power-ups.', true); return; }
+                    this._activePowerups = { charmer: false, boots: false, shield: false, charm: false };
+                    this._updatePowerupButtons();
+                    this._dom.climbBtn.disabled = false;
+                    this._dom.cashoutBtn.disabled = false;
+                    this._dom.newGameBtn.disabled = true;
+                    this._updateDisplay();
+                    this._renderStepList();
+                    this._showResult(`🐍 Game started! Step 1 · ${STEPS[0].multiplier}x · Risk ${Math.round(this._engine
+                        .effectiveSnakeProb * 100)}%`, false);
+                    this._dom.multiplierDisplay.classList.remove('danger');
+                    this._refreshStats();
+                }
+                async _handleClimb() {
+                    if (!this._engine.isActive) return;
+                    const result = this._engine.processClimb();
+                    if (!result) return;
+                    if (result.snake) {
+                        this._audio.play('snake');
+                        this._dom.mainCard.classList.add('shake');
+                        setTimeout(() => this._dom.mainCard.classList.remove('shake'), 500);
+                        const loss = this._engine.currentBet;
+                        const r = this._engine.snakeBite();
+                        this._dom.climbBtn.disabled = true;
+                        this._dom.cashoutBtn.disabled = true;
+                        this._dom.newGameBtn.disabled = false;
+                        this._dom.multiplierDisplay.classList.add('danger');
+                        this._showResult(`🐍 SNAKE BITE! Lost ${formatGold(loss)} GOLD at step ${r.step}.`, true,
+                            'loss');
+                        this._renderStepList(r.step, true);
+                        this._refreshStats();
+                        this._checkAchievements();
+                        return;
+                    }
+                    if (result.antidoteUsed) {
+                        this._audio.play('shield');
+                        this._showFloatingText('🛡️ Antidote!');
+                    }
+                    if (result.cobraShieldUsed) {
+                        this._audio.play('shield');
+                        this._showFloatingText('🛡️ Cobra Shield!');
+                    }
+                    if (result.bootsSkipped > 0) {
+                        this._showFloatingText(`👢 Skipped ${result.bootsSkipped}!`);
+                    }
+                    this._audio.play('climb');
+                    this._updateDisplay();
+                    this._renderStepList();
+                    let msg = `✅ Step ${this._engine.currentStep} · ${this._engine.currentMultiplier.toFixed(2)}x`;
+                    if (result.bonus) {
+                        msg += ` · ${result.bonus.message}`;
+                        if (result.bonus.reward > 0) this._showFloatingText(`+${formatGold(result.bonus.reward)}`);
+                    }
+                    if (result.rare) {
+                        if (result.rare.snakePit) {
+                            this._showSnakePitModal();
+                            return;
+                        }
+                        if (result.rare.instantLoss) {
+                            this._audio.play('snake');
+                            this._dom.mainCard.classList.add('shake');
+                            setTimeout(() => this._dom.mainCard.classList.remove('shake'), 500);
+                            const r2 = this._engine.snakeBite();
+                            this._dom.climbBtn.disabled = true;
+                            this._dom.cashoutBtn.disabled = true;
+                            this._dom.newGameBtn.disabled = false;
+                            this._showResult(result.rare.message, true, 'loss');
+                            this._renderStepList(r2.step, true);
+                            this._refreshStats();
+                            this._checkAchievements();
+                            return;
+                        }
+                        msg += ` · ${result.rare.message}`;
+                        if (result.rare.reward > 0) this._showFloatingText(`+${formatGold(result.rare.reward)}`);
+                    }
+                    if (result.reachedTop) {
+                        await this._finishGameWin();
+                        return;
+                    }
+                    if (this._engine.currentMultiplier >= 8) this._dom.multiplierDisplay.classList.add('danger');
+                    this._showResult(msg, false);
+                    this._refreshStats();
+                }
+                async _handleCashout() {
+                    if (!this._engine.isActive) return;
+                    await this._finishGameWin();
+                }
+                async _finishGameWin() {
+                    const r = this._engine.cashOut();
+                    const payout = r.payout;
+                    this._dom.climbBtn.disabled = true;
+                    this._dom.cashoutBtn.disabled = true;
+                    this._dom.newGameBtn.disabled = false;
+                    this._dom.multiplierDisplay.classList.remove('danger');
+                    this._audio.play(payout >= this._engine.currentBet * 10 ? 'bigwin' : 'win');
+                    ConfettiSystem.fire(payout >= this._engine.currentBet * 20 ? 'jackpot' : payout >= this._engine
+                        .currentBet * 5 ? 'high' : 'normal');
+                    this._showFloatingText(`💰 +${formatGold(payout)}`);
+                    this._showResult(
+                        `💰 CASHED OUT! Won ${formatGold(payout)} GOLD (${r.multiplier.toFixed(2)}x) at step ${r.step}`,
+                        false, 'win');
+                    this._renderStepList(r.step);
+                    this._refreshStats();
+                    this._checkAchievements();
+                    // Offer double or nothing
+                    if (payout > this._engine.currentBet && r.step > 1 && !this._engine.doubleMode) {
+                        this._offerDoubleOrNothing(payout);
+                    }
+                    // Check jackpot
+                    const jpChance = 0.002;
+                    if (Math.random() < jpChance && this._user.globalJackpot > 100) {
+                        const jpWin = this._user.globalJackpot;
+                        this._user.globalJackpot = 0;
+                        this._user.balance += jpWin;
+                        this._user.stats.jackpotWins = (this._user.stats.jackpotWins || 0) + 1;
+                        await this._user.save();
+                        this._audio.play('jackpot');
+                        ConfettiSystem.fire('jackpot');
+                        this._showResult(`🎰 MEGA JACKPOT! Won ${formatGold(jpWin)} GOLD!`, false, 'rare');
+                        this._updateJackpotDisplay();
+                    }
+                    await this._user.save();
+                    this._updateBalanceUI();
+                }
+                _offerDoubleOrNothing(amount) {
+                    this._dom.doubleModal.classList.add('show');
+                    this._dom.doubleAmount.textContent = formatGold(amount);
+                    this._doubleAmount = amount;
+                }
+                _startDoubleMode(multiplier, chance) {
+                    this._dom.doubleModal.classList.remove('show');
+                    const riskAmount = Math.floor(this._doubleAmount * (multiplier === 2 ? 0.5 : multiplier === 3 ? 0.6 :
+                        0.7));
+                    if (riskAmount > this._user.balance || riskAmount <= 0) {
+                        this._showResult('Insufficient balance for this risk level.', true);
+                        return;
+                    }
+                    if (Math.random() < chance) {
+                        const win = Math.floor(riskAmount * multiplier);
+                        this._user.balance += win - riskAmount;
+                        this._user.addTransaction(`Double or Nothing (${multiplier}x) Win +${formatGold(win)}`, win,
+                            'game_win');
+                        this._audio.play('bigwin');
+                        ConfettiSystem.fire('high');
+                        this._showFloatingText(`⚡ +${formatGold(win)}`);
+                        this._showResult(`⚡ DOUBLE OR NOTHING WIN! +${formatGold(win)} GOLD (${multiplier}x)`, false,
+                            'win');
+                    } else {
+                        this._user.balance -= riskAmount;
+                        this._user.addTransaction(`Double or Nothing (${multiplier}x) Loss -${formatGold(riskAmount)}`,
+                            -riskAmount, 'game_loss');
+                        this._audio.play('lose');
+                        this._showResult(`💔 Double or Nothing lost. -${formatGold(riskAmount)} GOLD`, true, 'loss');
+                    }
+                    this._user.save();
+                    this._updateBalanceUI();
+                    this._refreshStats();
+                }
+                _declineDouble() {
+                    this._dom.doubleModal.classList.remove('show');
+                    this._showResult('Kept winnings. 🎉', false);
+                }
+                _showSnakePitModal() {
+                    this._dom.snakePitModal.classList.add('show');
+                }
+                async _resolveSnakePit(choice) {
+                    this._dom.snakePitModal.classList.remove('show');
+                    const safe = ['left', 'center', 'right'][Math.floor(Math.random() * 3)];
+                    if (choice === safe) {
+                        const reward = Math.floor(rand(200, 1000) * this._user.vipMultiplier);
+                        this._user.balance += reward;
+                        this._audio.play('bonus');
+                        this._showFloatingText(`🕳️ Safe! +${formatGold(reward)}`);
+                        this._showResult(`🕳️ Snake Pit escaped! +${formatGold(reward)} GOLD`, false, 'win');
+                    } else {
+                        this._audio.play('snake');
+                        this._dom.mainCard.classList.add('shake');
+                        setTimeout(() => this._dom.mainCard.classList.remove('shake'), 500);
+                        const r = this._engine.snakeBite();
+                        this._dom.climbBtn.disabled = true;
+                        this._dom.cashoutBtn.disabled = true;
+                        this._dom.newGameBtn.disabled = false;
+                        this._showResult('🕳️ Snake Pit! You chose poorly... Lost!', true, 'loss');
+                        this._renderStepList(r.step, true);
+                    }
+                    await this._user.save();
+                    this._updateBalanceUI();
+                    this._refreshStats();
+                }
+                _updateDisplay() {
+                    this._dom.multiplierDisplay.textContent = this._engine.currentMultiplier.toFixed(2) + 'x';
+                    const hasAntidote = this._engine.hasAntidote;
+                    const hasShield = this._engine.hasCobraShield;
+                    this._dom.antidoteStatus.innerHTML = hasAntidote ?
+                        '<span class="antidote-badge"><i class="fas fa-shield-alt"></i> Antidote Active</span>' :
+                        'No Antidote';
+                    this._dom.shieldStatus.textContent = hasShield ? '🛡️ Cobra Shield Active' : '';
+                    this._dom.multiplierDisplay.classList.toggle('danger', this._engine.currentMultiplier >= 8);
+                }
+                _renderStepList(snakeStep = -1, showSnake = false) {
+                    const list = this._dom.stepList;
+                    list.innerHTML = '';
+                    STEPS.forEach(s => {
+                        const div = document.createElement('div');
+                        div.className = 'step-item';
+                        if (s.step === this._engine.currentStep && this._engine.isActive) div.classList.add(
+                            'current');
+                        if (s.step < this._engine.currentStep && this._engine.isActive) div.classList.add(
+                            'cleared');
+                        if (s.step === snakeStep && showSnake) div.classList.add('snake-hit');
+                        let badges = '';
+                        if (s.bonusType === 'antidote') badges +=
+                            '<span class="bonus-badge">💊 Antidote</span>';
+                        if (s.bonusType === 'golden_chest') badges +=
+                            '<span class="bonus-badge">🎁 Chest</span>';
+                        if (s.bonusType === 'snake_egg') badges +=
+                        '<span class="bonus-badge">🥚 Egg</span>';
+                        if (s.bonusType === 'fortune_tile') badges +=
+                            '<span class="bonus-badge">🔮 Fortune</span>';
+                        if (s.bonusType === 'lucky_ladder') badges +=
+                            '<span class="bonus-badge">🪜 Ladder</span>';
+                        if (s.bonusType === 'treasure_chamber') badges +=
+                            '<span class="bonus-badge">🏛️ Treasure</span>';
+                        if (s.rareChance >= 0.06) badges +=
+                            '<span class="rare-badge">✨ Rare</span>';
+                        div.innerHTML = `
+                            <span class="step-number">${s.step}</span>
+                            <span class="step-mult">${s.multiplier}x</span>
+                            <span class="step-risk">🐍 ${Math.round(s.snakeProb * 100)}%</span>
+                            ${badges}
+                        `;
+                        list.appendChild(div);
+                    });
+                    // Scroll to current step
+                    const currentEl = list.querySelector('.current');
+                    if (currentEl) currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                _showResult(msg, isErr, extraClass = '') {
+                    const d = this._dom.resultDiv;
+                    d.innerHTML = msg;
+                    d.className = 'result-panel';
+                    if (extraClass) d.classList.add(extraClass);
+                    if (isErr) d.style.color = '#ef9a9a';
+                    else d.style.color = '';
+                    this._clearResultTimer();
+                    this._resultTimer = setTimeout(() => {
+                        if (!this._engine.isActive) {
+                            d.innerHTML = '🐍 Press New Game to start';
+                            d.className = 'result-panel';
+                            d.style.color = '';
+                        }
+                    }, 4000);
+                }
+                _clearResultTimer() { if (this._resultTimer) { clearTimeout(this._resultTimer);
+                        this._resultTimer = null; } }
+                _showFloatingText(msg) {
+                    const el = document.createElement('div');
+                    el.className = 'floating-text';
+                    el.textContent = msg;
+                    el.style.left = '50%';
+                    el.style.top = '40%';
+                    el.style.transform = 'translateX(-50%)';
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 1600);
+                }
+                _updateBalanceUI() { this._dom.balance.textContent = formatGold(this._user.balance);
+                    this._updateJackpotDisplay(); }
+                _updateJackpotDisplay() { this._dom.jackpotAmount.textContent = formatGold(this._user.globalJackpot); }
+                _updateBetSummary() { const bet = parseInt(this._dom.betInput.value) || 0;
+                    this._dom.newGameBtn.disabled = bet <= 0 || bet > this._user.balance; }
+                _refreshStats() {
+                    const s = this._user.sessionStats;
+                    this._updateBalanceUI();
+                    this._dom.gamesCount.textContent = s.games;
+                    this._dom.winsCount.textContent = s.wins;
+                    this._dom.sessionPL.textContent = (s.profit >= 0 ? '+' : '') + formatGold(s.profit);
+                    this._dom.sessionPL.style.color = s.profit >= 0 ? '#4caf50' : '#ff5252';
+                    this._dom.highestStep.textContent = s.highestStep;
+                    this._dom.biggestWin.textContent = formatGold(s.biggestWin);
+                    this._dom.winRate.textContent = s.winRate + '%';
+                    this._dom.vipBadge.textContent = this._user.vipName;
+                    const vLevel = this._user.vipLevel;
+                    this._dom.vipBadge.className = 'vip-badge vip-' + vLevel;
+                    this._updateMilestoneNote();
+                    this._updateBetSummary();
+                }
+                _updateMilestoneNote() {
+                    const plays = this._user.user?.gamePlayCount?.snakes || 0;
+                    const claimed = this._user.user?.earnedAchievements?.includes('snakes_10');
+                    const note = this._dom.milestoneNote;
+                    if (plays >= CONFIG.MILESTONE_SPINS && !claimed) {
+                        note.innerHTML =
+                            `🎁 MILESTONE: ${CONFIG.MILESTONE_SPINS} PLAYS! <button id="claimSnakeMilestone" class="preset-sm" style="margin-left:6px;">CLAIM ${formatGold(CONFIG.MILESTONE_REWARD)}</button>`;
+                        const btn = document.getElementById('claimSnakeMilestone');
+                        if (btn) btn.addEventListener('click', () => this._claimMilestone(), { once: true });
+                    } else if (plays >= CONFIG.MILESTONE_SPINS && claimed) {
+                        note.innerHTML =
+                            `✅ Milestone claimed: +${formatGold(CONFIG.MILESTONE_REWARD)} GOLD (${CONFIG.MILESTONE_SPINS} plays)`;
+                    } else {
+                        note.innerHTML =
+                            `🏆 ${CONFIG.MILESTONE_SPINS - plays} more plays → ${formatGold(CONFIG.MILESTONE_REWARD)} GOLD bonus`;
+                    }
+                }
+                async _claimMilestone() {
+                    const plays = this._user.user?.gamePlayCount?.snakes || 0;
+                    const key = 'snakes_10';
+                    if (plays >= CONFIG.MILESTONE_SPINS && !(this._user.user.earnedAchievements || []).includes(key)) {
+                        this._user.balance += CONFIG.MILESTONE_REWARD;
+                        if (!this._user.user.earnedAchievements) this._user.user.earnedAchievements = [];
+                        this._user.user.earnedAchievements.push(key);
+                        this._user.addTransaction(
+                            `Snakes Milestone ${CONFIG.MILESTONE_SPINS} plays +${formatGold(CONFIG.MILESTONE_REWARD)}`,
+                            CONFIG.MILESTONE_REWARD, 'deposit');
+                        await this._user.save();
+                        this._refreshStats();
+                        this._showResult(`🎉 Milestone: +${formatGold(CONFIG.MILESTONE_REWARD)} GOLD!`, false, 'win');
+                        this._audio.play('win');
+                        ConfettiSystem.fire('normal');
+                    }
+                }
+                _checkAchievements() {
+                    const u = this._user.user;
+                    const achieved = u.earnedAchievements || [];
+                    const stats = this._user.stats;
+                    const newAchievements = [];
+                    const check = (key, cond, name) => { if (!achieved.includes(key) && cond) { newAchievements.push(
+                                name);
+                            achieved.push(key); } };
+                    check('first_climb', stats.gamesPlayed >= 1, 'First Climb');
+                    check('snake_survivor', stats.gamesPlayed >= 5 && stats.wins >= 3, 'Snake Survivor');
+                    check('treasure_hunter', (stats.rareEventsFound || 0) >= 3, 'Treasure Hunter');
+                    check('10_wins', stats.wins >= 10, '10 Wins');
+                    check('reach_step_10', stats.highestStep >= 10, 'Reach Step 10');
+                    check('reach_step_15', stats.highestStep >= 15, 'Reach Step 15');
+                    check('hit_35x', stats.bestMultiplier >= 35, 'Hit 35x Multiplier');
+                    check('jackpot_winner', (stats.jackpotWins || 0) >= 1, 'Jackpot Winner');
+                    check('big_winner', stats.biggestWin >= 5000, 'Big Winner (5k+)');
+                    if (newAchievements.length > 0) {
+                        u.earnedAchievements = achieved;
+                        this._user.save();
+                        for (const name of newAchievements) {
+                            this._showAchievementPopup(name);
+                            this._audio.play('achievement');
+                        }
+                    }
+                }
+                _showAchievementPopup(name) {
+                    const el = document.createElement('div');
+                    el.className = 'achievement-popup';
+                    el.innerHTML = `🏆 Achievement Unlocked: <strong>${name}</strong>`;
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 3200);
+                }
+                _checkDailyReward() {
+                    const dd = StorageManager.getDailyData();
+                    const today = new Date().toDateString();
+                    if (dd.lastDate === today && dd.claimed) return;
+                    if (dd.lastDate !== today) {
+                        const yesterday = new Date();
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        if (dd.lastDate === yesterday.toDateString()) {
+                            dd.streak = Math.min(dd.streak + 1, 30);
+                        } else {
+                            dd.streak = 1;
+                        }
+                        dd.lastDate = today;
+                        dd.claimed = false;
+                    }
+                    if (!dd.claimed) {
+                        const reward = 10 + dd.streak * 5 + (this._user.vipMultiplier > 1 ? Math.floor(20 * this._user
+                            .vipMultiplier) : 0);
+                        this._user.balance += reward;
+                        this._user.addTransaction(`Daily Reward (Day ${dd.streak}) +${formatGold(reward)}`, reward,
+                            'deposit');
+                        dd.claimed = true;
+                        StorageManager.setDailyData(dd);
+                        this._user.save();
+                        this._updateBalanceUI();
+                        this._showResult(`🌅 Daily Reward: +${formatGold(reward)} GOLD (Streak: ${dd.streak} days)`,
+                            false, 'win');
+                    }
+                }
+                _renderAll() {
+                    this._renderStepList();
+                    this._updateDisplay();
+                    this._refreshStats();
+                    this._updatePowerupButtons();
+                    this._updateJackpotDisplay();
+                }
+                destroy() {
+                    this._clearResultTimer();
+                    this._particles.destroy();
+                }
+            }
+
+            // ══════════════════════════════════════════
+            //  INITIALIZATION
+            // ══════════════════════════════════════════
+            async function initApp() {
+                const audio = new AudioManager();
+                const userSession = new UserSession();
+                const loaded = await userSession.load();
+                if (!loaded) return;
+                const ui = new UIManager(userSession, audio);
+                const soundToggle = document.getElementById('soundToggle');
+                if (soundToggle) soundToggle.innerHTML = audio.enabled ? '<i class="fas fa-volume-up"></i>' :
+                    '<i class="fas fa-volume-mute"></i>';
+                const cleanup = () => { ui.destroy();
+                    audio.destroy(); };
+                window.addEventListener('beforeunload', cleanup, { once: true });
+                window.addEventListener('pagehide', cleanup, { once: true });
+                if (typeof window.__SNAKES_DEV__ !== 'undefined') window.__snakesApp = { userSession, audio, ui };
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
+            else initApp();
+        })();
+    </script>
+</body>
+</html>

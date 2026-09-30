@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GOLD TOWER CLIMB | Higher you climb, more multiplier increases. Cash out anytime.</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd966;
+            --gold-bright: #ffed4e;
+            --gold-deep: #c9a840;
+            --bg-deep: #0a0908;
+            --bg-card: rgba(20, 18, 16, 0.8);
+            --border-gold: rgba(255, 217, 102, 0.3);
+            --border-active: rgba(255, 217, 102, 0.6);
+            --danger: #ff6b6b;
+            --success: #4caf50;
+            --text-muted: #9a9484;
+            --radius-xl: 2.2rem;
+            --radius-lg: 1.5rem;
+            --radius-md: 1.2rem;
+            --radius-full: 60px;
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --cell: 52px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #14110c 0%, #030202 100%);
+            color: #f5f0e6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .bg-particles {
+            position: fixed; inset:0; pointer-events:none; z-index:0;
+        }
+        .sparkle {
+            position: absolute; width:3px; height:3px; background:var(--gold);
+            border-radius:50%; animation:floatUp 4s infinite ease-in; opacity:0;
+        }
+        .sparkle:nth-child(odd){ animation-delay:2s; background:var(--gold-bright); }
+        .sparkle:nth-child(3n){ animation-delay:1.3s; width:5px; height:5px; }
+        @keyframes floatUp {
+            0% { transform:translateY(0) scale(0); opacity:0; }
+            15% { opacity:0.8; transform:scale(1.2); }
+            40% { transform:translateY(-160px) scale(1); opacity:0.4; }
+            70% { transform:translateY(-320px) scale(0.3); opacity:0.05; }
+            100% { transform:translateY(-420px) scale(0); opacity:0; }
+        }
+        .game-container {
+            width:100%; max-width:620px; display:flex; flex-direction:column; gap:1.2rem;
+            position:relative; z-index:1;
+        }
+        .top-nav {
+            display:flex; justify-content:space-between; align-items:center;
+            background:rgba(15,13,11,0.8); backdrop-filter:blur(20px);
+            border-radius:var(--radius-full); padding:0.7rem 2rem;
+            border:1px solid var(--border-gold); box-shadow:0 10px 30px rgba(0,0,0,0.5);
+            animation:slideDown 0.6s var(--transition-bounce);
+        }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+        .back-home { text-decoration:none; color:var(--gold); font-weight:600; background:rgba(255,217,102,0.08); padding:0.4rem 1.2rem; border-radius:40px; transition:0.3s; display:flex; align-items:center; gap:0.5rem; }
+        .back-home:hover { background:rgba(255,217,102,0.2); transform:translateX(-3px); }
+        .balance-tag { background:rgba(31,28,24,0.9); padding:0.3rem 1.2rem; border-radius:40px; font-weight:700; border:1px solid rgba(255,217,102,0.4); display:flex; align-items:center; gap:0.5rem; transition:box-shadow 0.3s; }
+        .balance-tag.pulse { animation:balancePulse 0.5s ease-out; }
+        @keyframes balancePulse { 0% { box-shadow:0 0 0 0 rgba(255,217,102,0.5); } 100% { box-shadow:0 0 0 20px rgba(255,217,102,0); } }
+        .sound-btn { background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--gold); transition:transform 0.2s; }
+        .sound-btn:hover { transform:scale(1.1); }
+
+        .game-card {
+            background:linear-gradient(145deg, rgba(28,25,21,0.95), rgba(10,9,7,0.98));
+            backdrop-filter:blur(20px); border-radius:var(--radius-xl); padding:1.8rem;
+            border:1px solid var(--border-gold); box-shadow:0 30px 50px rgba(0,0,0,0.7), 0 0 80px -10px rgba(255,217,102,0.1);
+            display:flex; flex-direction:column; gap:1.4rem;
+            animation:slideUp 0.6s var(--transition-bounce);
+        }
+        @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+        .game-title { text-align:center; font-size:1.6rem; font-weight:800; color:var(--gold); }
+        .game-title i { margin:0 0.3rem; }
+
+        .difficulty-selector {
+            display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap;
+        }
+        .diff-btn {
+            flex: 1; min-width: 90px; padding: 0.7rem 0.8rem; border-radius: var(--radius-full);
+            border: 2px solid rgba(255,217,102,0.3); background: rgba(0,0,0,0.3);
+            color: var(--gold); font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.2s; text-transform: uppercase;
+            letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center;
+            gap: 0.4rem; font-family: 'Inter', sans-serif;
+        }
+        .diff-btn i { font-size: 0.9rem; }
+        .diff-btn:hover:not(:disabled) {
+            background: rgba(255,217,102,0.1); border-color: var(--border-active);
+            transform: translateY(-2px);
+        }
+        .diff-btn.active {
+            background: linear-gradient(135deg, #f5b042, #ffd966);
+            color: #1a150e; border-color: #ffed4e;
+            box-shadow: 0 0 18px rgba(255,217,102,0.5);
+            font-weight: 800;
+        }
+        .diff-btn:disabled {
+            opacity: 0.4; cursor: not-allowed; transform: none;
+        }
+
+        .tower-area {
+            background:linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 25%, #1a0a0a 75%, #0d0505 100%);
+            border-radius:var(--radius-lg); padding:1rem; border:2px solid var(--border-gold);
+            box-shadow:inset 0 0 30px rgba(0,0,0,0.5); overflow-y:auto; max-height:420px;
+            position:relative; scroll-behavior:smooth;
+        }
+        .tower-grid { display:flex; flex-direction:column; gap:5px; align-items:center; }
+        .tower-row { display:flex; gap:5px; align-items:center; }
+        .row-number { width:30px; text-align:center; font-size:0.7rem; color:var(--text-muted); font-weight:700; }
+        .tower-cell {
+            width:var(--cell); height:var(--cell); border-radius:12px;
+            background:rgba(30,30,50,0.9); border:2px solid rgba(255,255,255,0.08);
+            cursor:default; transition:all 0.2s ease-out;
+            display:flex; align-items:center; justify-content:center;
+            font-weight:700; font-size:0.85rem; color:rgba(255,255,255,0.3);
+            position:relative;
+        }
+        .tower-cell.clickable { cursor:pointer; border-color:var(--gold); box-shadow:0 0 15px rgba(255,217,102,0.4); }
+        .tower-cell.clickable:hover { background:rgba(255,217,102,0.15); transform:scale(1.05); }
+        .tower-cell.climbed { background:rgba(76,175,80,0.3); border-color:var(--success); color:#fff; cursor:default; }
+        .tower-cell.mine-revealed { background:rgba(255,107,107,0.5); border-color:var(--danger); color:#fff; animation:mineShake 0.5s; }
+        @keyframes mineShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }
+        .tower-cell i { font-size:1.1rem; }
+        .tower-cell .cell-glow { position:absolute; inset:0; border-radius:12px; background:transparent; pointer-events:none; transition:0.3s; }
+        .tower-cell.clickable .cell-glow { box-shadow:inset 0 0 15px rgba(255,217,102,0.3); }
+
+        /* Multiplier panel */
+        .multiplier-panel {
+            background:rgba(0,0,0,0.6); border-radius:var(--radius-md); padding:1rem;
+            text-align:center; border:1px solid var(--border-gold);
+            transition:all 0.3s;
+        }
+        .climb-counter { font-size:2.2rem; font-weight:900; color:var(--gold-bright); }
+        .multiplier-value { font-size:1.8rem; font-weight:800; color:var(--gold); }
+        .cashout-preview strong { color:#fff; font-size:1.2rem; }
+        .multiplier-progress { height:6px; background:rgba(255,255,255,0.1); border-radius:10px; margin-top:0.5rem; overflow:hidden; }
+        .multiplier-progress-fill { height:100%; background:linear-gradient(90deg, #ffd966, #ffaa33); border-radius:10px; transition:width 0.3s; }
+
+        .bet-row { display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap; }
+        .bet-row label { display:flex; align-items:center; gap:0.3rem; font-weight:600; color:var(--gold); }
+        .bet-input {
+            background:#1f1b17; border:2px solid rgba(255,217,102,0.2); border-radius:var(--radius-full);
+            padding:0.65rem 1.2rem; color:white; font-weight:700; width:110px; text-align:center;
+            font-size:1rem; transition:var(--transition-fast); outline:none;
+        }
+        .bet-input:focus { border-color:var(--border-active); box-shadow:0 0 0 4px rgba(255,217,102,0.1); }
+        .bet-input.invalid { border-color:var(--danger); }
+        .quick-bets { display:flex; gap:0.4rem; flex-wrap:wrap; }
+        .quick-bet { background:rgba(255,217,102,0.08); border:1px solid rgba(255,217,102,0.3); border-radius:40px; padding:0.35rem 0.9rem; color:var(--gold); font-weight:600; cursor:pointer; transition:var(--transition-fast); font-size:0.8rem; }
+        .quick-bet:hover { background:rgba(255,217,102,0.2); transform:scale(1.05); }
+
+        .action-buttons { display:flex; gap:1rem; }
+        .btn {
+            flex:1; border:none; border-radius:var(--radius-full); font-weight:800; font-size:1rem;
+            padding:0.9rem; cursor:pointer; transition:all 0.15s; text-transform:uppercase;
+            letter-spacing:1px; font-family:'Inter', sans-serif; position:relative; overflow:hidden;
+        }
+        .btn:active { transform:translateY(3px); box-shadow:none!important; }
+        .btn-start {
+            background:linear-gradient(135deg, #f5b042 0%, #ffd966 40%, #ffed4e 100%);
+            color:#1a150e; box-shadow:0 5px 0 #a05f15, 0 8px 20px rgba(255,180,40,0.3);
+        }
+        .btn-start:hover:not(:disabled) { transform:translateY(-3px); box-shadow:0 8px 0 #a05f15, 0 14px 30px rgba(255,180,40,0.45); }
+        .btn-cashout {
+            background:linear-gradient(135deg, #2e7d32, #1b5e20); color:white;
+            box-shadow:0 5px 0 #0a3a0a, 0 8px 20px rgba(76,175,80,0.3);
+        }
+        .btn-cashout:hover:not(:disabled) { transform:translateY(-3px); box-shadow:0 8px 0 #0a3a0a, 0 14px 30px rgba(76,175,80,0.45); }
+        .btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:0 2px 0 #555; }
+        .ripple {
+            position:absolute; border-radius:50%; background:rgba(255,255,255,0.4);
+            transform:scale(0); animation:rippleEffect 0.7s ease-out; pointer-events:none;
+        }
+        @keyframes rippleEffect { to { transform:scale(4); opacity:0; } }
+
+        .result-panel {
+            background:rgba(0,0,0,0.5); border-radius:var(--radius-md); padding:0.8rem;
+            text-align:center; font-weight:600; font-size:0.9rem; backdrop-filter:blur(10px);
+            min-height:44px; display:flex; align-items:center; justify-content:center; gap:0.5rem;
+            transition:0.3s;
+        }
+        .result-panel.win { color:#a5d6a7; }
+        .result-panel.loss { color:#ffab91; }
+
+        .win-multiplier-bubble {
+            position:fixed; left:50%; top:50%; transform:translate(-50%, -50%);
+            color:var(--gold-bright); font-weight:900; font-size:2.8rem;
+            text-shadow:0 0 30px gold; pointer-events:none; z-index:100;
+            animation:bubbleUp 1.8s ease-out forwards;
+        }
+        @keyframes bubbleUp {
+            0% { opacity:1; transform:translate(-50%, -50%) scale(0.5); }
+            30% { opacity:1; transform:translate(-50%, -50%) scale(1.2); }
+            100% { opacity:0; transform:translate(-50%, -160%) scale(1); }
+        }
+
+        .stats-grid {
+            display:grid; grid-template-columns:repeat(3,1fr); gap:0.8rem;
+            background:rgba(0,0,0,0.4); border-radius:var(--radius-md); padding:0.8rem;
+        }
+        .stat-cell { text-align:center; }
+        .stat-value { font-weight:800; font-size:1.2rem; color:var(--gold); }
+        .stat-label { font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; }
+
+        #confettiCanvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:999; }
+
+        @media (max-width:500px) {
+            :root { --cell: 44px; }
+            .tower-cell { border-radius:8px; font-size:0.7rem; }
+            .game-card { padding:1.2rem; }
+            .btn { font-size:0.85rem; padding:0.7rem; }
+            .multiplier-value { font-size:1.4rem; }
+            .diff-btn { font-size: 0.75rem; padding: 0.5rem 0.6rem; }
+        }
+    </style>
+</head>
+<body>
+<canvas id="confettiCanvas"></canvas>
+<div class="bg-particles" id="bgParticles"></div>
+
+<div class="game-container">
+    <div class="top-nav">
+        <a href=".././home.html" class="back-home"><i class="fas fa-arrow-left"></i> Lobby</a>
+        <div class="balance-tag" id="balanceTag"><i class="fas fa-coins"></i> <span id="headerBalance">0</span></div>
+        <button id="soundToggleBtn" class="sound-btn"><i class="fas fa-volume-up"></i></button>
+    </div>
+
+    <div class="game-card">
+        <div class="game-title"><i class="fas fa-chess-rook"></i> TOWER CLIMB <i class="fas fa-chess-rook"></i></div>
+
+        <div class="difficulty-selector" id="difficultySelector">
+            <button class="diff-btn active" data-mines="1"><i class="fas fa-skull"></i> Easy</button>
+            <button class="diff-btn" data-mines="2"><i class="fas fa-skull"></i> Medium</button>
+            <button class="diff-btn" data-mines="3"><i class="fas fa-skull"></i> Hard</button>
+        </div>
+
+        <div class="tower-area" id="towerArea">
+            <div class="tower-grid" id="towerGrid"></div>
+        </div>
+
+        <div class="multiplier-panel" id="multiplierPanel">
+            <div style="font-size:0.7rem; color:var(--text-muted);">FLOOR CLIMBED</div>
+            <div class="climb-counter" id="climbCount">0</div>
+            <div class="multiplier-value" id="multiplierDisplay">1.00×</div>
+            <div class="cashout-preview" id="cashoutPreview">Cash out: <strong>0 GOLD</strong></div>
+            <div class="multiplier-progress"><div class="multiplier-progress-fill" id="progressFill" style="width:0%"></div></div>
+        </div>
+
+        <div class="bet-row" id="betRow">
+            <label><i class="fas fa-coins"></i> Bet</label>
+            <input type="number" id="betAmount" class="bet-input" value="25" step="1" min="1" inputmode="numeric">
+            <div class="quick-bets">
+                <button class="quick-bet" data-bet="10">+10</button>
+                <button class="quick-bet" data-bet="25">+25</button>
+                <button class="quick-bet" data-bet="50">+50</button>
+                <button class="quick-bet" data-bet="100">+100</button>
+                <button class="quick-bet" id="halfBetBtn">½</button>
+                <button class="quick-bet" id="maxBetBtn">MAX</button>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-start" id="startBtn"><i class="fas fa-play"></i> START CLIMB</button>
+            <button class="btn btn-cashout" id="cashoutBtn" disabled><i class="fas fa-hand-holding-usd"></i> CASH OUT</button>
+        </div>
+
+        <div class="result-panel" id="resultMessage"><i class="fas fa-info-circle"></i> Select difficulty & start climbing!</div>
+
+        <div class="stats-grid">
+            <div class="stat-cell"><div class="stat-value" id="climbsStat">0</div><div class="stat-label">Climbs</div></div>
+            <div class="stat-cell"><div class="stat-value" id="bestFloorStat">0</div><div class="stat-label">Best Floor</div></div>
+            <div class="stat-cell"><div class="stat-value" id="sessionPL">0</div><div class="stat-label">Session P/L</div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (() => {
+        // ── AUDIO ──
+        let audioCtx = null, soundEnabled = true;
+        function initAudio() { if (!audioCtx && soundEnabled) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+        function playTone(type) {
+            if(!soundEnabled) return;
+            try {
+                initAudio(); if(!audioCtx) return;
+                const now = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                switch(type) {
+                    case 'start': osc.type='triangle'; osc.frequency.setValueAtTime(400,now); osc.frequency.exponentialRampToValueAtTime(800,now+0.2); gain.gain.setValueAtTime(0.1,now); gain.gain.exponentialRampToValueAtTime(0.001,now+0.3); osc.start(now); osc.stop(now+0.35); break;
+                    case 'step': osc.type='sine'; osc.frequency.setValueAtTime(660,now); gain.gain.setValueAtTime(0.07,now); gain.gain.exponentialRampToValueAtTime(0.001,now+0.1); osc.start(now); osc.stop(now+0.12); break;
+                    case 'cashout': osc.type='sine'; osc.frequency.setValueAtTime(660,now); osc.frequency.setValueAtTime(880,now+0.15); osc.frequency.setValueAtTime(1100,now+0.3); gain.gain.setValueAtTime(0.12,now); gain.gain.exponentialRampToValueAtTime(0.001,now+0.5); osc.start(now); osc.stop(now+0.6); break;
+                    case 'bust': osc.type='sawtooth'; osc.frequency.setValueAtTime(200,now); osc.frequency.exponentialRampToValueAtTime(60,now+0.5); gain.gain.setValueAtTime(0.12,now); gain.gain.exponentialRampToValueAtTime(0.001,now+0.6); osc.start(now); osc.stop(now+0.7); break;
+                    case 'click': osc.type='sine'; osc.frequency.setValueAtTime(500,now); gain.gain.setValueAtTime(0.05,now); gain.gain.exponentialRampToValueAtTime(0.001,now+0.06); osc.start(now); osc.stop(now+0.08); break;
+                }
+            } catch(e) {}
+        }
+
+        // ── CONFETTI ──
+        function triggerConfetti() {
+            const c = document.getElementById('confettiCanvas');
+            c.width = window.innerWidth; c.height = window.innerHeight;
+            const ctx = c.getContext('2d');
+            const particles = [];
+            const colors = ['#ffd966','#f5b042','#ffed4e','#4caf50','#ffaa00'];
+            for(let i=0;i<220;i++) particles.push({
+                x:Math.random()*c.width, y:-30-Math.random()*100,
+                size:Math.random()*7+3, speedY:Math.random()*6+5,
+                speedX:(Math.random()-0.5)*6, color:colors[Math.floor(Math.random()*colors.length)],
+                rot:Math.random()*360, rotSpeed:(Math.random()-0.5)*14,
+                shape:Math.random()>0.5?'rect':'circle', opacity:1
+            });
+            let frame; const start = performance.now();
+            function draw(now) {
+                if(now-start>2800){ ctx.clearRect(0,0,c.width,c.height); cancelAnimationFrame(frame); return; }
+                ctx.clearRect(0,0,c.width,c.height);
+                particles.forEach(p=>{
+                    p.y+=p.speedY; p.x+=p.speedX; p.rot+=p.rotSpeed;
+                    p.opacity = Math.max(0, 1-(now-start)/2800);
+                    ctx.save(); ctx.globalAlpha=p.opacity; ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+                    ctx.fillStyle=p.color;
+                    if(p.shape==='circle'){ ctx.beginPath(); ctx.arc(0,0,p.size/2,0,Math.PI*2); ctx.fill(); }
+                    else ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);
+                    ctx.restore();
+                });
+                frame=requestAnimationFrame(draw);
+            }
+            frame=requestAnimationFrame(draw);
+        }
+
+        // ── USER DATA ──
+        let currentUser = null, sessionProfit = 0;
+        const defaultTowerStats = { climbs:0, wins:0, losses:0, totalBet:0, totalWin:0, bestFloor:0, currentStreak:0, bestStreak:0 };
+
+        function initUserStats(u) {
+            const def = {
+                globalStats: { totalWagered:0, totalWon:0, totalLosses:0, totalGames:0, currentStreak:0, bestStreak:0, totalWins:0 },
+                transactions:[], gameOutcomes:[], gamePlayCount:{}, bankBalance:0, xp:0,
+                avatar:'fas fa-crown', theme:'theme-gold', autoTransfer:false, earnedAchievements:[],
+                lastInterestDate:null, lastDailyBonusDate:null, lastWheelSpinDate:null,
+                dailyBalanceSnapshots:[],
+                towerStats: { ...defaultTowerStats }
+            };
+            for(let [k,v] of Object.entries(def)) if(u[k]===undefined) u[k]=v;
+            if(!u.towerStats) u.towerStats = { ...defaultTowerStats };
+            return u;
+        }
+
+        async function loadUser() {
+            const sess = sessionStorage.getItem('gold_current_user');
+            if(!sess){ window.location.href='../../sign-in.html'; return false; }
+            const su = JSON.parse(sess);
+            const users = JSON.parse(localStorage.getItem('gold_users')||'{}');
+            let user = users[su.username];
+            if(!user){ sessionStorage.removeItem('gold_current_user'); window.location.href='../../sign-in.html'; return false; }
+            currentUser = initUserStats(user);
+            updateBalance(); updateStats(); validateBet(); return true;
+        }
+
+        async function saveUser() {
+            const users = JSON.parse(localStorage.getItem('gold_users')||'{}');
+            users[currentUser.username] = currentUser;
+            localStorage.setItem('gold_users', JSON.stringify(users));
+            const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
+            if(sess){ sess.balance=currentUser.balance; sessionStorage.setItem('gold_current_user',JSON.stringify(sess)); }
+        }
+
+        function updateBalance() {
+            const el = document.getElementById('headerBalance');
+            const prev = parseInt(el.textContent.replace(/,/g,''))||0;
+            const next = currentUser.balance;
+            if(prev!==next){
+                animateNumber(el, prev, next, 400);
+                if(next>prev) document.getElementById('balanceTag').classList.add('pulse'), setTimeout(()=>document.getElementById('balanceTag').classList.remove('pulse'),500);
+            } else el.textContent = next.toLocaleString();
+            validateBet();
+        }
+
+        function animateNumber(el, start, end, dur) {
+            if(start===end){ el.textContent=end.toLocaleString(); return; }
+            const range=end-start, st=performance.now();
+            function step(now){
+                const p=Math.min((now-st)/dur,1), eased=1-Math.pow(1-p,3);
+                el.textContent = Math.floor(start+range*eased).toLocaleString();
+                if(p<1) requestAnimationFrame(step); else el.textContent=end.toLocaleString();
+            }
+            requestAnimationFrame(step);
+        }
+
+        function updateStats() {
+            const s = currentUser.towerStats;
+            document.getElementById('climbsStat').textContent = s.climbs||0;
+            document.getElementById('bestFloorStat').textContent = s.bestFloor||0;
+            const pl = document.getElementById('sessionPL');
+            pl.textContent = (sessionProfit>=0?'+':'')+sessionProfit.toFixed(2);
+            pl.style.color = sessionProfit>=0?'var(--success)':'var(--danger)';
+        }
+
+        function validateBet() {
+            const inp = document.getElementById('betAmount'), bet = parseFloat(inp.value)||0;
+            const startBtn = document.getElementById('startBtn');
+            const invalid = gameActive || bet<=0 || bet>currentUser.balance;
+            inp.classList.toggle('invalid', bet>0 && bet>currentUser.balance);
+            startBtn.disabled = invalid;
+            if(!invalid && bet>0) inp.classList.remove('invalid');
+        }
+
+        function addRipple(e, btn) {
+            const ripple = document.createElement('span');
+            ripple.className='ripple';
+            const rect=btn.getBoundingClientRect(), size=Math.max(rect.width, rect.height);
+            ripple.style.width=ripple.style.height=size+'px';
+            ripple.style.left=(e.clientX-rect.left-size/2)+'px';
+            ripple.style.top=(e.clientY-rect.top-size/2)+'px';
+            btn.appendChild(ripple);
+            ripple.addEventListener('animationend', ()=>ripple.remove());
+        }
+
+        // ── TOWER LOGIC ──
+        const COLS=5, TOTAL_FLOORS=20;
+        let gameActive=false, currentFloor=0, baseBet=0;
+        let towerMines=[], climbedColumns=[];
+        let minesPerFloor = 1; // default difficulty
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        function pickMines(count) {
+            const cols = [...Array(COLS).keys()];
+            shuffleArray(cols);
+            return cols.slice(0, count);
+        }
+
+        function generateTowerMines() {
+            towerMines = Array.from({length:TOTAL_FLOORS}, () => pickMines(minesPerFloor));
+        }
+
+        function getMultiplier(floor) {
+            if (floor <= 0) return 1.0;
+            const probSurvive = (COLS - minesPerFloor) / COLS;
+            const fairMult = Math.pow(1 / probSurvive, floor);
+            // Apply a 5% house edge
+            return Math.floor(fairMult * 100 * 0.95) / 100;
+        }
+
+        function buildTower() {
+            const grid = document.getElementById('towerGrid');
+            grid.innerHTML = '';
+            for(let floor=TOTAL_FLOORS-1; floor>=0; floor--) {
+                const row = document.createElement('div');
+                row.className='tower-row';
+                const numSpan = document.createElement('span');
+                numSpan.className='row-number';
+                numSpan.textContent = floor+1;
+                row.appendChild(numSpan);
+                for(let col=0; col<COLS; col++) {
+                    const cell = document.createElement('div');
+                    cell.className='tower-cell';
+                    cell.dataset.floor=floor; cell.dataset.col=col;
+                    cell.innerHTML = '<i class="fas fa-question"></i><div class="cell-glow"></div>';
+                    if(gameActive && floor===currentFloor) {
+                        cell.classList.add('clickable');
+                    }
+                    if(climbedColumns[floor]!==undefined && climbedColumns[floor]===col) {
+                        cell.classList.add('climbed');
+                        cell.innerHTML = '<i class="fas fa-check-circle"></i>';
+                    }
+                    if(!gameActive && currentFloor>0 && climbedColumns.length) {
+                        if(floor < climbedColumns.length) {
+                            const mines = towerMines[floor] || [];
+                            if(mines.includes(col)) {
+                                cell.classList.add('mine-revealed');
+                                cell.innerHTML = '<i class="fas fa-bomb"></i>';
+                            } else if(climbedColumns[floor] === col) {
+                                cell.classList.add('climbed');
+                                cell.innerHTML = '<i class="fas fa-check-circle"></i>';
+                            } else {
+                                cell.style.color = 'rgba(255,255,255,0.2)';
+                                cell.innerHTML = '<i class="fas fa-circle"></i>';
+                            }
+                        }
+                    }
+                    cell.addEventListener('click', () => onCellClick(floor, col));
+                    row.appendChild(cell);
+                }
+                grid.appendChild(row);
+            }
+            if(gameActive && currentFloor<TOTAL_FLOORS) {
+                const targetRow = grid.querySelector(`[data-floor="${currentFloor}"]`);
+                if(targetRow) targetRow.scrollIntoView({ behavior:'smooth', block:'center' });
+            }
+        }
+
+        function updateMultiplierPanel() {
+            const mult = getMultiplier(currentFloor);
+            const cashoutVal = Math.floor(baseBet * mult);
+            document.getElementById('climbCount').textContent = currentFloor;
+            document.getElementById('multiplierDisplay').textContent = mult.toFixed(2)+'×';
+            document.getElementById('cashoutPreview').innerHTML = 'Cash out: <strong>'+cashoutVal.toLocaleString()+' GOLD</strong>';
+            document.getElementById('progressFill').style.width = (currentFloor/TOTAL_FLOORS*100)+'%';
+        }
+
+        async function onCellClick(floor, col) {
+            if(!gameActive || floor!==currentFloor) return;
+            playTone('click');
+            const mines = towerMines[floor] || [];
+            if(mines.includes(col)) {
+                gameActive = false;
+                climbedColumns[floor] = col;
+                buildTower();
+                const bustFloor = floor+1;
+                document.getElementById('resultMessage').innerHTML = `<i class="fas fa-bomb"></i> <strong>BUST!</strong> Mine hit on floor ${bustFloor}. Lost ${baseBet} GOLD.`;
+                document.getElementById('resultMessage').className = 'result-panel loss';
+                playTone('bust');
+                sessionProfit -= baseBet;
+                const ts = currentUser.towerStats;
+                ts.climbs++; ts.losses++; ts.totalBet += baseBet; ts.currentStreak = 0;
+                if(floor > ts.bestFloor) ts.bestFloor = floor;
+                recordGame(false, floor, 0);
+                await saveUser(); updateBalance(); updateStats();
+                disableButtons();
+                setTimeout(resetGame, 2300);
+                return;
+            }
+            // safe
+            climbedColumns[floor] = col;
+            currentFloor++;
+            buildTower();
+            updateMultiplierPanel();
+            playTone('step');
+            document.getElementById('resultMessage').innerHTML = `<i class="fas fa-arrow-up"></i> Safe! Now at floor ${currentFloor}.`;
+            document.getElementById('resultMessage').className = 'result-panel';
+            if(currentFloor >= TOTAL_FLOORS) {
+                await cashOut(true);
+            }
+        }
+
+        async function cashOut(isMax=false) {
+            if(!gameActive) return;
+            gameActive = false;
+            const multiplier = getMultiplier(currentFloor);
+            const winAmount = Math.floor(baseBet * multiplier);
+            const netProfit = winAmount - baseBet;
+            currentUser.balance += winAmount;
+            sessionProfit += netProfit;
+            document.getElementById('resultMessage').innerHTML = `<i class="fas fa-trophy"></i> <strong>CASHED OUT!</strong> Floor ${currentFloor} at ${multiplier.toFixed(2)}× = +${winAmount} GOLD!`;
+            document.getElementById('resultMessage').className = 'result-panel win';
+            playTone('cashout');
+            triggerConfetti();
+            showMultiplierBubble(multiplier.toFixed(2)+'×');
+            buildTower();
+            const ts = currentUser.towerStats;
+            ts.climbs++; ts.wins++; ts.totalBet += baseBet; ts.totalWin += winAmount;
+            ts.currentStreak = (ts.currentStreak||0)+1;
+            if(ts.currentStreak > (ts.bestStreak||0)) ts.bestStreak = ts.currentStreak;
+            if(currentFloor > ts.bestFloor) ts.bestFloor = currentFloor;
+            recordGame(true, currentFloor, winAmount);
+            await saveUser(); updateBalance(); updateStats();
+            disableButtons();
+            setTimeout(resetGame, 2500);
+        }
+
+        function showMultiplierBubble(text) {
+            const bubble = document.createElement('div');
+            bubble.className = 'win-multiplier-bubble';
+            bubble.textContent = text;
+            document.body.appendChild(bubble);
+            bubble.addEventListener('animationend', ()=>bubble.remove());
+        }
+
+        function recordGame(isWin, floor, winAmount) {
+            const netProfit = isWin ? (winAmount - baseBet) : -baseBet;
+            const gs = currentUser.globalStats;
+            gs.totalWagered += baseBet; gs.totalWon += winAmount; gs.totalGames++;
+            if(isWin) { gs.totalWins++; gs.currentStreak = (gs.currentStreak||0)+1; if(gs.currentStreak>(gs.bestStreak||0)) gs.bestStreak=gs.currentStreak; }
+            else { gs.currentStreak=0; gs.totalLosses=(gs.totalLosses||0)+1; }
+            currentUser.xp = (currentUser.xp||0)+baseBet;
+            currentUser.gamePlayCount['tower-climb'] = (currentUser.gamePlayCount['tower-climb'] || 0) + 1;
+            currentUser.transactions.unshift({
+                desc: `🗼 Tower Climb | Difficulty ${minesPerFloor} mine(s) | Floor ${floor} | ${isWin?'Cashed out +'+winAmount:'Bust -'+baseBet} GOLD`,
+                amount: netProfit, type: isWin?'game_win':'game_loss', date: new Date().toISOString()
+            });
+            if(currentUser.transactions.length>30) currentUser.transactions.pop();
+            currentUser.gameOutcomes.unshift({
+                game:'Tower Climb', result:isWin?'win':'loss', profit:netProfit, floor, multiplier:getMultiplier(floor), bet:baseBet, date:new Date().toISOString()
+            });
+            if(currentUser.gameOutcomes.length>50) currentUser.gameOutcomes.pop();
+        }
+
+        function disableButtons() {
+            document.getElementById('cashoutBtn').disabled = true;
+            document.getElementById('startBtn').disabled = true;
+            setDifficultyButtonsEnabled(false);
+        }
+
+        function setDifficultyButtonsEnabled(enabled) {
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.disabled = !enabled;
+            });
+        }
+
+        async function startGame() {
+            if(gameActive) return;
+            const bet = Math.floor(parseFloat(document.getElementById('betAmount').value));
+            if(isNaN(bet)||bet<1||bet>currentUser.balance) return;
+            currentUser.balance -= bet;
+            baseBet = bet;
+            currentFloor = 0;
+            climbedColumns = [];
+            generateTowerMines();
+            gameActive = true;
+            setDifficultyButtonsEnabled(false);
+            await saveUser(); updateBalance();
+            document.getElementById('cashoutBtn').disabled = false;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('resultMessage').innerHTML = '<i class="fas fa-arrow-up"></i> Choose a column to climb!';
+            document.getElementById('resultMessage').className = 'result-panel';
+            updateMultiplierPanel();
+            buildTower();
+            playTone('start');
+            setTimeout(()=>{
+                const towerArea = document.getElementById('towerArea');
+                if(towerArea) towerArea.scrollTop = towerArea.scrollHeight;
+            }, 100);
+        }
+
+        function resetGame() {
+            gameActive = false;
+            currentFloor = 0; climbedColumns = []; towerMines = []; baseBet = 0;
+            document.getElementById('cashoutBtn').disabled = true;
+            document.getElementById('startBtn').disabled = false;
+            setDifficultyButtonsEnabled(true);
+            document.getElementById('climbCount').textContent = '0';
+            document.getElementById('multiplierDisplay').textContent = '1.00×';
+            document.getElementById('cashoutPreview').innerHTML = 'Cash out: <strong>0 GOLD</strong>';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('resultMessage').innerHTML = '<i class="fas fa-info-circle"></i> Select difficulty & start climbing!';
+            document.getElementById('resultMessage').className = 'result-panel';
+            buildTower();
+            validateBet();
+        }
+
+        function setDifficulty(mines) {
+            if (gameActive) return;
+            minesPerFloor = mines;
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                const btnMines = parseInt(btn.dataset.mines);
+                btn.classList.toggle('active', btnMines === mines);
+            });
+            updateMultiplierPanel(); // refresh multiplier display for floor 0
+        }
+
+        // ── EVENT BINDINGS ──
+        function bindEvents() {
+            document.getElementById('startBtn').addEventListener('click', (e)=>{ addRipple(e, e.target); startGame(); });
+            document.getElementById('cashoutBtn').addEventListener('click', (e)=>{ addRipple(e, e.target); cashOut(false); });
+
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const mines = parseInt(btn.dataset.mines);
+                    setDifficulty(mines);
+                    playTone('click');
+                });
+            });
+
+            document.querySelectorAll('.quick-bet').forEach(btn => {
+                btn.addEventListener('click', ()=>{
+                    const inp = document.getElementById('betAmount');
+                    if(btn.id==='halfBetBtn'){ const v=parseFloat(inp.value)||0; inp.value=Math.max(1,Math.floor(v/2)); }
+                    else if(btn.id==='maxBetBtn'){ if(currentUser) inp.value=Math.floor(currentUser.balance); }
+                    else {
+                        const add=parseFloat(btn.dataset.bet); const val=parseFloat(inp.value)||0;
+                        let nv=val+add; if(currentUser && nv>currentUser.balance) nv=currentUser.balance;
+                        inp.value=Math.max(1,Math.floor(nv));
+                    }
+                    validateBet();
+                    playTone('click');
+                });
+            });
+            document.getElementById('betAmount').addEventListener('input', validateBet);
+            document.getElementById('soundToggleBtn').addEventListener('click', ()=>{
+                soundEnabled=!soundEnabled;
+                document.getElementById('soundToggleBtn').innerHTML = soundEnabled?'<i class="fas fa-volume-up"></i>':'<i class="fas fa-volume-mute"></i>';
+                localStorage.setItem('gold_sound_enabled', soundEnabled);
+                if(soundEnabled) initAudio();
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e)=>{
+                if(!gameActive) {
+                    if(e.key==='Enter') { e.preventDefault(); startGame(); }
+                    return;
+                }
+                const key = e.key;
+                if(key>='1' && key<='5') {
+                    const col = parseInt(key)-1;
+                    if(currentFloor<TOTAL_FLOORS) onCellClick(currentFloor, col);
+                } else if(key===' ' || key==='Spacebar') {
+                    e.preventDefault();
+                    cashOut(false);
+                }
+            });
+        }
+
+        // ── BACKGROUND PARTICLES ──
+        function createSparkles() {
+            const cont = document.getElementById('bgParticles');
+            for(let i=0;i<40;i++){
+                const s = document.createElement('div');
+                s.className='sparkle';
+                s.style.left=Math.random()*100+'%';
+                s.style.bottom=-(Math.random()*20+5)+'%';
+                s.style.animationDelay=Math.random()*5+'s';
+                s.style.animationDuration=(Math.random()*4+3)+'s';
+                cont.appendChild(s);
+            }
+        }
+
+        async function init() {
+            createSparkles();
+            if(!(await loadUser())) return;
+            setDifficulty(1); // default easy
+            buildTower();
+            bindEvents();
+            updateStats();
+            validateBet();
+            const savedSound = localStorage.getItem('gold_sound_enabled');
+            if(savedSound==='false') { soundEnabled=false; document.getElementById('soundToggleBtn').innerHTML='<i class="fas fa-volume-mute"></i>'; }
+            else soundEnabled=true;
+        }
+        init();
+    })();
+</script>
+</body>
+</html>

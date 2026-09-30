@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>CRYSTAL PUSH | Match Crytstals, Enlarge your payout!</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd966;
+            --gold-bright: #ffe484;
+            --gold-deep: #f5b042;
+            --bg-deep: #0a0908;
+            --card-bg: rgba(20, 18, 16, 0.94);
+            --border-gold: rgba(255, 217, 102, 0.6);
+            --shadow-gold: 0 0 28px rgba(255, 217, 102, 0.35);
+            --radius-lg: 2rem;
+            --radius-md: 1.5rem;
+            --radius-full: 60px;
+            --transition-fast: 0.15s ease;
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(circle at 30% 10%, #0f0e0c 0%, #020101 100%);
+            color: #f5f0e6;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            max-width: 860px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-full);
+            padding: 0.6rem 1.8rem;
+            border: 1px solid var(--border-gold);
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .back-home {
+            text-decoration: none;
+            color: var(--gold);
+            font-weight: 700;
+            background: rgba(255, 217, 102, 0.12);
+            padding: 0.45rem 1.2rem;
+            border-radius: 40px;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        .back-home:hover {
+            background: rgba(255, 217, 102, 0.22);
+            color: #fff;
+        }
+
+        .balance-tag {
+            background: #1f1b16e6;
+            padding: 0.4rem 1.4rem;
+            border-radius: 40px;
+            font-weight: 800;
+            border: 1px solid var(--gold);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            font-size: 0.95rem;
+            white-space: nowrap;
+            transition: var(--transition-fast);
+        }
+        .balance-tag.pulse {
+            animation: balancePulse 0.35s ease-out;
+        }
+        @keyframes balancePulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.06);
+                border-color: #fff;
+            }
+        }
+
+        .sound-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--gold);
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--gold-bright);
+            transition: var(--transition-fast);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sound-btn:hover {
+            background: rgba(255, 217, 102, 0.2);
+        }
+
+        .main-card {
+            background: linear-gradient(145deg, rgba(28, 25, 21, 0.97), rgba(12, 10, 8, 0.99));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: var(--radius-lg);
+            padding: 1.6rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 35px 55px rgba(0, 0, 0, 0.6), var(--shadow-gold);
+            text-align: center;
+        }
+
+        .canvas-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: 28px;
+            padding: 12px;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 217, 102, 0.25);
+            position: relative;
+        }
+
+        canvas {
+            border-radius: 1.2rem;
+            border: 2px solid var(--border-gold);
+            box-shadow: 0 0 22px rgba(0, 0, 0, 0.7);
+            width: 100%;
+            height: auto;
+            max-width: 660px;
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+            transition: transform 0.05s ease;
+            background: #0b0a07;
+            display: block;
+        }
+        canvas:active {
+            transform: scale(0.985);
+        }
+        canvas.processing {
+            cursor: wait;
+            pointer-events: none;
+        }
+
+        .stats-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            background: rgba(0, 0, 0, 0.55);
+            padding: 0.7rem 1.4rem;
+            border-radius: 60px;
+            margin: 0.6rem 0;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .multiplier-badge {
+            background: linear-gradient(135deg, #3a2e1e, #1f1a10);
+            padding: 0.3rem 1rem;
+            border-radius: 60px;
+            font-weight: 800;
+            border-left: 3px solid var(--gold);
+            transition: var(--transition-smooth);
+            min-width: 180px;
+            text-align: center;
+        }
+        .multiplier-badge.updated {
+            animation: multiGlow 0.5s ease-out;
+        }
+        @keyframes multiGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 0px transparent;
+            }
+            50% {
+                box-shadow: 0 0 18px rgba(255, 217, 102, 0.7);
+            }
+        }
+
+        .bet-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 1rem 0 0.6rem;
+        }
+
+        .bet-input {
+            width: 130px;
+            background: #0f0d0b;
+            border: 2px solid var(--gold);
+            border-radius: 60px;
+            padding: 0.7rem;
+            text-align: center;
+            font-weight: 800;
+            color: var(--gold-bright);
+            font-size: 1rem;
+            transition: var(--transition-fast);
+            outline: none;
+            font-family: inherit;
+        }
+        .bet-input:focus {
+            border-color: #fff;
+            box-shadow: 0 0 12px rgba(255, 217, 102, 0.5);
+        }
+        .bet-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-gem {
+            border: none;
+            font-weight: 800;
+            cursor: pointer;
+            padding: 0.7rem 1.8rem;
+            font-size: 1rem;
+            transition: all 0.12s linear;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            border-radius: 20px;
+            background: linear-gradient(145deg, #ffd966, #e6a017);
+            color: #1f1506;
+            box-shadow: 0 6px 0 #9b5e1a, 0 4px 18px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 0 rgba(255, 255, 200, 0.6);
+            position: relative;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .btn-gem::before {
+            content: "◆";
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #2c1c06;
+            text-shadow: 0 0 2px gold;
+        }
+        .btn-gem:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #9b5e1a;
+        }
+        .btn-gem:disabled {
+            opacity: 0.55;
+            transform: translateY(0);
+            cursor: not-allowed;
+            filter: grayscale(0.1);
+        }
+        .btn-gem:not(:disabled):hover {
+            filter: brightness(1.08);
+        }
+
+        .btn-outline-cash {
+            background: linear-gradient(145deg, #2c241a, #1a1610);
+            border: 1px solid #ffd966;
+            color: #ffdd99;
+            box-shadow: 0 4px 0 #6b4c1a;
+            text-shadow: none;
+        }
+        .btn-outline-cash::before {
+            content: "💰";
+            font-size: 1rem;
+        }
+        .btn-outline-cash.cashout-ready {
+            animation: cashoutGlow 0.8s ease-in-out infinite;
+        }
+        @keyframes cashoutGlow {
+            0%,
+            100% {
+                box-shadow: 0 4px 0 #6b4c1a, 0 0 8px rgba(255, 217, 102, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 0 #6b4c1a, 0 0 22px rgba(255, 217, 102, 0.75);
+            }
+        }
+
+        .message {
+            text-align: center;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 60px;
+            padding: 0.7rem 1.2rem;
+            margin: 0.6rem 0;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 217, 102, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            transition: var(--transition-smooth);
+            min-height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .floating-number {
+            position: fixed;
+            pointer-events: none;
+            font-weight: 900;
+            font-size: 1.3rem;
+            text-shadow: 0 0 8px #ffb347, 0 0 14px rgba(255, 179, 71, 0.5);
+            animation: floatUpFade 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            z-index: 200;
+            font-family: 'Inter', monospace;
+            color: #ffea9e;
+            will-change: transform, opacity;
+            white-space: nowrap;
+        }
+
+        @keyframes floatUpFade {
+            0% {
+                opacity: 1;
+                transform: translateY(0px) scale(0.7);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-18px) scale(1.15);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-56px) scale(1.35);
+            }
+        }
+
+        .gem-flash-overlay {
+            position: fixed;
+            pointer-events: none;
+            z-index: 99;
+            animation: flashWhite 0.14s ease-out forwards;
+            border-radius: 10px;
+            will-change: opacity;
+        }
+
+        @keyframes flashWhite {
+            0% {
+                opacity: 0.85;
+                background: rgba(255, 245, 160, 0.9);
+                transform: scale(0.7);
+            }
+            50% {
+                opacity: 0.6;
+                background: rgba(255, 255, 220, 0.7);
+                transform: scale(1.05);
+            }
+            100% {
+                opacity: 0;
+                background: rgba(255, 245, 160, 0);
+                transform: scale(0.95);
+            }
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            opacity: 0.7;
+            margin-top: 0.3rem;
+        }
+
+        @media (max-width: 600px) {
+            .main-card {
+                padding: 1rem;
+            }
+            .btn-gem {
+                padding: 0.5rem 1.2rem;
+                font-size: 0.8rem;
+            }
+            .top-nav {
+                padding: 0.5rem 1rem;
+                gap: 0.4rem;
+            }
+            .balance-tag {
+                font-size: 0.8rem;
+                padding: 0.35rem 0.9rem;
+            }
+            .stats-panel {
+                font-size: 0.75rem;
+                gap: 0.4rem;
+                padding: 0.5rem 0.8rem;
+            }
+            .message {
+                font-size: 0.78rem;
+                padding: 0.5rem 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- TOP NAVIGATION BAR -->
+        <nav class="top-nav" aria-label="Game navigation">
+            <a href=".././home.html" class="back-home" aria-label="Return to lobby">
+                <i class="fas fa-arrow-left" aria-hidden="true"></i> Lobby
+            </a>
+            <div class="balance-tag" id="balanceTag" aria-live="polite">
+                <i class="fas fa-coins" aria-hidden="true"></i>
+                <span id="headerBalance">0</span> GOLD
+            </div>
+            <button id="soundToggleBtn" class="sound-btn" aria-label="Toggle sound" title="Toggle Sound">
+                <i class="fas fa-volume-up" aria-hidden="true"></i>
+            </button>
+        </nav>
+
+        <!-- MAIN GAME CARD -->
+        <main class="main-card">
+            <h2 style="color:var(--gold-bright); letter-spacing:1px;">
+                <i class="fas fa-gem" aria-hidden="true"></i> CRYSTAL PUSH · 12x12 DIAMOND CORE
+            </h2>
+            <p style="font-size:0.75rem; margin-bottom:6px;">
+                ⚡ tap any gem group (≥3 same color) — cascades increase your multiplier ⚡
+            </p>
+
+            <!-- CANVAS GAME BOARD -->
+            <div class="canvas-wrapper" id="canvasWrapper">
+                <canvas id="gameCanvas" width="660" height="660" aria-label="12x12 Gem Grid"></canvas>
+            </div>
+
+            <!-- STATISTICS PANEL -->
+            <div class="stats-panel">
+                <span><i class="fas fa-gem" aria-hidden="true"></i> Cleared: <strong id="clearedGems">0</strong></span>
+                <span class="multiplier-badge" id="multiplierBadge">
+                    <i class="fas fa-chart-line" aria-hidden="true"></i> Current Multiplier:
+                    <span id="potentialMultiplier">0.00</span>x
+                </span>
+                <span><i class="fas fa-border-all" aria-hidden="true"></i> 12 × 12 | CRYSTAL GRID</span>
+            </div>
+
+            <!-- BETTING CONTROLS -->
+            <div class="bet-row" id="betRow">
+                <span style="color:var(--gold);"><i class="fas fa-ticket-alt" aria-hidden="true"></i> BET (GOLD)</span>
+                <input type="number" id="betAmount" class="bet-input" value="50" min="1" step="1" aria-label="Bet amount in gold">
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="btn-group">
+                <button class="btn-gem" id="startBtn"><span>PLAY ROUND</span></button>
+                <button class="btn-gem btn-outline-cash" id="cashoutBtn" style="display: none;">CASH OUT</button>
+            </div>
+
+            <!-- MESSAGE / RESULT AREA -->
+            <div class="message" id="resultMessage" aria-live="polite">✨ tap [PLAY ROUND] to start ✨</div>
+            <div id="sessionProfitDisplay" style="font-size:0.8rem; color:#e6d5b8; margin-top: 0.2rem;"></div>
+
+            <footer>match 3+ gems | chain reactions | cash out anytime to secure winnings</footer>
+        </main>
+    </div>
+
+    <script>
+        (function() {
+            // =====================================================================
+            //  MODULE: AudioEngine — WebAudio API sound synthesis
+            //  Handles all game sound effects with minimal latency.
+            // =====================================================================
+            class AudioEngine {
+                constructor() {
+                    this._ctx = null;
+                    this._enabled = true;
+                }
+
+                get enabled() { return this._enabled; }
+                set enabled(val) { this._enabled = val; }
+
+                /** Lazily initialize AudioContext (must happen after user gesture). */
+                _initContext() {
+                    if (!this._ctx && this._enabled) {
+                        try {
+                            this._ctx = new(window.AudioContext || window.webkitAudioContext)();
+                        } catch (e) {
+                            console.warn('AudioEngine: WebAudio not available');
+                            this._enabled = false;
+                        }
+                    }
+                    if (this._ctx && this._ctx.state === 'suspended') {
+                        this._ctx.resume().catch(() => {});
+                    }
+                }
+
+                /**
+                 * Play a synthesized sound.
+                 * @param {'pop'|'clear_combo'|'win_fanfare'|'loss_tone'|'cashout'} type
+                 * @param {number} [intensity=1] Intensity multiplier (affects pitch/volume).
+                 */
+                play(type, intensity = 1) {
+                    if (!this._enabled) return;
+                    this._initContext();
+                    const ctx = this._ctx;
+                    if (!ctx) return;
+                    const now = ctx.currentTime;
+                    const masterGain = ctx.createGain();
+                    masterGain.connect(ctx.destination);
+                    masterGain.gain.setValueAtTime(0.32, now);
+                    masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
+
+                    switch (type) {
+                        case 'pop': {
+                            const osc = ctx.createOscillator();
+                            osc.type = 'sine';
+                            osc.frequency.value = 840 + intensity * 120;
+                            const g = ctx.createGain();
+                            osc.connect(g);
+                            g.connect(masterGain);
+                            g.gain.setValueAtTime(0.1, now);
+                            g.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+                            osc.start(now);
+                            osc.stop(now + 0.14);
+                            break;
+                        }
+                        case 'clear_combo': {
+                            for (let i = 0; i < 2; i++) {
+                                const osc = ctx.createOscillator();
+                                osc.type = 'triangle';
+                                osc.frequency.value = 660 + i * 190;
+                                const g = ctx.createGain();
+                                osc.connect(g);
+                                g.connect(masterGain);
+                                g.gain.setValueAtTime(0.12, now + i * 0.03);
+                                g.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+                                osc.start(now + i * 0.03);
+                                osc.stop(now + 0.3);
+                            }
+                            break;
+                        }
+                        case 'win_fanfare': {
+                            const notes = [523.25, 659.25, 783.99, 1046.5];
+                            notes.forEach((freq, idx) => {
+                                const osc = ctx.createOscillator();
+                                osc.type = 'sine';
+                                osc.frequency.value = freq;
+                                const g = ctx.createGain();
+                                osc.connect(g);
+                                g.connect(masterGain);
+                                g.gain.setValueAtTime(0.11, now + idx * 0.09);
+                                g.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+                                osc.start(now + idx * 0.09);
+                                osc.stop(now + 0.68);
+                            });
+                            break;
+                        }
+                        case 'loss_tone': {
+                            const osc = ctx.createOscillator();
+                            osc.type = 'sawtooth';
+                            osc.frequency.value = 200;
+                            const g = ctx.createGain();
+                            osc.connect(g);
+                            g.connect(masterGain);
+                            g.gain.setValueAtTime(0.13, now);
+                            g.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+                            osc.start(now);
+                            osc.stop(now + 0.6);
+                            break;
+                        }
+                        case 'cashout': {
+                            const osc = ctx.createOscillator();
+                            osc.type = 'sine';
+                            osc.frequency.value = 880;
+                            const g = ctx.createGain();
+                            osc.connect(g);
+                            g.connect(masterGain);
+                            g.gain.setValueAtTime(0.12, now);
+                            g.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                            osc.start(now);
+                            osc.stop(now + 0.27);
+                            break;
+                        }
+                    }
+                }
+
+                /** Clean up the audio context. */
+                destroy() {
+                    if (this._ctx) {
+                        this._ctx.close().catch(() => {});
+                        this._ctx = null;
+                    }
+                }
+            }
+
+            // =====================================================================
+            //  MODULE: StorageManager — localStorage + sessionStorage sync
+            //  Handles all persistence: user data, stats, XP, transactions.
+            // =====================================================================
+            class StorageManager {
+                constructor() {
+                    this._currentUser = null;
+                }
+
+                get currentUser() { return this._currentUser; }
+
+                /** Retrieve all users from localStorage. */
+                _getAllUsers() {
+                    try {
+                        return JSON.parse(localStorage.getItem('gold_users') || '{}');
+                    } catch (e) {
+                        console.error('StorageManager: corrupted users data');
+                        return {};
+                    }
+                }
+
+                /** Persist all users to localStorage. */
+                _saveAllUsers(users) {
+                    try {
+                        localStorage.setItem('gold_users', JSON.stringify(users));
+                    } catch (e) {
+                        console.error('StorageManager: failed to save users', e);
+                    }
+                }
+
+                /** Initialize default stats for a user object. */
+                _initializeUserStats(user) {
+                    const defaults = {
+                        globalStats: {
+                            totalWagered: 0,
+                            totalWon: 0,
+                            totalLosses: 0,
+                            totalGames: 0,
+                            currentStreak: 0,
+                            bestStreak: 0,
+                            totalWins: 0
+                        },
+                        transactions: [],
+                        gameOutcomes: [],
+                        gamePlayCount: {},
+                        bankBalance: 0,
+                        xp: 0,
+                        avatar: 'fas fa-crown',
+                        theme: 'theme-gold',
+                        earnedAchievements: [],
+                        crystalPushStats: {
+                            plays: 0,
+                            totalCleared: 0,
+                            milestoneClaimed: false,
+                            bestGridClears: 0
+                        }
+                    };
+                    for (const key in defaults) {
+                        if (user[key] === undefined) user[key] = defaults[key];
+                    }
+                    if (!user.crystalPushStats) user.crystalPushStats = { ...defaults.crystalPushStats };
+                    // Ensure nested crystalPushStats fields exist
+                    for (const subKey in defaults.crystalPushStats) {
+                        if (user.crystalPushStats[subKey] === undefined) {
+                            user.crystalPushStats[subKey] = defaults.crystalPushStats[subKey];
+                        }
+                    }
+                    return user;
+                }
+
+                /**
+                 * Load the current user from sessionStorage, then fetch full data
+                 * from localStorage. Returns true on success, false if redirect needed.
+                 */
+                async loadUser() {
+                    const sessRaw = sessionStorage.getItem('gold_current_user');
+                    if (!sessRaw) {
+                        window.location.href = '../../sign-in.html';
+                        return false;
+                    }
+                    let sessionUser;
+                    try {
+                        sessionUser = JSON.parse(sessRaw);
+                    } catch (e) {
+                        sessionStorage.removeItem('gold_current_user');
+                        window.location.href = '../../sign-in.html';
+                        return false;
+                    }
+                    const allUsers = this._getAllUsers();
+                    let user = allUsers[sessionUser.username];
+                    if (!user) {
+                        sessionStorage.removeItem('gold_current_user');
+                        window.location.href = '../../sign-in.html';
+                        return false;
+                    }
+                    this._currentUser = this._initializeUserStats(user);
+                    // Sync balance to session
+                    sessionUser.balance = this._currentUser.balance;
+                    sessionStorage.setItem('gold_current_user', JSON.stringify(sessionUser));
+                    return true;
+                }
+
+                /** Persist current user to localStorage and update sessionStorage balance. */
+                async saveUser() {
+                    if (!this._currentUser) return;
+                    const allUsers = this._getAllUsers();
+                    allUsers[this._currentUser.username] = this._currentUser;
+                    this._saveAllUsers(allUsers);
+                    // Update session balance
+                    const sessRaw = sessionStorage.getItem('gold_current_user');
+                    if (sessRaw) {
+                        try {
+                            const sess = JSON.parse(sessRaw);
+                            sess.balance = this._currentUser.balance;
+                            sessionStorage.setItem('gold_current_user', JSON.stringify(sess));
+                        } catch (e) { /* ignore */ }
+                    }
+                }
+
+                /** Get the current gold balance (safe accessor). */
+                getBalance() {
+                    return this._currentUser ? (this._currentUser.balance || 0) : 0;
+                }
+
+                /** Safely deduct amount from balance. Returns true if successful. */
+                deductBalance(amount) {
+                    if (!this._currentUser) return false;
+                    const rounded = Math.round(amount * 100) / 100;
+                    if (rounded <= 0) return false;
+                    if (this._currentUser.balance < rounded) return false;
+                    this._currentUser.balance = Math.round((this._currentUser.balance - rounded) * 100) / 100;
+                    return true;
+                }
+
+                /** Safely add amount to balance. */
+                addBalance(amount) {
+                    if (!this._currentUser) return;
+                    const rounded = Math.round(amount * 100) / 100;
+                    if (rounded <= 0) return;
+                    this._currentUser.balance = Math.round((this._currentUser.balance + rounded) * 100) / 100;
+                }
+
+                /** Record a completed round's stats. */
+                recordRound(bet, winAmount, netProfit, finalMulti, totalCleared, isCashout) {
+                    const u = this._currentUser;
+                    if (!u) return;
+                    u.globalStats.totalGames++;
+                    u.globalStats.totalWagered += bet;
+                    u.globalStats.totalWon += winAmount;
+                    if (netProfit > 0) {
+                        u.globalStats.totalWins++;
+                        u.globalStats.currentStreak = (u.globalStats.currentStreak || 0) + 1;
+                        if (u.globalStats.currentStreak > u.globalStats.bestStreak) {
+                            u.globalStats.bestStreak = u.globalStats.currentStreak;
+                        }
+                    } else {
+                        u.globalStats.currentStreak = 0;
+                    }
+                    u.xp = (u.xp || 0) + totalCleared;
+                    u.gamePlayCount['crystal-push'] = (u.gamePlayCount['crystal-push'] || 0) + 1;
+                    const cp = u.crystalPushStats;
+                    cp.plays++;
+                    cp.totalCleared += totalCleared;
+                    if (totalCleared > (cp.bestGridClears || 0)) cp.bestGridClears = totalCleared;
+
+                    u.gameOutcomes.unshift({
+                        game: 'CrystalPush',
+                        result: netProfit > 0 ? 'win' : 'loss',
+                        profit: netProfit,
+                        multiplier: parseFloat(finalMulti.toFixed(3)),
+                        totalCleared,
+                        bet,
+                        date: new Date().toISOString()
+                    });
+                    u.transactions.unshift({
+                        desc: `💎 Crystal Push ${isCashout ? 'CASHOUT' : 'ROUND'} | Bet ${bet} → ${totalCleared} gems → ${winAmount.toFixed(2)} GOLD`,
+                        amount: netProfit,
+                        type: netProfit > 0 ? 'game_win' : 'game_loss',
+                        date: new Date().toISOString()
+                    });
+
+                    // Milestone check
+                    if (cp.plays >= 20 && !cp.milestoneClaimed) {
+                        cp.milestoneClaimed = true;
+                        this.addBalance(100);
+                        return true; // indicates milestone was just claimed
+                    }
+                    return false;
+                }
+            }
+
+            // =====================================================================
+            //  MODULE: GameConstants — all tunable game parameters in one place
+            // =====================================================================
+            const GameConstants = Object.freeze({
+                GRID_SIZE: 12,
+                LOGICAL_CANVAS_SIZE: 660,
+                MIN_GROUP_SIZE: 3,
+                GEM_COLORS: ['#E06C4A', '#4A90E2', '#46C46A', '#F4D03F', '#B983FF', '#E67E22', '#1ABC9C',
+                    '#E84393'
+                ],
+                MULTIPLIER_DIVISOR: 6, // baseMulti = totalCleared / 6
+                MULTIPLIER_MIN_BASE: 0.25,
+                RANDOM_LUCK_MIN: 0.88,
+                RANDOM_LUCK_RANGE: 1.5,
+                MULTIPLIER_MIN_FINAL: 0.35,
+                MULTIPLIER_MAX_FINAL: 12,
+                FLOATING_TEXT_LIFETIME_MS: 750,
+                FLASH_LIFETIME_MS: 140,
+                PROCESSING_DELAY_MS: 60,
+                CHAIN_CHECK_DELAY_MS: 280,
+            });
+
+            // =====================================================================
+            //  MODULE: GameLogic — grid operations, flood-fill, gravity, matching
+            // =====================================================================
+            class GameLogic {
+                constructor(gridSize = GameConstants.GRID_SIZE) {
+                    this.gridSize = gridSize;
+                    this.grid = [];
+                    this._initEmptyGrid();
+                }
+
+                _initEmptyGrid() {
+                    this.grid = [];
+                    for (let r = 0; r < this.gridSize; r++) {
+                        this.grid[r] = new Array(this.gridSize).fill(-1);
+                    }
+                }
+
+                /** Fill the grid with random gems, ensuring at least one valid move. */
+                initRandom() {
+                    const numColors = GameConstants.GEM_COLORS.length;
+                    for (let r = 0; r < this.gridSize; r++) {
+                        for (let c = 0; c < this.gridSize; c++) {
+                            this.grid[r][c] = Math.floor(Math.random() * numColors);
+                        }
+                    }
+                    // Reshuffle if deadlocked
+                    if (!this.hasAnyMoves()) {
+                        for (let r = 0; r < this.gridSize; r++) {
+                            for (let c = 0; c < this.gridSize; c++) {
+                                this.grid[r][c] = Math.floor(Math.random() * numColors);
+                            }
+                        }
+                    }
+                }
+
+                /**
+                 * Iterative BFS flood-fill to find all connected cells of the same color.
+                 * Avoids recursion stack overflow on large groups.
+                 */
+                findGroup(row, col) {
+                    if (row < 0 || row >= this.gridSize || col < 0 || col >= this.gridSize) return [];
+                    const colorIdx = this.grid[row][col];
+                    if (colorIdx < 0) return [];
+                    const visited = new Set();
+                    const group = [];
+                    const queue = [{ row, col }];
+                    const key = (r, c) => `${r},${c}`;
+                    visited.add(key(row, col));
+                    const dirs = [
+                        [-1, 0],
+                        [1, 0],
+                        [0, -1],
+                        [0, 1]
+                    ];
+
+                    while (queue.length > 0) {
+                        const curr = queue.shift();
+                        if (this.grid[curr.row][curr.col] !== colorIdx) continue;
+                        group.push({ row: curr.row, col: curr.col });
+                        for (const [dr, dc] of dirs) {
+                            const nr = curr.row + dr;
+                            const nc = curr.col + dc;
+                            const nk = key(nr, nc);
+                            if (
+                                nr >= 0 && nr < this.gridSize &&
+                                nc >= 0 && nc < this.gridSize &&
+                                !visited.has(nk)
+                            ) {
+                                visited.add(nk);
+                                queue.push({ row: nr, col: nc });
+                            }
+                        }
+                    }
+                    return group;
+                }
+
+                /** Check if any group of 3+ exists on the grid. */
+                hasAnyMoves() {
+                    const globalVisited = new Set();
+                    for (let r = 0; r < this.gridSize; r++) {
+                        for (let c = 0; c < this.gridSize; c++) {
+                            if (this.grid[r][c] >= 0 && !globalVisited.has(`${r},${c}`)) {
+                                const group = this.findGroup(r, c);
+                                // Mark all found cells as visited to skip redundant checks
+                                for (const cell of group) globalVisited.add(`${cell.row},${cell.col}`);
+                                if (group.length >= GameConstants.MIN_GROUP_SIZE) return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+
+                /** Mark group cells as empty (-1). */
+                clearCells(group) {
+                    for (const { row, col } of group) {
+                        this.grid[row][col] = -1;
+                    }
+                }
+
+                /** Apply gravity: drop gems down, then refill empty top cells randomly. */
+                applyGravityAndRefill() {
+                    const numColors = GameConstants.GEM_COLORS.length;
+                    for (let c = 0; c < this.gridSize; c++) {
+                        let writeRow = this.gridSize - 1;
+                        for (let r = this.gridSize - 1; r >= 0; r--) {
+                            if (this.grid[r][c] >= 0) {
+                                this.grid[writeRow][c] = this.grid[r][c];
+                                writeRow--;
+                            }
+                        }
+                        for (let r = writeRow; r >= 0; r--) {
+                            this.grid[r][c] = -1;
+                        }
+                    }
+                    // Refill empties
+                    for (let r = 0; r < this.gridSize; r++) {
+                        for (let c = 0; c < this.gridSize; c++) {
+                            if (this.grid[r][c] < 0) {
+                                this.grid[r][c] = Math.floor(Math.random() * numColors);
+                            }
+                        }
+                    }
+                }
+
+                /** Calculate the final multiplier for a given number of cleared gems. */
+                static calculateMultiplier(totalCleared) {
+                    const baseMulti = Math.max(
+                        GameConstants.MULTIPLIER_MIN_BASE,
+                        totalCleared / GameConstants.MULTIPLIER_DIVISOR
+                    );
+                    const randomLuck =
+                        GameConstants.RANDOM_LUCK_MIN + Math.random() * GameConstants.RANDOM_LUCK_RANGE;
+                    let finalMulti = baseMulti * randomLuck;
+                    finalMulti = Math.max(GameConstants.MULTIPLIER_MIN_FINAL, Math.min(GameConstants
+                        .MULTIPLIER_MAX_FINAL, finalMulti));
+                    return {
+                        baseMulti,
+                        randomLuck,
+                        finalMulti
+                    };
+                }
+            }
+
+            // =====================================================================
+            //  MODULE: Renderer — canvas drawing with DPI-aware scaling
+            // =====================================================================
+            class Renderer {
+                constructor(canvas, logicalSize = GameConstants.LOGICAL_CANVAS_SIZE) {
+                    this.canvas = canvas;
+                    this.ctx = canvas.getContext('2d');
+                    this.logicalSize = logicalSize;
+                    this.dpr = Math.min(window.devicePixelRatio || 1, 2); // cap at 2x for performance
+                    this.cellSize = logicalSize / GameConstants.GRID_SIZE;
+                    this._setupCanvas();
+                }
+
+                _setupCanvas() {
+                    this.canvas.width = this.logicalSize * this.dpr;
+                    this.canvas.height = this.logicalSize * this.dpr;
+                    this.canvas.style.width = this.logicalSize + 'px';
+                    this.canvas.style.height = this.logicalSize + 'px';
+                    this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+                    // Enable image smoothing for gem gradients
+                    this.ctx.imageSmoothingEnabled = true;
+                    this.ctx.imageSmoothingQuality = 'high';
+                }
+
+                /** Recalculate after resize. */
+                recalculate() {
+                    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+                    this._setupCanvas();
+                    this.cellSize = this.logicalSize / GameConstants.GRID_SIZE;
+                }
+
+                /** Helper: darken/lighten a hex color by a percentage. */
+                static _shadeColor(hex, percent) {
+                    let R = parseInt(hex.substring(1, 3), 16);
+                    let G = parseInt(hex.substring(3, 5), 16);
+                    let B = parseInt(hex.substring(5, 7), 16);
+                    R = Math.min(255, Math.max(0, R + percent));
+                    G = Math.min(255, Math.max(0, G + percent));
+                    B = Math.min(255, Math.max(0, B + percent));
+                    return `rgb(${R},${G},${B})`;
+                }
+
+                /** Draw a single diamond-shaped gem at grid position (row, col). */
+                _drawGem(row, col, colorHex) {
+                    const ctx = this.ctx;
+                    const size = this.cellSize;
+                    const x = col * size;
+                    const y = row * size;
+                    const cx = x + size / 2;
+                    const cy = y + size / 2;
+                    const w = size * 0.72;
+                    const h = size * 0.72;
+                    const top = cy - h / 2;
+                    const bottom = cy + h / 2;
+                    const left = cx - w / 2;
+                    const right = cx + w / 2;
+
+                    // Main diamond shape
+                    ctx.beginPath();
+                    ctx.moveTo(cx, top);
+                    ctx.lineTo(right, cy);
+                    ctx.lineTo(cx, bottom);
+                    ctx.lineTo(left, cy);
+                    ctx.closePath();
+
+                    const grad = ctx.createLinearGradient(left, top, right, bottom);
+                    grad.addColorStop(0, colorHex);
+                    grad.addColorStop(1, Renderer._shadeColor(colorHex, -28));
+                    ctx.fillStyle = grad;
+                    ctx.fill();
+
+                    // Facet stroke
+                    ctx.strokeStyle = 'rgba(255,225,130,0.9)';
+                    ctx.lineWidth = 1.6;
+                    ctx.stroke();
+
+                    // Inner shine facet
+                    ctx.beginPath();
+                    ctx.moveTo(cx, top + size * 0.1);
+                    ctx.lineTo(right - size * 0.12, cy);
+                    ctx.lineTo(cx, bottom - size * 0.1);
+                    ctx.lineTo(left + size * 0.12, cy);
+                    ctx.fillStyle = 'rgba(255,245,180,0.3)';
+                    ctx.fill();
+                }
+
+                /** Draw a highlight ring around a specific cell. */
+                _drawHighlight(row, col) {
+                    const ctx = this.ctx;
+                    const size = this.cellSize;
+                    const x = col * size;
+                    const y = row * size;
+                    ctx.save();
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#ffd966';
+                    ctx.beginPath();
+                    this._roundRect(x + 3, y + 3, size - 6, size - 6, size * 0.12);
+                    ctx.strokeStyle = '#fff5c4';
+                    ctx.lineWidth = 3.2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                /** Polyfill-safe roundRect helper. */
+                _roundRect(x, y, w, h, r) {
+                    const ctx = this.ctx;
+                    if (ctx.roundRect) {
+                        ctx.roundRect(x, y, w, h, r);
+                    } else {
+                        if (w < 2 * r) r = w / 2;
+                        if (h < 2 * r) r = h / 2;
+                        ctx.moveTo(x + r, y);
+                        ctx.lineTo(x + w - r, y);
+                        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+                        ctx.lineTo(x + w, y + h - r);
+                        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                        ctx.lineTo(x + r, y + h);
+                        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+                        ctx.lineTo(x, y + r);
+                        ctx.quadraticCurveTo(x, y, x + r, y);
+                    }
+                    return ctx;
+                }
+
+                /**
+                 * Render the full grid.
+                 * @param {number[][]} grid - The grid data
+                 * @param {Array<{row:number,col:number}>} [highlightGroup=[]] - Cells to highlight
+                 */
+                render(grid, highlightGroup = []) {
+                    const ctx = this.ctx;
+                    ctx.clearRect(0, 0, this.logicalSize, this.logicalSize);
+
+                    const highlightSet = new Set(
+                        highlightGroup.map(cell => `${cell.row},${cell.col}`)
+                    );
+
+                    for (let r = 0; r < GameConstants.GRID_SIZE; r++) {
+                        for (let c = 0; c < GameConstants.GRID_SIZE; c++) {
+                            const colorIdx = grid[r][c];
+                            if (colorIdx < 0) continue;
+                            this._drawGem(r, c, GameConstants.GEM_COLORS[colorIdx]);
+                            if (highlightSet.has(`${r},${c}`)) {
+                                this._drawHighlight(r, c);
+                            }
+                        }
+                    }
+                }
+
+                /**
+                 * Convert a mouse/touch event to logical grid coordinates.
+                 * Returns {row, col} or null if outside the grid.
+                 */
+                getGridCoordFromEvent(e) {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const logicalScaleX = this.logicalSize / rect.width;
+                    const logicalScaleY = this.logicalSize / rect.height;
+                    let clientX, clientY;
+                    if (e.touches && e.touches.length > 0) {
+                        clientX = e.touches[0].clientX;
+                        clientY = e.touches[0].clientY;
+                    } else if (e.changedTouches && e.changedTouches.length > 0) {
+                        clientX = e.changedTouches[0].clientX;
+                        clientY = e.changedTouches[0].clientY;
+                    } else {
+                        clientX = e.clientX;
+                        clientY = e.clientY;
+                    }
+                    const logicalX = (clientX - rect.left) * logicalScaleX;
+                    const logicalY = (clientY - rect.top) * logicalScaleY;
+                    const col = Math.floor(logicalX / this.cellSize);
+                    const row = Math.floor(logicalY / this.cellSize);
+                    if (
+                        row >= 0 && row < GameConstants.GRID_SIZE &&
+                        col >= 0 && col < GameConstants.GRID_SIZE
+                    ) {
+                        return { row, col };
+                    }
+                    return null;
+                }
+
+                /** Get the pixel position of a cell's center relative to the viewport. */
+                getCellCenterViewport(row, col) {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const logicalScaleX = rect.width / this.logicalSize;
+                    const logicalScaleY = rect.height / this.logicalSize;
+                    const cxLogical = col * this.cellSize + this.cellSize / 2;
+                    const cyLogical = row * this.cellSize + this.cellSize / 2;
+                    return {
+                        x: rect.left + cxLogical * logicalScaleX,
+                        y: rect.top + cyLogical * logicalScaleY
+                    };
+                }
+            }
+
+            // =====================================================================
+            //  MODULE: UIManager — DOM updates, floating text, flash overlays
+            // =====================================================================
+            class UIManager {
+                constructor() {
+                    this._floatingElements = new Set();
+                    this._flashElements = new Set();
+                }
+
+                /** Update the header balance display with optional pulse animation. */
+                updateBalanceDisplay(balance, animate = false) {
+                    const el = document.getElementById('headerBalance');
+                    if (el) el.textContent = Math.floor(balance).toLocaleString();
+                    if (animate) {
+                        const tag = document.getElementById('balanceTag');
+                        if (tag) {
+                            tag.classList.remove('pulse');
+                            void tag.offsetWidth; // force reflow
+                            tag.classList.add('pulse');
+                        }
+                    }
+                }
+
+                /** Update the cleared gems counter. */
+                updateClearedGems(count) {
+                    const el = document.getElementById('clearedGems');
+                    if (el) el.textContent = count;
+                }
+
+                /** Update the multiplier display with optional glow animation. */
+                updateMultiplier(value, animate = false) {
+                    const el = document.getElementById('potentialMultiplier');
+                    if (el) el.textContent = parseFloat(value).toFixed(2);
+                    if (animate) {
+                        const badge = document.getElementById('multiplierBadge');
+                        if (badge) {
+                            badge.classList.remove('updated');
+                            void badge.offsetWidth;
+                            badge.classList.add('updated');
+                        }
+                    }
+                }
+
+                /** Update the session profit display. */
+                updateSessionProfit(profit) {
+                    const el = document.getElementById('sessionProfitDisplay');
+                    if (el) {
+                        const sign = profit >= 0 ? '+' : '';
+                        el.innerHTML =
+                            `📊 Session P/L: ${sign}${profit.toFixed(2)} GOLD`;
+                    }
+                }
+
+                /** Set the main message text. */
+                setMessage(html) {
+                    const el = document.getElementById('resultMessage');
+                    if (el) el.innerHTML = html;
+                }
+
+                /** Show/hide the cashout button. */
+                setCashoutVisible(visible) {
+                    const btn = document.getElementById('cashoutBtn');
+                    if (btn) {
+                        btn.style.display = visible ? 'inline-flex' : 'none';
+                        if (visible) {
+                            btn.classList.add('cashout-ready');
+                        } else {
+                            btn.classList.remove('cashout-ready');
+                        }
+                    }
+                }
+
+                /** Enable/disable the start button and bet input. */
+                setRoundControlsEnabled(enabled) {
+                    const startBtn = document.getElementById('startBtn');
+                    const betInput = document.getElementById('betAmount');
+                    if (startBtn) startBtn.disabled = !enabled;
+                    if (betInput) betInput.disabled = !enabled;
+                }
+
+                /** Spawn a floating number at viewport coordinates. */
+                spawnFloatingText(text, viewportX, viewportY) {
+                    const div = document.createElement('div');
+                    div.className = 'floating-number';
+                    div.textContent = text;
+                    div.style.left = viewportX + 'px';
+                    div.style.top = viewportY + 'px';
+                    document.body.appendChild(div);
+                    this._floatingElements.add(div);
+                    const lifetime = GameConstants.FLOATING_TEXT_LIFETIME_MS;
+                    const timer = setTimeout(() => {
+                        this._floatingElements.delete(div);
+                        div.remove();
+                    }, lifetime);
+                    // Store timer reference for cleanup
+                    div._cleanupTimer = timer;
+                }
+
+                /** Spawn a flash overlay over a cell. */
+                spawnCellFlash(row, col, cellSize, canvasRect) {
+                    const logicalScaleX = canvasRect.width / GameConstants.LOGICAL_CANVAS_SIZE;
+                    const logicalScaleY = canvasRect.height / GameConstants.LOGICAL_CANVAS_SIZE;
+                    const x = canvasRect.left + col * cellSize * logicalScaleX;
+                    const y = canvasRect.top + row * cellSize * logicalScaleY;
+                    const size = cellSize * logicalScaleX;
+
+                    const flashDiv = document.createElement('div');
+                    flashDiv.className = 'gem-flash-overlay';
+                    flashDiv.style.left = x + 'px';
+                    flashDiv.style.top = y + 'px';
+                    flashDiv.style.width = size + 'px';
+                    flashDiv.style.height = size + 'px';
+                    document.body.appendChild(flashDiv);
+                    this._flashElements.add(flashDiv);
+                    const timer = setTimeout(() => {
+                        this._flashElements.delete(flashDiv);
+                        flashDiv.remove();
+                    }, GameConstants.FLASH_LIFETIME_MS);
+                    flashDiv._cleanupTimer = timer;
+                }
+
+                /** Clean up all floating and flash elements immediately. */
+                cleanupAllEffects() {
+                    for (const el of this._floatingElements) {
+                        if (el._cleanupTimer) clearTimeout(el._cleanupTimer);
+                        el.remove();
+                    }
+                    this._floatingElements.clear();
+                    for (const el of this._flashElements) {
+                        if (el._cleanupTimer) clearTimeout(el._cleanupTimer);
+                        el.remove();
+                    }
+                    this._flashElements.clear();
+                }
+
+                /** Update sound button icon. */
+                updateSoundButton(enabled) {
+                    const btn = document.getElementById('soundToggleBtn');
+                    if (btn) {
+                        btn.innerHTML = enabled ?
+                            '<i class="fas fa-volume-up"></i>' :
+                            '<i class="fas fa-volume-mute"></i>';
+                    }
+                }
+
+                /** Set canvas processing state (changes cursor). */
+                setCanvasProcessing(isProcessing) {
+                    const canvas = document.getElementById('gameCanvas');
+                    if (canvas) {
+                        if (isProcessing) {
+                            canvas.classList.add('processing');
+                        } else {
+                            canvas.classList.remove('processing');
+                        }
+                    }
+                }
+            }
+
+            // =====================================================================
+            //  MODULE: GameController — main orchestrator
+            //  Connects all modules and manages game flow / state machine.
+            // =====================================================================
+            class GameController {
+                constructor() {
+                    // Sub-modules
+                    this.audio = new AudioEngine();
+                    this.storage = new StorageManager();
+                    this.logic = new GameLogic(GameConstants.GRID_SIZE);
+                    this.renderer = new Renderer(document.getElementById('gameCanvas'));
+                    this.ui = new UIManager();
+
+                    // Game state
+                    this._state = 'IDLE'; // IDLE | ACTIVE | PROCESSING | ENDING
+                    this._bet = 50;
+                    this._sessionProfit = 0;
+                    this._totalCleared = 0;
+                    this._currentHighlightGroup = [];
+                    this._processingLock = false;
+                    this._isCashout = false;
+                }
+
+                // ---- State management ----
+                get state() { return this._state; }
+                _setState(newState) {
+                    const prev = this._state;
+                    this._state = newState;
+                    // Update canvas cursor based on state
+                    this.ui.setCanvasProcessing(newState === 'PROCESSING' || newState === 'ENDING');
+                    return prev;
+                }
+
+                // ---- Initialization ----
+                async init() {
+                    // Load user
+                    const loaded = await this.storage.loadUser();
+                    if (!loaded) return false;
+
+                    // Load sound preference
+                    const savedSound = localStorage.getItem('gold_sound_enabled');
+                    if (savedSound === 'false') {
+                        this.audio.enabled = false;
+                    }
+                    this.ui.updateSoundButton(this.audio.enabled);
+
+                    // Setup renderer
+                    this.renderer.recalculate();
+                    this.logic.initRandom();
+                    this.renderer.render(this.logic.grid);
+                    this._updateAllUI();
+
+                    // Bind events
+                    this._bindEvents();
+                    return true;
+                }
+
+                _bindEvents() {
+                    const canvas = this.renderer.canvas;
+
+                    // Click event
+                    canvas.addEventListener('click', (e) => this._handleCanvasInteraction(e));
+
+                    // Touch events
+                    canvas.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        this._handleCanvasInteraction(e);
+                    }, { passive: false });
+
+                    // Prevent context menu on long press
+                    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+                    // Buttons
+                    document.getElementById('startBtn').addEventListener('click', () => this.startRound());
+                    document.getElementById('cashoutBtn').addEventListener('click', () => this.cashOut());
+                    document.getElementById('soundToggleBtn').addEventListener('click', () => this
+                        ._toggleSound());
+
+                    // Bet input validation
+                    const betInput = document.getElementById('betAmount');
+                    betInput.addEventListener('input', () => this._validateBetInput());
+                    betInput.addEventListener('change', () => this._validateBetInput());
+
+                    // Window resize handler (debounced)
+                    let resizeTimeout;
+                    window.addEventListener('resize', () => {
+                        clearTimeout(resizeTimeout);
+                        resizeTimeout = setTimeout(() => {
+                            this.renderer.recalculate();
+                            this.renderer.render(this.logic.grid, this._currentHighlightGroup);
+                        }, 200);
+                    });
+                }
+
+                _toggleSound() {
+                    this.audio.enabled = !this.audio.enabled;
+                    this.ui.updateSoundButton(this.audio.enabled);
+                    localStorage.setItem('gold_sound_enabled', this.audio.enabled.toString());
+                }
+
+                _validateBetInput() {
+                    const betInput = document.getElementById('betAmount');
+                    let val = parseInt(betInput.value, 10);
+                    if (isNaN(val) || val < 1) val = 1;
+                    const maxBet = this.storage.getBalance();
+                    if (val > maxBet && maxBet > 0) val = Math.floor(maxBet);
+                    betInput.value = val;
+                    this._bet = val;
+                }
+
+                // ---- Canvas interaction ----
+                _handleCanvasInteraction(e) {
+                    if (this._state !== 'ACTIVE') return;
+                    if (this._processingLock) return;
+
+                    const coord = this.renderer.getGridCoordFromEvent(e);
+                    if (!coord) return;
+
+                    const { row, col } = coord;
+                    const colorIdx = this.logic.grid[row][col];
+                    if (colorIdx < 0) return;
+
+                    // Prevent rapid re-clicks on same group
+                    if (this._processingLock) return;
+                    this._processingLock = true;
+
+                    const group = this.logic.findGroup(row, col);
+                    if (group.length >= GameConstants.MIN_GROUP_SIZE) {
+                        // Highlight the group briefly
+                        this._currentHighlightGroup = group;
+                        this.renderer.render(this.logic.grid, this._currentHighlightGroup);
+                        this.audio.play('pop', Math.min(1, group.length / 12));
+
+                        // Brief delay for visual feedback, then clear
+                        setTimeout(() => {
+                            this._clearGroupAndProcess(group, e);
+                        }, GameConstants.PROCESSING_DELAY_MS);
+                    } else {
+                        // Not enough gems
+                        const rect = this.renderer.canvas.getBoundingClientRect();
+                        const pos = this.renderer.getCellCenterViewport(row, col);
+                        this.ui.spawnFloatingText('need 3+', pos.x, pos.y - 20);
+                        this.audio.play('pop', 0.3);
+                        this._processingLock = false;
+                    }
+                }
+
+                async _clearGroupAndProcess(group, originalEvent) {
+                    if (this._state !== 'ACTIVE') {
+                        this._processingLock = false;
+                        return;
+                    }
+                    this._setState('PROCESSING');
+
+                    // Spawn floating numbers for cleared gems (up to 12 for performance)
+                    const numFloats = Math.min(group.length, 12);
+                    const shuffled = [...group].sort(() => Math.random() - 0.5);
+                    for (let i = 0; i < numFloats; i++) {
+                        const cell = shuffled[i];
+                        const pos = this.renderer.getCellCenterViewport(cell.row, cell.col);
+                        this.ui.spawnFloatingText(`+${group.length}`, pos.x, pos.y);
+                    }
+
+                    // Flash each cell
+                    const canvasRect = this.renderer.canvas.getBoundingClientRect();
+                    const cellSize = this.renderer.cellSize;
+                    for (const cell of group) {
+                        this.ui.spawnCellFlash(cell.row, cell.col, cellSize, canvasRect);
+                    }
+
+                    // Clear gems and update grid
+                    this.logic.clearCells(group);
+                    this._totalCleared += group.length;
+                    this.logic.applyGravityAndRefill();
+                    this._currentHighlightGroup = [];
+                    this.renderer.render(this.logic.grid);
+                    this._updateStatsUI();
+                    this.audio.play('clear_combo', 0.65);
+
+                    // Check if moves remain
+                    if (!this.logic.hasAnyMoves()) {
+                        // Delay before ending to let animations play
+                        await new Promise(r => setTimeout(r, GameConstants.CHAIN_CHECK_DELAY_MS));
+                        if (this._state === 'PROCESSING') {
+                            this._setState('ACTIVE'); // temporarily restore for endRound check
+                            this._endRound(false);
+                        }
+                    } else {
+                        this._setState('ACTIVE');
+                    }
+                    this._processingLock = false;
+                }
+
+                // ---- Round lifecycle ----
+                async startRound() {
+                    if (this._state === 'ACTIVE' || this._state === 'PROCESSING') return;
+
+                    // Validate bet
+                    this._validateBetInput();
+                    const bet = this._bet;
+                    if (isNaN(bet) || bet < 1) {
+                        this.ui.setMessage('❌ Please enter a valid bet amount.');
+                        return;
+                    }
+                    if (bet > this.storage.getBalance()) {
+                        this.ui.setMessage('❌ Insufficient gold! Reduce your bet.');
+                        return;
+                    }
+
+                    // Deduct bet
+                    const deducted = this.storage.deductBalance(bet);
+                    if (!deducted) {
+                        this.ui.setMessage('❌ Bet deduction failed. Please try again.');
+                        return;
+                    }
+                    this._sessionProfit -= bet;
+                    await this.storage.saveUser();
+
+                    // Initialize round
+                    this._bet = bet;
+                    this._totalCleared = 0;
+                    this._currentHighlightGroup = [];
+                    this._isCashout = false;
+                    this.logic.initRandom();
+                    this._setState('ACTIVE');
+
+                    // Update UI
+                    this._updateAllUI();
+                    this.ui.setRoundControlsEnabled(false);
+                    this.ui.setCashoutVisible(true);
+                    this.ui.setMessage('✨ GAME ACTIVE! Tap matching groups (≥3) ✨');
+                    this.renderer.render(this.logic.grid);
+
+                    // Edge case: initial grid has no moves
+                    if (!this.logic.hasAnyMoves()) {
+                        await new Promise(r => setTimeout(r, 300));
+                        this._endRound(false);
+                    }
+                }
+
+                async cashOut() {
+                    if (this._state !== 'ACTIVE' && this._state !== 'PROCESSING') return;
+                    this._isCashout = true;
+                    this._setState('ENDING');
+                    this._processingLock = true;
+                    this.ui.setCanvasProcessing(true);
+                    await this._endRound(true);
+                }
+
+                async _endRound(isCashout) {
+                    // Prevent double execution
+                    if (this._state === 'IDLE') return;
+                    const prevState = this._state;
+                    this._setState('ENDING');
+                    this._processingLock = true;
+
+                    const totalCleared = this._totalCleared;
+                    const bet = this._bet;
+                    const {
+                        baseMulti,
+                        randomLuck,
+                        finalMulti
+                    } = GameLogic.calculateMultiplier(totalCleared);
+                    const winAmount = Math.round(bet * finalMulti * 100) / 100;
+                    const netProfit = Math.round((winAmount - bet) * 100) / 100;
+
+                    // Add winnings
+                    this.storage.addBalance(winAmount);
+                    this._sessionProfit += netProfit;
+
+                    // Play sound
+                    if (isCashout) {
+                        this.audio.play('cashout');
+                    } else if (winAmount > bet) {
+                        this.audio.play('win_fanfare');
+                    } else {
+                        this.audio.play('loss_tone');
+                    }
+
+                    // Record stats (returns true if milestone was just claimed)
+                    const milestoneClaimed = this.storage.recordRound(
+                        bet, winAmount, netProfit, finalMulti, totalCleared, isCashout
+                    );
+                    await this.storage.saveUser();
+
+                    // Build result message
+                    let msg;
+                    if (isCashout) {
+                        msg =
+                            `💰 CASH OUT! Cleared ${totalCleared} gems → ${finalMulti.toFixed(3)}x multiplier → +${winAmount.toFixed(2)} GOLD! 💰`;
+                    } else if (winAmount > bet) {
+                        msg =
+                            `🏆 VICTORY! Cleared ${totalCleared} gems! Multiplier: ${baseMulti.toFixed(2)}x × ${randomLuck.toFixed(2)} = ${finalMulti.toFixed(3)}x → +${winAmount.toFixed(2)} GOLD 🏆`;
+                        // Spawn celebratory particles
+                        for (let i = 0; i < 16; i++) {
+                            this.ui.spawnFloatingText('✦', Math.random() * window.innerWidth, window.innerHeight -
+                                70);
+                        }
+                    } else {
+                        msg =
+                            `💎 Round ended. ${totalCleared} gems cleared → ${finalMulti.toFixed(2)}x = ${winAmount.toFixed(2)} GOLD.`;
+                    }
+                    if (milestoneClaimed) {
+                        msg += '<br>🏅 BONUS: 20 plays milestone! +100 GOLD!';
+                    }
+                    this.ui.setMessage(msg);
+
+                    // Reset round UI
+                    this._resetRoundState();
+                    this._updateAllUI(true);
+                }
+
+                _resetRoundState() {
+                    this._setState('IDLE');
+                    this._processingLock = false;
+                    this._totalCleared = 0;
+                    this._currentHighlightGroup = [];
+                    this._isCashout = false;
+                    this.ui.setRoundControlsEnabled(true);
+                    this.ui.setCashoutVisible(false);
+                    this.ui.setCanvasProcessing(false);
+                    this.ui.updateMultiplier(0, false);
+                    this.ui.updateClearedGems(0);
+                    this.renderer.render(this.logic.grid);
+                }
+
+                // ---- UI update helpers ----
+                _updateStatsUI() {
+                    this.ui.updateClearedGems(this._totalCleared);
+                    const potential = this._totalCleared / GameConstants.MULTIPLIER_DIVISOR;
+                    this.ui.updateMultiplier(potential, true);
+                }
+
+                _updateAllUI(animateBalance = false) {
+                    this.ui.updateBalanceDisplay(this.storage.getBalance(), animateBalance);
+                    this.ui.updateSessionProfit(this._sessionProfit);
+                    this.ui.updateClearedGems(this._totalCleared);
+                    const potential = this._totalCleared / GameConstants.MULTIPLIER_DIVISOR;
+                    this.ui.updateMultiplier(potential, false);
+                    this._validateBetInput();
+                }
+            }
+
+            // =====================================================================
+            //  BOOTSTRAP — Initialize the game controller on DOM ready
+            // =====================================================================
+            const controller = new GameController();
+
+            // Ensure roundRect polyfill exists
+            if (!CanvasRenderingContext2D.prototype.roundRect) {
+                CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                    if (w < 2 * r) r = w / 2;
+                    if (h < 2 * r) r = h / 2;
+                    this.moveTo(x + r, y);
+                    this.lineTo(x + w - r, y);
+                    this.quadraticCurveTo(x + w, y, x + w, y + r);
+                    this.lineTo(x + w, y + h - r);
+                    this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                    this.lineTo(x + r, y + h);
+                    this.quadraticCurveTo(x, y + h, x, y + h - r);
+                    this.lineTo(x, y + r);
+                    this.quadraticCurveTo(x, y, x + r, y);
+                    return this;
+                };
+            }
+
+            // Start the application
+            controller.init().then((success) => {
+                if (!success) {
+                    // loadUser handles redirect; if we get here, show a fallback
+                    document.getElementById('resultMessage').textContent =
+                        '⚠️ Unable to load user. Please sign in again.';
+                }
+            }).catch((err) => {
+                console.error('GameController init error:', err);
+                document.getElementById('resultMessage').textContent =
+                    '⚠️ An error occurred. Please refresh the page.';
+            });
+
+            // Expose for debugging (non-intrusive)
+            if (typeof window !== 'undefined') {
+                window.__crystalPushController = controller;
+            }
+        })();
+    </script>
+</body>
+</html>

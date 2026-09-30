@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GOLD KENO | Pick a card any card, lower the chances higher the reward.</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd966;
+            --gold-bright: #ffe484;
+            --gold-deep: #f5b042;
+            --bg-deep: #0a0908;
+            --card-bg: rgba(20, 18, 16, 0.75);
+            --border-gold: rgba(255, 217, 102, 0.4);
+            --shadow-gold: 0 0 30px rgba(255, 217, 102, 0.2);
+            --radius-lg: 2rem;
+            --radius-md: 1.5rem;
+            --radius-full: 60px;
+            --transition-fast: 0.15s ease-out;
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #0c0b0a 0%, #030202 100%);
+            color: #f5f0e6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 1.5rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .particles-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .particle {
+            position: absolute;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatUp 7s infinite ease-in;
+        }
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            15% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            50% {
+                transform: translateY(30vh) scale(0.6);
+                opacity: 0.2;
+            }
+            100% {
+                transform: translateY(-20vh) scale(0);
+                opacity: 0;
+            }
+        }
+        .game-container {
+            max-width: 950px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 13, 11, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: var(--radius-full);
+            padding: 0.65rem 1.8rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: slideDown 0.6s var(--transition-bounce);
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .back-home {
+            text-decoration: none;
+            color: var(--gold);
+            font-weight: 600;
+            background: rgba(255, 217, 102, 0.12);
+            padding: 0.45rem 1.2rem;
+            border-radius: 40px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        .back-home:hover {
+            background: rgba(255, 217, 102, 0.22);
+            transform: translateX(-3px);
+        }
+        .balance-tag {
+            background: rgba(31, 28, 24, 0.9);
+            padding: 0.35rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 217, 102, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: box-shadow 0.3s;
+            white-space: nowrap;
+        }
+        .balance-tag.pulse {
+            animation: balancePulse 0.5s ease-out;
+        }
+        @keyframes balancePulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 217, 102, 0.5);
+            }
+            100% {
+                box-shadow: 0 0 0 20px rgba(255, 217, 102, 0);
+            }
+        }
+        .sound-btn {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--gold-bright);
+            transition: transform 0.2s;
+            padding: 0.3rem;
+        }
+        .sound-btn:hover {
+            transform: scale(1.1);
+        }
+        .main-card {
+            background: linear-gradient(145deg, rgba(25, 22, 19, 0.95) 0%, rgba(12, 10, 8, 0.98) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem 1.6rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), var(--shadow-gold);
+            animation: fadeInUp 0.5s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .slider-section {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 1.8rem;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .slider-section label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--gold-bright);
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .slider-section input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 10px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #3a3324, #ffd966);
+            outline: none;
+            cursor: pointer;
+            margin: 0.5rem 0;
+        }
+        .slider-section input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gold-bright);
+            border: 3px solid #1a1712;
+            cursor: pointer;
+            box-shadow: 0 0 16px rgba(255, 217, 102, 0.5);
+            transition: 0.2s;
+        }
+        .slider-section input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 24px rgba(255, 217, 102, 0.7);
+        }
+        .pool-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: #bfb6a4;
+            margin-top: 0.4rem;
+        }
+        .pool-info span {
+            background: rgba(255, 217, 102, 0.08);
+            padding: 0.3rem 0.9rem;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 217, 102, 0.18);
+            white-space: nowrap;
+        }
+        .pool-info strong {
+            color: var(--gold-bright);
+        }
+        .actions-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+            justify-content: center;
+            margin: 0.8rem 0;
+        }
+        .btn {
+            border: none;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 1.2rem;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: none !important;
+        }
+        .btn-outline {
+            background: rgba(255, 217, 102, 0.1);
+            border: 1px solid var(--border-gold);
+            color: var(--gold);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 217, 102, 0.2);
+            transform: translateY(-2px);
+        }
+        .btn-accent {
+            background: rgba(255, 150, 80, 0.2);
+            border: 1px solid rgba(255, 150, 80, 0.5);
+            color: #ffb88c;
+        }
+        .btn-accent:hover {
+            background: rgba(255, 150, 80, 0.35);
+            transform: translateY(-2px);
+        }
+        .btn-spin {
+            background: linear-gradient(135deg, #f5b042, #ffd966);
+            color: #1a150e;
+            box-shadow: 0 4px 0 #a05f15;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            padding: 0.7rem 2rem;
+            font-weight: 800;
+        }
+        .btn-spin:hover {
+            box-shadow: 0 6px 18px rgba(255, 217, 102, 0.45);
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            pointer-events: none;
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0);
+            animation: rippleEffect 0.6s ease-out;
+            pointer-events: none;
+        }
+        @keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        .keno-grid-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            max-height: 420px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin: 0.8rem 0;
+            position: relative;
+        }
+        .keno-grid {
+            display: grid;
+            gap: 3px;
+            justify-content: center;
+        }
+        .keno-cell {
+            aspect-ratio: 1 / 1;
+            min-width: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(40, 36, 30, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #b0a898;
+            transition: all 0.12s;
+            user-select: none;
+            position: relative;
+        }
+        .keno-cell:hover {
+            background: rgba(255, 217, 102, 0.2);
+            border-color: rgba(255, 217, 102, 0.4);
+            color: #fff;
+            transform: scale(1.08);
+            z-index: 2;
+        }
+        .keno-cell.selected {
+            background: linear-gradient(135deg, #c98d20, #e6b840);
+            border-color: #ffd966;
+            color: #1a150e;
+            font-weight: 800;
+            box-shadow: 0 0 10px rgba(255, 217, 102, 0.4);
+            animation: selectedPop 0.25s var(--transition-bounce);
+        }
+        @keyframes selectedPop {
+            0% {
+                transform: scale(0.7);
+            }
+            60% {
+                transform: scale(1.12);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .keno-cell.matched {
+            background: linear-gradient(135deg, #2e7d32, #4caf50) !important;
+            border-color: #81c784 !important;
+            color: #fff !important;
+            box-shadow: 0 0 18px rgba(76, 175, 80, 0.6) !important;
+            animation: matchGlow 0.6s ease-in-out;
+            font-weight: 800;
+        }
+        @keyframes matchGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 18px rgba(76, 175, 80, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 32px rgba(76, 175, 80, 1);
+            }
+        }
+        .keno-cell.drawn-not-matched {
+            background: rgba(60, 50, 30, 0.6);
+            border-color: rgba(255, 217, 102, 0.2);
+            color: #8a8060;
+        }
+        .keno-cell.ghost {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        .bet-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 60px;
+            padding: 0.3rem 0.3rem 0.3rem 1.1rem;
+            border: 1px solid rgba(255, 217, 102, 0.3);
+        }
+        .bet-input {
+            background: #0f0d0b;
+            border: 2px solid var(--gold);
+            border-radius: 40px;
+            padding: 0.5rem 0.7rem;
+            width: 100px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--gold-bright);
+            font-size: 0.95rem;
+            outline: none;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .bet-input:focus {
+            box-shadow: 0 0 0 4px rgba(255, 217, 102, 0.1);
+        }
+        .bet-input.invalid {
+            border-color: #ff6b6b;
+        }
+        .result-area {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            transition: background 0.2s;
+            min-height: 3.5rem;
+            margin-top: 0.5rem;
+        }
+        .big-win-display {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--gold-bright);
+            text-shadow: 0 0 24px rgba(255, 217, 102, 0.7);
+            margin: 0.3rem 0;
+            display: none;
+            animation: multiPop 0.5s ease-out;
+        }
+        @keyframes multiPop {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            80% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .payout-table-compact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 0.6rem;
+            font-size: 0.78rem;
+        }
+        .payout-chip {
+            background: rgba(35, 32, 28, 0.8);
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+        }
+        .payout-chip.highlight-tier {
+            border-color: var(--gold);
+            background: rgba(255, 217, 102, 0.1);
+            color: var(--gold-bright);
+            font-weight: 700;
+        }
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .picks-indicator {
+            display: inline-block;
+            background: rgba(255, 217, 102, 0.15);
+            padding: 0.35rem 1rem;
+            border-radius: 30px;
+            font-weight: 700;
+            color: var(--gold-bright);
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 217, 102, 0.25);
+        }
+        @media (max-width: 700px) {
+            .game-container {
+                padding: 0;
+            }
+            .main-card {
+                padding: 1rem 0.8rem;
+                border-radius: 1.4rem;
+            }
+            .keno-cell {
+                min-width: 20px;
+                font-size: 0.6rem;
+                border-radius: 4px;
+            }
+            .keno-grid {
+                gap: 2px;
+            }
+            .keno-grid-container {
+                max-height: 300px;
+                padding: 0.5rem;
+            }
+            .btn {
+                padding: 0.45rem 0.9rem;
+                font-size: 0.8rem;
+            }
+            .btn-spin {
+                padding: 0.6rem 1.4rem;
+                font-size: 1rem;
+            }
+            .top-nav {
+                padding: 0.5rem 1rem;
+                border-radius: 2rem;
+            }
+            .slider-section {
+                padding: 0.8rem 1rem;
+            }
+            .big-win-display {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+    <div class="particles-container" id="particlesContainer"></div>
+
+    <div class="game-container">
+        <div class="top-nav">
+            <a href=".././home.html" class="back-home"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <span class="picks-indicator" id="picksIndicator">🎯 0 / 0 picks</span>
+            <div class="balance-tag" id="balanceTag"><i class="fas fa-coins"></i> <span id="headerBalance">0</span> GOLD</div>
+            <button id="soundToggleBtn" class="sound-btn"><i class="fas fa-volume-up"></i></button>
+        </div>
+
+        <div class="main-card">
+            <div class="slider-section">
+                <label>
+                    <span><i class="fas fa-sliders-h"></i> POOL SIZE: <strong id="poolSizeDisplay">200</strong></span>
+                    <span style="font-size:0.8rem;color:#bfb6a4;">80 – 750</span>
+                </label>
+                <input type="range" id="poolSizeSlider" min="80" max="750" value="200" step="10">
+                <div class="pool-info">
+                    <span>🎯 Numbers Drawn: <strong id="drawnCountDisplay">50</strong> (25%)</span>
+                    <span>📋 Max Picks: <strong id="maxPicksDisplay">20</strong> (10%)</span>
+                    <span>📊 Expected Matches: <strong id="expectedMatchesDisplay">--</strong></span>
+                </div>
+            </div>
+
+            <div class="actions-row">
+                <button id="quickPick5Btn" class="btn btn-outline">🎲 Pick 5</button>
+                <button id="quickPick10Btn" class="btn btn-outline">🎲 Pick 10</button>
+                <button id="quickPickMaxBtn" class="btn btn-outline">🎲 Pick Max</button>
+                <button id="clearPicksBtn" class="btn btn-accent"><i class="fas fa-eraser"></i> Clear All</button>
+            </div>
+
+            <div class="keno-grid-container" id="kenoGridContainer">
+                <div class="keno-grid" id="kenoGrid"></div>
+            </div>
+
+            <div style="text-align:center;margin-top:0.4rem;">
+                <span style="font-size:0.8rem;color:#bfb6a4;">💡 Click numbers to select/deselect • Scroll for more</span>
+            </div>
+
+            <div class="actions-row" style="margin-top:1rem;">
+                <div class="bet-group">
+                    <label style="color:var(--gold);font-weight:600;">BET</label>
+                    <input type="number" id="betAmount" class="bet-input" value="50" step="5" min="1">
+                    <button id="halfBetBtn" class="btn btn-outline" style="padding:0.3rem 0.7rem;">½</button>
+                    <button id="doubleBetBtn" class="btn btn-outline" style="padding:0.3rem 0.7rem;">2×</button>
+                </div>
+                <button id="drawButton" class="btn btn-spin"><i class="fas fa-play"></i> DRAW</button>
+            </div>
+
+            <div class="result-area" id="resultArea">
+                <div id="winMessage" style="font-size:1.05rem;">✨ SELECT NUMBERS & DRAW ✨</div>
+                <div id="bigWinDisplay" class="big-win-display"></div>
+                <div id="matchDetail" style="font-size:0.85rem;color:#bfb6a4;"></div>
+                <div id="sessionProfitDisplay" style="font-size:0.85rem;color:#b5afa4;margin-top:0.3rem;"></div>
+            </div>
+
+            <div class="payout-table-compact" id="payoutTableCompact">
+                <span style="color:#bfb6a4;font-size:0.75rem;">📋 Payout tiers appear after selecting numbers</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ── AUDIO ENGINE ──
+            let audioCtx = null;
+            let soundEnabled = true;
+
+            function initAudio() { if (!audioCtx && soundEnabled) audioCtx = new(window.AudioContext || window
+                    .webkitAudioContext)(); }
+
+            function playTone(type) {
+                if (!soundEnabled) return;
+                try {
+                    initAudio();
+                    if (!audioCtx) return;
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+                    if (type === 'draw') { osc.frequency.value = 440;
+                        osc.start();
+                        osc.stop(now + 0.3); } else if (type === 'match') { osc.frequency.value = 880;
+                        gain.gain.setValueAtTime(0.06, now);
+                        osc.start();
+                        osc.stop(now + 0.08); } else if (type === 'win') { osc.frequency.value = 1100;
+                        osc.start();
+                        osc.stop(now + 0.4); } else if (type === 'bigwin') {
+                        osc.frequency.value = 880;
+                        osc.start();
+                        osc.stop(now + 0.5);
+                        const osc2 = audioCtx.createOscillator();
+                        osc2.connect(gain);
+                        osc2.frequency.value = 1760;
+                        osc2.start();
+                        osc2.stop(now + 0.45);
+                    } else if (type === 'select') { osc.frequency.value = 600;
+                        gain.gain.setValueAtTime(0.04, now);
+                        osc.start();
+                        osc.stop(now + 0.06); }
+                } catch (e) { /* silent */ }
+            }
+
+            // ── CONFETTI ──
+            function triggerConfetti() {
+                const canvas = document.getElementById('confettiCanvas');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                const ctx = canvas.getContext('2d');
+                const particles = [];
+                const colors = ['#ffd966', '#f5b042', '#ffed4e', '#4caf50', '#ffaa00', '#ff6b6b', '#81c784'];
+                for (let i = 0; i < 300; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: -30,
+                        size: Math.random() * 7 + 3,
+                        speedY: Math.random() * 8 + 4,
+                        speedX: (Math.random() - 0.5) * 6,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        rotation: Math.random() * 360,
+                        rotSpeed: (Math.random() - 0.5) * 14,
+                        shape: Math.random() > 0.4 ? 'star' : 'rect'
+                    });
+                }
+                let frame;
+                const start = performance.now();
+
+                function draw(now) {
+                    if (now - start > 3000) { ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        cancelAnimationFrame(frame); return; }
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    particles.forEach(p => {
+                        p.y += p.speedY;
+                        p.x += p.speedX;
+                        p.rotation += p.rotSpeed;
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rotation * Math.PI / 180);
+                        ctx.fillStyle = p.color;
+                        if (p.shape === 'star') {
+                            ctx.beginPath();
+                            for (let i = 0; i < 5; i++) {
+                                const angle = (i * 72) * Math.PI / 180;
+                                const x1 = Math.cos(angle) * p.size / 2;
+                                const y1 = Math.sin(angle) * p.size / 2;
+                                if (i === 0) ctx.moveTo(x1, y1);
+                                else ctx.lineTo(x1, y1);
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+                        } else {
+                            ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                        }
+                        ctx.restore();
+                    });
+                    frame = requestAnimationFrame(draw);
+                }
+                frame = requestAnimationFrame(draw);
+            }
+
+            // ── STATE ──
+            let currentUser = null;
+            let poolSize = 200;
+            let drawnCount = 50;
+            let maxPicks = 20;
+            let selectedNumbers = new Set();
+            let drawnNumbers = new Set();
+            let drawing = false;
+            let sessionProfit = 0;
+
+            const poolSlider = document.getElementById('poolSizeSlider');
+            const poolSizeDisplay = document.getElementById('poolSizeDisplay');
+            const drawnCountDisplay = document.getElementById('drawnCountDisplay');
+            const maxPicksDisplay = document.getElementById('maxPicksDisplay');
+            const expectedMatchesDisplay = document.getElementById('expectedMatchesDisplay');
+            const kenoGrid = document.getElementById('kenoGrid');
+            const kenoGridContainer = document.getElementById('kenoGridContainer');
+            const picksIndicator = document.getElementById('picksIndicator');
+            const drawBtn = document.getElementById('drawButton');
+            const betInput = document.getElementById('betAmount');
+            const winMessage = document.getElementById('winMessage');
+            const bigWinDisplay = document.getElementById('bigWinDisplay');
+            const matchDetail = document.getElementById('matchDetail');
+            const sessionDisplay = document.getElementById('sessionProfitDisplay');
+            const payoutTableCompact = document.getElementById('payoutTableCompact');
+            const balanceTag = document.getElementById('balanceTag');
+
+            // ── HYPERGEOMETRIC PROBABILITY (log-space) ──
+            function logComb(n, k) {
+                if (k > n || k < 0 || n < 0) return -Infinity;
+                if (k === 0 || k === n) return 0;
+                let result = 0;
+                const kMin = Math.min(k, n - k);
+                for (let i = 1; i <= kMin; i++) {
+                    result += Math.log(n - kMin + i) - Math.log(i);
+                }
+                return result;
+            }
+
+            function hypergeometricPMF(N, K, n, k) {
+                const logP = logComb(K, k) + logComb(N - K, n - k) - logComb(N, n);
+                return Math.exp(logP);
+            }
+
+            // ── UPDATE POOL PARAMETERS ──
+            function updatePoolParameters() {
+                poolSize = parseInt(poolSlider.value);
+                drawnCount = Math.floor(poolSize * 0.25);
+                maxPicks = Math.floor(poolSize * 0.10);
+                if (maxPicks < 1) maxPicks = 1;
+                poolSizeDisplay.textContent = poolSize;
+                drawnCountDisplay.textContent = drawnCount;
+                maxPicksDisplay.textContent = maxPicks;
+                selectedNumbers.clear();
+                drawnNumbers.clear();
+                buildKenoGrid();
+                updatePicksIndicator();
+                updateExpectedMatches();
+                updatePayoutTable();
+                clearResults();
+                validateBetInput();
+            }
+
+            function updateExpectedMatches() {
+                if (selectedNumbers.size > 0) {
+                    const expected = selectedNumbers.size * (drawnCount / poolSize);
+                    expectedMatchesDisplay.textContent = expected.toFixed(1);
+                } else {
+                    expectedMatchesDisplay.textContent = '--';
+                }
+            }
+
+            function updatePicksIndicator() {
+                picksIndicator.innerHTML = `🎯 <strong>${selectedNumbers.size}</strong> / ${maxPicks} picks`;
+                if (selectedNumbers.size >= maxPicks) {
+                    picksIndicator.style.borderColor = '#ff6b6b';
+                    picksIndicator.style.color = '#ff8a80';
+                } else {
+                    picksIndicator.style.borderColor = 'rgba(255,217,102,0.25)';
+                    picksIndicator.style.color = 'var(--gold-bright)';
+                }
+            }
+
+            // ── BUILD NUMBER GRID ──
+            function buildKenoGrid() {
+                kenoGrid.innerHTML = '';
+                const cols = poolSize <= 120 ? 8 : poolSize <= 250 ? 12 : poolSize <= 450 ? 16 : 20;
+                kenoGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                const fragment = document.createDocumentFragment();
+                for (let i = 1; i <= poolSize; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'keno-cell';
+                    cell.textContent = i;
+                    cell.dataset.number = i;
+                    if (selectedNumbers.has(i)) cell.classList.add('selected');
+                    if (drawnNumbers.has(i) && selectedNumbers.has(i)) cell.classList.add('matched');
+                    else if (drawnNumbers.has(i)) cell.classList.add('drawn-not-matched');
+                    cell.addEventListener('click', () => toggleNumber(i, cell));
+                    fragment.appendChild(cell);
+                }
+                kenoGrid.appendChild(fragment);
+                updatePicksIndicator();
+                updateExpectedMatches();
+                updatePayoutTable();
+            }
+
+            function refreshCellVisuals() {
+                const cells = kenoGrid.querySelectorAll('.keno-cell');
+                cells.forEach(cell => {
+                    const num = parseInt(cell.dataset.number);
+                    cell.classList.remove('selected', 'matched', 'drawn-not-matched');
+                    if (selectedNumbers.has(num) && drawnNumbers.has(num)) cell.classList.add('matched');
+                    else if (selectedNumbers.has(num)) cell.classList.add('selected');
+                    else if (drawnNumbers.has(num)) cell.classList.add('drawn-not-matched');
+                });
+            }
+
+            function toggleNumber(num, cellElement) {
+                if (drawing) return;
+                if (drawnNumbers.size > 0 && !drawing) {
+                    // Starting fresh after previous draw
+                    drawnNumbers.clear();
+                    refreshCellVisuals();
+                    clearResults();
+                }
+                if (selectedNumbers.has(num)) {
+                    selectedNumbers.delete(num);
+                    if (cellElement) cellElement.classList.remove('selected');
+                    playTone('select');
+                } else {
+                    if (selectedNumbers.size >= maxPicks) {
+                        showToast(`Max ${maxPicks} picks allowed!`, true);
+                        return;
+                    }
+                    selectedNumbers.add(num);
+                    if (cellElement) {
+                        cellElement.classList.add('selected');
+                        cellElement.classList.remove('drawn-not-matched', 'matched');
+                    }
+                    playTone('select');
+                }
+                updatePicksIndicator();
+                updateExpectedMatches();
+                updatePayoutTable();
+                validateBetInput();
+            }
+
+            function clearPicks() {
+                selectedNumbers.clear();
+                drawnNumbers.clear();
+                refreshCellVisuals();
+                updatePicksIndicator();
+                updateExpectedMatches();
+                updatePayoutTable();
+                clearResults();
+                validateBetInput();
+            }
+
+            function quickPick(count) {
+                drawnNumbers.clear();
+                const actualCount = Math.min(count, maxPicks);
+                selectedNumbers.clear();
+                const pool = [];
+                for (let i = 1; i <= poolSize; i++) pool.push(i);
+                // Fisher-Yates partial shuffle
+                for (let i = 0; i < actualCount; i++) {
+                    const j = i + Math.floor(Math.random() * (pool.length - i));
+                    [pool[i], pool[j]] = [pool[j], pool[i]];
+                    selectedNumbers.add(pool[i]);
+                }
+                refreshCellVisuals();
+                updatePicksIndicator();
+                updateExpectedMatches();
+                updatePayoutTable();
+                clearResults();
+                validateBetInput();
+                // Highlight selected cells
+                const cells = kenoGrid.querySelectorAll('.keno-cell');
+                cells.forEach(cell => {
+                    const num = parseInt(cell.dataset.number);
+                    if (selectedNumbers.has(num)) cell.classList.add('selected');
+                });
+            }
+
+            // ── PAYOUT TABLE ──
+            function computePayoutTiers() {
+                if (selectedNumbers.size === 0) return [];
+                const K = selectedNumbers.size;
+                const N = poolSize;
+                const D = drawnCount;
+                const expected = K * (D / N);
+                const tiers = [];
+                // Generate tiers from max(0, floor(expected)-3) to K
+                const startM = Math.max(0, Math.floor(expected) - 3);
+                const endM = K;
+                // Show key tiers
+                const keyTiers = new Set();
+                keyTiers.add(Math.max(0, Math.floor(expected) - 2));
+                keyTiers.add(Math.max(0, Math.floor(expected) - 1));
+                keyTiers.add(Math.floor(expected));
+                keyTiers.add(Math.ceil(expected));
+                keyTiers.add(Math.min(K, Math.ceil(expected) + 1));
+                keyTiers.add(Math.min(K, Math.ceil(expected) + 2));
+                keyTiers.add(Math.min(K, Math.ceil(expected) + 4));
+                keyTiers.add(Math.min(K, Math.ceil(expected) + 7));
+                if (K >= Math.ceil(expected) + 10) keyTiers.add(Math.min(K, Math.ceil(expected) + 10));
+                keyTiers.add(K); // perfect match
+                const sortedTiers = [...keyTiers].filter(m => m >= 0 && m <= K).sort((a, b) => a - b);
+
+                for (const m of sortedTiers) {
+                    const prob = hypergeometricPMF(N, D, K, m);
+                    // Cumulative probability for m or more
+                    let cumProb = 0;
+                    for (let mm = m; mm <= K; mm++) {
+                        cumProb += hypergeometricPMF(N, D, K, mm);
+                    }
+                    const fairMultiplier = cumProb > 0 ? 1 / cumProb : 0;
+                    const houseMultiplier = fairMultiplier * 0.78; // ~22% house edge
+                    const displayMultiplier = Math.max(0, Math.round(houseMultiplier * 100) / 100);
+                    tiers.push({
+                        matches: m,
+                        probability: cumProb,
+                        fairMult: fairMultiplier,
+                        multiplier: displayMultiplier,
+                        isKey: m === Math.floor(expected) || m === Math.ceil(expected) || m === K
+                    });
+                }
+                // Filter to reasonable display count (keep most relevant)
+                const filtered = tiers.filter(t => t.multiplier >= 0.3 || t.matches === K || t.isKey);
+                // Ensure we don't have too many
+                const display = filtered.slice(0, 10);
+                return display;
+            }
+
+            function updatePayoutTable() {
+                const tiers = computePayoutTiers();
+                if (tiers.length === 0) {
+                    payoutTableCompact.innerHTML =
+                        '<span style="color:#bfb6a4;font-size:0.75rem;">📋 Payout tiers appear after selecting numbers</span>';
+                    return;
+                }
+                payoutTableCompact.innerHTML = tiers.map(t => {
+                    let cls = 'payout-chip';
+                    if (t.isKey) cls += ' highlight-tier';
+                    const multDisplay = t.multiplier >= 100 ? Math.round(t.multiplier) + 'x' :
+                        t.multiplier.toFixed(1) + 'x';
+                    return `<span class="${cls}">${t.matches}+ matches → <strong>${multDisplay}</strong></span>`;
+                }).join('');
+            }
+
+            function getMultiplierForMatches(matches) {
+                if (selectedNumbers.size === 0) return 0;
+                const K = selectedNumbers.size;
+                const N = poolSize;
+                const D = drawnCount;
+                let cumProb = 0;
+                for (let mm = matches; mm <= K; mm++) {
+                    cumProb += hypergeometricPMF(N, D, K, mm);
+                }
+                const fairMult = cumProb > 0 ? 1 / cumProb : 0;
+                const houseMult = fairMult * 0.78;
+                return Math.max(0, houseMult);
+            }
+
+            // ── DRAW ──
+            async function performDraw() {
+                if (drawing) return;
+                if (selectedNumbers.size === 0) {
+                    showToast('Please select at least 1 number!', true);
+                    return;
+                }
+                let bet = parseFloat(betInput.value);
+                if (isNaN(bet) || bet <= 0) bet = 50;
+                bet = Math.floor(bet * 100) / 100;
+                if (bet < 1) bet = 1;
+                if (bet > currentUser.balance) {
+                    winMessage.innerHTML = '❌ Insufficient balance!';
+                    return;
+                }
+
+                drawing = true;
+                drawBtn.disabled = true;
+                document.querySelectorAll('.btn-outline, .btn-accent').forEach(b => b.disabled = true);
+                poolSlider.disabled = true;
+                winMessage.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> DRAWING...';
+                bigWinDisplay.style.display = 'none';
+                matchDetail.innerHTML = '';
+
+                // Deduct bet
+                currentUser.balance -= bet;
+                await saveUser();
+                updateBalanceDisplay();
+                playTone('draw');
+
+                // Generate drawn numbers
+                drawnNumbers.clear();
+                const pool = [];
+                for (let i = 1; i <= poolSize; i++) pool.push(i);
+                // Fisher-Yates partial shuffle for drawnCount numbers
+                for (let i = 0; i < drawnCount; i++) {
+                    const j = i + Math.floor(Math.random() * (pool.length - i));
+                    [pool[i], pool[j]] = [pool[j], pool[i]];
+                    drawnNumbers.add(pool[i]);
+                }
+
+                // Animate reveal in batches
+                const drawnArray = [...drawnNumbers];
+                const batchSize = Math.max(5, Math.floor(drawnCount / 12));
+                const totalBatches = Math.ceil(drawnArray.length / batchSize);
+
+                for (let batch = 0; batch < totalBatches; batch++) {
+                    const start = batch * batchSize;
+                    const end = Math.min(start + batchSize, drawnArray.length);
+                    const batchNums = drawnArray.slice(start, end);
+
+                    batchNums.forEach(num => {
+                        const cell = kenoGrid.querySelector(`[data-number="${num}"]`);
+                        if (cell) {
+                            if (selectedNumbers.has(num)) {
+                                cell.classList.add('matched');
+                                cell.classList.remove('selected');
+                                playTone('match');
+                            } else {
+                                cell.classList.add('drawn-not-matched');
+                            }
+                        }
+                    });
+
+                    if (batch < totalBatches - 1) {
+                        await new Promise(r => setTimeout(r, 120));
+                    }
+                }
+
+                // Count matches
+                let matchCount = 0;
+                selectedNumbers.forEach(num => {
+                    if (drawnNumbers.has(num)) matchCount++;
+                });
+
+                const multiplier = getMultiplierForMatches(matchCount);
+                const winAmount = bet * multiplier;
+                const netProfit = winAmount - bet;
+                currentUser.balance += winAmount;
+                sessionProfit += netProfit;
+                recordStats(bet, winAmount, matchCount, multiplier);
+                await saveUser();
+                updateBalanceDisplay();
+
+                // Display results
+                if (winAmount > 0) {
+                    winMessage.innerHTML =
+                        `<span style="color:#aaffaa;">🎉 WIN! +${winAmount.toFixed(2)} GOLD</span>`;
+                    bigWinDisplay.style.display = 'block';
+                    bigWinDisplay.textContent = `${multiplier >= 100 ? Math.round(multiplier) : multiplier.toFixed(1)}x`;
+                    if (multiplier >= 15) {
+                        triggerConfetti();
+                        playTone('bigwin');
+                    } else {
+                        playTone('win');
+                    }
+                } else {
+                    winMessage.innerHTML = '💔 No win this time.';
+                    bigWinDisplay.style.display = 'none';
+                }
+                matchDetail.innerHTML =
+                    `📊 Matched <strong>${matchCount}</strong> / ${selectedNumbers.size} numbers • Expected ~${(selectedNumbers.size * drawnCount / poolSize).toFixed(1)}`;
+                updateSessionDisplay();
+
+                drawing = false;
+                drawBtn.disabled = false;
+                document.querySelectorAll('.btn-outline, .btn-accent').forEach(b => b.disabled = false);
+                poolSlider.disabled = false;
+                validateBetInput();
+                updatePayoutTable();
+            }
+
+            function clearResults() {
+                winMessage.innerHTML = '✨ SELECT NUMBERS & DRAW ✨';
+                bigWinDisplay.style.display = 'none';
+                matchDetail.innerHTML = '';
+            }
+
+            // ── USER DATA ──
+            function initializeUserStats(user) {
+                const defaults = {
+                    globalStats: { totalWagered: 0, totalWon: 0, totalLosses: 0, totalGames: 0, currentStreak: 0,
+                        bestStreak: 0, lastGameWin: null, totalWins: 0 },
+                    minesStats: { gamesPlayed: 0, wins: 0, losses: 0, totalBet: 0, totalPayout: 0,
+                    bestMultiplier: 1.0 },
+                    transactions: [],
+                    gameOutcomes: [],
+                    gamePlayCount: {},
+                    bankBalance: 0,
+                    xp: 0,
+                    level: 1,
+                    dailyClaims: 0,
+                    wheelSpins: 0,
+                    dailyGuessWins: 0,
+                    giftsSent: 0,
+                    avatar: 'fas fa-crown',
+                    theme: 'theme-gold',
+                    autoTransfer: false,
+                    seasonalTheme: true,
+                    earnedAchievements: [],
+                    lastInterestDate: null,
+                    lastDailyBonusDate: null,
+                    lastWheelSpinDate: null,
+                    dailyBalanceSnapshots: [],
+                    kenoStats: { gamesPlayed: 0, biggestWin: 0, totalBet: 0, totalWin: 0, bestMultiplier: 1.0,
+                        totalMatches: 0, totalPicks: 0 }
+                };
+                for (const [key, value] of Object.entries(defaults)) {
+                    if (user[key] === undefined) user[key] = value;
+                }
+                if (!user.kenoStats) user.kenoStats = defaults.kenoStats;
+                return user;
+            }
+
+            async function loadUser() {
+                const sess = sessionStorage.getItem('gold_current_user');
+                if (!sess) { window.location.href = '../../sign-in.html'; return false; }
+                const sessionUser = JSON.parse(sess);
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                const user = users[sessionUser.username];
+                if (!user) { sessionStorage.removeItem('gold_current_user');
+                    window.location.href = '../../sign-in.html'; return false; }
+                currentUser = initializeUserStats(user);
+                sessionUser.balance = currentUser.balance;
+                sessionStorage.setItem('gold_current_user', JSON.stringify(sessionUser));
+                return true;
+            }
+
+            async function saveUser() {
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                users[currentUser.username] = currentUser;
+                localStorage.setItem('gold_users', JSON.stringify(users));
+                const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
+                if (sess) { sess.balance = currentUser.balance;
+                    sessionStorage.setItem('gold_current_user', JSON.stringify(sess)); }
+            }
+
+            function recordStats(bet, winAmount, matchCount, multiplier) {
+                const net = winAmount - bet;
+                currentUser.globalStats.totalGames++;
+                currentUser.globalStats.totalWagered += bet;
+                currentUser.globalStats.totalWon += winAmount;
+                if (net > 0) {
+                    currentUser.globalStats.currentStreak = (currentUser.globalStats.currentStreak || 0) + 1;
+                    if (currentUser.globalStats.currentStreak > currentUser.globalStats.bestStreak)
+                        currentUser.globalStats.bestStreak = currentUser.globalStats.currentStreak;
+                    currentUser.globalStats.totalWins = (currentUser.globalStats.totalWins || 0) + 1;
+                } else if (net < 0) {
+                    currentUser.globalStats.currentStreak = 0;
+                }
+                currentUser.xp = (currentUser.xp || 0) + bet;
+                currentUser.gamePlayCount['keno'] = (currentUser.gamePlayCount['keno'] || 0) + 1;
+
+                const ks = currentUser.kenoStats;
+                ks.gamesPlayed++;
+                ks.totalBet += bet;
+                ks.totalWin += winAmount;
+                ks.totalMatches += matchCount;
+                ks.totalPicks += selectedNumbers.size;
+                if (winAmount > ks.biggestWin) ks.biggestWin = winAmount;
+                if (multiplier > ks.bestMultiplier) ks.bestMultiplier = multiplier;
+
+                currentUser.gameOutcomes.unshift({
+                    game: 'Keno',
+                    result: net > 0 ? 'win' : (net < 0 ? 'loss' : 'push'),
+                    profit: net,
+                    multiplier: multiplier,
+                    bet,
+                    win: winAmount,
+                    date: new Date().toISOString(),
+                    matchCount,
+                    picks: selectedNumbers.size,
+                    poolSize
+                });
+                if (currentUser.gameOutcomes.length > 50) currentUser.gameOutcomes.pop();
+                currentUser.transactions.unshift({
+                    desc: `🎱 Keno | Bet ${bet} → ${winAmount > 0 ? 'Won ' + winAmount.toFixed(2) : 'No win'} | ${matchCount}/${selectedNumbers.size} matches`,
+                    amount: net,
+                    type: net > 0 ? 'game_win' : (net < 0 ? 'game_loss' : 'game_push'),
+                    date: new Date().toISOString()
+                });
+                if (currentUser.transactions.length > 30) currentUser.transactions.shift();
+                saveUser();
+            }
+
+            // ── BALANCE DISPLAY ──
+            function updateBalanceDisplay() {
+                const balEl = document.getElementById('headerBalance');
+                const prev = parseInt(balEl.textContent.replace(/,/g, '')) || 0;
+                const next = currentUser.balance;
+                if (prev !== next) {
+                    animateNumber(balEl, prev, next, 400);
+                    if (next > prev) { balanceTag.classList.add('pulse');
+                        setTimeout(() => balanceTag.classList.remove('pulse'), 500); }
+                } else balEl.textContent = next.toLocaleString();
+                validateBetInput();
+            }
+
+            function animateNumber(el, start, end, duration) {
+                if (start === end) { el.textContent = end.toLocaleString(); return; }
+                const range = end - start;
+                const startTime = performance.now();
+
+                function step(now) {
+                    const progress = Math.min((now - startTime) / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    el.textContent = Math.round(start + range * eased).toLocaleString();
+                    if (progress < 1) requestAnimationFrame(step);
+                    else el.textContent = end.toLocaleString();
+                }
+                requestAnimationFrame(step);
+            }
+
+            function validateBetInput() {
+                const bet = parseFloat(betInput.value);
+                const invalid = bet <= 0 || bet > (currentUser?.balance || 0) || selectedNumbers.size === 0;
+                betInput.classList.toggle('invalid', bet > 0 && bet > (currentUser?.balance || 0));
+                drawBtn.disabled = invalid || drawing || selectedNumbers.size === 0;
+            }
+
+            function updateSessionDisplay() {
+                sessionDisplay.textContent =
+                    `📊 Session P/L: ${sessionProfit >= 0 ? '+' : ''}${sessionProfit.toFixed(2)} GOLD`;
+            }
+
+            // ── TOAST ──
+            let toastTimer;
+
+            function showToast(msg, isErr = false) {
+                let toast = document.getElementById('toastMsg');
+                if (!toast) {
+                    toast = document.createElement('div');
+                    toast.id = 'toastMsg';
+                    toast.style.cssText =
+                        'position:fixed;bottom:28px;right:28px;background:rgba(22,20,17,0.95);border-left:4px solid var(--gold);padding:14px 22px;border-radius:20px;font-weight:600;z-index:1000;opacity:0;transform:translateX(40px);transition:all 0.35s;max-width:400px;font-family:Inter,sans-serif;color:#f5f0e6;font-size:0.9rem;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(0,0,0,0.5);';
+                    document.body.appendChild(toast);
+                }
+                if (toastTimer) clearTimeout(toastTimer);
+                toast.classList.remove('show');
+                toast.textContent = msg;
+                toast.style.borderLeftColor = isErr ? '#ff6b6b' : 'var(--gold)';
+                void toast.offsetWidth;
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(0)';
+                toast.classList.add('show');
+                toastTimer = setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(40px)';
+                }, 2800);
+            }
+
+            // ── RIPPLE ──
+            function addRipple(e, btn) {
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = e.clientX - rect.left - size / 2 + 'px';
+                ripple.style.top = e.clientY - rect.top - size / 2 + 'px';
+                btn.appendChild(ripple);
+                ripple.addEventListener('animationend', () => ripple.remove());
+            }
+
+            // ── PARTICLES ──
+            function initParticles() {
+                const container = document.getElementById('particlesContainer');
+                for (let i = 0; i < 28; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    const size = Math.random() * 5 + 2;
+                    p.style.width = p.style.height = size + 'px';
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.animationDelay = Math.random() * 8 + 's';
+                    p.style.animationDuration = (Math.random() * 7 + 5) + 's';
+                    container.appendChild(p);
+                }
+            }
+
+            // ── EVENT BINDINGS ──
+            poolSlider.addEventListener('input', () => {
+                updatePoolParameters();
+                clearResults();
+                drawnNumbers.clear();
+                refreshCellVisuals();
+                updatePayoutTable();
+            });
+
+            drawBtn.addEventListener('click', (e) => {
+                addRipple(e, drawBtn);
+                performDraw();
+            });
+
+            document.getElementById('quickPick5Btn').addEventListener('click', () => quickPick(5));
+            document.getElementById('quickPick10Btn').addEventListener('click', () => quickPick(10));
+            document.getElementById('quickPickMaxBtn').addEventListener('click', () => quickPick(maxPicks));
+            document.getElementById('clearPicksBtn').addEventListener('click', clearPicks);
+
+            document.getElementById('halfBetBtn').addEventListener('click', () => {
+                const current = parseFloat(betInput.value) || 50;
+                betInput.value = Math.max(1, Math.floor(current / 2));
+                validateBetInput();
+            });
+            document.getElementById('doubleBetBtn').addEventListener('click', () => {
+                const current = parseFloat(betInput.value) || 50;
+                betInput.value = Math.min(currentUser?.balance || 999999, current * 2);
+                validateBetInput();
+            });
+
+            betInput.addEventListener('input', validateBetInput);
+
+            document.getElementById('soundToggleBtn').addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                document.getElementById('soundToggleBtn').innerHTML = soundEnabled ?
+                    '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+                if (soundEnabled && !audioCtx) initAudio();
+                localStorage.setItem('gold_sound_enabled', soundEnabled);
+            });
+
+            window.addEventListener('focus', async () => {
+                if (currentUser) { await loadUser();
+                    updateBalanceDisplay(); }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !drawing && selectedNumbers.size > 0) {
+                    e.preventDefault();
+                    performDraw();
+                }
+                if (e.key === 'c' && e.ctrlKey && !drawing) {
+                    e.preventDefault();
+                    clearPicks();
+                }
+            });
+
+            // ── INIT ──
+            async function init() {
+                initParticles();
+                if (!(await loadUser())) return;
+                updatePoolParameters();
+                buildKenoGrid();
+                updateBalanceDisplay();
+                updateSessionDisplay();
+                validateBetInput();
+                updatePayoutTable();
+                const savedSound = localStorage.getItem('gold_sound_enabled');
+                if (savedSound === 'false') {
+                    soundEnabled = false;
+                    document.getElementById('soundToggleBtn').innerHTML = '<i class="fas fa-volume-mute"></i>';
+                }
+                // Focus bet input
+                setTimeout(() => betInput.focus(), 600);
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>

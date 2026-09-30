@@ -1,0 +1,2464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GOLD MINES | Uncover gems, avoid mines</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&family=Orbitron:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd966;
+            --gold-bright: #ffe484;
+            --gold-deep: #f5b042;
+            --gold-dark: #c48a1a;
+            --bg-deep: #0a0908;
+            --bg-card: rgba(20, 18, 16, 0.75);
+            --border-gold: rgba(255, 217, 102, 0.3);
+            --border-gold-bright: rgba(255, 217, 102, 0.55);
+            --shadow-card: 0 20px 40px rgba(0, 0, 0, 0.55);
+            --shadow-gold: 0 0 30px rgba(255, 217, 102, 0.2);
+            --radius-lg: 2rem;
+            --radius-md: 1.2rem;
+            --radius-sm: 0.8rem;
+            --radius-full: 60px;
+            --transition: 0.22s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --font-display: 'Orbitron', 'Inter', sans-serif;
+            --risk-low: #4caf50;
+            --risk-med: #ffa726;
+            --risk-high: #ef5350;
+            --risk-extreme: #b71c1c;
+            --rarity-common: #b0b0b0;
+            --rarity-rare: #4caf50;
+            --rarity-epic: #9c27b0;
+            --rarity-legendary: #ff9800;
+            --rarity-mythic: #ff1744;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 30% 10%, #1a1610 0%, #050404 100%);
+            color: #f5f0e6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.2rem;
+            overflow-x: hidden;
+            position: relative;
+            background-attachment: fixed;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 30%, rgba(255, 217, 102, 0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 70%, rgba(245, 176, 66, 0.03) 0%, transparent 55%),
+                radial-gradient(ellipse at 75% 45%, rgba(255, 217, 102, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+            animation: ambientGlow 12s ease-in-out infinite;
+        }
+        @keyframes ambientGlow {
+            0%,
+            100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Floating particles */
+        .particles-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .particle {
+            position: absolute;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatUp 7s infinite ease-in;
+            filter: blur(0.5px);
+        }
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) scale(0);
+                opacity: 0;
+            }
+            8% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            55% {
+                transform: translateY(28vh) scale(0.6);
+                opacity: 0.25;
+            }
+            100% {
+                transform: translateY(-25vh) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Main container */
+        .game-container {
+            max-width: 780px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Top nav */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 13, 11, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-full);
+            padding: 0.6rem 1.8rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), var(--shadow-gold);
+            animation: slideDown 0.6s var(--ease-spring);
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .back-home {
+            text-decoration: none;
+            color: var(--gold);
+            font-weight: 600;
+            background: rgba(255, 217, 102, 0.1);
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        .back-home:hover {
+            background: rgba(255, 217, 102, 0.2);
+            transform: translateX(-4px);
+            box-shadow: 0 0 20px rgba(255, 217, 102, 0.15);
+        }
+        .balance-tag {
+            background: rgba(31, 28, 24, 0.9);
+            padding: 0.35rem 1.3rem;
+            border-radius: 40px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 217, 102, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: box-shadow 0.3s, transform 0.2s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        .balance-tag.pulse {
+            animation: balancePulse 0.5s ease-out;
+        }
+        @keyframes balancePulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 217, 102, 0.6);
+                transform: scale(1.04);
+            }
+            100% {
+                box-shadow: 0 0 0 22px rgba(255, 217, 102, 0);
+                transform: scale(1);
+            }
+        }
+        .sound-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--gold);
+            transition: transform 0.2s, opacity 0.2s;
+            padding: 0.3rem;
+        }
+        .sound-btn:hover {
+            transform: scale(1.15);
+            opacity: 0.85;
+        }
+        .xp-bar-mini {
+            background: #1f1b17;
+            border-radius: 20px;
+            height: 6px;
+            flex: 1;
+            min-width: 50px;
+            max-width: 120px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 217, 102, 0.2);
+        }
+        .xp-fill-mini {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd966, #ffaa33);
+            border-radius: 20px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 8px rgba(255, 217, 102, 0.4);
+        }
+        .level-badge-mini {
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+        /* Game card */
+        .game-card {
+            background: linear-gradient(145deg, rgba(28, 25, 21, 0.95), rgba(12, 11, 9, 0.98));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: var(--shadow-card), var(--shadow-gold);
+            transition: border 0.3s, box-shadow 0.3s;
+            animation: fadeInUp 0.5s var(--ease-out-expo);
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .game-card.big-win {
+            border-color: var(--gold-bright) !important;
+            box-shadow: 0 0 60px rgba(255, 217, 102, 0.5), 0 20px 40px rgba(0, 0, 0, 0.6) !important;
+            animation: bigWinGlow 0.8s ease-in-out 3;
+        }
+        @keyframes bigWinGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 40px rgba(255, 217, 102, 0.4), 0 20px 40px rgba(0, 0, 0, 0.55);
+            }
+            50% {
+                box-shadow: 0 0 80px rgba(255, 217, 102, 0.7), 0 20px 50px rgba(0, 0, 0, 0.65);
+            }
+        }
+
+        /* Risk tier selector */
+        .risk-tier-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 0.3rem;
+        }
+        .risk-tier-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.35);
+            color: #ccc;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.78rem;
+            transition: all 0.25s;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            position: relative;
+        }
+        .risk-tier-btn:hover {
+            border-color: var(--gold);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+        .risk-tier-btn.active {
+            border-color: var(--gold-bright);
+            color: #1a150e;
+            background: linear-gradient(135deg, #f5b042, #ffd966);
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(255, 217, 102, 0.4);
+            animation: tierSelect 0.3s var(--ease-spring);
+        }
+        @keyframes tierSelect {
+            from {
+                transform: scale(0.9);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+        .risk-tier-btn .tier-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+        .tier-dot.low {
+            background: var(--risk-low);
+            box-shadow: 0 0 6px var(--risk-low);
+        }
+        .tier-dot.med {
+            background: var(--risk-med);
+            box-shadow: 0 0 6px var(--risk-med);
+        }
+        .tier-dot.high {
+            background: var(--risk-high);
+            box-shadow: 0 0 6px var(--risk-high);
+        }
+        .tier-dot.extreme {
+            background: var(--risk-extreme);
+            box-shadow: 0 0 6px var(--risk-extreme);
+        }
+
+        /* Control card */
+        .control-card {
+            background: rgba(28, 25, 21, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 1.8rem;
+            padding: 1rem 1.4rem;
+            border: 1px solid rgba(255, 217, 102, 0.2);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .bet-input {
+            background: #1f1b17;
+            border: 2px solid rgba(255, 217, 102, 0.2);
+            border-radius: var(--radius-full);
+            padding: 0.65rem 1.1rem;
+            color: white;
+            font-weight: 700;
+            width: 120px;
+            text-align: center;
+            transition: 0.2s;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .bet-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(255, 217, 102, 0.1);
+        }
+        .bet-input.invalid {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-6px);
+            }
+            75% {
+                transform: translateX(6px);
+            }
+        }
+        .quick-bets {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+        .quick-bet {
+            background: rgba(255, 217, 102, 0.07);
+            border: 1px solid rgba(255, 217, 102, 0.3);
+            border-radius: 40px;
+            padding: 0.3rem 0.75rem;
+            color: var(--gold);
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+        .quick-bet:hover {
+            background: rgba(255, 217, 102, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .quick-bet:active {
+            transform: scale(0.95);
+        }
+
+        /* Grid */
+        .grid-wrapper {
+            position: relative;
+            margin: 1rem 0;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 11px;
+        }
+        .cell {
+            aspect-ratio: 1;
+            background: linear-gradient(145deg, #2a2520, #1b1814);
+            border-radius: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.22s var(--ease-spring);
+            border: 1.5px solid rgba(255, 217, 102, 0.22);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            position: relative;
+            overflow: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .cell::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.04) 0%, transparent 60%);
+            pointer-events: none;
+            border-radius: inherit;
+        }
+        .cell:hover:not(.revealed):not(.game-over-cell) {
+            transform: translateY(-6px) scale(1.04);
+            background: #3a3530;
+            border-color: var(--gold-bright);
+            box-shadow: 0 12px 24px rgba(255, 217, 102, 0.18), 0 0 0 4px rgba(255, 217, 102, 0.06);
+            z-index: 2;
+        }
+        .cell:active:not(.revealed):not(.game-over-cell) {
+            transform: scale(0.93);
+            transition: 0.08s;
+        }
+        .cell.revealed {
+            transform: scale(1);
+            cursor: default;
+            box-shadow: none;
+        }
+        .cell.mine {
+            background: radial-gradient(circle at 40% 35%, #c0392b, #6b1a1a);
+            animation: explode 0.45s ease-out;
+            border-color: #ff4444;
+        }
+        .cell.mine i {
+            animation: skullPop 0.35s ease-out;
+            filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.6));
+        }
+        @keyframes skullPop {
+            0% {
+                transform: scale(0.1) rotate(-30deg);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.3) rotate(5deg);
+            }
+            100% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+        .cell.gem {
+            background: radial-gradient(circle at 40% 35%, #2e7d32, #1a3a1a);
+            box-shadow: 0 0 18px rgba(76, 175, 80, 0.5);
+            border-color: #4caf50;
+        }
+        .cell.gem i {
+            animation: gemPop 0.35s ease-out;
+            filter: drop-shadow(0 0 6px rgba(76, 175, 80, 0.7));
+        }
+        @keyframes gemPop {
+            0% {
+                transform: scale(0.1);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.35);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        @keyframes explode {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(255, 0, 0, 0);
+            }
+            40% {
+                transform: scale(1.18);
+                box-shadow: 0 0 30px rgba(255, 0, 0, 0.7);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 8px rgba(255, 0, 0, 0.3);
+            }
+        }
+        .cell.golden-gem {
+            background: radial-gradient(circle at 40% 35%, #ffb300, #7a5800) !important;
+            box-shadow: 0 0 28px rgba(255, 193, 7, 0.8) !important;
+            border-color: #ffd966 !important;
+            animation: goldenPulse 0.6s ease-out;
+        }
+        .cell.golden-gem i {
+            animation: gemPop 0.4s ease-out;
+            filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.9));
+            color: #fff8dc;
+        }
+        @keyframes goldenPulse {
+            0% {
+                box-shadow: 0 0 0 rgba(255, 193, 7, 0);
+                transform: scale(0.8);
+            }
+            60% {
+                box-shadow: 0 0 50px rgba(255, 193, 7, 1);
+                transform: scale(1.15);
+            }
+            100% {
+                box-shadow: 0 0 28px rgba(255, 193, 7, 0.8);
+                transform: scale(1);
+            }
+        }
+        .cell.near-miss {
+            animation: nearMiss 0.3s ease;
+        }
+        @keyframes nearMiss {
+            0% {
+                box-shadow: 0 0 0 rgba(255, 100, 50, 0);
+            }
+            50% {
+                box-shadow: 0 0 18px rgba(255, 120, 50, 0.7);
+                border-color: #ff7733;
+            }
+            100% {
+                box-shadow: 0 0 0 rgba(255, 100, 50, 0);
+            }
+        }
+        .cell.hot-tile {
+            border-color: #ff9800 !important;
+            box-shadow: 0 0 14px rgba(255, 152, 0, 0.5) !important;
+            animation: hotPulse 1.2s ease-in-out infinite;
+        }
+        @keyframes hotPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 10px rgba(255, 152, 0, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 22px rgba(255, 152, 0, 0.7);
+            }
+        }
+
+        /* Multiplier section */
+        .multiplier-section {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            margin: 0.5rem 0;
+            text-align: center;
+            position: relative;
+            border: 1px solid rgba(255, 217, 102, 0.1);
+        }
+        .multiplier-value {
+            font-size: 3.2rem;
+            font-weight: 900;
+            font-family: var(--font-display);
+            background: linear-gradient(135deg, #ffd966, #ffaa33);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(255, 217, 102, 0.3);
+            transition: transform 0.25s;
+            letter-spacing: -1px;
+        }
+        .multiplier-value.pulsing {
+            animation: multiPulse 0.5s ease-out;
+        }
+        @keyframes multiPulse {
+            0% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+            50% {
+                transform: scale(1.18);
+                filter: brightness(1.4);
+            }
+            100% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+        }
+        .potential-win {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 0.1rem;
+            color: #ccc;
+        }
+        .potential-win strong {
+            color: #ffd966;
+            font-size: 1.1rem;
+        }
+        .multiplier-bar {
+            height: 10px;
+            background: #2a2724;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 0.7rem 0;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        .multiplier-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ffd966, #ffaa33, #ff6d00);
+            border-radius: 20px;
+            transition: width 0.35s ease;
+            box-shadow: 0 0 18px rgba(255, 217, 102, 0.55);
+            position: relative;
+        }
+        .multiplier-fill::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -2px;
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+        }
+        .auto-cashout-marker {
+            position: absolute;
+            top: -20px;
+            font-size: 0.7rem;
+            background: #ef5350;
+            color: white;
+            padding: 0.1rem 0.55rem;
+            border-radius: 20px;
+            left: var(--marker-pos);
+            transform: translateX(-50%);
+            white-space: nowrap;
+            display: none;
+            z-index: 2;
+            font-weight: 700;
+            box-shadow: 0 0 10px rgba(239, 83, 80, 0.5);
+        }
+
+        /* Buttons */
+        .action-row {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            border: none;
+            padding: 0.75rem 1.8rem;
+            border-radius: var(--radius-full);
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            font-family: var(--font-display);
+            letter-spacing: 0.5px;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: none !important;
+        }
+        .btn-start {
+            background: linear-gradient(135deg, #f5b042, #ffd966);
+            color: #1a150e;
+            box-shadow: 0 4px 0 #a05f15, 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        .btn-start:hover {
+            box-shadow: 0 6px 18px rgba(255, 217, 102, 0.45), 0 8px 20px rgba(0, 0, 0, 0.35);
+            transform: translateY(-2px);
+        }
+        .btn-cashout {
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+            color: white;
+            box-shadow: 0 4px 0 #0a3a0a, 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        .btn-cashout:hover {
+            box-shadow: 0 6px 18px rgba(76, 175, 80, 0.45), 0 8px 20px rgba(0, 0, 0, 0.35);
+            transform: translateY(-2px);
+        }
+        .btn-cashout.flash-me {
+            animation: cashoutFlash 0.8s ease-in-out infinite;
+        }
+        @keyframes cashoutFlash {
+            0%,
+            100% {
+                box-shadow: 0 4px 0 #0a3a0a, 0 0 10px rgba(76, 175, 80, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 0 #0a3a0a, 0 0 30px rgba(76, 175, 80, 0.8);
+            }
+        }
+        .btn-replay {
+            background: rgba(58, 53, 48, 0.9);
+            border: 1px solid rgba(255, 217, 102, 0.5);
+            color: var(--gold);
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+        }
+        .btn-replay:hover {
+            box-shadow: 0 6px 15px rgba(255, 217, 102, 0.25);
+            transform: translateY(-2px);
+        }
+        .btn-auto {
+            background: rgba(100, 60, 180, 0.7);
+            border: 1px solid rgba(180, 130, 255, 0.5);
+            color: #e0d0ff;
+            font-size: 0.78rem;
+            padding: 0.5rem 1.2rem;
+        }
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+            filter: grayscale(30%);
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0);
+            animation: rippleEffect 0.6s ease-out;
+            pointer-events: none;
+        }
+        @keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Win rarity badge */
+        .rarity-badge {
+            display: inline-block;
+            padding: 0.25rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-family: var(--font-display);
+            animation: rarityPop 0.5s var(--ease-spring);
+        }
+        @keyframes rarityPop {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .rarity-common {
+            background: #555;
+            color: #ccc;
+        }
+        .rarity-rare {
+            background: #2e7d32;
+            color: #a5d6a7;
+        }
+        .rarity-epic {
+            background: #6a1b9a;
+            color: #e1bee7;
+        }
+        .rarity-legendary {
+            background: #e65100;
+            color: #ffe0b2;
+            box-shadow: 0 0 15px rgba(255, 152, 0, 0.5);
+        }
+        .rarity-mythic {
+            background: #b71c1c;
+            color: #ffcdd2;
+            box-shadow: 0 0 20px rgba(255, 23, 68, 0.6);
+            animation: mythicGlow 1s ease-in-out infinite;
+        }
+        @keyframes mythicGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 15px rgba(255, 23, 68, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 35px rgba(255, 23, 68, 0.9);
+            }
+        }
+
+        /* Stats row */
+        .stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 1.2rem;
+            padding: 0.8rem 1rem;
+            margin-top: 0.4rem;
+            font-size: 0.78rem;
+            align-items: center;
+        }
+        .stats-row>div {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            white-space: nowrap;
+        }
+        .history-strip {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+            margin-top: 0.2rem;
+            overflow-x: auto;
+            padding: 0.3rem 0;
+        }
+        .history-badge {
+            background: #2a2520;
+            padding: 0.2rem 0.55rem;
+            border-radius: 30px;
+            font-weight: 600;
+            white-space: nowrap;
+            font-size: 0.7rem;
+        }
+        .history-badge.win {
+            color: #7ddf80;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        .history-badge.loss {
+            color: #ff8888;
+            border: 1px solid rgba(255, 100, 100, 0.3);
+        }
+        .history-badge.jackpot {
+            color: #ffd966;
+            border: 1px solid rgba(255, 217, 102, 0.5);
+            box-shadow: 0 0 8px rgba(255, 217, 102, 0.3);
+        }
+
+        /* Auto-play panel */
+        .autoplay-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            margin-top: 0.4rem;
+            display: none;
+            border: 1px solid rgba(255, 217, 102, 0.15);
+            animation: fadeInUp 0.3s ease;
+        }
+        .autoplay-panel.show {
+            display: block;
+        }
+        .autoplay-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            font-size: 0.75rem;
+        }
+        .autoplay-row label {
+            color: #b5afa4;
+            white-space: nowrap;
+        }
+        .autoplay-row input {
+            width: 60px;
+            background: #1f1b17;
+            border: 1px solid rgba(255, 217, 102, 0.3);
+            border-radius: 20px;
+            padding: 0.25rem 0.5rem;
+            color: white;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+        .autoplay-row select {
+            background: #1f1b17;
+            border: 1px solid rgba(255, 217, 102, 0.3);
+            border-radius: 20px;
+            padding: 0.25rem 0.5rem;
+            color: white;
+            font-size: 0.75rem;
+        }
+
+        /* Achievement toast */
+        .achievement-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #1a150e, #2a2520);
+            border: 2px solid var(--gold);
+            border-radius: 1rem;
+            padding: 1rem;
+            color: #fff;
+            z-index: 1000;
+            animation: slideInRight 0.5s var(--ease-spring), slideOutRight 0.4s 3s ease forwards;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 217, 102, 0.3);
+            max-width: 320px;
+        }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+
+        /* Jackpot overlay */
+        .jackpot-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .jackpot-overlay.show {
+            opacity: 1;
+        }
+        .jackpot-text {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 900;
+            color: #ffd966;
+            text-shadow: 0 0 40px rgba(255, 217, 102, 0.8);
+            animation: jackpotBounce 0.6s var(--ease-spring);
+            text-align: center;
+        }
+        @keyframes jackpotBounce {
+            0% {
+                transform: scale(0.2);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Canvas */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            body {
+                padding: 0.5rem;
+            }
+            .game-container {
+                gap: 0.7rem;
+            }
+            .game-card {
+                padding: 1rem;
+                border-radius: 1.2rem;
+            }
+            .grid {
+                gap: 7px;
+            }
+            .cell {
+                font-size: 1.3rem;
+                border-radius: 0.7rem;
+            }
+            .control-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.6rem;
+            }
+            .multiplier-value {
+                font-size: 2.2rem;
+            }
+            .btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.78rem;
+            }
+            .top-nav {
+                padding: 0.5rem 1rem;
+                gap: 0.4rem;
+            }
+            .risk-tier-btn {
+                padding: 0.35rem 0.6rem;
+                font-size: 0.68rem;
+            }
+            .stats-row {
+                font-size: 0.68rem;
+                gap: 0.4rem;
+            }
+        }
+        @media (max-width: 380px) {
+            .grid {
+                gap: 5px;
+            }
+            .cell {
+                font-size: 1rem;
+                border-radius: 0.5rem;
+            }
+            .multiplier-value {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+    <div class="particles-container" id="particlesContainer"></div>
+    <div class="jackpot-overlay" id="jackpotOverlay"><div class="jackpot-text" id="jackpotText"></div></div>
+
+    <div class="game-container">
+        <!-- Top Nav -->
+        <div class="top-nav">
+            <a href=".././home.html" class="back-home"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <span class="level-badge-mini">Lv.<span id="levelDisplay">1</span></span>
+            <div class="xp-bar-mini"><div class="xp-fill-mini" id="xpFillMini" style="width:0%"></div></div>
+            <div class="balance-tag" id="balanceTag">
+                <i class="fas fa-coins"></i> <span id="gameBalance">0</span>
+            </div>
+            <button id="soundToggleBtn" class="sound-btn" title="Toggle Sound"><i class="fas fa-volume-up"></i></button>
+        </div>
+
+        <!-- Game Card -->
+        <div class="game-card" id="gameCard">
+            <!-- Risk Tiers -->
+            <div class="risk-tier-row" id="riskTierRow">
+                <button class="risk-tier-btn" data-tier="low"><span class="tier-dot low"></span>Low Risk</button>
+                <button class="risk-tier-btn active" data-tier="medium"><span class="tier-dot med"></span>Medium</button>
+                <button class="risk-tier-btn" data-tier="high"><span class="tier-dot high"></span>High Risk</button>
+                <button class="risk-tier-btn" data-tier="extreme"><span class="tier-dot extreme"></span>Extreme</button>
+                <button class="risk-tier-btn" data-tier="custom"><i class="fas fa-sliders-h"></i> Custom</button>
+            </div>
+
+            <!-- Controls -->
+            <div class="control-card">
+                <div>
+                    <label style="font-size:0.75rem;color:#b5afa4;">Bet Amount</label><br>
+                    <input type="number" id="betAmount" class="bet-input" value="50" step="5" min="1">
+                </div>
+                <div class="quick-bets">
+                    <button class="quick-bet" data-bet="25">+25</button>
+                    <button class="quick-bet" data-bet="50">+50</button>
+                    <button class="quick-bet" data-bet="100">+100</button>
+                    <button class="quick-bet" data-bet="250">+250</button>
+                    <button class="quick-bet" id="halfBetBtn">½</button>
+                    <button class="quick-bet" id="maxBetBtn">MAX</button>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.6rem;background:rgba(0,0,0,0.3);border-radius:60px;padding:0.3rem 0.9rem;" id="customMinesContainer">
+                    <i class="fas fa-skull" style="color:#ff8888;"></i>
+                    <input type="range" id="minesSlider" min="1" max="20" value="5" step="1" style="width:100px;">
+                    <span class="mines-count-badge" id="minesCountDisplay">5</span> mines
+                </div>
+            </div>
+
+            <!-- Grid -->
+            <div class="grid-wrapper">
+                <div id="gameGrid" class="grid"></div>
+            </div>
+
+            <!-- Multiplier -->
+            <div class="multiplier-section">
+                <div style="font-size:0.8rem;color:#b5afa4;"><i class="fas fa-chart-line"></i> Current Multiplier</div>
+                <div class="multiplier-value" id="currentMultiplier">1.00x</div>
+                <div class="potential-win">Potential win: <strong id="potentialWin">0</strong> GOLD</div>
+                <div style="font-size:0.7rem;color:#b5afa4;" id="rarityLabel"></div>
+                <div class="multiplier-bar">
+                    <div class="multiplier-fill" id="multiplierFill"></div>
+                    <div id="autoCashMarker" class="auto-cashout-marker">AUTO</div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:#8a847a;">
+                    <span>1x</span><span id="barMidLabel">5x</span><span id="barMaxLabel">10x</span>
+                </div>
+                <div style="display:flex;justify-content:center;gap:1.5rem;margin-top:0.4rem;font-size:0.8rem;">
+                    <span><i class="fas fa-gem" style="color:#4caf50;"></i> Gems left: <strong id="gemsLeft">20</strong></span>
+                    <span><i class="fas fa-skull" style="color:#ff8888;"></i> Mines: <strong id="minesLeft">5</strong></span>
+                    <span style="color:#ffd966;" id="streakIndicator"></span>
+                </div>
+            </div>
+
+            <!-- Auto cashout -->
+            <div style="display:flex;justify-content:center;align-items:center;gap:0.6rem;background:rgba(0,0,0,0.3);border-radius:60px;padding:0.4rem 1rem;width:fit-content;margin:0 auto;flex-wrap:wrap;">
+                <i class="fas fa-robot"></i> Auto cashout at
+                <input type="number" id="autoCashoutMulti" step="0.1" min="1.2" max="100" value="2.5" style="width:65px;background:#1f1b17;border:1px solid var(--gold);border-radius:40px;padding:0.3rem;text-align:center;color:white;font-size:0.8rem;">
+                <span>x</span>
+                <button id="setAutoBtn" class="btn btn-start" style="padding:0.25rem 0.8rem;font-size:0.7rem;">Set</button>
+            </div>
+
+            <!-- Message -->
+            <div id="gameMessage" style="text-align:center;font-weight:600;padding:0.5rem;background:rgba(0,0,0,0.4);border-radius:40px;margin-top:0.4rem;font-size:0.85rem;"></div>
+
+            <!-- Action buttons -->
+            <div class="action-row" style="margin-top:0.8rem;">
+                <button id="startGameBtn" class="btn btn-start"><i class="fas fa-play"></i> NEW GAME</button>
+                <button id="cashOutBtn" class="btn btn-cashout" disabled><i class="fas fa-hand-holding-usd"></i> CASH OUT</button>
+                <button id="replayBtn" class="btn btn-replay" disabled><i class="fas fa-redo-alt"></i> REPLAY</button>
+                <button id="autoPlayBtn" class="btn btn-auto" title="Auto Play"><i class="fas fa-infinity"></i> AUTO</button>
+            </div>
+
+            <!-- Auto-play panel -->
+            <div class="autoplay-panel" id="autoplayPanel">
+                <div class="autoplay-row" style="justify-content:space-between;flex-wrap:wrap;gap:0.6rem;">
+                    <label>Games: <input type="number" id="autoGameCount" value="10" min="1" max="500"></label>
+                    <label>Stop profit: <input type="number" id="autoStopProfit" value="0" step="10"></label>
+                    <label>Stop loss: <input type="number" id="autoStopLoss" value="0" step="10"></label>
+                    <label style="display:flex;align-items:center;gap:0.3rem;">
+                        <input type="checkbox" id="autoStopOnLoss"> Stop on loss
+                    </label>
+                    <button id="startAutoBtn" class="btn btn-start" style="padding:0.3rem 0.9rem;font-size:0.7rem;">▶ Run</button>
+                    <button id="stopAutoBtn" class="btn btn-replay" style="padding:0.3rem 0.9rem;font-size:0.7rem;">⏹ Stop</button>
+                </div>
+                <div style="font-size:0.7rem;color:#b5afa4;margin-top:0.3rem;" id="autoStatus">Ready</div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div><i class="fas fa-trophy" style="color:#ffd966;"></i> Wins: <strong id="minesWinsStat">0</strong></div>
+                <div><i class="fas fa-skull" style="color:#ff8888;"></i> Losses: <strong id="minesLossesStat">0</strong></div>
+                <div><i class="fas fa-rocket"></i> Best: <strong id="bestMultiStat">1.0</strong>x</div>
+                <div><i class="fas fa-chart-line"></i> P/L: <strong id="sessionPL">0</strong></div>
+                <div><i class="fas fa-fire" style="color:#ff9800;"></i> Streak: <strong id="streakCount">0</strong></div>
+            </div>
+            <div class="history-strip" id="historyContainer"><span style="color:#b5afa4;">Recent:</span></div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ═══════════════════════════════════════════
+            //  GOLD MINES | ROYAL MINESWEEPER — OVERHAUL
+            // ═══════════════════════════════════════════
+
+            // ── DOM REFS ──
+            const $ = (sel) => document.querySelector(sel);
+            const $$ = (sel) => document.querySelectorAll(sel);
+
+            const dom = {
+                startGameBtn: $('#startGameBtn'),
+                cashOutBtn: $('#cashOutBtn'),
+                replayBtn: $('#replayBtn'),
+                autoPlayBtn: $('#autoPlayBtn'),
+                betAmountInput: $('#betAmount'),
+                minesSlider: $('#minesSlider'),
+                minesCountDisplay: $('#minesCountDisplay'),
+                autoCashoutMultiInput: $('#autoCashoutMulti'),
+                setAutoBtn: $('#setAutoBtn'),
+                gameMessage: $('#gameMessage'),
+                gameBalanceSpan: $('#gameBalance'),
+                balanceTag: $('#balanceTag'),
+                soundToggleBtn: $('#soundToggleBtn'),
+                gameGrid: $('#gameGrid'),
+                currentMultiplierSpan: $('#currentMultiplier'),
+                potentialWinSpan: $('#potentialWin'),
+                multiplierFill: $('#multiplierFill'),
+                autoCashMarker: $('#autoCashMarker'),
+                gemsLeftSpan: $('#gemsLeft'),
+                minesLeftSpan: $('#minesLeft'),
+                minesWinsStat: $('#minesWinsStat'),
+                minesLossesStat: $('#minesLossesStat'),
+                bestMultiStat: $('#bestMultiStat'),
+                sessionPLElement: $('#sessionPL'),
+                historyContainer: $('#historyContainer'),
+                streakIndicator: $('#streakIndicator'),
+                streakCount: $('#streakCount'),
+                rarityLabel: $('#rarityLabel'),
+                gameCard: $('#gameCard'),
+                jackpotOverlay: $('#jackpotOverlay'),
+                jackpotText: $('#jackpotText'),
+                autoplayPanel: $('#autoplayPanel'),
+                levelDisplay: $('#levelDisplay'),
+                xpFillMini: $('#xpFillMini'),
+                barMidLabel: $('#barMidLabel'),
+                barMaxLabel: $('#barMaxLabel'),
+                customMinesContainer: $('#customMinesContainer'),
+                riskTierRow: $('#riskTierRow'),
+            };
+
+            // ── CONFIG ──
+            const GRID_SIZE = 5;
+            const TOTAL_CELLS = GRID_SIZE * GRID_SIZE;
+            const RISK_TIERS = {
+                low: { name: 'Low Risk', mines: [1, 3], houseEdge: 0.97, maxMultiplier: 25, shieldChance: 0.08,
+                    goldenChance: 0.04, color: 'var(--risk-low)' },
+                medium: { name: 'Medium Risk', mines: [4, 6], houseEdge: 0.96, maxMultiplier: 100, shieldChance: 0.05,
+                    goldenChance: 0.06, color: 'var(--risk-med)' },
+                high: { name: 'High Risk', mines: [7, 12], houseEdge: 0.95, maxMultiplier: 500, shieldChance: 0.03,
+                    goldenChance: 0.08, color: 'var(--risk-high)' },
+                extreme: { name: 'Extreme Risk', mines: [13, 20], houseEdge: 0.93, maxMultiplier: 2000, shieldChance: 0.015,
+                    goldenChance: 0.10, color: 'var(--risk-extreme)' },
+                custom: { name: 'Custom', mines: [1, 20], houseEdge: 0.96, maxMultiplier: 500, shieldChance: 0.04,
+                    goldenChance: 0.06, color: '#b5afa4' },
+            };
+
+            const WIN_RARITIES = [
+                { name: 'Common', minMult: 1.0, maxMult: 1.8, cls: 'rarity-common', color: '#b0b0b0' },
+                { name: 'Rare', minMult: 1.8, maxMult: 4.0, cls: 'rarity-rare', color: '#4caf50' },
+                { name: 'Epic', minMult: 4.0, maxMult: 12.0, cls: 'rarity-epic', color: '#9c27b0' },
+                { name: 'Legendary', minMult: 12.0, maxMult: 50.0, cls: 'rarity-legendary', color: '#ff9800' },
+                { name: 'Mythic', minMult: 50.0, maxMult: Infinity, cls: 'rarity-mythic', color: '#ff1744' },
+            ];
+
+            const ACHIEVEMENTS = [
+                { id: 'first_win', name: 'First Strike', desc: 'Win your first game', icon: 'fa-star', check: (s) => s
+                        .wins >= 1 },
+                { id: 'streak_3', name: 'Hot Hand', desc: '3-win streak', icon: 'fa-fire', check: (s) => s.currentStreak >=
+                        3 },
+                { id: 'streak_7', name: 'On Fire', desc: '7-win streak', icon: 'fa-fire-alt', check: (s) => s
+                        .currentStreak >= 7 },
+                { id: 'big_win_100', name: 'High Roller', desc: 'Win 100+ in one game', icon: 'fa-gem', check: (s) => s
+                        .biggestSingleWin >= 100 },
+                { id: 'big_win_1000', name: 'Whale', desc: 'Win 1,000+ in one game', icon: 'fa-crown', check: (s) => s
+                        .biggestSingleWin >= 1000 },
+                { id: 'multi_10x', name: 'Ten-Bagger', desc: 'Hit 10x multiplier', icon: 'fa-rocket', check: (s) => s
+                        .bestMultiplier >= 10 },
+                { id: 'multi_50x', name: 'Moon Shot', desc: 'Hit 50x multiplier', icon: 'fa-moon', check: (s) => s
+                        .bestMultiplier >= 50 },
+                { id: 'games_100', name: 'Veteran Miner', desc: 'Play 100 games', icon: 'fa-hard-hat', check: (s) => s
+                        .gamesPlayed >= 100 },
+                { id: 'golden_find', name: 'Golden Touch', desc: 'Find a Golden Gem', icon: 'fa-sun', check: (s) => s
+                        .goldenGemsFound >= 1 },
+                { id: 'shield_save', name: 'Lucky Break', desc: 'Get saved by Lucky Shield', icon: 'fa-shield-alt',
+                    check: (s) => s.shieldsUsed >= 1 },
+                { id: 'jackpot', name: 'Jackpot!', desc: 'Hit the progressive jackpot', icon: 'fa-trophy',
+                    check: (s) => s.jackpotsHit >= 1 },
+                { id: 'all_gems', name: 'Clean Sweep', desc: 'Reveal all gems in a round', icon: 'fa-star-of-life',
+                    check: (s) => s.cleanSweeps >= 1 },
+            ];
+
+            // ── STATE ──
+            let currentUser = null;
+            let sessionProfit = 0;
+            let gameHistory = [];
+            let currentRiskTier = 'medium';
+            let progressiveJackpot = 0;
+            let jackpotContribution = 0.005; // 0.5% of each bet goes to jackpot
+
+            // Game state
+            let gameActive = false;
+            let currentBet = 0;
+            let multiplier = 1.0;
+            let revealedCount = 0;
+            let totalMines = 5;
+            let minePositions = [];
+            let revealedCells = [];
+            let autoCashoutTarget = 2.5;
+            let luckyShieldActive = false;
+            let goldenGemPositions = [];
+            let comboStreak = 0;
+            let comboTimer = null;
+            let hotTileIndex = -1;
+            let hotTileTimer = null;
+
+            // Auto-play state
+            let autoPlayActive = false;
+            let autoPlaySettings = { gameCount: 10, stopProfit: 0, stopLoss: 0, stopOnLoss: false };
+            let autoPlayGamesRun = 0;
+            let autoPlayStartBalance = 0;
+            let autoPlayTimeout = null;
+
+            // Tracking for achievements
+            let sessionTracking = {
+                wins: 0,
+                currentStreak: 0,
+                bestMultiplier: 1.0,
+                biggestSingleWin: 0,
+                gamesPlayed: 0,
+                goldenGemsFound: 0,
+                shieldsUsed: 0,
+                jackpotsHit: 0,
+                cleanSweeps: 0,
+            };
+
+            // ── AUDIO ENGINE ──
+            let audioCtx = null;
+            let soundEnabled = true;
+            let tensionNode = null;
+            let tensionGain = null;
+
+            function initAudio() {
+                if (!audioCtx && soundEnabled) {
+                    audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                }
+            }
+
+            function playTone(type, freq = 880, dur = 0.2, vol = 0.15) {
+                if (!soundEnabled || !audioCtx) return;
+                try {
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    gain.gain.setValueAtTime(vol, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+                    switch (type) {
+                        case 'crash':
+                            osc.type = 'sawtooth';
+                            osc.frequency.setValueAtTime(200, now);
+                            osc.frequency.exponentialRampToValueAtTime(40, now + dur);
+                            break;
+                        case 'gem':
+                            osc.type = 'sine';
+                            osc.frequency.value = 1200 + Math.random() * 400;
+                            break;
+                        case 'golden':
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(800, now);
+                            osc.frequency.exponentialRampToValueAtTime(1600, now + dur * 0.5);
+                            osc.frequency.exponentialRampToValueAtTime(800, now + dur);
+                            break;
+                        case 'cashout':
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(600, now);
+                            osc.frequency.exponentialRampToValueAtTime(1200, now + dur);
+                            break;
+                        case 'jackpot':
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(400, now);
+                            osc.frequency.exponentialRampToValueAtTime(2000, now + dur * 0.6);
+                            break;
+                        case 'shield':
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(300, now);
+                            osc.frequency.exponentialRampToValueAtTime(900, now + dur);
+                            break;
+                        case 'nearmiss':
+                            osc.type = 'sine';
+                            osc.frequency.value = 200;
+                            dur = 0.1;
+                            vol = 0.08;
+                            break;
+                        case 'click':
+                            osc.type = 'sine';
+                            osc.frequency.value = freq;
+                            dur = 0.06;
+                            vol = 0.06;
+                            break;
+                        default:
+                            osc.type = 'sine';
+                            osc.frequency.value = freq;
+                    }
+                    osc.start();
+                    osc.stop(now + dur);
+                } catch (e) { /* silent */ }
+            }
+
+            function startTension() {
+                if (!soundEnabled || !audioCtx || tensionNode) return;
+                try {
+                    tensionNode = audioCtx.createOscillator();
+                    tensionGain = audioCtx.createGain();
+                    tensionNode.type = 'sine';
+                    tensionNode.frequency.value = 60;
+                    tensionGain.gain.value = 0.02;
+                    tensionNode.connect(tensionGain);
+                    tensionGain.connect(audioCtx.destination);
+                    tensionNode.start();
+                } catch (e) { /* silent */ }
+            }
+
+            function updateTension(mult) {
+                if (!tensionNode || !tensionGain) return;
+                const t = Math.min(1, (mult - 1) / 9);
+                tensionNode.frequency.value = 60 + t * 300;
+                tensionGain.gain.value = 0.02 + t * 0.1;
+            }
+
+            function stopTension() {
+                if (tensionNode) {
+                    try { tensionNode.stop();
+                        tensionNode.disconnect(); } catch (e) {}
+                    tensionNode = null;
+                }
+                if (tensionGain) {
+                    try { tensionGain.disconnect(); } catch (e) {}
+                    tensionGain = null;
+                }
+            }
+
+            // ── CONFETTI & PARTICLES ──
+            let confettiRAF = null;
+
+            function triggerConfetti(intensity = 'normal') {
+                const canvas = document.getElementById('confettiCanvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                const count = intensity === 'big' ? 350 : intensity === 'jackpot' ? 600 : 180;
+                const particles = [];
+                const colors = ['#ffd966', '#f5b042', '#ffed4e', '#4caf50', '#ffaa00', '#ff6d00', '#ff1744',
+                '#e040fb'];
+                for (let i = 0; i < count; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: -30 - Math.random() * 200,
+                        size: Math.random() * 8 + 3,
+                        speedY: Math.random() * 7 + 5,
+                        speedX: (Math.random() - 0.5) * 6,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        rotation: Math.random() * 360,
+                        rotSpeed: (Math.random() - 0.5) * 14,
+                        shape: Math.random() > 0.5 ? 'gem' : 'coin',
+                        life: 1,
+                    });
+                }
+                const startTime = performance.now();
+                const maxDuration = intensity === 'jackpot' ? 4000 : 2800;
+
+                function draw(now) {
+                    const elapsed = now - startTime;
+                    if (elapsed > maxDuration) {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        confettiRAF = null;
+                        return;
+                    }
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const fade = elapsed > maxDuration - 600 ? (maxDuration - elapsed) / 600 : 1;
+                    particles.forEach(p => {
+                        p.y += p.speedY;
+                        p.x += p.speedX;
+                        p.rotation += p.rotSpeed;
+                        p.speedY += 0.04;
+                        ctx.save();
+                        ctx.globalAlpha = fade * Math.min(1, p.life);
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rotation * Math.PI / 180);
+                        ctx.fillStyle = p.color;
+                        if (p.shape === 'gem') {
+                            ctx.beginPath();
+                            ctx.moveTo(0, -p.size);
+                            ctx.lineTo(p.size / 2, 0);
+                            ctx.lineTo(0, p.size);
+                            ctx.lineTo(-p.size / 2, 0);
+                            ctx.closePath();
+                            ctx.fill();
+                        } else {
+                            ctx.beginPath();
+                            ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        ctx.restore();
+                        if (p.y > canvas.height + 50) p.life = 0;
+                    });
+                    confettiRAF = requestAnimationFrame(draw);
+                }
+                if (confettiRAF) cancelAnimationFrame(confettiRAF);
+                confettiRAF = requestAnimationFrame(draw);
+            }
+
+            function showJackpotOverlay(text) {
+                dom.jackpotText.textContent = text;
+                dom.jackpotOverlay.classList.add('show');
+                setTimeout(() => dom.jackpotOverlay.classList.remove('show'), 2500);
+            }
+
+            // ── USER DATA ──
+            function initializeUserStats(user) {
+                const defaults = {
+                    globalStats: { totalWagered: 0, totalWon: 0, totalLosses: 0, totalGames: 0, currentStreak: 0,
+                        bestStreak: 0, lastGameWin: null, totalWins: 0 },
+                    minesStats: { gamesPlayed: 0, wins: 0, losses: 0, totalBet: 0, totalPayout: 0, bestMultiplier: 1.0,
+                        biggestWin: 0, goldenGemsFound: 0, shieldsUsed: 0, jackpotsHit: 0, cleanSweeps: 0 },
+                    transactions: [],
+                    gameOutcomes: [],
+                    gamePlayCount: {},
+                    bankBalance: 0,
+                    xp: 0,
+                    level: 1,
+                    dailyClaims: 0,
+                    wheelSpins: 0,
+                    dailyGuessWins: 0,
+                    giftsSent: 0,
+                    avatar: 'fas fa-crown',
+                    theme: 'theme-gold',
+                    autoTransfer: false,
+                    seasonalTheme: true,
+                    earnedAchievements: [],
+                    lastInterestDate: null,
+                    lastDailyBonusDate: null,
+                    lastWheelSpinDate: null,
+                    dailyBalanceSnapshots: [],
+                    progressiveJackpot: 0,
+                };
+                for (const [key, value] of Object.entries(defaults)) {
+                    if (user[key] === undefined) user[key] = value;
+                }
+                const ms = user.minesStats;
+                ms.goldenGemsFound = ms.goldenGemsFound || 0;
+                ms.shieldsUsed = ms.shieldsUsed || 0;
+                ms.jackpotsHit = ms.jackpotsHit || 0;
+                ms.cleanSweeps = ms.cleanSweeps || 0;
+                ms.biggestWin = ms.biggestWin || ms.biggestWin || 0;
+                return user;
+            }
+
+            async function loadUser() {
+                const sess = sessionStorage.getItem('gold_current_user');
+                if (!sess) { window.location.href = '../../sign-in.html'; return false; }
+                const sessionUser = JSON.parse(sess);
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                const user = users[sessionUser.username];
+                if (!user) { sessionStorage.removeItem('gold_current_user');
+                    window.location.href = '../../sign-in.html'; return false; }
+                currentUser = initializeUserStats(user);
+                sessionUser.balance = currentUser.balance;
+                sessionStorage.setItem('gold_current_user', JSON.stringify(sessionUser));
+                progressiveJackpot = currentUser.progressiveJackpot || 0;
+                // Restore session tracking
+                sessionTracking.wins = currentUser.minesStats.wins || 0;
+                sessionTracking.bestMultiplier = currentUser.minesStats.bestMultiplier || 1.0;
+                sessionTracking.biggestSingleWin = currentUser.minesStats.biggestWin || 0;
+                sessionTracking.gamesPlayed = currentUser.minesStats.gamesPlayed || 0;
+                sessionTracking.goldenGemsFound = currentUser.minesStats.goldenGemsFound || 0;
+                sessionTracking.shieldsUsed = currentUser.minesStats.shieldsUsed || 0;
+                sessionTracking.jackpotsHit = currentUser.minesStats.jackpotsHit || 0;
+                sessionTracking.cleanSweeps = currentUser.minesStats.cleanSweeps || 0;
+                updateBalanceUI();
+                updateStatsUI();
+                updateXPUI();
+                validateBet();
+                return true;
+            }
+
+            async function saveUser() {
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                currentUser.progressiveJackpot = progressiveJackpot;
+                currentUser.minesStats.bestMultiplier = Math.max(currentUser.minesStats.bestMultiplier,
+                    sessionTracking.bestMultiplier);
+                currentUser.minesStats.biggestWin = Math.max(currentUser.minesStats.biggestWin || 0,
+                    sessionTracking.biggestSingleWin);
+                currentUser.minesStats.goldenGemsFound = sessionTracking.goldenGemsFound;
+                currentUser.minesStats.shieldsUsed = sessionTracking.shieldsUsed;
+                currentUser.minesStats.jackpotsHit = sessionTracking.jackpotsHit;
+                currentUser.minesStats.cleanSweeps = sessionTracking.cleanSweeps;
+                users[currentUser.username] = currentUser;
+                localStorage.setItem('gold_users', JSON.stringify(users));
+                const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
+                if (sess) { sess.balance = currentUser.balance;
+                    sessionStorage.setItem('gold_current_user', JSON.stringify(sess)); }
+            }
+
+            function updateBalanceUI() {
+                const prev = parseInt(dom.gameBalanceSpan.textContent.replace(/,/g, '')) || 0;
+                const next = currentUser.balance;
+                if (prev !== next) {
+                    animateNumber(dom.gameBalanceSpan, prev, next, 400);
+                    if (next > prev) {
+                        dom.balanceTag.classList.add('pulse');
+                        setTimeout(() => dom.balanceTag.classList.remove('pulse'), 500);
+                    }
+                } else {
+                    dom.gameBalanceSpan.textContent = next.toLocaleString();
+                }
+                validateBet();
+                updateStartButtonState();
+            }
+
+            function updateXPUI() {
+                const level = currentUser.level || 1;
+                const xp = currentUser.xp || 0;
+                const xpForNext = getXPForLevel(level);
+                const xpForCurrent = getXPForLevel(level - 1);
+                const progress = ((xp - xpForCurrent) / (xpForNext - xpForCurrent)) * 100;
+                dom.levelDisplay.textContent = level;
+                dom.xpFillMini.style.width = Math.min(100, Math.max(0, progress)) + '%';
+            }
+
+            function getXPForLevel(lvl) {
+                return Math.floor(100 * Math.pow(lvl, 2.2));
+            }
+
+            function addXP(amount) {
+                currentUser.xp = (currentUser.xp || 0) + amount;
+                const newLevel = calculateLevel(currentUser.xp);
+                if (newLevel > (currentUser.level || 1)) {
+                    currentUser.level = newLevel;
+                    showAchievementToast('Level Up!', `You reached level ${newLevel}!`, 'fa-arrow-up');
+                    triggerConfetti('normal');
+                }
+                updateXPUI();
+            }
+
+            function calculateLevel(xp) {
+                let lvl = 1;
+                while (getXPForLevel(lvl) <= xp) lvl++;
+                return lvl;
+            }
+
+            function animateNumber(el, start, end, duration) {
+                if (start === end) { el.textContent = end.toLocaleString(); return; }
+                const range = end - start;
+                const startTime = performance.now();
+
+                function step(now) {
+                    const progress = Math.min((now - startTime) / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    el.textContent = Math.round(start + range * eased).toLocaleString();
+                    if (progress < 1) requestAnimationFrame(step);
+                    else el.textContent = end.toLocaleString();
+                }
+                requestAnimationFrame(step);
+            }
+
+            function updateStatsUI() {
+                dom.minesWinsStat.innerText = sessionTracking.wins;
+                dom.minesLossesStat.innerText = currentUser.minesStats?.losses || 0;
+                dom.bestMultiStat.innerText = sessionTracking.bestMultiplier.toFixed(2);
+                const pl = dom.sessionPLElement;
+                pl.innerText = (sessionProfit >= 0 ? '+' : '') + sessionProfit.toFixed(2);
+                pl.style.color = sessionProfit >= 0 ? '#4caf50' : '#ff6b6b';
+                dom.streakCount.textContent = sessionTracking.currentStreak;
+            }
+
+            function updateStartButtonState() {
+                const bet = parseFloat(dom.betAmountInput.value) || 0;
+                const invalidBet = bet <= 0 || bet > currentUser.balance;
+                dom.startGameBtn.disabled = invalidBet || gameActive || autoPlayActive;
+            }
+
+            function validateBet() {
+                const bet = parseFloat(dom.betAmountInput.value) || 0;
+                if (bet <= 0 || bet > currentUser.balance) {
+                    dom.betAmountInput.classList.add('invalid');
+                    dom.startGameBtn.disabled = true;
+                } else {
+                    dom.betAmountInput.classList.remove('invalid');
+                    dom.startGameBtn.disabled = gameActive || autoPlayActive;
+                }
+            }
+
+            function addRipple(e, btn) {
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = e.clientX - rect.left - size / 2 + 'px';
+                ripple.style.top = e.clientY - rect.top - size / 2 + 'px';
+                btn.appendChild(ripple);
+                ripple.addEventListener('animationend', () => ripple.remove());
+            }
+
+            // ── ACHIEVEMENT SYSTEM ──
+            function checkAchievements() {
+                const earned = currentUser.earnedAchievements || [];
+                const newAchievements = [];
+                for (const ach of ACHIEVEMENTS) {
+                    if (!earned.includes(ach.id) && ach.check(sessionTracking)) {
+                        newAchievements.push(ach);
+                        earned.push(ach.id);
+                    }
+                }
+                currentUser.earnedAchievements = earned;
+                if (newAchievements.length > 0) {
+                    for (const ach of newAchievements) {
+                        showAchievementToast(ach.name, ach.desc, ach.icon);
+                    }
+                    saveUser();
+                }
+            }
+
+            function showAchievementToast(title, desc, icon) {
+                const toast = document.createElement('div');
+                toast.className = 'achievement-toast';
+                toast.innerHTML =
+                    `<i class="fas ${icon}" style="color:#ffd966;font-size:1.5rem;"></i> <strong>${title}</strong><br><small>${desc}</small>`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3500);
+            }
+
+            // ── MULTIPLIER ENGINE ──
+            function getRiskConfig() {
+                return RISK_TIERS[currentRiskTier] || RISK_TIERS['medium'];
+            }
+
+            function calculateMultiplier(gemsPicked, totalMines, totalCells, riskConfig) {
+                const safe = totalCells - totalMines;
+                if (gemsPicked >= safe) return riskConfig.maxMultiplier;
+                let prob = 1.0;
+                for (let i = 0; i < gemsPicked; i++) {
+                    prob *= (safe - i) / (totalCells - i);
+                }
+                const fairMult = 1.0 / Math.max(0.000001, prob);
+                const houseMult = fairMult * riskConfig.houseEdge;
+                return Math.min(riskConfig.maxMultiplier, Math.max(1.01, houseMult));
+            }
+
+            function getWinRarity(mult) {
+                for (const r of WIN_RARITIES) {
+                    if (mult >= r.minMult && mult < r.maxMult) return r;
+                }
+                return WIN_RARITIES[WIN_RARITIES.length - 1];
+            }
+
+            function getStreakBonus() {
+                if (sessionTracking.currentStreak >= 7) return 1.12;
+                if (sessionTracking.currentStreak >= 5) return 1.08;
+                if (sessionTracking.currentStreak >= 3) return 1.04;
+                return 1.0;
+            }
+
+            // ── GAME LOGIC ──
+            function generateMinePositions(count) {
+                const positions = [];
+                while (positions.length < count) {
+                    const pos = Math.floor(Math.random() * TOTAL_CELLS);
+                    if (!positions.includes(pos)) positions.push(pos);
+                }
+                return positions;
+            }
+
+            function generateGoldenGems(count, minePositionsArr) {
+                const positions = [];
+                const safeCells = [];
+                for (let i = 0; i < TOTAL_CELLS; i++) {
+                    if (!minePositionsArr.includes(i)) safeCells.push(i);
+                }
+                const shuffled = safeCells.sort(() => Math.random() - 0.5);
+                for (let i = 0; i < Math.min(count, shuffled.length); i++) {
+                    positions.push(shuffled[i]);
+                }
+                return positions;
+            }
+
+            function getAdjacentCells(index) {
+                const row = Math.floor(index / GRID_SIZE);
+                const col = index % GRID_SIZE;
+                const adj = [];
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        if (dr === 0 && dc === 0) continue;
+                        const nr = row + dr;
+                        const nc = col + dc;
+                        if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+                            adj.push(nr * GRID_SIZE + nc);
+                        }
+                    }
+                }
+                return adj;
+            }
+
+            function updateMultiplierUI() {
+                const mult = multiplier;
+                dom.currentMultiplierSpan.innerText = mult.toFixed(2) + 'x';
+                if (gameActive && mult > 1.0) {
+                    dom.currentMultiplierSpan.classList.add('pulsing');
+                    setTimeout(() => dom.currentMultiplierSpan.classList.remove('pulsing'), 500);
+                }
+                const riskConfig = getRiskConfig();
+                const winAmount = Math.floor(currentBet * mult);
+                dom.potentialWinSpan.innerHTML = `<strong>${winAmount.toLocaleString()}</strong> GOLD`;
+                const percent = Math.min(100, (mult / riskConfig.maxMultiplier) * 100);
+                dom.multiplierFill.style.width = percent + '%';
+                if (autoCashoutTarget > 1.0 && gameActive) {
+                    dom.autoCashMarker.style.display = 'block';
+                    dom.autoCashMarker.style.setProperty('--marker-pos', Math.min(100, (autoCashoutTarget / riskConfig
+                        .maxMultiplier) * 100) + '%');
+                } else {
+                    dom.autoCashMarker.style.display = 'none';
+                }
+                dom.gemsLeftSpan.innerText = TOTAL_CELLS - totalMines - revealedCount;
+                dom.minesLeftSpan.innerText = totalMines;
+                // Rarity label
+                const rarity = getWinRarity(mult);
+                dom.rarityLabel.innerHTML = mult >= 1.8 ?
+                    `<span class="rarity-badge ${rarity.cls}">${rarity.name}</span>` : '';
+                // Streak indicator
+                if (sessionTracking.currentStreak >= 2) {
+                    dom.streakIndicator.innerHTML =
+                        `<i class="fas fa-fire"></i> Streak x${sessionTracking.currentStreak} (+${((getStreakBonus()-1)*100).toFixed(0)}%)`;
+                } else {
+                    dom.streakIndicator.innerHTML = '';
+                }
+                updateTension(mult);
+            }
+
+            function renderGrid() {
+                dom.gameGrid.innerHTML = '';
+                for (let i = 0; i < TOTAL_CELLS; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    if (revealedCells[i]) {
+                        cell.classList.add('revealed');
+                        if (minePositions.includes(i)) {
+                            cell.classList.add('mine');
+                            cell.innerHTML = '<i class="fas fa-skull"></i>';
+                        } else if (goldenGemPositions.includes(i)) {
+                            cell.classList.add('golden-gem');
+                            cell.innerHTML = '<i class="fas fa-crown"></i>';
+                        } else {
+                            cell.classList.add('gem');
+                            cell.innerHTML = '<i class="fas fa-gem"></i>';
+                        }
+                    } else {
+                        cell.innerHTML = '<span style="color:rgba(255,255,255,0.25);font-weight:300;">?</span>';
+                        if (i === hotTileIndex && gameActive) {
+                            cell.classList.add('hot-tile');
+                        }
+                    }
+                    if (gameActive && !revealedCells[i]) {
+                        cell.onclick = (e) => revealCell(i);
+                        cell.style.cursor = 'pointer';
+                    } else if (!gameActive && revealedCells[i] && minePositions.includes(i)) {
+                        cell.classList.add('game-over-cell');
+                    }
+                    dom.gameGrid.appendChild(cell);
+                }
+            }
+
+            function revealAllMines() {
+                for (let i = 0; i < TOTAL_CELLS; i++) {
+                    if (minePositions.includes(i)) revealedCells[i] = true;
+                }
+                renderGrid();
+            }
+
+            async function revealCell(index) {
+                if (!gameActive || revealedCells[index]) return;
+                playTone('click', 800, 0.06);
+
+                // Check for near-miss (adjacent to mine)
+                const adjacent = getAdjacentCells(index);
+                const nearMine = adjacent.some(a => minePositions.includes(a) && !revealedCells[a]);
+                if (nearMine && !minePositions.includes(index)) {
+                    playTone('nearmiss', 200, 0.08);
+                    const cellEl = dom.gameGrid.children[index];
+                    if (cellEl) {
+                        cellEl.classList.add('near-miss');
+                        setTimeout(() => cellEl.classList.remove('near-miss'), 300);
+                    }
+                }
+
+                // COMBO: track quick picks
+                if (comboTimer) clearTimeout(comboTimer);
+                comboStreak++;
+                comboTimer = setTimeout(() => { comboStreak = 0; }, 1500);
+                const comboBonus = Math.min(1.1, 1 + comboStreak * 0.008);
+
+                if (minePositions.includes(index)) {
+                    // Check Lucky Shield
+                    const riskConfig = getRiskConfig();
+                    if (!luckyShieldActive && Math.random() < riskConfig.shieldChance) {
+                        // Shield activates!
+                        luckyShieldActive = true;
+                        playTone('shield', 500, 0.35);
+                        message('🛡️ LUCKY SHIELD! The mine was defused!', 'shield');
+                        sessionTracking.shieldsUsed++;
+                        revealedCells[index] = true;
+                        // Mark as revealed but don't end game - treat as gem
+                        revealedCount++;
+                        const oldMult = multiplier;
+                        multiplier = calculateMultiplier(revealedCount, totalMines, TOTAL_CELLS, riskConfig) * comboBonus *
+                            getStreakBonus();
+                        updateMultiplierUI();
+                        renderGrid();
+                        checkAutoCashout();
+                        return;
+                    }
+                    // LOSS
+                    gameActive = false;
+                    stopTension();
+                    revealedCells[index] = true;
+                    revealAllMines();
+                    playTone('crash', 150, 0.5);
+                    sessionProfit -= currentBet;
+                    sessionTracking.currentStreak = 0;
+                    currentUser.globalStats.currentStreak = 0;
+                    recordGame(false, currentBet, 0, multiplier);
+                    await saveUser();
+                    message('💥 BOOM! You lost ' + currentBet.toLocaleString() + ' GOLD.', 'loss');
+                    dom.cashOutBtn.disabled = true;
+                    dom.cashOutBtn.classList.remove('flash-me');
+                    dom.replayBtn.disabled = false;
+                    dom.startGameBtn.disabled = false;
+                    addHistory(false, multiplier);
+                    updateBalanceUI();
+                    updateStatsUI();
+                    renderGrid();
+                    dom.gameCard.classList.remove('big-win');
+                    checkAutoPlayNext();
+                    return;
+                }
+
+                // GEM found
+                revealedCells[index] = true;
+                revealedCount++;
+                const riskConfig2 = getRiskConfig();
+                let gemMultiplier = calculateMultiplier(revealedCount, totalMines, TOTAL_CELLS, riskConfig2);
+
+                // Golden gem check
+                if (goldenGemPositions.includes(index)) {
+                    gemMultiplier *= (2.5 + Math.random() * 1.5);
+                    playTone('golden', 1200, 0.3);
+                    sessionTracking.goldenGemsFound++;
+                    message('✨ GOLDEN GEM! Multiplier boosted!', 'golden');
+                    triggerConfetti('normal');
+                } else {
+                    playTone('gem', 1200, 0.1);
+                }
+
+                multiplier = gemMultiplier * comboBonus * getStreakBonus();
+                updateMultiplierUI();
+                renderGrid();
+
+                // Hot tile hint
+                updateHotTile();
+
+                // Progressive jackpot check (tiny chance at high multipliers)
+                if (multiplier >= 10 && Math.random() < 0.003 && progressiveJackpot > 0) {
+                    const jackpotWin = Math.floor(progressiveJackpot * 0.5);
+                    currentUser.balance += jackpotWin;
+                    progressiveJackpot -= jackpotWin;
+                    sessionTracking.jackpotsHit++;
+                    showJackpotOverlay('JACKPOT! +' + jackpotWin.toLocaleString() + ' GOLD');
+                    triggerConfetti('jackpot');
+                    playTone('jackpot', 1000, 0.6);
+                    message('🎰 PROGRESSIVE JACKPOT! +' + jackpotWin.toLocaleString() + ' GOLD!', 'jackpot');
+                }
+
+                checkAutoCashout();
+                if (revealedCount === TOTAL_CELLS - totalMines) {
+                    // All gems found - auto cashout
+                    sessionTracking.cleanSweeps++;
+                    await cashOut();
+                }
+            }
+
+            function updateHotTile() {
+                if (hotTileTimer) clearTimeout(hotTileTimer);
+                hotTileIndex = -1;
+                // Occasionally show a hot tile hint at high streaks
+                if (sessionTracking.currentStreak >= 4 && gameActive && Math.random() < 0.25) {
+                    const safeUnrevealed = [];
+                    for (let i = 0; i < TOTAL_CELLS; i++) {
+                        if (!revealedCells[i] && !minePositions.includes(i)) safeUnrevealed.push(i);
+                    }
+                    if (safeUnrevealed.length > 0) {
+                        hotTileIndex = safeUnrevealed[Math.floor(Math.random() * safeUnrevealed.length)];
+                        hotTileTimer = setTimeout(() => {
+                            hotTileIndex = -1;
+                            if (gameActive) renderGrid();
+                        }, 2000);
+                        renderGrid();
+                    }
+                }
+            }
+
+            function checkAutoCashout() {
+                if (gameActive && autoCashoutTarget > 0 && multiplier >= autoCashoutTarget) {
+                    cashOut();
+                }
+            }
+
+            async function cashOut() {
+                if (!gameActive) return;
+                const winAmount = Math.floor(currentBet * multiplier);
+                currentUser.balance += winAmount;
+                const profit = winAmount - currentBet;
+                sessionProfit += profit;
+                sessionTracking.currentStreak++;
+                currentUser.globalStats.currentStreak = sessionTracking.currentStreak;
+                if (sessionTracking.currentStreak > (currentUser.globalStats.bestStreak || 0)) {
+                    currentUser.globalStats.bestStreak = sessionTracking.currentStreak;
+                }
+                if (multiplier > sessionTracking.bestMultiplier) sessionTracking.bestMultiplier = multiplier;
+                if (winAmount > sessionTracking.biggestSingleWin) sessionTracking.biggestSingleWin = winAmount;
+                sessionTracking.wins++;
+                recordGame(true, currentBet, winAmount, multiplier);
+                await saveUser();
+                stopTension();
+                playTone('cashout', 1000, 0.25);
+                const rarity = getWinRarity(multiplier);
+                const isBigWin = multiplier >= 10;
+                if (isBigWin) {
+                    triggerConfetti(multiplier >= 50 ? 'jackpot' : 'big');
+                    dom.gameCard.classList.add('big-win');
+                    setTimeout(() => dom.gameCard.classList.remove('big-win'), 2400);
+                } else {
+                    triggerConfetti('normal');
+                }
+                message(
+                    `🎉 CASHED OUT! +${winAmount.toLocaleString()} GOLD <span class="rarity-badge ${rarity.cls}">${rarity.name}</span>`,
+                    'win');
+                gameActive = false;
+                dom.cashOutBtn.disabled = true;
+                dom.cashOutBtn.classList.remove('flash-me');
+                dom.replayBtn.disabled = false;
+                dom.startGameBtn.disabled = false;
+                addHistory(true, multiplier, isBigWin);
+                updateBalanceUI();
+                updateStatsUI();
+                renderGrid();
+                dom.gameCard.classList.remove('big-win');
+                addXP(Math.floor(currentBet * multiplier));
+                checkAchievements();
+                checkAutoPlayNext();
+            }
+
+            async function startGame() {
+                if (gameActive || autoPlayActive) return;
+                const bet = parseFloat(dom.betAmountInput.value);
+                if (isNaN(bet) || bet <= 0 || bet > currentUser.balance) {
+                    message('Invalid bet amount.', 'error');
+                    return;
+                }
+                currentBet = bet;
+                currentUser.balance -= bet;
+                // Jackpot contribution
+                const contrib = Math.floor(bet * jackpotContribution);
+                progressiveJackpot += contrib;
+                await saveUser();
+                updateBalanceUI();
+                const riskConfig = getRiskConfig();
+                totalMines = currentRiskTier === 'custom' ?
+                    parseInt(dom.minesSlider.value) :
+                    riskConfig.mines[0] + Math.floor(Math.random() * (riskConfig.mines[1] - riskConfig.mines[0] + 1));
+                totalMines = Math.max(1, Math.min(20, totalMines));
+                dom.minesCountDisplay.textContent = totalMines;
+                dom.minesSlider.value = totalMines;
+                revealedCount = 0;
+                multiplier = 1.0;
+                luckyShieldActive = false;
+                comboStreak = 0;
+                hotTileIndex = -1;
+                revealedCells = new Array(TOTAL_CELLS).fill(false);
+                minePositions = generateMinePositions(totalMines);
+                const goldenCount = Math.floor(TOTAL_CELLS * riskConfig.goldenChance);
+                goldenGemPositions = generateGoldenGems(Math.max(1, goldenCount), minePositions);
+                gameActive = true;
+                dom.cashOutBtn.disabled = false;
+                dom.cashOutBtn.classList.add('flash-me');
+                dom.replayBtn.disabled = true;
+                dom.startGameBtn.disabled = true;
+                updateMultiplierUI();
+                message('💎 Pick gems, avoid mines! Shield chance: ' + (riskConfig.shieldChance * 100).toFixed(1) + '%',
+                    'normal');
+                playTone('click', 700, 0.08);
+                startTension();
+                updateBarLabels();
+                renderGrid();
+            }
+
+            function updateBarLabels() {
+                const riskConfig = getRiskConfig();
+                dom.barMidLabel.textContent = (riskConfig.maxMultiplier / 2).toFixed(0) + 'x';
+                dom.barMaxLabel.textContent = riskConfig.maxMultiplier.toFixed(0) + 'x';
+            }
+
+            function resetAndReplay() {
+                if (gameActive || autoPlayActive) return;
+                startGame();
+            }
+
+            function message(text, type) {
+                dom.gameMessage.innerHTML = text;
+                switch (type) {
+                    case 'win':
+                        dom.gameMessage.style.color = '#aaffaa';
+                        break;
+                    case 'loss':
+                        dom.gameMessage.style.color = '#ff8888';
+                        break;
+                    case 'golden':
+                        dom.gameMessage.style.color = '#ffd966';
+                        break;
+                    case 'jackpot':
+                        dom.gameMessage.style.color = '#ffaa00';
+                        break;
+                    case 'shield':
+                        dom.gameMessage.style.color = '#88ccff';
+                        break;
+                    case 'error':
+                        dom.gameMessage.style.color = '#ff6b6b';
+                        break;
+                    default:
+                        dom.gameMessage.style.color = '#f5f0e6';
+                }
+            }
+
+            function recordGame(isWin, betAmount, winAmount, multiplierVal) {
+                const profit = winAmount - betAmount;
+                currentUser.globalStats.totalGames++;
+                currentUser.globalStats.totalWagered += betAmount;
+                if (isWin) {
+                    currentUser.globalStats.totalWon += winAmount;
+                    currentUser.globalStats.totalWins = (currentUser.globalStats.totalWins || 0) + 1;
+                } else {
+                    currentUser.globalStats.totalLosses++;
+                }
+                currentUser.xp = (currentUser.xp || 0) + Math.floor(betAmount * 0.5);
+                currentUser.minesStats.gamesPlayed++;
+                currentUser.minesStats.totalBet += betAmount;
+                if (isWin) {
+                    currentUser.minesStats.wins++;
+                    currentUser.minesStats.totalPayout += winAmount;
+                } else {
+                    currentUser.minesStats.losses++;
+                }
+                sessionTracking.gamesPlayed++;
+                currentUser.gameOutcomes.unshift({
+                    game: 'Mines',
+                    result: isWin ? 'win' : 'loss',
+                    profit: isWin ? profit : -betAmount,
+                    multiplier: multiplierVal,
+                    bet: betAmount,
+                    win: winAmount,
+                    date: new Date().toISOString(),
+                });
+                if (currentUser.gameOutcomes.length > 50) currentUser.gameOutcomes.pop();
+                currentUser.transactions.unshift({
+                    desc: `💣 Mines | ${isWin ? `Cashed ${multiplierVal.toFixed(2)}x` : 'Hit mine'}`,
+                    amount: isWin ? profit : -betAmount,
+                    type: isWin ? 'game_win' : 'game_loss',
+                    date: new Date().toISOString(),
+                });
+                if (currentUser.transactions.length > 30) currentUser.transactions.shift();
+                updateXPUI();
+            }
+
+            function addHistory(won, multi, isBig = false) {
+                gameHistory.unshift({ won, multi: multi.toFixed(2), isBig });
+                if (gameHistory.length > 10) gameHistory.pop();
+                renderHistory();
+            }
+
+            function renderHistory() {
+                let html = '<span style="color:#b5afa4;">Recent:</span> ';
+                gameHistory.forEach(h => {
+                    const cls = h.isBig ? 'jackpot' : (h.won ? 'win' : 'loss');
+                    html +=
+                        `<span class="history-badge ${cls}" title="${h.won ? 'Won' : 'Lost'} at ${h.multi}x">${h.multi}x</span>`;
+                });
+                dom.historyContainer.innerHTML = html;
+            }
+
+            function setAutoCashout() {
+                const val = parseFloat(dom.autoCashoutMultiInput.value);
+                autoCashoutTarget = (val >= 1.2) ? val : 0;
+                updateMultiplierUI();
+                message(autoCashoutTarget ? 'Auto cashout set to ' + val.toFixed(1) + 'x' : 'Auto cashout off', 'normal');
+            }
+
+            // ── AUTO-PLAY ──
+            function toggleAutoPlayPanel() {
+                dom.autoplayPanel.classList.toggle('show');
+            }
+
+            async function startAutoPlay() {
+                if (autoPlayActive || gameActive) return;
+                autoPlaySettings.gameCount = parseInt($('#autoGameCount').value) || 10;
+                autoPlaySettings.stopProfit = parseFloat($('#autoStopProfit').value) || 0;
+                autoPlaySettings.stopLoss = parseFloat($('#autoStopLoss').value) || 0;
+                autoPlaySettings.stopOnLoss = $('#autoStopOnLoss').checked;
+                autoPlayActive = true;
+                autoPlayGamesRun = 0;
+                autoPlayStartBalance = currentUser.balance;
+                dom.autoPlayBtn.textContent = '⏹ STOP';
+                dom.autoPlayBtn.style.background = 'rgba(200,60,60,0.7)';
+                $('#autoStatus').textContent = 'Running...';
+                dom.startGameBtn.disabled = true;
+                runAutoPlayCycle();
+            }
+
+            function stopAutoPlay() {
+                autoPlayActive = false;
+                if (autoPlayTimeout) clearTimeout(autoPlayTimeout);
+                autoPlayTimeout = null;
+                dom.autoPlayBtn.textContent = 'AUTO';
+                dom.autoPlayBtn.style.background = '';
+                $('#autoStatus').textContent = 'Stopped';
+                dom.startGameBtn.disabled = false;
+                updateStartButtonState();
+            }
+
+            async function runAutoPlayCycle() {
+                if (!autoPlayActive) return;
+                if (autoPlayGamesRun >= autoPlaySettings.gameCount) {
+                    stopAutoPlay();
+                    $('#autoStatus').textContent = 'Completed ' + autoPlayGamesRun + ' games';
+                    return;
+                }
+                const profitSoFar = currentUser.balance - autoPlayStartBalance;
+                if (autoPlaySettings.stopProfit > 0 && profitSoFar >= autoPlaySettings.stopProfit) {
+                    stopAutoPlay();
+                    $('#autoStatus').textContent = 'Profit target reached: +' + profitSoFar.toFixed(2);
+                    return;
+                }
+                if (autoPlaySettings.stopLoss > 0 && profitSoFar <= -autoPlaySettings.stopLoss) {
+                    stopAutoPlay();
+                    $('#autoStatus').textContent = 'Loss limit reached: ' + profitSoFar.toFixed(2);
+                    return;
+                }
+                const bet = parseFloat(dom.betAmountInput.value) || 0;
+                if (bet <= 0 || bet > currentUser.balance) {
+                    stopAutoPlay();
+                    $('#autoStatus').textContent = 'Insufficient balance';
+                    return;
+                }
+                autoPlayGamesRun++;
+                $('#autoStatus').textContent = `Game ${autoPlayGamesRun}/${autoPlaySettings.gameCount} | P/L: ${(currentUser.balance - autoPlayStartBalance).toFixed(2)}`;
+                await startGame();
+                // Wait for game to resolve
+                const checkInterval = setInterval(() => {
+                    if (!gameActive) {
+                        clearInterval(checkInterval);
+                        if (autoPlaySettings.stopOnLoss && sessionTracking.currentStreak === 0 && autoPlayGamesRun >
+                            0) {
+                            // Check if last game was a loss
+                            const lastOutcome = currentUser.gameOutcomes[0];
+                            if (lastOutcome && lastOutcome.result === 'loss') {
+                                stopAutoPlay();
+                                $('#autoStatus').textContent = 'Stopped on loss';
+                                return;
+                            }
+                        }
+                        autoPlayTimeout = setTimeout(() => runAutoPlayCycle(), 600);
+                    }
+                }, 100);
+            }
+
+            function checkAutoPlayNext() {
+                if (autoPlayActive && !gameActive) {
+                    // Will be handled by the interval in runAutoPlayCycle
+                }
+            }
+
+            // ── RISK TIER MANAGEMENT ──
+            function setRiskTier(tier) {
+                currentRiskTier = tier;
+                const config = RISK_TIERS[tier];
+                // Update UI
+                $$('.risk-tier-btn').forEach(b => b.classList.remove('active'));
+                const activeBtn = document.querySelector(`.risk-tier-btn[data-tier="${tier}"]`);
+                if (activeBtn) activeBtn.classList.add('active');
+                // Show/hide custom slider
+                if (tier === 'custom') {
+                    dom.customMinesContainer.style.opacity = '1';
+                    dom.customMinesContainer.style.pointerEvents = 'auto';
+                    dom.minesSlider.value = totalMines;
+                    dom.minesCountDisplay.textContent = totalMines;
+                } else {
+                    dom.customMinesContainer.style.opacity = '0.5';
+                    dom.customMinesContainer.style.pointerEvents = 'none';
+                    const mines = config.mines[0] + Math.floor(Math.random() * (config.mines[1] - config.mines[0] + 1));
+                    dom.minesSlider.value = mines;
+                    dom.minesCountDisplay.textContent = mines;
+                    totalMines = mines;
+                }
+                updateBarLabels();
+                updateMultiplierUI();
+                message(`Risk: ${config.name} | Mines: ~${config.mines[0]}-${config.mines[1]} | Max: ${config.maxMultiplier}x`,
+                    'normal');
+            }
+
+            // ── EVENT BINDINGS ──
+            function bindEvents() {
+                dom.startGameBtn.addEventListener('click', (e) => {
+                    addRipple(e, dom.startGameBtn);
+                    startGame();
+                });
+                dom.cashOutBtn.addEventListener('click', (e) => {
+                    addRipple(e, dom.cashOutBtn);
+                    cashOut();
+                });
+                dom.replayBtn.addEventListener('click', (e) => {
+                    addRipple(e, dom.replayBtn);
+                    resetAndReplay();
+                });
+                dom.setAutoBtn.addEventListener('click', setAutoCashout);
+                dom.autoPlayBtn.addEventListener('click', () => {
+                    if (autoPlayActive) {
+                        stopAutoPlay();
+                    } else {
+                        toggleAutoPlayPanel();
+                    }
+                });
+                $('#startAutoBtn').addEventListener('click', startAutoPlay);
+                $('#stopAutoBtn').addEventListener('click', stopAutoPlay);
+
+                dom.minesSlider.addEventListener('input', () => {
+                    if (currentRiskTier === 'custom') {
+                        totalMines = parseInt(dom.minesSlider.value);
+                        dom.minesCountDisplay.textContent = totalMines;
+                        updateBarLabels();
+                        if (!gameActive) updateMultiplierUI();
+                    }
+                });
+
+                // Risk tier buttons
+                $$('.risk-tier-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const tier = btn.dataset.tier;
+                        if (tier) setRiskTier(tier);
+                    });
+                });
+
+                // Quick bets
+                $$('.quick-bet').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        let currentVal = parseFloat(dom.betAmountInput.value) || 0;
+                        if (btn.id === 'halfBetBtn') {
+                            dom.betAmountInput.value = Math.max(1, Math.floor(currentVal / 2));
+                        } else if (btn.id === 'maxBetBtn') {
+                            if (currentUser) dom.betAmountInput.value = Math.floor(currentUser
+                                .balance);
+                        } else {
+                            const add = parseFloat(btn.dataset.bet);
+                            let newVal = currentVal + add;
+                            if (currentUser && newVal > currentUser.balance) newVal = currentUser.balance;
+                            dom.betAmountInput.value = Math.max(1, Math.floor(newVal));
+                        }
+                        validateBet();
+                    });
+                });
+
+                dom.betAmountInput.addEventListener('input', validateBet);
+                dom.betAmountInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !gameActive && !autoPlayActive) startGame();
+                });
+                dom.autoCashoutMultiInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') setAutoCashout();
+                });
+
+                dom.soundToggleBtn.addEventListener('click', () => {
+                    soundEnabled = !soundEnabled;
+                    dom.soundToggleBtn.innerHTML = soundEnabled ?
+                        '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+                    if (soundEnabled && !audioCtx) initAudio();
+                    if (!soundEnabled) stopTension();
+                    localStorage.setItem('gold_sound_enabled', soundEnabled);
+                });
+
+                // Keyboard controls
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === ' ' && !gameActive && !autoPlayActive) {
+                        e.preventDefault();
+                        startGame();
+                    } else if (e.key === 'c' && gameActive) {
+                        e.preventDefault();
+                        cashOut();
+                    } else if (e.key === 'r' && !gameActive && !autoPlayActive) {
+                        e.preventDefault();
+                        resetAndReplay();
+                    }
+                });
+            }
+
+            // ── PARTICLES INIT ──
+            function initParticles() {
+                const container = document.getElementById('particlesContainer');
+                for (let i = 0; i < 30; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    const size = Math.random() * 5 + 2;
+                    p.style.width = p.style.height = size + 'px';
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.animationDelay = Math.random() * 8 + 's';
+                    p.style.animationDuration = (Math.random() * 6 + 4) + 's';
+                    container.appendChild(p);
+                }
+            }
+
+            // ── INIT ──
+            async function init() {
+                initParticles();
+                if (!(await loadUser())) return;
+                bindEvents();
+                setRiskTier('medium');
+                renderGrid();
+                gameActive = false;
+                dom.cashOutBtn.disabled = true;
+                dom.replayBtn.disabled = true;
+                dom.startGameBtn.disabled = false;
+                updateMultiplierUI();
+                renderHistory();
+                updateXPUI();
+                const savedSound = localStorage.getItem('gold_sound_enabled');
+                if (savedSound === 'false') {
+                    soundEnabled = false;
+                    dom.soundToggleBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else {
+                    soundEnabled = true;
+                    initAudio();
+                }
+                document.addEventListener('click', () => {
+                    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+                }, { once: true });
+                document.addEventListener('touchstart', () => {
+                    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+                }, { once: true });
+                // Periodic save
+                setInterval(async () => {
+                    if (currentUser) await saveUser();
+                }, 15000);
+                console.log('🏆 GOLD MINES | Royal Minesweeper — Overhaul Ready');
+                console.log('   Risk Tiers:', Object.keys(RISK_TIERS).join(', '));
+                console.log('   Progressive Jackpot:', progressiveJackpot.toLocaleString(), 'GOLD');
+                console.log('   Achievements:', ACHIEVEMENTS.length, 'to unlock');
+            }
+
+            init().catch(err => console.error('Initialization error:', err));
+        })();
+    </script>
+</body>
+</html>

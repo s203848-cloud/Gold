@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GOLD FLIP | Flip the coin, double or nothing</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd966;
+            --gold-bright: #ffed4e;
+            --gold-deep: #c9a840;
+            --bg-deep: #0a0908;
+            --bg-card: rgba(20, 18, 16, 0.8);
+            --border-gold: rgba(255, 217, 102, 0.3);
+            --border-active: rgba(255, 217, 102, 0.6);
+            --danger: #ff6b6b;
+            --success: #4caf50;
+            --text-muted: #9a9484;
+            --radius-xl: 2.2rem;
+            --radius-lg: 1.5rem;
+            --radius-md: 1.2rem;
+            --radius-full: 60px;
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --coin-size: 180px;
+            --coin-thickness: 14px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #14110c 0%, #030202 100%);
+            color: #f5f0e6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Floating gold particles */
+        .bg-particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: sparkleFloat 4s infinite ease-in;
+            opacity: 0;
+        }
+        .sparkle:nth-child(odd) {
+            animation-delay: 2s;
+            background: var(--gold-bright);
+        }
+        .sparkle:nth-child(3n) {
+            animation-delay: 1.3s;
+            width: 6px;
+            height: 6px;
+        }
+        .sparkle:nth-child(5n+2) {
+            animation-delay: 3.2s;
+            background: #f5b042;
+        }
+        @keyframes sparkleFloat {
+            0% { transform: translateY(0) translateX(0) scale(0); opacity: 0; }
+            15% { opacity: 0.9; scale: 1.2; }
+            40% { transform: translateY(-160px) translateX(30px) scale(1); opacity: 0.4; }
+            70% { transform: translateY(-320px) translateX(-20px) scale(0.3); opacity: 0.06; }
+            100% { transform: translateY(-480px) translateX(15px) scale(0); opacity: 0; }
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Top Nav ── */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 13, 11, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-full);
+            padding: 0.7rem 2rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: slideDown 0.6s var(--transition-bounce);
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .back-home {
+            text-decoration: none;
+            color: var(--gold);
+            font-weight: 600;
+            background: rgba(255, 217, 102, 0.08);
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .back-home:hover {
+            background: rgba(255, 217, 102, 0.2);
+            transform: translateX(-3px);
+        }
+        .balance-tag {
+            background: rgba(31, 28, 24, 0.9);
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 217, 102, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: box-shadow 0.3s;
+        }
+        .balance-tag.pulse {
+            animation: balancePulse 0.5s ease-out;
+        }
+        @keyframes balancePulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 217, 102, 0.5); }
+            100% { box-shadow: 0 0 0 20px rgba(255, 217, 102, 0); }
+        }
+        .sound-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--gold);
+            transition: transform 0.2s;
+            padding: 0.3rem;
+            touch-action: manipulation;
+        }
+        .sound-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* ── Main Game Card ── */
+        .game-card {
+            background: linear-gradient(145deg, rgba(28, 25, 21, 0.95), rgba(10, 9, 7, 0.98));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 1.8rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.7), 0 0 80px -10px rgba(255, 217, 102, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: slideUp 0.6s var(--transition-bounce);
+            transition: box-shadow 0.4s, border-color 0.4s;
+        }
+        .game-card.hot-streak {
+            border-color: var(--gold-bright);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.7), 0 0 100px 10px rgba(255, 200, 60, 0.35);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .game-title {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--gold);
+            text-shadow: 0 0 30px rgba(255, 217, 102, 0.4);
+        }
+        .game-title i {
+            margin: 0 0.4rem;
+        }
+
+        /* ── 3D COIN STAGE ── */
+        .coin-stage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem 0;
+            perspective: 800px;
+            position: relative;
+        }
+        .coin-scene {
+            width: var(--coin-size);
+            height: var(--coin-size);
+            position: relative;
+            perspective: 900px;
+        }
+        .coin {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.4s ease-out;
+            cursor: default;
+            will-change: transform;
+        }
+        /* Idle gentle floating rotation */
+        .coin.idle {
+            animation: coinIdle 3s ease-in-out infinite;
+            transition: none;
+        }
+        @keyframes coinIdle {
+            0%, 100% { transform: rotateY(0deg) rotateX(5deg); }
+            25% { transform: rotateY(15deg) rotateX(-3deg); }
+            50% { transform: rotateY(-10deg) rotateX(8deg); }
+            75% { transform: rotateY(8deg) rotateX(-5deg); }
+        }
+        /* Flipping animation */
+        .coin.flipping {
+            animation: coinFlip 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+            transition: none;
+        }
+        @keyframes coinFlip {
+            0% { transform: rotateY(0deg) rotateX(0deg) scale(1) translateY(0); }
+            10% { transform: rotateY(72deg) rotateX(-10deg) scale(1.06) translateY(-18px); }
+            30% { transform: rotateY(324deg) rotateX(12deg) scale(1.12) translateY(-30px); }
+            50% { transform: rotateY(540deg) rotateX(-14deg) scale(1.15) translateY(-14px); }
+            70% { transform: rotateY(792deg) rotateX(8deg) scale(1.1) translateY(0px); }
+            85% { transform: rotateY(972deg) rotateX(-6deg) scale(1.04) translateY(-6px); }
+            100% { transform: rotateY(1080deg) rotateX(0deg) scale(1) translateY(0); }
+        }
+        /* Coin faces */
+        .coin-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            border: 4px solid #b8941e;
+            box-shadow:
+                inset 0 0 50px rgba(255, 217, 102, 0.3),
+                0 0 40px rgba(255, 180, 40, 0.4),
+                0 0 80px rgba(255, 180, 40, 0.18);
+            overflow: hidden;
+        }
+        .coin-face::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 217, 102, 0.5);
+            pointer-events: none;
+        }
+        .coin-face::after {
+            content: '';
+            position: absolute;
+            inset: 16px;
+            border-radius: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            pointer-events: none;
+            animation: dashRotate 20s linear infinite;
+        }
+        @keyframes dashRotate { to { transform: rotate(360deg); } }
+        .coin-heads {
+            background: radial-gradient(ellipse at 35% 30%, #ffe9a0 0%, #f5b840 30%, #c98c20 65%, #7a4e0a 100%);
+            z-index: 1;
+        }
+        .coin-tails {
+            background: radial-gradient(ellipse at 35% 30%, #ffe9a0 0%, #f0b535 30%, #c4851a 65%, #6b4208 100%);
+            transform: rotateY(180deg);
+        }
+        .coin-icon {
+            font-size: 3.5rem;
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+            color: #5c3808;
+        }
+        .coin-label {
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #4a2805;
+            font-weight: 800;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        /* Edge ribs for 3D thickness */
+        .coin-edge-rib {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--coin-thickness);
+            height: var(--coin-size);
+            background: linear-gradient(to top, #7a4e0a, #f5b042, #ffd966, #c98c20, #5c3808);
+            transform-origin: center center;
+            transform: translate(-50%, -50%) rotateY(0deg) translateZ(calc(var(--coin-size) / 2));
+            backface-visibility: hidden;
+            border-radius: 2px;
+            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+        }
+        .coin-edge-glow {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            background: transparent;
+            box-shadow: 0 0 35px 8px rgba(255, 200, 60, 0.5);
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+        .coin.flipping .coin-edge-glow {
+            box-shadow: 0 0 55px 15px rgba(255, 200, 60, 0.85);
+            opacity: 1;
+        }
+
+        /* ── Bet Area ── */
+        .bet-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .bet-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .bet-row label {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-weight: 600;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+        .bet-input {
+            background: #1f1b17;
+            border: 2px solid rgba(255, 217, 102, 0.2);
+            border-radius: var(--radius-full);
+            padding: 0.65rem 1.2rem;
+            color: white;
+            font-weight: 700;
+            width: 110px;
+            text-align: center;
+            font-size: 1rem;
+            transition: var(--transition-fast);
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .bet-input:focus {
+            border-color: var(--border-active);
+            box-shadow: 0 0 0 4px rgba(255, 217, 102, 0.1);
+        }
+        .bet-input.invalid {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+        }
+        .quick-bets {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+        .quick-bet {
+            background: rgba(255, 217, 102, 0.08);
+            border: 1px solid rgba(255, 217, 102, 0.3);
+            border-radius: 40px;
+            padding: 0.35rem 0.9rem;
+            color: var(--gold);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            touch-action: manipulation;
+        }
+        .quick-bet:hover {
+            background: rgba(255, 217, 102, 0.2);
+            transform: scale(1.05);
+        }
+        .quick-bet:active {
+            transform: scale(0.94);
+        }
+
+        /* ── Choice Buttons ── */
+        .choice-row {
+            display: flex;
+            gap: 1rem;
+        }
+        .choice-btn {
+            flex: 1;
+            border: 2px solid rgba(255, 217, 102, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 1.2rem 1rem;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            text-align: center;
+            background: rgba(20, 18, 16, 0.7);
+            color: #ccc;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+            touch-action: manipulation;
+        }
+        .choice-btn i {
+            font-size: 2rem;
+        }
+        .choice-btn:hover:not(.disabled) {
+            border-color: var(--border-active);
+            background: rgba(255, 217, 102, 0.1);
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 217, 102, 0.2);
+        }
+        .choice-btn.selected {
+            border-color: var(--gold) !important;
+            background: rgba(255, 217, 102, 0.18) !important;
+            color: var(--gold-bright) !important;
+            box-shadow: 0 0 30px rgba(255, 217, 102, 0.3) !important;
+            animation: selectedGlow 1.5s ease-in-out infinite;
+        }
+        @keyframes selectedGlow {
+            0%, 100% { box-shadow: 0 0 25px rgba(255, 217, 102, 0.25); }
+            50% { box-shadow: 0 0 45px rgba(255, 217, 102, 0.5); }
+        }
+        .choice-btn.disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .choice-btn .payout-badge {
+            font-size: 0.7rem;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Flip Button ── */
+        .flip-btn {
+            width: 100%;
+            border: none;
+            border-radius: var(--radius-full);
+            font-weight: 800;
+            font-size: 1.15rem;
+            padding: 0.95rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, #f5b042 0%, #ffd966 40%, #ffed4e 100%);
+            color: #1a150e;
+            box-shadow: 0 5px 0 #a05f15, 0 8px 20px rgba(255, 180, 40, 0.3);
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        .flip-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #a05f15, 0 14px 30px rgba(255, 180, 40, 0.45);
+        }
+        .flip-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #a05f15, 0 4px 10px rgba(255, 180, 40, 0.3);
+            transition: 0.08s;
+        }
+        .flip-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 0 #a05f15;
+        }
+        .flip-btn .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(0);
+            animation: rippleEffect 0.7s ease-out;
+            pointer-events: none;
+        }
+        @keyframes rippleEffect {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* ── Result ── */
+        .result-panel {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: var(--radius-md);
+            padding: 0.8rem 1.2rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .result-panel.win {
+            color: #a5d6a7;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
+            animation: resultPop 0.4s var(--transition-bounce);
+        }
+        .result-panel.loss {
+            color: #ffab91;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.4);
+            animation: resultPop 0.4s var(--transition-bounce);
+        }
+        @keyframes resultPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* ── Stats ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.6rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        @media (max-width: 500px) {
+            .stats-row {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        .stat-cell {
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--gold);
+            transition: color 0.3s;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── History ── */
+        .history-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            min-height: 28px;
+        }
+        .history-tag {
+            background: #2a2520;
+            padding: 0.25rem 0.6rem;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .history-tag.win {
+            color: #7ddf80;
+            background: rgba(76, 175, 80, 0.15);
+        }
+        .history-tag.loss {
+            color: #ff8888;
+            background: rgba(255, 107, 107, 0.12);
+        }
+
+        /* ── Shake animation for invalid actions ── */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* ── Confetti Canvas ── */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @media (max-width: 500px) {
+            :root {
+                --coin-size: 140px;
+                --coin-thickness: 10px;
+            }
+            .game-card { padding: 1.2rem; }
+            .coin-icon { font-size: 2.6rem; }
+            .coin-label { font-size: 0.7rem; letter-spacing: 2px; }
+            .choice-row { gap: 0.6rem; }
+            .choice-btn { padding: 0.9rem 0.6rem; font-size: 0.9rem; }
+            .choice-btn i { font-size: 1.5rem; }
+            .bet-row { gap: 0.4rem; }
+            .quick-bets { gap: 0.3rem; }
+            .quick-bet { padding: 0.3rem 0.6rem; font-size: 0.7rem; }
+            .flip-btn { font-size: 1rem; padding: 0.8rem; }
+            .top-nav { padding: 0.6rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+    <div class="bg-particles" id="bgParticles"></div>
+
+    <div class="game-container">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <a href=".././home.html" class="back-home" aria-label="Back to Lobby"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <div class="balance-tag" id="balanceTag">
+                <i class="fas fa-coins"></i> <span id="headerBalance">0</span>
+            </div>
+            <button id="soundToggleBtn" class="sound-btn" title="Toggle Sound" aria-label="Toggle sound">
+                <i class="fas fa-volume-up"></i>
+            </button>
+        </div>
+
+        <!-- Main Game Card -->
+        <div class="game-card" id="gameCard">
+            <div class="game-title">
+                <i class="fas fa-coins"></i> GOLD FLIP <i class="fas fa-coins"></i>
+                <div style="font-size:0.65rem;color:var(--text-muted);letter-spacing:2px;margin-top:2px;">
+                    CLASSIC COIN TOSS • 1.96× PAYOUT
+                </div>
+            </div>
+
+            <!-- 3D Coin -->
+            <div class="coin-stage">
+                <div class="coin-scene">
+                    <div class="coin idle" id="theCoin" role="img" aria-label="3D coin showing result">
+                        <div class="coin-edge-glow"></div>
+                        <!-- Edge ribs injected dynamically via JavaScript -->
+                        <div class="coin-face coin-heads">
+                            <span class="coin-icon"><i class="fas fa-crown"></i></span>
+                            <span class="coin-label">HEADS</span>
+                        </div>
+                        <div class="coin-face coin-tails">
+                            <span class="coin-icon"><i class="fas fa-gem"></i></span>
+                            <span class="coin-label">TAILS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bet Input -->
+            <div class="bet-section">
+                <div class="bet-row">
+                    <label for="betAmount"><i class="fas fa-coins"></i> Bet</label>
+                    <input type="number" id="betAmount" class="bet-input" value="25" step="any" min="1" inputmode="decimal" aria-label="Bet amount">
+                    <div class="quick-bets">
+                        <button class="quick-bet" data-bet="10" aria-label="Add 10 to bet">+10</button>
+                        <button class="quick-bet" data-bet="25" aria-label="Add 25 to bet">+25</button>
+                        <button class="quick-bet" data-bet="50" aria-label="Add 50 to bet">+50</button>
+                        <button class="quick-bet" data-bet="100" aria-label="Add 100 to bet">+100</button>
+                        <button class="quick-bet" id="halfBetBtn" aria-label="Halve the bet">½</button>
+                        <button class="quick-bet" id="maxBetBtn" aria-label="Bet maximum balance">MAX</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Choice Buttons -->
+            <div class="choice-row" id="choiceRow">
+                <button class="choice-btn" data-choice="heads" id="headsBtn" aria-label="Choose Heads">
+                    <i class="fas fa-crown"></i>
+                    <span>HEADS</span>
+                    <span class="payout-badge">1.96×</span>
+                </button>
+                <button class="choice-btn" data-choice="tails" id="tailsBtn" aria-label="Choose Tails">
+                    <i class="fas fa-gem"></i>
+                    <span>TAILS</span>
+                    <span class="payout-badge">1.96×</span>
+                </button>
+            </div>
+
+            <!-- Flip Button -->
+            <button id="flipBtn" class="flip-btn" disabled aria-label="Flip the coin">
+                <span class="btn-text"><i class="fas fa-hand-pointer"></i> FLIP COIN</span>
+            </button>
+
+            <!-- Result (with aria-live for screen readers) -->
+            <div class="result-panel" id="resultMessage" role="status" aria-live="polite">
+                <i class="fas fa-info-circle"></i> Choose <strong>HEADS</strong> or <strong>TAILS</strong> and flip!
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-cell">
+                    <div class="stat-value" id="flipsStat">0</div>
+                    <div class="stat-label">Flips</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="stat-value" id="winsStat">0</div>
+                    <div class="stat-label">Wins</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="stat-value" id="sessionPL">0</div>
+                    <div class="stat-label">Session P/L</div>
+                </div>
+                <div class="stat-cell" id="streakCell">
+                    <div class="stat-value" id="streakValue">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+            </div>
+
+            <!-- History -->
+            <div class="history-row" id="flipHistory">
+                <span style="color:var(--text-muted);">History:</span>
+                <span style="color:var(--text-muted);font-size:0.75rem;">No flips yet</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ══════════════════════════════════════════
+            // GAME ENGINE – Core state & constants
+            // ══════════════════════════════════════════
+            const PAYOUT_MULTIPLIER = 1.96;
+            const FLIP_ANIMATION_MS = 1800;
+            const RESULT_DISPLAY_MS = 2500;
+            const ANTI_SPAM_COOLDOWN_MS = 400;
+
+            const state = {
+                currentUser: null,
+                sessionProfit: 0,
+                flipHistory: [],
+                isFlipping: false,
+                selectedChoice: null,
+                lastFlipEndTime: 0,       // timestamp of last flip end (for cooldown)
+                soundEnabled: true,
+                audioCtx: null
+            };
+
+            // ══════════════════════════════════════════
+            // DOM REFS – collected once
+            // ══════════════════════════════════════════
+            const DOM = {
+                coin: document.getElementById('theCoin'),
+                betInput: document.getElementById('betAmount'),
+                flipBtn: document.getElementById('flipBtn'),
+                headsBtn: document.getElementById('headsBtn'),
+                tailsBtn: document.getElementById('tailsBtn'),
+                resultMessage: document.getElementById('resultMessage'),
+                soundToggleBtn: document.getElementById('soundToggleBtn'),
+                confettiCanvas: document.getElementById('confettiCanvas'),
+                balanceEl: document.getElementById('headerBalance'),
+                balanceTag: document.getElementById('balanceTag'),
+                flipsStat: document.getElementById('flipsStat'),
+                winsStat: document.getElementById('winsStat'),
+                sessionPLEl: document.getElementById('sessionPL'),
+                streakValue: document.getElementById('streakValue'),
+                historyContainer: document.getElementById('flipHistory'),
+                gameCard: document.getElementById('gameCard'),
+                bgParticles: document.getElementById('bgParticles')
+            };
+
+            // ══════════════════════════════════════════
+            // AUDIO ENGINE – Web Audio API tones
+            // ══════════════════════════════════════════
+            function initAudioContext() {
+                if (!state.audioCtx && state.soundEnabled) {
+                    try {
+                        state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    } catch (e) { /* user gesture required */ }
+                }
+            }
+
+            function playTone(type) {
+                if (!state.soundEnabled) return;
+                try {
+                    initAudioContext();
+                    const ctx = state.audioCtx;
+                    if (!ctx) return;
+                    const now = ctx.currentTime;
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    switch (type) {
+                        case 'flip':
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(300, now);
+                            osc.frequency.exponentialRampToValueAtTime(900, now + 0.25);
+                            gain.gain.setValueAtTime(0.07, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                            osc.start(now); osc.stop(now + 0.35);
+                            break;
+                        case 'win':
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(660, now);
+                            osc.frequency.setValueAtTime(880, now + 0.1);
+                            osc.frequency.setValueAtTime(1100, now + 0.2);
+                            gain.gain.setValueAtTime(0.12, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                            osc.start(now); osc.stop(now + 0.45);
+                            break;
+                        case 'lose':
+                            osc.type = 'sawtooth';
+                            osc.frequency.setValueAtTime(200, now);
+                            osc.frequency.exponentialRampToValueAtTime(80, now + 0.35);
+                            gain.gain.setValueAtTime(0.08, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                            osc.start(now); osc.stop(now + 0.5);
+                            break;
+                        case 'click':
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(600, now);
+                            gain.gain.setValueAtTime(0.05, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                            osc.start(now); osc.stop(now + 0.1);
+                            break;
+                    }
+                } catch (e) { /* audio not critical */ }
+            }
+
+            // ══════════════════════════════════════════
+            // CONFETTI ANIMATION – canvas based
+            // ══════════════════════════════════════════
+            function triggerConfetti() {
+                const canvas = DOM.confettiCanvas;
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                const ctx = canvas.getContext('2d');
+                const particles = [];
+                const colors = ['#ffd966', '#f5b042', '#ffed4e', '#4caf50', '#ffaa00', '#c9a840', '#fff'];
+                const particleCount = window.innerWidth < 600 ? 100 : 200; // performance on low-end
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: -30 - Math.random() * 100,
+                        size: Math.random() * 8 + 3,
+                        speedY: Math.random() * 6 + 4,
+                        speedX: (Math.random() - 0.5) * 7,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        rotation: Math.random() * 360,
+                        rotSpeed: (Math.random() - 0.5) * 14,
+                        shape: Math.random() > 0.5 ? 'rect' : 'circle',
+                        opacity: 1
+                    });
+                }
+
+                let frame;
+                const start = performance.now();
+
+                function draw(now) {
+                    if (now - start > 2800) {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        cancelAnimationFrame(frame);
+                        return;
+                    }
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    particles.forEach(p => {
+                        p.y += p.speedY;
+                        p.x += p.speedX;
+                        p.rotation += p.rotSpeed;
+                        p.opacity = Math.max(0, 1 - (now - start) / 2800);
+                        ctx.save();
+                        ctx.globalAlpha = p.opacity;
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rotation * Math.PI / 180);
+                        ctx.fillStyle = p.color;
+                        if (p.shape === 'circle') {
+                            ctx.beginPath();
+                            ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else {
+                            ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                        }
+                        ctx.restore();
+                    });
+                    frame = requestAnimationFrame(draw);
+                }
+                frame = requestAnimationFrame(draw);
+            }
+
+            // ══════════════════════════════════════════
+            // STORAGE – load/save user data
+            // ══════════════════════════════════════════
+            function initializeUserStats(user) {
+                const defaults = {
+                    globalStats: {
+                        totalWagered: 0, totalWon: 0, totalLosses: 0, totalGames: 0,
+                        currentStreak: 0, bestStreak: 0, lastGameWin: null, totalWins: 0
+                    },
+                    transactions: [],
+                    gameOutcomes: [],
+                    gamePlayCount: {},
+                    bankBalance: 0,
+                    xp: 0,
+                    avatar: 'fas fa-crown',
+                    theme: 'theme-gold',
+                    autoTransfer: false,
+                    earnedAchievements: [],
+                    lastInterestDate: null,
+                    lastDailyBonusDate: null,
+                    lastWheelSpinDate: null,
+                    dailyBalanceSnapshots: [],
+                    flipStats: {
+                        gamesPlayed: 0, wins: 0, losses: 0, totalBet: 0, totalWin: 0,
+                        headsCount: 0, tailsCount: 0, headsWins: 0, tailsWins: 0
+                    }
+                };
+                for (const [key, value] of Object.entries(defaults)) {
+                    if (user[key] === undefined) user[key] = value;
+                }
+                // Ensure flipStats exists even if user loaded from older version
+                if (!user.flipStats) {
+                    user.flipStats = { gamesPlayed: 0, wins: 0, losses: 0, totalBet: 0, totalWin: 0, headsCount: 0, tailsCount: 0, headsWins: 0, tailsWins: 0 };
+                }
+                return user;
+            }
+
+            async function loadUser() {
+                const sess = sessionStorage.getItem('gold_current_user');
+                if (!sess) { window.location.href = '../../sign-in.html'; return false; }
+                const sessionUser = JSON.parse(sess);
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                let user = users[sessionUser.username];
+                if (!user) {
+                    sessionStorage.removeItem('gold_current_user');
+                    window.location.href = '../../sign-in.html';
+                    return false;
+                }
+                state.currentUser = initializeUserStats(user);
+                updateBalanceDisplay();
+                updateStatsUI();
+                clampAndValidateBet();
+                return true;
+            }
+
+            async function saveUser() {
+                if (!state.currentUser) return;
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                users[state.currentUser.username] = state.currentUser;
+                localStorage.setItem('gold_users', JSON.stringify(users));
+                const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
+                if (sess) {
+                    sess.balance = state.currentUser.balance;
+                    sessionStorage.setItem('gold_current_user', JSON.stringify(sess));
+                }
+            }
+
+            // ══════════════════════════════════════════
+            // UI UPDATE HELPERS
+            // ══════════════════════════════════════════
+            function updateBalanceDisplay() {
+                const balEl = DOM.balanceEl;
+                const prevText = balEl.textContent.replace(/,/g, '');
+                const prev = parseFloat(prevText) || 0;
+                const next = state.currentUser ? state.currentUser.balance : 0;
+                if (prev !== next) {
+                    animateNumber(balEl, prev, next, 400);
+                    if (next > prev) {
+                        DOM.balanceTag.classList.add('pulse');
+                        setTimeout(() => DOM.balanceTag.classList.remove('pulse'), 500);
+                    }
+                } else {
+                    balEl.textContent = next.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
+                clampAndValidateBet();
+            }
+
+            function animateNumber(el, start, end, duration) {
+                if (start === end) {
+                    el.textContent = end.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    return;
+                }
+                const range = end - start;
+                const startTime = performance.now();
+                function step(now) {
+                    const progress = Math.min((now - startTime) / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const current = start + range * eased;
+                    el.textContent = Math.floor(current).toLocaleString();
+                    if (progress < 1) requestAnimationFrame(step);
+                    else el.textContent = end.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
+                requestAnimationFrame(step);
+            }
+
+            function updateStatsUI() {
+                const stats = state.currentUser ? state.currentUser.flipStats : {};
+                DOM.flipsStat.textContent = stats.gamesPlayed || 0;
+                DOM.winsStat.textContent = stats.wins || 0;
+                const pl = state.sessionProfit;
+                DOM.sessionPLEl.textContent = (pl >= 0 ? '+' : '') + pl.toFixed(2);
+                DOM.sessionPLEl.style.color = pl >= 0 ? 'var(--success)' : 'var(--danger)';
+                // streak indicator
+                const streak = state.currentUser ? (state.currentUser.globalStats.currentStreak || 0) : 0;
+                DOM.streakValue.textContent = streak;
+                if (streak >= 3) {
+                    DOM.gameCard.classList.add('hot-streak');
+                } else {
+                    DOM.gameCard.classList.remove('hot-streak');
+                }
+            }
+
+            function clampAndValidateBet() {
+                const input = DOM.betInput;
+                let val = parseFloat(input.value);
+                if (isNaN(val) || val < 0) val = 1;
+                const max = state.currentUser ? state.currentUser.balance : 0;
+                if (val > max) val = max;
+                if (val < 1) val = 1;
+                // keep two decimals
+                val = Math.floor(val * 100) / 100;
+                input.value = val;
+                validateBet();
+            }
+
+            function validateBet() {
+                const input = DOM.betInput;
+                const bet = parseFloat(input.value) || 0;
+                const balance = state.currentUser ? state.currentUser.balance : 0;
+                const valid = bet > 0 && bet <= balance && !state.isFlipping && state.selectedChoice !== null && Date.now() > state.lastFlipEndTime + ANTI_SPAM_COOLDOWN_MS;
+                if (!valid) {
+                    input.classList.add('invalid');
+                } else {
+                    input.classList.remove('invalid');
+                }
+                DOM.flipBtn.disabled = !valid;
+            }
+
+            // ══════════════════════════════════════════
+            // COIN RENDERING – 3D ribs & visual feedback
+            // ══════════════════════════════════════════
+            function createEdgeRibs() {
+                const coin = DOM.coin;
+                const ribCount = 8;
+                const angleStep = 360 / ribCount;
+                for (let i = 0; i < ribCount; i++) {
+                    const rib = document.createElement('div');
+                    rib.className = 'coin-edge-rib';
+                    rib.style.transform = `translate(-50%, -50%) rotateY(${i * angleStep}deg) translateZ(calc(var(--coin-size) / 2))`;
+                    coin.appendChild(rib);
+                }
+            }
+
+            function resetCoinToIdle() {
+                const coin = DOM.coin;
+                coin.classList.remove('flipping');
+                coin.style.transition = 'transform 0.4s ease-out';
+                coin.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+                const onTransitionEnd = () => {
+                    coin.removeEventListener('transitionend', onTransitionEnd);
+                    coin.style.transition = '';
+                    coin.style.transform = '';
+                    coin.classList.add('idle');
+                };
+                coin.addEventListener('transitionend', onTransitionEnd);
+                // fallback if transitionend doesn't fire
+                setTimeout(() => {
+                    if (coin.classList.contains('idle')) return;
+                    coin.style.transition = '';
+                    coin.style.transform = '';
+                    coin.classList.add('idle');
+                }, 500);
+            }
+
+            // ══════════════════════════════════════════
+            // HISTORY RENDERING
+            // ══════════════════════════════════════════
+            function addToHistory(coinResult, isWin, bet, winAmount) {
+                state.flipHistory.unshift({
+                    result: coinResult,
+                    won: isWin,
+                    bet: bet,
+                    win: winAmount,
+                    time: Date.now()
+                });
+                if (state.flipHistory.length > 15) state.flipHistory.pop();
+                renderHistory();
+            }
+
+            function renderHistory() {
+                const container = DOM.historyContainer;
+                if (state.flipHistory.length === 0) {
+                    container.innerHTML = '<span style="color:var(--text-muted);">History:</span> <span style="color:var(--text-muted);font-size:0.75rem;">No flips yet</span>';
+                    return;
+                }
+                let html = '<span style="color:var(--text-muted);">History:</span> ';
+                state.flipHistory.forEach(h => {
+                    const icon = h.result === 'heads' ? '<i class="fas fa-crown"></i>' : '<i class="fas fa-gem"></i>';
+                    const cssClass = h.won ? 'win' : 'loss';
+                    const amt = h.won ? '+' + h.win : '-' + h.bet;
+                    html += `<span class="history-tag ${cssClass}" title="${h.won ? 'Won' : 'Lost'} ${amt} GOLD">${icon} ${h.result.toUpperCase()} ${amt}</span>`;
+                });
+                container.innerHTML = html;
+            }
+
+            // ══════════════════════════════════════════
+            // GAMEPLAY – choice, flip, stats recording
+            // ══════════════════════════════════════════
+            function selectChoice(choice) {
+                if (state.isFlipping) return;
+                state.selectedChoice = choice;
+                DOM.headsBtn.classList.remove('selected');
+                DOM.tailsBtn.classList.remove('selected');
+                if (choice === 'heads') {
+                    DOM.headsBtn.classList.add('selected');
+                } else {
+                    DOM.tailsBtn.classList.add('selected');
+                }
+                playTone('click');
+                validateBet();
+                DOM.resultMessage.innerHTML = `<i class="fas fa-check-circle"></i> You chose <strong>${choice.toUpperCase()}</strong>. Ready to flip!`;
+                DOM.resultMessage.className = 'result-panel';
+            }
+
+            async function flipCoin(e) {
+                // anti-spam cooldown
+                if (state.isFlipping || Date.now() < state.lastFlipEndTime + ANTI_SPAM_COOLDOWN_MS) return;
+
+                const choice = state.selectedChoice;
+                if (!choice) {
+                    showError('Please choose HEADS or TAILS first!');
+                    return;
+                }
+
+                let bet = parseFloat(DOM.betInput.value);
+                if (isNaN(bet) || bet <= 0) bet = 1;
+                bet = Math.floor(bet * 100) / 100;
+                if (bet < 1) bet = 1;
+
+                if (bet > state.currentUser.balance) {
+                    showError('Insufficient balance!');
+                    return;
+                }
+
+                // Ensure UI consistency
+                DOM.betInput.value = bet;
+
+                addRipple(e, DOM.flipBtn);
+                state.isFlipping = true;
+                DOM.flipBtn.disabled = true;
+                DOM.headsBtn.classList.add('disabled');
+                DOM.tailsBtn.classList.add('disabled');
+                DOM.betInput.disabled = true;
+                DOM.resultMessage.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Flipping...';
+                DOM.resultMessage.className = 'result-panel';
+
+                // Deduct bet
+                state.currentUser.balance -= bet;
+                await saveUser();
+                updateBalanceDisplay();
+
+                // Fair 50/50 randomness
+                const randomValue = Math.random();
+                const playerWins = randomValue < 0.5;
+                const coinResult = playerWins ? choice : (choice === 'heads' ? 'tails' : 'heads');
+
+                // Start flip animation
+                const coin = DOM.coin;
+                coin.classList.remove('idle');
+                void coin.offsetWidth; // force reflow to restart animation
+                coin.classList.add('flipping');
+
+                // Flip sounds
+                playTone('flip');
+                setTimeout(() => playTone('flip'), 400);
+                setTimeout(() => playTone('flip'), 800);
+
+                setTimeout(async () => {
+                    // Animation done – set final orientation
+                    coin.classList.remove('flipping');
+                    coin.style.transition = 'none';
+                    if (coinResult === 'heads') {
+                        coin.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+                    } else {
+                        coin.style.transform = 'rotateY(180deg) rotateX(0deg) scale(1)';
+                    }
+
+                    const winAmount = playerWins ? Math.floor(bet * PAYOUT_MULTIPLIER) : 0;
+                    const netProfit = winAmount - bet;
+                    state.sessionProfit += netProfit;
+
+                    if (playerWins) {
+                        state.currentUser.balance += winAmount;
+                        DOM.resultMessage.innerHTML = `<i class="fas fa-trophy"></i> <strong>${coinResult.toUpperCase()}!</strong> You chose <strong>${choice.toUpperCase()}</strong> — <span style="color:#a5d6a7;">WON +${winAmount} GOLD!</span>`;
+                        DOM.resultMessage.className = 'result-panel win';
+                        triggerConfetti();
+                        playTone('win');
+                    } else {
+                        DOM.resultMessage.innerHTML = `<i class="fas fa-times-circle"></i> <strong>${coinResult.toUpperCase()}!</strong> You chose <strong>${choice.toUpperCase()}</strong> — <span style="color:#ffab91;">Lost ${bet} GOLD</span>`;
+                        DOM.resultMessage.className = 'result-panel loss';
+                        playTone('lose');
+                    }
+
+                    // Record stats
+                    recordFlip(playerWins, bet, winAmount, coinResult);
+                    addToHistory(coinResult, playerWins, bet, winAmount);
+
+                    await saveUser();
+                    updateBalanceDisplay();
+                    updateStatsUI();
+
+                    // Re-enable UI with cooldown
+                    state.isFlipping = false;
+                    state.lastFlipEndTime = Date.now();
+                    DOM.headsBtn.classList.remove('disabled');
+                    DOM.tailsBtn.classList.remove('disabled');
+                    DOM.betInput.disabled = false;
+                    validateBet();
+
+                    // Reset coin to idle after showing result
+                    setTimeout(resetCoinToIdle, RESULT_DISPLAY_MS);
+                }, FLIP_ANIMATION_MS);
+            }
+
+            function recordFlip(isWin, betAmount, winAmount, coinResult) {
+                const user = state.currentUser;
+                const netProfit = winAmount - betAmount;
+                // Global stats
+                user.globalStats.totalWagered = (user.globalStats.totalWagered || 0) + betAmount;
+                user.globalStats.totalWon = (user.globalStats.totalWon || 0) + winAmount;
+                user.globalStats.totalGames = (user.globalStats.totalGames || 0) + 1;
+                if (isWin) {
+                    user.globalStats.currentStreak = (user.globalStats.currentStreak || 0) + 1;
+                    if (user.globalStats.currentStreak > (user.globalStats.bestStreak || 0))
+                        user.globalStats.bestStreak = user.globalStats.currentStreak;
+                    user.globalStats.totalWins = (user.globalStats.totalWins || 0) + 1;
+                } else {
+                    user.globalStats.currentStreak = 0;
+                    user.globalStats.totalLosses = (user.globalStats.totalLosses || 0) + 1;
+                }
+                user.xp = (user.xp || 0) + Math.floor(betAmount);
+
+                // Flip-specific stats
+                const fs = user.flipStats;
+                fs.gamesPlayed = (fs.gamesPlayed || 0) + 1;
+                fs.totalBet = (fs.totalBet || 0) + betAmount;
+                if (isWin) {
+                    fs.wins = (fs.wins || 0) + 1;
+                    fs.totalWin = (fs.totalWin || 0) + winAmount;
+                    if (coinResult === 'heads') fs.headsWins = (fs.headsWins || 0) + 1;
+                    else fs.tailsWins = (fs.tailsWins || 0) + 1;
+                } else {
+                    fs.losses = (fs.losses || 0) + 1;
+                }
+                if (coinResult === 'heads') fs.headsCount = (fs.headsCount || 0) + 1;
+                else fs.tailsCount = (fs.tailsCount || 0) + 1;
+
+                user.gamePlayCount['coin-flip'] = (user.gamePlayCount['coin-flip'] || 0) + 1;
+
+                user.transactions.unshift({
+                    desc: `🪙 Gold Flip | ${isWin ? 'Won' : 'Lost'} | ${coinResult.toUpperCase()} | ${isWin ? '+' + winAmount : '-' + betAmount} GOLD`,
+                    amount: netProfit,
+                    type: isWin ? 'game_win' : 'game_loss',
+                    date: new Date().toISOString()
+                });
+                if (user.transactions.length > 30) user.transactions.pop();
+
+                user.gameOutcomes.unshift({
+                    game: 'Gold Flip',
+                    result: isWin ? 'win' : 'loss',
+                    profit: netProfit,
+                    multiplier: isWin ? PAYOUT_MULTIPLIER : 0,
+                    bet: betAmount,
+                    win: winAmount,
+                    choice: state.selectedChoice,
+                    coinResult: coinResult,
+                    date: new Date().toISOString()
+                });
+                if (user.gameOutcomes.length > 50) user.gameOutcomes.pop();
+            }
+
+            function showError(message) {
+                DOM.resultMessage.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+                DOM.resultMessage.className = 'result-panel loss';
+                // shake the bet input or choice row?
+                DOM.betInput.classList.add('shake');
+                setTimeout(() => DOM.betInput.classList.remove('shake'), 400);
+            }
+
+            function addRipple(e, btn) {
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = e.clientX - rect.left - size / 2 + 'px';
+                ripple.style.top = e.clientY - rect.top - size / 2 + 'px';
+                btn.appendChild(ripple);
+                ripple.addEventListener('animationend', () => ripple.remove());
+            }
+
+            // ══════════════════════════════════════════
+            // BACKGROUND SPARKLES
+            // ══════════════════════════════════════════
+            function createSparkles() {
+                const container = DOM.bgParticles;
+                const count = 40;
+                for (let i = 0; i < count; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.bottom = -(Math.random() * 20 + 5) + '%';
+                    sparkle.style.animationDelay = Math.random() * 5 + 's';
+                    sparkle.style.animationDuration = (Math.random() * 5 + 3.5) + 's';
+                    container.appendChild(sparkle);
+                }
+            }
+
+            // ══════════════════════════════════════════
+            // EVENT BINDINGS
+            // ══════════════════════════════════════════
+            function bindEvents() {
+                DOM.flipBtn.addEventListener('click', (e) => flipCoin(e));
+
+                // Quick bet buttons
+                document.querySelectorAll('.quick-bet').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        if (btn.id === 'halfBetBtn') {
+                            const val = parseFloat(DOM.betInput.value) || 0;
+                            DOM.betInput.value = Math.max(1, Math.floor(val / 2));
+                        } else if (btn.id === 'maxBetBtn') {
+                            if (state.currentUser) DOM.betInput.value = Math.floor(state.currentUser.balance);
+                        } else {
+                            const add = parseFloat(btn.dataset.bet);
+                            const val = parseFloat(DOM.betInput.value) || 0;
+                            let newVal = val + add;
+                            if (state.currentUser && newVal > state.currentUser.balance) newVal = state.currentUser.balance;
+                            DOM.betInput.value = Math.max(1, Math.floor(newVal));
+                        }
+                        clampAndValidateBet();
+                        playTone('click');
+                    });
+                });
+
+                // Bet input changes
+                DOM.betInput.addEventListener('input', clampAndValidateBet);
+                DOM.betInput.addEventListener('blur', clampAndValidateBet);
+                DOM.betInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !state.isFlipping && state.selectedChoice) {
+                        e.preventDefault();
+                        DOM.flipBtn.click();
+                    }
+                });
+
+                // Choice buttons
+                DOM.headsBtn.addEventListener('click', () => selectChoice('heads'));
+                DOM.tailsBtn.addEventListener('click', () => selectChoice('tails'));
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (state.isFlipping) return;
+                    if (e.key === 'h' || e.key === 'H') {
+                        e.preventDefault();
+                        selectChoice('heads');
+                    }
+                    if (e.key === 't' || e.key === 'T') {
+                        e.preventDefault();
+                        selectChoice('tails');
+                    }
+                    if (e.key === ' ' && state.selectedChoice && !state.isFlipping) {
+                        e.preventDefault();
+                        DOM.flipBtn.click();
+                    }
+                });
+
+                // Sound toggle
+                DOM.soundToggleBtn.addEventListener('click', () => {
+                    state.soundEnabled = !state.soundEnabled;
+                    DOM.soundToggleBtn.innerHTML = state.soundEnabled ?
+                        '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+                    if (state.soundEnabled) initAudioContext();
+                    localStorage.setItem('gold_sound_enabled', state.soundEnabled);
+                });
+
+                // Window resize updates confetti canvas if needed
+                window.addEventListener('resize', () => {
+                    DOM.confettiCanvas.width = window.innerWidth;
+                    DOM.confettiCanvas.height = window.innerHeight;
+                });
+            }
+
+            // ══════════════════════════════════════════
+            // INITIALIZATION
+            // ══════════════════════════════════════════
+            async function init() {
+                createEdgeRibs();
+                createSparkles();
+                if (!(await loadUser())) return;
+                bindEvents();
+                updateStatsUI();
+                renderHistory();
+                validateBet();
+
+                // Restore sound preference
+                const savedSound = localStorage.getItem('gold_sound_enabled');
+                state.soundEnabled = savedSound !== 'false'; // default true
+                DOM.soundToggleBtn.innerHTML = state.soundEnabled ?
+                    '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+                if (state.soundEnabled) initAudioContext();
+
+                // Start coin idle animation
+                DOM.coin.classList.add('idle');
+
+                console.log('%c🪙 Gold Flip %cClassic %cReady',
+                    'color:#ffd966;font-size:1.2rem;font-weight:bold;',
+                    'color:#ccc;', 'color:#888;');
+                console.log('%c💡 Tip: Press H for Heads, T for Tails, Space to Flip!',
+                    'color:#aaa;font-style:italic;');
+            }
+            init();
+        })();
+    </script>
+</body>
+</html>

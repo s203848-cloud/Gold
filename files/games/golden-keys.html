@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GOLD | GOLDEN KEYS | Pick the key that matches, and earn big!</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd966;
+            --gold-bright: #ffe9a0;
+            --gold-dim: #c9a840;
+            --bg-deep: #0a0908;
+            --bg-card: rgba(20, 18, 16, 0.85);
+            --border-gold: rgba(255, 217, 102, 0.3);
+            --danger: #ff4444;
+            --danger-glow: #ff6b6b;
+            --success: #4caf50;
+            --text-muted: #9a9484;
+            --radius-lg: 1.5rem;
+            --radius-md: 1rem;
+            --transition-fast: 0.15s;
+            --transition-soft: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-display: 'Orbitron', 'Inter', sans-serif;
+            --jackpot-glow: #ffb347;
+            --shield-blue: #5b9bd5;
+            --curse-purple: #9b59b6;
+            --mimic-teal: #1abc9c;
+            --chain-cyan: #00d4ff;
+            --lucky-green: #2ecc71;
+            --corrupted-red: #e74c3c;
+            --double-orange: #f39c12;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #14110c 0%, #030202 100%);
+            color: #f5f0e6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 0.8s ease;
+        }
+        body.nightmare-mode {
+            background: radial-gradient(circle at 20% 30%, #1a0808 0%, #050000 100%);
+        }
+        body.hard-mode {
+            background: radial-gradient(circle at 20% 30%, #18100c 0%, #040101 100%);
+        }
+
+        .bg-particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .sparkle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: floatSparkle 6s infinite ease-in;
+            opacity: 0;
+        }
+        .sparkle.danger-spark {
+            background: var(--danger);
+            animation-duration: 4s;
+        }
+        @keyframes floatSparkle {
+            0% {
+                transform: translateY(0) translateX(0) scale(0);
+                opacity: 0;
+            }
+            12% {
+                opacity: 0.9;
+                transform: scale(1.3);
+            }
+            35% {
+                transform: translateY(-160px) translateX(25px) scale(1);
+                opacity: 0.4;
+            }
+            65% {
+                transform: translateY(-340px) translateX(-18px) scale(0.5);
+                opacity: 0.08;
+            }
+            100% {
+                transform: translateY(-500px) translateX(12px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* ── Screen Shake ── */
+        @keyframes screenShake {
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+            10% {
+                transform: translate(-6px, 3px);
+            }
+            20% {
+                transform: translate(5px, -4px);
+            }
+            30% {
+                transform: translate(-4px, -2px);
+            }
+            40% {
+                transform: translate(3px, 5px);
+            }
+            50% {
+                transform: translate(-5px, -1px);
+            }
+            60% {
+                transform: translate(2px, -3px);
+            }
+            70% {
+                transform: translate(-3px, 4px);
+            }
+            80% {
+                transform: translate(4px, 1px);
+            }
+            90% {
+                transform: translate(-2px, -5px);
+            }
+        }
+        .shaking {
+            animation: screenShake 0.55s ease-out;
+        }
+
+        /* ── Red Flash Overlay ── */
+        .danger-flash {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 999;
+            background: radial-gradient(ellipse at center, rgba(255, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.85) 100%);
+            opacity: 0;
+            transition: opacity 0.1s ease-out;
+        }
+        .danger-flash.active {
+            opacity: 1;
+            transition: opacity 0.05s ease-in;
+        }
+
+        /* ── Golden Glow Overlay ── */
+        .golden-flash {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 998;
+            background: radial-gradient(ellipse at center, rgba(255, 217, 102, 0.35) 0%, rgba(0, 0, 0, 0.7) 100%);
+            opacity: 0;
+            transition: opacity 0.15s ease-out;
+        }
+        .golden-flash.active {
+            opacity: 1;
+            transition: opacity 0.06s ease-in;
+        }
+
+        .game-wrapper {
+            max-width: 880px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Nav ── */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 13, 11, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            padding: 0.6rem 1.4rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-gold);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .back-home {
+            text-decoration: none;
+            color: var(--gold);
+            font-weight: 600;
+            background: rgba(255, 217, 102, 0.1);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .back-home:hover {
+            background: rgba(255, 217, 102, 0.2);
+            transform: translateX(-3px);
+        }
+        .balance-tag {
+            background: rgba(31, 28, 24, 0.9);
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 217, 102, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .sound-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--gold);
+            border-radius: 50%;
+            padding: 0.3rem;
+            transition: var(--transition-fast);
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sound-btn:hover {
+            background: rgba(255, 217, 102, 0.15);
+        }
+
+        /* ── Game Card ── */
+        .game-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: 1.3rem 1.5rem;
+            border: 1px solid var(--border-gold);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            transition: border-color 0.5s ease, box-shadow 0.5s ease;
+        }
+        .game-card.nightmare-border {
+            border-color: rgba(255, 68, 68, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 0, 0, 0.15);
+        }
+        .game-card.hard-border {
+            border-color: rgba(255, 150, 50, 0.45);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 140, 0, 0.1);
+        }
+
+        .game-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 0.3rem;
+            text-shadow: 0 0 10px rgba(255, 217, 102, 0.3);
+            font-family: var(--font-display);
+        }
+        .game-subtitle {
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+        }
+
+        /* ── Difficulty Selector ── */
+        .difficulty-selector {
+            display: flex;
+            gap: 0.4rem;
+            justify-content: center;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .diff-btn {
+            background: rgba(30, 26, 22, 0.8);
+            border: 2px solid rgba(255, 217, 102, 0.2);
+            border-radius: 30px;
+            padding: 0.45rem 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition-soft);
+            color: #a09888;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            outline: none;
+            position: relative;
+            font-family: var(--font-display);
+        }
+        .diff-btn:hover {
+            border-color: var(--gold-dim);
+            color: #d4c9a8;
+            transform: translateY(-2px);
+        }
+        .diff-btn:focus-visible {
+            box-shadow: 0 0 0 3px var(--gold-dim);
+        }
+        .diff-btn.active {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(255, 217, 102, 0.12);
+            box-shadow: 0 0 15px rgba(255, 217, 102, 0.2);
+            text-shadow: 0 0 8px rgba(255, 217, 102, 0.4);
+        }
+        .diff-btn.danger-active {
+            border-color: var(--danger);
+            color: #ff8888;
+            background: rgba(255, 68, 68, 0.12);
+            box-shadow: 0 0 15px rgba(255, 68, 68, 0.25);
+            text-shadow: 0 0 8px rgba(255, 100, 100, 0.4);
+            animation: pulseDanger 2s infinite;
+        }
+        @keyframes pulseDanger {
+            0%,
+            100% {
+                box-shadow: 0 0 15px rgba(255, 68, 68, 0.25);
+            }
+            50% {
+                box-shadow: 0 0 28px rgba(255, 68, 68, 0.5);
+            }
+        }
+        .diff-info {
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+            min-height: 1.2em;
+            transition: color 0.3s;
+        }
+
+        /* ── Risk Meter & Multiplier ── */
+        .risk-multiplier-row {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .risk-meter-wrap {
+            flex: 1;
+            min-width: 140px;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 20px;
+            padding: 0.5rem 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .risk-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+        .risk-bar-outer {
+            flex: 1;
+            height: 8px;
+            background: #1a1815;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        .risk-bar-inner {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.4s ease, background 0.5s ease;
+            background: linear-gradient(90deg, #4caf50, #ffd966, #f39c12, #e74c3c, #8b0000);
+            background-size: 300% 100%;
+            background-position: 0% 50%;
+        }
+        .risk-percent {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--gold);
+            min-width: 38px;
+            text-align: right;
+            font-family: var(--font-display);
+        }
+        .multiplier-wrap {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 20px;
+            padding: 0.5rem 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            min-width: 100px;
+        }
+        .multiplier-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .multiplier-value {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--gold-bright);
+            font-family: var(--font-display);
+            text-shadow: 0 0 10px rgba(255, 217, 102, 0.5);
+            transition: all 0.3s ease;
+        }
+        .multiplier-value.booming {
+            animation: multBoom 0.4s ease-out;
+        }
+        @keyframes multBoom {
+            0% {
+                transform: scale(1.6);
+                color: #fff;
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* ── Keys Grid ── */
+        .keys-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.7rem;
+            margin: 1rem 0;
+        }
+        .key-card {
+            background: #2c241c;
+            border: 2px solid var(--border-gold);
+            border-radius: 18px;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-soft);
+            font-size: 1.8rem;
+            position: relative;
+            outline: none;
+            overflow: hidden;
+        }
+        .key-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            background: radial-gradient(circle at 50% 30%, rgba(255, 217, 102, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+        .key-card:hover:not(.revealed)::after {
+            opacity: 1;
+        }
+        .key-card:focus-visible {
+            box-shadow: 0 0 0 3px var(--gold), 0 0 16px var(--gold);
+            border-color: var(--gold);
+            transform: scale(1.06);
+        }
+        .key-card:hover:not(.revealed) {
+            transform: translateY(-6px);
+            border-color: var(--gold);
+            background: #3a3026;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+        .key-card:active:not(.revealed) {
+            transform: scale(0.94);
+            transition: transform 0.1s;
+        }
+        .key-card.revealed {
+            cursor: default;
+            background: #1f1b17;
+            border-color: #444;
+            opacity: 0.85;
+        }
+        .key-card.revealed::after {
+            opacity: 0;
+        }
+        .key-card.skeleton {
+            background: #2a1010;
+            border-color: var(--danger);
+            color: var(--danger);
+            animation: skeletonPulse 0.6s ease-out;
+        }
+        @keyframes skeletonPulse {
+            0% {
+                transform: scale(1.3);
+                background: #4a0000;
+                border-color: #ff0000;
+            }
+            100% {
+                transform: scale(1);
+                background: #2a1010;
+            }
+        }
+        .key-card.special-reveal {
+            animation: specialPop 0.5s ease-out;
+        }
+        @keyframes specialPop {
+            0% {
+                transform: scale(1.35);
+                filter: brightness(2);
+            }
+            60% {
+                transform: scale(0.92);
+                filter: brightness(1.3);
+            }
+            100% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+        }
+        .key-value {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .key-card .fa-key {
+            font-size: 2rem;
+            color: var(--gold);
+            transition: all 0.3s;
+        }
+        .key-card:hover:not(.revealed) .fa-key {
+            color: var(--gold-bright);
+            filter: drop-shadow(0 0 6px rgba(255, 217, 102, 0.6));
+        }
+        .key-card.skeleton .fa-skull {
+            color: var(--danger);
+            font-size: 2rem;
+            animation: skullThrob 0.5s ease-out;
+        }
+        @keyframes skullThrob {
+            0% {
+                transform: scale(1.5);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .key-card .fa-coins {
+            font-size: 2rem;
+            color: var(--gold);
+        }
+        .key-card .fa-gem {
+            font-size: 2rem;
+            color: #ff69b4;
+        }
+
+        /* ── Special Key Type Styles ── */
+        .key-card[data-key-type="jackpot"] .fa-coins,
+        .key-card[data-key-type="jackpot"] .fa-gem {
+            color: #ffb347;
+            filter: drop-shadow(0 0 10px rgba(255, 179, 71, 0.8));
+            animation: jackpotGlow 0.8s infinite alternate;
+        }
+        @keyframes jackpotGlow {
+            0% {
+                filter: drop-shadow(0 0 8px rgba(255, 179, 71, 0.6));
+            }
+            100% {
+                filter: drop-shadow(0 0 20px rgba(255, 200, 100, 1));
+            }
+        }
+        .key-card[data-key-type="double"] .fa-coins {
+            color: #f39c12;
+            filter: drop-shadow(0 0 8px rgba(243, 156, 18, 0.7));
+        }
+        .key-card[data-key-type="shield"] .fa-shield-halved {
+            color: var(--shield-blue);
+            filter: drop-shadow(0 0 8px rgba(91, 155, 213, 0.7));
+        }
+        .key-card[data-key-type="curse"] .fa-fire {
+            color: var(--curse-purple);
+            filter: drop-shadow(0 0 8px rgba(155, 89, 182, 0.7));
+        }
+        .key-card[data-key-type="mimic"] .fa-mask {
+            color: var(--mimic-teal);
+        }
+        .key-card[data-key-type="chain"] .fa-link {
+            color: var(--chain-cyan);
+            filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.7));
+        }
+        .key-card[data-key-type="lucky"] .fa-clover {
+            color: var(--lucky-green);
+            filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.8));
+        }
+        .key-card[data-key-type="corrupted"] .fa-question {
+            color: var(--corrupted-red);
+        }
+
+        /* ── Floating reward text ── */
+        .float-reward {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1500;
+            font-weight: 900;
+            font-size: 1.2rem;
+            animation: floatUp 1.4s ease-out forwards;
+            text-shadow: 0 0 12px currentColor;
+            white-space: nowrap;
+        }
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.8);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-30px) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0.6);
+            }
+        }
+
+        /* ── Stats Bar ── */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-md);
+            padding: 0.7rem 1rem;
+            margin: 0.8rem 0;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .pot-display {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--gold);
+            text-shadow: 0 0 8px rgba(255, 217, 102, 0.5);
+            font-family: var(--font-display);
+        }
+        .pot-display.epic {
+            animation: potEpic 0.5s ease-out;
+        }
+        @keyframes potEpic {
+            0% {
+                transform: scale(1.25);
+                color: #fff;
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .remaining {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ── Controls ── */
+        .control-panel {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin: 0.8rem 0;
+            align-items: center;
+        }
+        .bet-group {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .bet-input {
+            background: #1f1b17;
+            border: 2px solid rgba(255, 217, 102, 0.2);
+            border-radius: 60px;
+            padding: 0.55rem 0.9rem;
+            color: white;
+            font-weight: 700;
+            width: 90px;
+            text-align: center;
+            outline: none;
+            font-size: 0.85rem;
+            transition: var(--transition-fast);
+            font-family: var(--font-display);
+        }
+        .bet-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 10px var(--gold-dim);
+        }
+        .max-bet-btn {
+            background: rgba(255, 217, 102, 0.15);
+            border: 1px solid var(--border-gold);
+            border-radius: 20px;
+            color: var(--gold);
+            padding: 0.35rem 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: var(--transition-fast);
+        }
+        .max-bet-btn:hover {
+            background: rgba(255, 217, 102, 0.28);
+        }
+        .btn {
+            background: rgba(255, 217, 102, 0.1);
+            border: 1px solid var(--border-gold);
+            border-radius: 60px;
+            padding: 0.55rem 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            color: var(--gold);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            outline: none;
+            font-size: 0.82rem;
+            white-space: nowrap;
+        }
+        .btn:focus-visible {
+            box-shadow: 0 0 0 3px var(--gold-dim);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f5a623, #ffd966);
+            color: #1a150e;
+            border: none;
+            box-shadow: 0 3px 0 #a05f15;
+            font-weight: 800;
+        }
+        .btn-primary:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #a05f15;
+        }
+        .btn-success {
+            background: #4caf50;
+            color: white;
+            border: none;
+            box-shadow: 0 3px 0 #2e7d32;
+        }
+        .btn-success:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #2e7d32;
+        }
+        .btn-danger {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ffab91;
+            border-color: #ff6b6b;
+        }
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn-highlight {
+            animation: btnGlow 1.5s infinite;
+        }
+        @keyframes btnGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 8px rgba(255, 217, 102, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 22px rgba(255, 217, 102, 0.7);
+            }
+        }
+
+        /* ── Info Panel ── */
+        .info-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.4rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-md);
+            padding: 0.7rem;
+            text-align: center;
+            margin-top: 0.8rem;
+        }
+        .info-value {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--gold);
+            font-family: var(--font-display);
+        }
+        .info-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── XP & Level ── */
+        .xp-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+        .xp-bar-outer {
+            flex: 1;
+            max-width: 180px;
+            height: 6px;
+            background: #1a1815;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .xp-bar-inner {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd966, #ffb347);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        .level-badge {
+            background: rgba(255, 217, 102, 0.15);
+            border: 1px solid var(--gold-dim);
+            border-radius: 20px;
+            padding: 0.2rem 0.6rem;
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 0.7rem;
+            font-family: var(--font-display);
+        }
+        .prestige-badge {
+            background: rgba(255, 100, 180, 0.2);
+            border: 1px solid #ff69b4;
+            border-radius: 20px;
+            padding: 0.2rem 0.6rem;
+            font-weight: 700;
+            color: #ff69b4;
+            font-size: 0.65rem;
+            font-family: var(--font-display);
+        }
+
+        /* ── Toast ── */
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1c1916;
+            border-left: 4px solid var(--gold);
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity var(--transition-soft), transform var(--transition-soft);
+            pointer-events: none;
+            white-space: nowrap;
+            backdrop-filter: blur(12px);
+            max-width: 90vw;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast-msg.error {
+            border-left-color: var(--danger);
+        }
+        .toast-msg.epic {
+            border-left-color: #ffb347;
+            background: #1a140e;
+            font-size: 0.9rem;
+        }
+
+        /* ── Provably Fair ── */
+        .fair-hash {
+            text-align: center;
+            font-size: 0.6rem;
+            color: #555;
+            margin-top: 0.4rem;
+            word-break: break-all;
+            font-family: monospace;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 650px) {
+            .keys-grid {
+                gap: 0.45rem;
+            }
+            .key-card .fa-key,
+            .key-card .fa-coins,
+            .key-card .fa-skull,
+            .key-card .fa-gem,
+            .key-card .fa-shield-halved,
+            .key-card .fa-fire,
+            .key-card .fa-mask,
+            .key-card .fa-link,
+            .key-card .fa-clover,
+            .key-card .fa-question {
+                font-size: 1.4rem;
+            }
+            .key-value {
+                font-size: 0.65rem;
+            }
+            .control-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .bet-group {
+                justify-content: center;
+            }
+            .game-title {
+                font-size: 1.2rem;
+            }
+            .diff-btn {
+                font-size: 0.65rem;
+                padding: 0.35rem 0.6rem;
+            }
+            .info-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .risk-multiplier-row {
+                flex-direction: column;
+                gap: 0.4rem;
+            }
+        }
+        @media (max-width: 380px) {
+            .keys-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.35rem;
+            }
+            .key-card {
+                border-radius: 12px;
+            }
+            .key-card .fa-key,
+            .key-card .fa-coins,
+            .key-card .fa-skull,
+            .key-card .fa-gem {
+                font-size: 1.2rem;
+            }
+            .key-value {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-particles" id="particles" aria-hidden="true"></div>
+    <div class="danger-flash" id="dangerFlash" aria-hidden="true"></div>
+    <div class="golden-flash" id="goldenFlash" aria-hidden="true"></div>
+
+    <div class="game-wrapper" id="gameWrapper">
+        <nav class="nav-bar" aria-label="Game navigation">
+            <a href=".././home.html" class="back-home" aria-label="Return to lobby"><i class="fas fa-arrow-left" aria-hidden="true"></i> Lobby</a>
+            <div class="balance-tag" aria-live="polite" aria-label="Balance"><i class="fas fa-coins" aria-hidden="true"></i> <span id="balanceDisplay">0</span> GOLD</div>
+            <button id="soundToggle" class="sound-btn" aria-label="Toggle sound" title="Toggle sound"><i class="fas fa-volume-up" aria-hidden="true"></i></button>
+        </nav>
+
+        <main class="game-card" id="gameCard" aria-label="Golden Keys game">
+            <h1 class="game-title"><i class="fas fa-key" aria-hidden="true"></i> GOLDEN KEYS</h1>
+            <p class="game-subtitle" id="difficultyLabel">Select Difficulty &amp; Start Round</p>
+
+            <!-- Difficulty Selector -->
+            <div class="difficulty-selector" id="difficultySelector" role="radiogroup" aria-label="Difficulty selection">
+                <button class="diff-btn" data-diff="easy" role="radio" aria-checked="false">🟢 EASY</button>
+                <button class="diff-btn active" data-diff="normal" role="radio" aria-checked="true">🟡 NORMAL</button>
+                <button class="diff-btn" data-diff="hard" role="radio" aria-checked="false">🟠 HARD</button>
+                <button class="diff-btn" data-diff="nightmare" role="radio" aria-checked="false">🔴 NIGHTMARE</button>
+            </div>
+            <div class="diff-info" id="diffInfo" aria-live="polite">Balanced risk &amp; reward · 1 skeleton · Standard payouts</div>
+
+            <!-- Risk Meter & Multiplier -->
+            <div class="risk-multiplier-row">
+                <div class="risk-meter-wrap">
+                    <span class="risk-label">RISK</span>
+                    <div class="risk-bar-outer">
+                        <div class="risk-bar-inner" id="riskBarInner" style="width:5%; background-position:0% 50%;"></div>
+                    </div>
+                    <span class="risk-percent" id="riskPercent">5%</span>
+                </div>
+                <div class="multiplier-wrap">
+                    <span class="multiplier-label">MULT</span>
+                    <span class="multiplier-value" id="multiplierValue">1.00x</span>
+                </div>
+            </div>
+
+            <!-- Keys Grid -->
+            <div class="keys-grid" id="keysGrid" role="list" aria-label="Key selection grid"></div>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar" aria-live="polite">
+                <div>💰 POT: <span id="potAmount" class="pot-display">0</span> GOLD</div>
+                <div>🔑 <span id="keysLeft">12</span> left</div>
+                <div id="masterKeyStatus" style="color:var(--gold);font-size:0.8rem;"><i class="fas fa-star" aria-hidden="true"></i> No Master Key</div>
+            </div>
+
+            <!-- Controls -->
+            <div class="control-panel">
+                <div class="bet-group">
+                    <input type="number" id="betAmount" class="bet-input" value="50" step="10" min="10" aria-label="Bet amount">
+                    <button id="maxBetBtn" class="max-bet-btn" aria-label="Set maximum bet">MAX</button>
+                </div>
+                <button id="buyMasterKeyBtn" class="btn" aria-label="Buy Master Key"><i class="fas fa-crown" aria-hidden="true"></i> Master Key (<span id="mkCost">50</span> GOLD)</button>
+                <button id="startRoundBtn" class="btn btn-primary btn-highlight"><i class="fas fa-play" aria-hidden="true"></i> Start Round</button>
+                <button id="collectBtn" class="btn btn-success" disabled><i class="fas fa-hand-holding-heart" aria-hidden="true"></i> Collect</button>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="info-panel">
+                <div><span class="info-value" id="gamesPlayed">0</span><div class="info-label">Games</div></div>
+                <div><span class="info-value" id="winsCount">0</span><div class="info-label">Chests</div></div>
+                <div><span class="info-value" id="bestPot">0</span><div class="info-label">Best Pot</div></div>
+                <div><span class="info-value" id="totalGold">0</span><div class="info-label">Collected</div></div>
+            </div>
+
+            <!-- XP Row -->
+            <div class="xp-row">
+                <span class="level-badge" id="levelBadge">LVL 1</span>
+                <div class="xp-bar-outer"><div class="xp-bar-inner" id="xpBarInner" style="width:0%;"></div></div>
+                <span id="xpText" style="font-size:0.65rem;">0 / 100 XP</span>
+                <span class="prestige-badge" id="prestigeBadge" style="display:none;">P0</span>
+            </div>
+
+            <div id="gameMessage" style="margin-top:0.6rem;text-align:center;font-size:0.8rem;min-height:1.8rem;font-weight:600;" aria-live="assertive"></div>
+            <div class="fair-hash" id="fairHash" aria-label="Provably fair verification hash"></div>
+        </main>
+    </div>
+    <div id="toastMsg" class="toast-msg" role="alert" aria-live="polite"></div>
+
+    <script>
+        (function() {
+            /* ================================================================
+               GOLDEN KEYS · ADVANCED CASINO-STYLE GAME
+               ================================================================ */
+
+            // ── CONFIGURATION ──────────────────────────────────────────
+            const DIFFICULTY_CONFIG = {
+                easy: {
+                    label: 'Easy',
+                    skeletons: 1,
+                    specialKeyChance: 0.08,
+                    payoutRange: { tiny: [15, 80], small: [60, 300], medium: [250, 1200], large: [800, 4000],
+                        jackpot: [3000, 15000] },
+                    weightTiers: { tiny: 0.35, small: 0.35, medium: 0.20, large: 0.08, jackpot: 0.02 },
+                    multiplierGrowth: [1.0, 1.04, 1.10, 1.18, 1.28, 1.40, 1.55, 1.72, 1.92, 2.15, 2.40, 2.70],
+                    xpMultiplier: 0.7,
+                    masterKeyCost: 30,
+                    riskStart: 0.04,
+                    riskIncrement: 0.025,
+                    skeletonBaseChance: 0.06,
+                    colorClass: '',
+                    bodyClass: '',
+                },
+                normal: {
+                    label: 'Normal',
+                    skeletons: 1,
+                    specialKeyChance: 0.12,
+                    payoutRange: { tiny: [25, 150], small: [100, 500], medium: [400, 2200], large: [1800, 7000],
+                        jackpot: [6000, 35000] },
+                    weightTiers: { tiny: 0.28, small: 0.34, medium: 0.24, large: 0.11, jackpot: 0.03 },
+                    multiplierGrowth: [1.0, 1.08, 1.20, 1.36, 1.55, 1.78, 2.05, 2.38, 2.75, 3.20, 3.70, 4.30],
+                    xpMultiplier: 1.0,
+                    masterKeyCost: 50,
+                    riskStart: 0.05,
+                    riskIncrement: 0.032,
+                    skeletonBaseChance: 0.08,
+                    colorClass: '',
+                    bodyClass: '',
+                },
+                hard: {
+                    label: 'Hard',
+                    skeletons: 2,
+                    specialKeyChance: 0.18,
+                    payoutRange: { tiny: [40, 250], small: [180, 800], medium: [700, 4000], large: [3000, 15000],
+                        jackpot: [12000, 70000] },
+                    weightTiers: { tiny: 0.20, small: 0.30, medium: 0.28, large: 0.16, jackpot: 0.06 },
+                    multiplierGrowth: [1.0, 1.12, 1.30, 1.55, 1.85, 2.20, 2.65, 3.20, 3.85, 4.60, 5.50, 6.60],
+                    xpMultiplier: 1.5,
+                    masterKeyCost: 80,
+                    riskStart: 0.08,
+                    riskIncrement: 0.040,
+                    skeletonBaseChance: 0.11,
+                    colorClass: 'hard-border',
+                    bodyClass: 'hard-mode',
+                },
+                nightmare: {
+                    label: 'Nightmare',
+                    skeletons: 3,
+                    specialKeyChance: 0.25,
+                    payoutRange: { tiny: [60, 400], small: [300, 1500], medium: [1200, 7000], large: [5000, 30000],
+                        jackpot: [25000, 150000] },
+                    weightTiers: { tiny: 0.12, small: 0.24, medium: 0.30, large: 0.22, jackpot: 0.12 },
+                    multiplierGrowth: [1.0, 1.18, 1.42, 1.75, 2.18, 2.70, 3.35, 4.15, 5.10, 6.30, 7.80, 9.60],
+                    xpMultiplier: 2.2,
+                    masterKeyCost: 120,
+                    riskStart: 0.12,
+                    riskIncrement: 0.050,
+                    skeletonBaseChance: 0.15,
+                    colorClass: 'nightmare-border',
+                    bodyClass: 'nightmare-mode',
+                },
+            };
+
+            const SPECIAL_KEY_TYPES = ['jackpot', 'double', 'shield', 'curse', 'mimic', 'chain', 'lucky', 'corrupted'];
+            const SPECIAL_KEY_ICONS = {
+                jackpot: 'fa-gem',
+                double: 'fa-coins',
+                shield: 'fa-shield-halved',
+                curse: 'fa-fire',
+                mimic: 'fa-mask',
+                chain: 'fa-link',
+                lucky: 'fa-clover',
+                corrupted: 'fa-question',
+            };
+            const SPECIAL_KEY_LABELS = {
+                jackpot: 'JACKPOT!',
+                double: 'DOUBLE POT',
+                shield: 'SHIELD',
+                curse: 'CURSE',
+                mimic: 'MIMIC',
+                chain: 'CHAIN',
+                lucky: 'LUCKY',
+                corrupted: 'CORRUPTED',
+            };
+            const PRESTIGE_TITLES = [
+                'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond',
+                'Master', 'Grandmaster', 'Legend', 'Mythic', 'Transcendent',
+            ];
+            const XP_PER_LEVEL = 100;
+            const MAX_LEVEL = 50;
+            const LEVELS_PER_PRESTIGE = 50;
+
+            // ── STATE ──────────────────────────────────────────────────
+            let audioCtx = null;
+            let soundEnabled = true;
+            let currentUser = null;
+            let gameActive = false;
+            let roundStarted = false;
+            let currentPot = 0;
+            let keysData = [];
+            let masterKeyOwned = false;
+            let masterKeyUsedThisRound = false;
+            let remainingKeys = 0;
+            let betAmount = 0;
+            let currentDifficulty = 'normal';
+            let safeRevealCount = 0;
+            let currentMultiplier = 1.0;
+            let roundSeed = '';
+            let roundHash = '';
+            let shieldActive = false;
+            let dailyChallengeCompleted = false;
+
+            // ── DOM REFS ──────────────────────────────────────────────
+            const $ = (id) => document.getElementById(id);
+            const balanceDisplay = $('balanceDisplay');
+            const potAmount = $('potAmount');
+            const keysLeft = $('keysLeft');
+            const masterKeyStatus = $('masterKeyStatus');
+            const gameMessage = $('gameMessage');
+            const toastMsg = $('toastMsg');
+            const keysGrid = $('keysGrid');
+            const collectBtn = $('collectBtn');
+            const startRoundBtn = $('startRoundBtn');
+            const buyMasterKeyBtn = $('buyMasterKeyBtn');
+            const maxBetBtn = $('maxBetBtn');
+            const betInput = $('betAmount');
+            const soundToggle = $('soundToggle');
+            const riskBarInner = $('riskBarInner');
+            const riskPercent = $('riskPercent');
+            const multiplierValue = $('multiplierValue');
+            const difficultySelector = $('difficultySelector');
+            const diffInfo = $('diffInfo');
+            const gameCard = $('gameCard');
+            const dangerFlash = $('dangerFlash');
+            const goldenFlash = $('goldenFlash');
+            const fairHash = $('fairHash');
+            const levelBadge = $('levelBadge');
+            const prestigeBadge = $('prestigeBadge');
+            const xpBarInner = $('xpBarInner');
+            const xpText = $('xpText');
+            const mkCost = $('mkCost');
+            const difficultyLabel = $('difficultyLabel');
+            const gameWrapper = $('gameWrapper');
+
+            // ── AUDIO SYSTEM ──────────────────────────────────────────
+            function initAudio() {
+                if (!audioCtx && soundEnabled) {
+                    try { audioCtx = new(window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+                }
+            }
+
+            function resumeAudio() {
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            }
+
+            function playTone(type, freqOpt = null) {
+                if (!soundEnabled) return;
+                try {
+                    initAudio();
+                    if (!audioCtx) return;
+                    resumeAudio();
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    const filter = audioCtx.createBiquadFilter();
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    switch (type) {
+                        case 'reveal':
+                            osc.type = 'sine';
+                            osc.frequency.value = 880;
+                            gain.gain.value = 0.07;
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                            osc.start(now);
+                            osc.stop(now + 0.25);
+                            break;
+                        case 'revealSpecial':
+                            osc.type = 'sine';
+                            osc.frequency.value = 1100;
+                            osc.frequency.exponentialRampToValueAtTime(1600, now + 0.2);
+                            gain.gain.value = 0.10;
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                            osc.start(now);
+                            osc.stop(now + 0.4);
+                            break;
+                        case 'collect':
+                            osc.type = 'triangle';
+                            osc.frequency.value = 660;
+                            osc.frequency.exponentialRampToValueAtTime(1400, now + 0.35);
+                            gain.gain.value = 0.11;
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+                            osc.start(now);
+                            osc.stop(now + 0.6);
+                            break;
+                        case 'jackpot':
+                            osc.type = 'triangle';
+                            osc.frequency.value = 800;
+                            osc.frequency.exponentialRampToValueAtTime(2000, now + 0.5);
+                            gain.gain.value = 0.14;
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+                            osc.start(now);
+                            osc.stop(now + 0.75);
+                            // second osc for richness
+                            const osc2 = audioCtx.createOscillator();
+                            const gain2 = audioCtx.createGain();
+                            osc2.type = 'sine';
+                            osc2.frequency.value = 1200;
+                            osc2.frequency.exponentialRampToValueAtTime(2400, now + 0.4);
+                            gain2.gain.value = 0.06;
+                            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                            osc2.connect(gain2);
+                            gain2.connect(audioCtx.destination);
+                            osc2.start(now);
+                            osc2.stop(now + 0.65);
+                            break;
+                        case 'skeleton':
+                            osc.type = 'sawtooth';
+                            osc.frequency.value = 140;
+                            osc.frequency.exponentialRampToValueAtTime(55, now + 0.5);
+                            filter.type = 'lowpass';
+                            filter.frequency.value = 400;
+                            filter.frequency.exponentialRampToValueAtTime(60, now + 0.5);
+                            gain.gain.value = 0.13;
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                            osc.start(now);
+                            osc.stop(now + 0.65);
+                            break;
+                        case 'start':
+                            osc.type = 'square';
+                            osc.frequency.value = 440;
+                            gain.gain.value = 0.05;
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                            osc.start(now);
+                            osc.stop(now + 0.25);
+                            break;
+                        case 'tick':
+                            osc.type = 'sine';
+                            osc.frequency.value = freqOpt || 600;
+                            gain.gain.value = 0.03;
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                            osc.start(now);
+                            osc.stop(now + 0.1);
+                            break;
+                        case 'shieldActivate':
+                            osc.type = 'sine';
+                            osc.frequency.value = 900;
+                            osc.frequency.exponentialRampToValueAtTime(1800, now + 0.25);
+                            gain.gain.value = 0.08;
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                            osc.start(now);
+                            osc.stop(now + 0.4);
+                            break;
+                        case 'curse':
+                            osc.type = 'sawtooth';
+                            osc.frequency.value = 200;
+                            osc.frequency.exponentialRampToValueAtTime(40, now + 0.35);
+                            gain.gain.value = 0.07;
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                            osc.start(now);
+                            osc.stop(now + 0.5);
+                            break;
+                    }
+                } catch (e) {}
+            }
+
+            // ── STORAGE & USER ────────────────────────────────────────
+            function getUsers() {
+                try { return JSON.parse(localStorage.getItem('gold_users') || '{}'); } catch (e) { return {}; }
+            }
+
+            function saveUsers(users) {
+                try { localStorage.setItem('gold_users', JSON.stringify(users)); } catch (e) { showToast(
+                        'Failed to save data.', true); }
+            }
+
+            function ensureUserStats() {
+                currentUser.goldenKeysStats = currentUser.goldenKeysStats || {
+                    gamesPlayed: 0,
+                    chestsUnlocked: 0,
+                    totalGoldCollected: 0,
+                    bestPot: 0,
+                    skeletonHits: 0,
+                    masterKeysPurchased: 0,
+                    biggestJackpot: 0,
+                    bestStreak: 0,
+                    totalSkeletonsAvoided: 0,
+                    difficultyWins: {},
+                    mostProfitableSession: 0,
+                    longestSurvivalStreak: 0,
+                };
+                currentUser.globalStats = currentUser.globalStats || {
+                    totalWagered: 0,
+                    totalWon: 0,
+                    totalGames: 0,
+                    totalWins: 0,
+                    currentStreak: 0,
+                    bestStreak: 0,
+                };
+                currentUser.gamePlayCount = currentUser.gamePlayCount || {};
+                currentUser.gameOutcomes = currentUser.gameOutcomes || [];
+                currentUser.transactions = currentUser.transactions || [];
+                currentUser.earnedAchievements = currentUser.earnedAchievements || [];
+                currentUser.xp = currentUser.xp || 0;
+                currentUser.level = currentUser.level || 1;
+                currentUser.prestige = currentUser.prestige || 0;
+                currentUser.hasMasterKey = currentUser.hasMasterKey || false;
+                currentUser.unlockedThemes = currentUser.unlockedThemes || [];
+                currentUser.dailyChallengeDate = currentUser.dailyChallengeDate || '';
+            }
+
+            async function loadUser() {
+                const sess = sessionStorage.getItem('gold_current_user');
+                if (!sess) { window.location.href = '../../sign-in.html'; return false; }
+                const su = JSON.parse(sess);
+                const users = getUsers();
+                let user = users[su.username];
+                if (!user) {
+                    sessionStorage.removeItem('gold_current_user');
+                    window.location.href = '../../sign-in.html';
+                    return false;
+                }
+                currentUser = user;
+                ensureUserStats();
+                masterKeyOwned = currentUser.hasMasterKey || false;
+                updateBalanceUI();
+                updateStatsUI();
+                updateMasterKeyStatus();
+                updateXPUI();
+                updatePrestigeUI();
+                checkDailyChallenge();
+                return true;
+            }
+
+            async function saveUser() {
+                const users = getUsers();
+                users[currentUser.username] = currentUser;
+                saveUsers(users);
+                const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
+                if (sess) { sess.balance = currentUser.balance;
+                    sessionStorage.setItem('gold_current_user', JSON.stringify(sess)); }
+            }
+
+            function updateBalanceUI() {
+                balanceDisplay.textContent = currentUser.balance.toLocaleString();
+            }
+
+            function updateStatsUI() {
+                const s = currentUser.goldenKeysStats;
+                $('gamesPlayed').textContent = (s.gamesPlayed || 0).toLocaleString();
+                $('winsCount').textContent = (s.chestsUnlocked || 0).toLocaleString();
+                $('bestPot').textContent = (s.bestPot || 0).toLocaleString();
+                $('totalGold').textContent = (s.totalGoldCollected || 0).toLocaleString();
+            }
+
+            function updateMasterKeyStatus() {
+                if (gameActive && masterKeyOwned && !masterKeyUsedThisRound) {
+                    masterKeyStatus.innerHTML =
+                        '<i class="fas fa-crown" aria-hidden="true"></i> Master Key READY (1 skeleton skip)';
+                } else if (masterKeyOwned) {
+                    masterKeyStatus.innerHTML =
+                        '<i class="fas fa-crown" aria-hidden="true"></i> Master Key OWNED (available next round)';
+                } else {
+                    masterKeyStatus.innerHTML = '<i class="fas fa-star" aria-hidden="true"></i> No Master Key';
+                }
+                currentUser.hasMasterKey = masterKeyOwned;
+            }
+
+            function updateXPUI() {
+                const level = currentUser.level || 1;
+                const xp = currentUser.xp || 0;
+                const xpForNext = XP_PER_LEVEL * level;
+                const progress = Math.min(100, Math.floor((xp / xpForNext) * 100));
+                levelBadge.textContent = 'LVL ' + level;
+                xpBarInner.style.width = progress + '%';
+                xpText.textContent = xp.toLocaleString() + ' / ' + xpForNext.toLocaleString() + ' XP';
+            }
+
+            function updatePrestigeUI() {
+                const p = currentUser.prestige || 0;
+                if (p > 0) {
+                    prestigeBadge.style.display = 'inline-block';
+                    prestigeBadge.textContent = 'P' + p + ' · ' + (PRESTIGE_TITLES[Math.min(p - 1, 9)] || '');
+                } else {
+                    prestigeBadge.style.display = 'none';
+                }
+            }
+
+            function addXP(amount) {
+                currentUser.xp = (currentUser.xp || 0) + amount;
+                let level = currentUser.level || 1;
+                while (currentUser.xp >= XP_PER_LEVEL * level && level < MAX_LEVEL) {
+                    currentUser.xp -= XP_PER_LEVEL * level;
+                    level++;
+                    showToast('🎉 LEVEL UP! You reached Level ' + level + '!', false);
+                    playTone('collect');
+                }
+                currentUser.level = level;
+                updateXPUI();
+                if (level >= MAX_LEVEL && (currentUser.prestige || 0) < 10) {
+                    showToast('🌟 MAX LEVEL! Prestige available! Check your stats.', false);
+                }
+            }
+
+            function prestigeUser() {
+                if ((currentUser.level || 1) < MAX_LEVEL) {
+                    showToast('Reach level ' + MAX_LEVEL + ' to prestige!', true);
+                    return;
+                }
+                if ((currentUser.prestige || 0) >= 10) {
+                    showToast('Maximum prestige reached!', true);
+                    return;
+                }
+                currentUser.prestige = (currentUser.prestige || 0) + 1;
+                currentUser.level = 1;
+                currentUser.xp = 0;
+                const bonus = (currentUser.prestige || 0) * 5;
+                showToast('🌟 PRESTIGE ' + currentUser.prestige + '! +' + bonus + '% permanent reward bonus!',
+                false);
+                updateXPUI();
+                updatePrestigeUI();
+                saveUser();
+                playTone('jackpot');
+            }
+
+            function checkDailyChallenge() {
+                const today = new Date().toISOString().split('T')[0];
+                dailyChallengeCompleted = (currentUser.dailyChallengeDate === today);
+            }
+
+            function markDailyChallenge() {
+                const today = new Date().toISOString().split('T')[0];
+                currentUser.dailyChallengeDate = today;
+                dailyChallengeCompleted = true;
+                saveUser();
+            }
+
+            // ── TOAST ──────────────────────────────────────────────────
+            function showToast(msg, isErr = false, isEpic = false) {
+                const t = toastMsg;
+                t.textContent = msg;
+                t.classList.remove('show', 'error', 'epic');
+                if (isErr) t.classList.add('error');
+                if (isEpic) t.classList.add('epic');
+                void t.offsetWidth;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 3200);
+            }
+
+            // ── VISUAL EFFECTS ────────────────────────────────────────
+            function triggerDangerFlash() {
+                dangerFlash.classList.add('active');
+                setTimeout(() => dangerFlash.classList.remove('active'), 300);
+            }
+
+            function triggerGoldenFlash() {
+                goldenFlash.classList.add('active');
+                setTimeout(() => goldenFlash.classList.remove('active'), 400);
+            }
+
+            function triggerScreenShake() {
+                gameWrapper.classList.add('shaking');
+                setTimeout(() => gameWrapper.classList.remove('shaking'), 600);
+            }
+
+            function spawnFloatReward(text, color, x, y) {
+                const el = document.createElement('div');
+                el.className = 'float-reward';
+                el.textContent = text;
+                el.style.color = color || 'var(--gold)';
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+                document.body.appendChild(el);
+                el.addEventListener('animationend', () => el.remove());
+                setTimeout(() => { if (el.parentNode) el.remove(); }, 1600);
+            }
+
+            function getKeyCardCenter(index) {
+                const card = keysGrid.children[index];
+                if (!card) return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+                const rect = card.getBoundingClientRect();
+                return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+            }
+
+            // ── RNG & FAIRNESS ────────────────────────────────────────
+            function seededRandom(seed) {
+                let h = 0;
+                for (let i = 0; i < seed.length; i++) {
+                    h = ((h << 5) - h) + seed.charCodeAt(i);
+                    h |= 0;
+                }
+                return function() {
+                    h = (h * 1103515245 + 12345) | 0;
+                    return (h >>> 0) / 4294967296;
+                };
+            }
+
+            function generateRoundSeed() {
+                const entropy = Date.now().toString() + Math.random().toString() + navigator.userAgent;
+                return entropy.split('').sort(() => Math.random() - 0.5).join('').substring(0, 48);
+            }
+
+            async function generateFairHash(seed) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(seed);
+                try {
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                } catch (e) {
+                    return seed.split('').reduce((a, c) => a + c.charCodeAt(0).toString(16), '');
+                }
+            }
+
+            // ── WEIGHTED RNG ──────────────────────────────────────────
+            function getWeightedRandomTier(weights) {
+                const r = Math.random();
+                let cumulative = 0;
+                for (const [tier, weight] of Object.entries(weights)) {
+                    cumulative += weight;
+                    if (r <= cumulative) return tier;
+                }
+                return 'small';
+            }
+
+            function getRandomInRange(range) {
+                const [min, max] = range;
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            function generatePayout(tier, config) {
+                const range = config.payoutRange[tier];
+                if (!range) return getRandomInRange([25, 150]);
+                return getRandomInRange(range);
+            }
+
+            // ── SPECIAL KEY EFFECTS ───────────────────────────────────
+            function applySpecialKeyEffect(keyType, keyIndex) {
+                const config = DIFFICULTY_CONFIG[currentDifficulty];
+                switch (keyType) {
+                    case 'jackpot':
+                        const jpRange = config.payoutRange.jackpot;
+                        const jpAmount = getRandomInRange([jpRange[0] * 2, jpRange[1] * 2]);
+                        currentPot += jpAmount;
+                        triggerGoldenFlash();
+                        showToast('💎 JACKPOT KEY! +' + jpAmount.toLocaleString() + ' GOLD!', false, true);
+                        playTone('jackpot');
+                        if (jpAmount > (currentUser.goldenKeysStats.biggestJackpot || 0)) {
+                            currentUser.goldenKeysStats.biggestJackpot = jpAmount;
+                        }
+                        return { msg: '💎 JACKPOT! +' + jpAmount.toLocaleString() + ' GOLD', amount: jpAmount,
+                            epic: true };
+                    case 'double':
+                        const beforeDouble = currentPot;
+                        currentPot = Math.floor(currentPot * 2);
+                        triggerGoldenFlash();
+                        showToast('🔄 DOUBLE POT! ' + beforeDouble.toLocaleString() + ' → ' + currentPot
+                            .toLocaleString() + ' GOLD!', false, true);
+                        playTone('revealSpecial');
+                        return { msg: '🔄 POT DOUBLED!', amount: currentPot - beforeDouble, epic: true };
+                    case 'shield':
+                        shieldActive = true;
+                        showToast('🛡️ SHIELD KEY! Protected from next skeleton!', false);
+                        playTone('shieldActivate');
+                        return { msg: '🛡️ SHIELD ACTIVE!', amount: 0, epic: false };
+                    case 'curse':
+                        const curseLoss = Math.floor(currentPot * (0.15 + Math.random() * 0.3));
+                        currentPot = Math.max(0, currentPot - curseLoss);
+                        showToast('🔥 CURSE KEY! Lost ' + curseLoss.toLocaleString() + ' GOLD from pot!', true);
+                        playTone('curse');
+                        return { msg: '🔥 CURSE! -' + curseLoss.toLocaleString() + ' GOLD', amount: -curseLoss,
+                            epic: false };
+                    case 'mimic':
+                        const mimicLoss = Math.floor(currentPot * (0.08 + Math.random() * 0.15));
+                        currentPot = Math.max(0, currentPot - mimicLoss);
+                        showToast('🎭 MIMIC KEY! It stole ' + mimicLoss.toLocaleString() + ' GOLD!', true);
+                        playTone('skeleton');
+                        return { msg: '🎭 MIMIC! -' + mimicLoss.toLocaleString() + ' GOLD', amount: -mimicLoss,
+                            epic: false };
+                    case 'chain':
+                        const revealed = [];
+                        for (let offset = -1; offset <= 1; offset += 2) {
+                            const adjIdx = keyIndex + offset;
+                            if (adjIdx >= 0 && adjIdx < keysData.length && !keysData[adjIdx].revealed) {
+                                keysData[adjIdx].revealed = true;
+                                remainingKeys--;
+                                if (!keysData[adjIdx].isSkeleton && !keysData[adjIdx].isSpecial) {
+                                    const val = keysData[adjIdx].value || 0;
+                                    currentPot += val;
+                                    revealed.push(val);
+                                }
+                            }
+                        }
+                        if (revealed.length > 0) {
+                            const sum = revealed.reduce((a, b) => a + b, 0);
+                            showToast('⛓️ CHAIN KEY! Revealed adjacent keys for +' + sum.toLocaleString() +
+                                ' GOLD!', false);
+                            playTone('revealSpecial');
+                            return { msg: '⛓️ CHAIN! +' + sum.toLocaleString() + ' GOLD', amount: sum,
+                            epic: false };
+                        }
+                        return { msg: '⛓️ CHAIN KEY!', amount: 0, epic: false };
+                    case 'lucky':
+                        const luckyBonus = getRandomInRange([500, 5000]);
+                        currentPot += luckyBonus;
+                        safeRevealCount += 2;
+                        updateMultiplier();
+                        showToast('🍀 LUCKY KEY! +' + luckyBonus.toLocaleString() +
+                            ' GOLD & multiplier boost!', false, true);
+                        playTone('revealSpecial');
+                        return { msg: '🍀 LUCKY! +' + luckyBonus.toLocaleString() + ' GOLD', amount: luckyBonus,
+                            epic: true };
+                    case 'corrupted':
+                        const roll = Math.random();
+                        if (roll < 0.45) {
+                            const bonus = getRandomInRange([300, 3000]);
+                            currentPot += bonus;
+                            showToast('⚠️ CORRUPTED KEY turned BLESSED! +' + bonus.toLocaleString() + ' GOLD!',
+                                false);
+                            playTone('revealSpecial');
+                            return { msg: '⚠️ BLESSED! +' + bonus.toLocaleString() + ' GOLD', amount: bonus,
+                                epic: false };
+                        } else if (roll < 0.85) {
+                            const loss = Math.floor(currentPot * (0.1 + Math.random() * 0.25));
+                            currentPot = Math.max(0, currentPot - loss);
+                            showToast('⚠️ CORRUPTED KEY! Lost ' + loss.toLocaleString() + ' GOLD!', true);
+                            playTone('curse');
+                            return { msg: '⚠️ CORRUPTED! -' + loss.toLocaleString() + ' GOLD', amount: -loss,
+                                epic: false };
+                        } else {
+                            const mega = getRandomInRange([2000, 15000]);
+                            currentPot += mega;
+                            triggerGoldenFlash();
+                            showToast('⚠️ CORRUPTED KEY turned LEGENDARY! +' + mega.toLocaleString() + ' GOLD!',
+                                false, true);
+                            playTone('jackpot');
+                            return { msg: '⚠️ LEGENDARY! +' + mega.toLocaleString() + ' GOLD', amount: mega,
+                                epic: true };
+                        }
+                    default:
+                        return { msg: '', amount: 0, epic: false };
+                }
+            }
+
+            // ── MULTIPLIER & RISK ─────────────────────────────────────
+            function updateMultiplier() {
+                const config = DIFFICULTY_CONFIG[currentDifficulty];
+                const growth = config.multiplierGrowth;
+                const idx = Math.min(safeRevealCount, growth.length - 1);
+                currentMultiplier = growth[idx];
+                multiplierValue.textContent = currentMultiplier.toFixed(2) + 'x';
+                if (safeRevealCount >= 3) {
+                    multiplierValue.classList.add('booming');
+                    setTimeout(() => multiplierValue.classList.remove('booming'), 450);
+                }
+            }
+
+            function updateRiskMeter() {
+                const config = DIFFICULTY_CONFIG[currentDifficulty];
+                const totalKeys = keysData.length;
+                const revealedCount = totalKeys - remainingKeys;
+                const maxRevealable = totalKeys - config.skeletons;
+                const progress = Math.min(1, revealedCount / Math.max(1, maxRevealable));
+                const riskPercentVal = Math.floor((config.riskStart + progress * config.riskIncrement * 15) * 100);
+                const clampedRisk = Math.min(95, Math.max(3, riskPercentVal));
+                riskBarInner.style.width = clampedRisk + '%';
+                riskBarInner.style.backgroundPosition = (clampedRisk) + '% 50%';
+                riskPercent.textContent = clampedRisk + '%';
+                if (clampedRisk > 65) {
+                    riskPercent.style.color = '#ff6b6b';
+                } else if (clampedRisk > 35) {
+                    riskPercent.style.color = '#f39c12';
+                } else {
+                    riskPercent.style.color = 'var(--gold)';
+                }
+            }
+
+            // ── GAME LOGIC ────────────────────────────────────────────
+            function getCurrentSkeletonChance() {
+                const config = DIFFICULTY_CONFIG[currentDifficulty];
+                const totalKeys = keysData.length;
+                const revealedCount = totalKeys - remainingKeys;
+                const maxRevealable = totalKeys - config.skeletons;
+                const progress = Math.min(1, revealedCount / Math.max(1, maxRevealable));
+                return config.skeletonBaseChance + progress * config.riskIncrement * 10;
+            }
+
+            function initializeKeys() {
+                const config = DIFFICULTY_CONFIG[currentDifficulty];
+                const totalKeys = 12;
+                const numSkeletons = config.skeletons;
+                const numSpecialKeys = Math.floor(Math.random() * 2) + (config.specialKeyChance > 0.15 ? 2 : config
+                    .specialKeyChance > 0.1 ? 1 : 0);
+                const numRegularGold = totalKeys - numSkeletons - numSpecialKeys;
+
+                keysData = [];
+                // Create gold keys
+                for (let i = 0; i < numRegularGold; i++) {
+                    const tier = getWeightedRandomTier(config.weightTiers);
+                    const value = generatePayout(tier, config);
+                    keysData.push({ value, revealed: false, isSkeleton: false, isSpecial: false, specialType: null,
+                        tier });
+                }
+                // Create special keys
+                for (let i = 0; i < numSpecialKeys; i++) {
+                    const sType = SPECIAL_KEY_TYPES[Math.floor(Math.random() * SPECIAL_KEY_TYPES.length)];
+                    const tier = getWeightedRandomTier(config.weightTiers);
+                    const value = generatePayout(tier, config);
+                    keysData.push({ value, revealed: false, isSkeleton: false, isSpecial: true, specialType: sType,
+                        tier });
+                }
+                // Create skeleton keys
+                for (let i = 0; i < numSkeletons; i++) {
+                    keysData.push({ value: 0, revealed: false, isSkeleton: true, isSpecial: false, specialType: null,
+                        tier: 'skeleton' });
+                }
+                // Shuffle
+                for (let i = keysData.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [keysData[i], keysData[j]] = [keysData[j], keysData[i]];
+                }
+                remainingKeys = totalKeys;
+                currentPot = 0;
+                safeRevealCount = 0;
+                currentMultiplier = 1.0;
+                shieldActive = false;
+                masterKeyUsedThisRound = false;
+                updatePotDisplay();
+                updateMultiplier();
+                updateRiskMeter();
+                keysLeft.textContent = remainingKeys;
+                updateMasterKeyStatus();
+            }
+
+            function updatePotDisplay() {
+                potAmount.textContent = currentPot.toLocaleString();
+                potAmount.classList.add('epic');
+                setTimeout(() => potAmount.classList.remove('epic'), 500);
+            }
+
+            async function startRound() {
+                if (gameActive) { showToast('Game already in progress!', true); return; }
+                const bet = parseInt(betInput.value);
+                if (isNaN(bet) || bet < 10) { showToast('Minimum bet 10 GOLD', true); return; }
+                if (bet > currentUser.balance) { showToast('Insufficient balance', true); return; }
+                betAmount = bet;
+                currentUser.balance -= betAmount;
+                addTransaction('Golden Keys - Bet ' + betAmount + ' GOLD [' + DIFFICULTY_CONFIG[currentDifficulty].label +
+                    ']', -betAmount, 'withdraw');
+                await saveUser();
+                updateBalanceUI();
+                gameActive = true;
+                roundStarted = true;
+                roundSeed = generateRoundSeed();
+                roundHash = await generateFairHash(roundSeed);
+                fairHash.textContent = 'Fair Hash: ' + roundHash.substring(0, 32) + '...';
+                initializeKeys();
+                renderKeysGrid();
+                collectBtn.disabled = false;
+                startRoundBtn.disabled = true;
+                buyMasterKeyBtn.disabled = true;
+                maxBetBtn.disabled = true;
+                difficultySelector.querySelectorAll('.diff-btn').forEach(b => b.disabled = true);
+                gameMessage.innerHTML =
+                    '🔑 Pick keys to build your pot. <b>Collect anytime</b>. Avoid the SKELETON KEY!';
+                updateRiskMeter();
+                updateMultiplier();
+                playTone('start');
+            }
+
+            async function buyMasterKey() {
+                if (gameActive) { showToast('Cannot buy during an active round', true); return; }
+                const cost = DIFFICULTY_CONFIG[currentDifficulty].masterKeyCost;
+                if (currentUser.balance < cost) { showToast('Need ' + cost + ' GOLD for Master Key', true); return; }
+                currentUser.balance -= cost;
+                masterKeyOwned = true;
+                currentUser.goldenKeysStats.masterKeysPurchased = (currentUser.goldenKeysStats.masterKeysPurchased || 0) + 1;
+                addTransaction('Golden Keys - Master Key purchased (-' + cost + ' GOLD)', -cost, 'withdraw');
+                await saveUser();
+                updateBalanceUI();
+                updateMasterKeyStatus();
+                showToast('Master Key purchased! Protects from one skeleton.', false);
+                playTone('reveal');
+            }
+
+            async function revealKey(index) {
+                if (!gameActive || !roundStarted) return;
+                if (keysData[index].revealed) return;
+
+                keysData[index].revealed = true;
+                remainingKeys--;
+                keysLeft.textContent = remainingKeys;
+
+                const center = getKeyCardCenter(index);
+
+                if (keysData[index].isSkeleton) {
+                    // Check shield first
+                    if (shieldActive) {
+                        shieldActive = false;
+                        const randomGold = getRandomInRange(DIFFICULTY_CONFIG[currentDifficulty].payoutRange.medium);
+                        keysData[index] = { value: randomGold, revealed: true, isSkeleton: false, isSpecial: false,
+                            specialType: null, tier: 'medium' };
+                        currentPot += randomGold;
+                        updatePotDisplay();
+                        currentUser.goldenKeysStats.totalSkeletonsAvoided = (currentUser.goldenKeysStats
+                            .totalSkeletonsAvoided || 0) + 1;
+                        gameMessage.innerHTML = '🛡️ Shield absorbed the skeleton! +' + randomGold +
+                            ' GOLD added to pot.';
+                        showToast('🛡️ Shield saved you! +' + randomGold + ' GOLD', false);
+                        playTone('shieldActivate');
+                        safeRevealCount++;
+                        updateMultiplier();
+                        updateRiskMeter();
+                        renderKeysGrid();
+                        await saveUser();
+                        return;
+                    }
+                    // Check master key
+                    if (masterKeyOwned && !masterKeyUsedThisRound) {
+                        masterKeyUsedThisRound = true;
+                        masterKeyOwned = false;
+                        const randomGold = getRandomInRange(DIFFICULTY_CONFIG[currentDifficulty].payoutRange.large);
+                        keysData[index] = { value: randomGold, revealed: true, isSkeleton: false, isSpecial: false,
+                            specialType: null, tier: 'large' };
+                        currentPot += randomGold;
+                        updatePotDisplay();
+                        updateMasterKeyStatus();
+                        currentUser.goldenKeysStats.totalSkeletonsAvoided = (currentUser.goldenKeysStats
+                            .totalSkeletonsAvoided || 0) + 1;
+                        gameMessage.innerHTML = '💀 Skeleton avoided! Master key turned it into ' + randomGold +
+                            ' GOLD.';
+                        showToast('Master key used! +' + randomGold + ' GOLD', false);
+                        playTone('reveal');
+                        safeRevealCount++;
+                        updateMultiplier();
+                        updateRiskMeter();
+                        renderKeysGrid();
+                        addTransaction('Golden Keys - Master Key saved, +' + randomGold + ' to pot', 0, 'game_win');
+                        await saveUser();
+                        return;
+                    }
+                    // GAME OVER
+                    gameActive = false;
+                    roundStarted = false;
+                    keysData.forEach(k => k.revealed = true);
+                    renderKeysGrid();
+                    triggerDangerFlash();
+                    triggerScreenShake();
+                    collectBtn.disabled = true;
+                    startRoundBtn.disabled = false;
+                    buyMasterKeyBtn.disabled = false;
+                    maxBetBtn.disabled = false;
+                    difficultySelector.querySelectorAll('.diff-btn').forEach(b => b.disabled = false);
+                    gameMessage.innerHTML = '💀 <b>SKELETON KEY!</b> Pot lost: ' + currentPot.toLocaleString() +
+                        ' GOLD. Game over.';
+                    playTone('skeleton');
+                    spawnFloatReward('💀 SKELETON!', '#ff4444', center.x, center.y);
+                    currentUser.goldenKeysStats.skeletonHits = (currentUser.goldenKeysStats.skeletonHits || 0) + 1;
+                    currentUser.globalStats.totalWagered += betAmount;
+                    currentUser.globalStats.totalGames++;
+                    currentUser.globalStats.currentStreak = 0;
+                    currentUser.goldenKeysStats.gamesPlayed++;
+                    recordGamePlay();
+                    currentUser.gameOutcomes.unshift({
+                        game: 'Golden Keys',
+                        result: 'loss',
+                        profit: -betAmount,
+                        bet: betAmount,
+                        potLost: currentPot,
+                        skeleton: true,
+                        difficulty: currentDifficulty,
+                        date: new Date().toISOString(),
+                    });
+                    if (currentUser.gameOutcomes.length > 80) currentUser.gameOutcomes.pop();
+                    fairHash.textContent = 'Seed: ' + roundSeed.substring(0, 24) + '... (verify at end)';
+                    updateRiskMeterReset();
+                    await saveUser();
+                    updateStatsUI();
+                    updateMasterKeyStatus();
+                    return;
+                }
+
+                // Safe key revealed
+                if (keysData[index].isSpecial) {
+                    const effect = applySpecialKeyEffect(keysData[index].specialType, index);
+                    gameMessage.innerHTML = effect.msg;
+                    spawnFloatReward(effect.msg, effect.epic ? '#ffb347' : 'var(--gold)', center.x, center.y);
+                } else {
+                    currentPot += keysData[index].value;
+                    updatePotDisplay();
+                    gameMessage.innerHTML = '🔑 +' + keysData[index].value.toLocaleString() + ' GOLD! Pot: ' + currentPot
+                        .toLocaleString() + ' GOLD';
+                    spawnFloatReward('+' + keysData[index].value.toLocaleString() + ' GOLD', 'var(--gold)', center.x,
+                        center.y);
+                }
+                safeRevealCount++;
+                updateMultiplier();
+                updateRiskMeter();
+                playTone(keysData[index].isSpecial ? 'revealSpecial' : 'reveal');
+                renderKeysGrid();
+                updatePotDisplay();
+
+                // Auto-collect if no hidden non-skeleton keys remain
+                const anyHiddenSafe = keysData.some(k => !k.revealed && !k.isSkeleton);
+                if (!anyHiddenSafe && remainingKeys > 0) {
+                    await collectPot(true);
+                }
+            }
+
+            async function collectPot(force = false) {
+                if (!gameActive || !roundStarted) return;
+                if (currentPot === 0 && !force) { showToast('Pot is empty! Pick some keys first.', true); return; }
+                gameActive = false;
+                roundStarted = false;
+                const collected = Math.floor(currentPot * currentMultiplier);
+                const basePot = currentPot;
+                currentUser.balance += collected;
+                const stats = currentUser.goldenKeysStats;
+                stats.gamesPlayed++;
+                stats.chestsUnlocked++;
+                stats.totalGoldCollected += collected;
+                if (collected > stats.bestPot) stats.bestPot = collected;
+                if (collected > (stats.mostProfitableSession || 0)) stats.mostProfitableSession = collected;
+                if (safeRevealCount > (stats.longestSurvivalStreak || 0)) stats.longestSurvivalStreak = safeRevealCount;
+                currentUser.globalStats.totalWagered += betAmount;
+                currentUser.globalStats.totalWon += collected;
+                currentUser.globalStats.totalGames++;
+                currentUser.globalStats.totalWins++;
+                currentUser.globalStats.currentStreak = (currentUser.globalStats.currentStreak || 0) + 1;
+                if (currentUser.globalStats.currentStreak > (currentUser.globalStats.bestStreak || 0))
+                    currentUser.globalStats.bestStreak = currentUser.globalStats.currentStreak;
+                if (currentUser.globalStats.currentStreak > (stats.bestStreak || 0))
+                    stats.bestStreak = currentUser.globalStats.currentStreak;
+                // Difficulty win tracking
+                stats.difficultyWins = stats.difficultyWins || {};
+                stats.difficultyWins[currentDifficulty] = (stats.difficultyWins[currentDifficulty] || 0) + 1;
+                // XP
+                const config = DIFFICULTY_CONFIG[currentDifficulty];
+                const prestigeBonus = 1 + ((currentUser.prestige || 0) * 0.05);
+                let xpGain = Math.floor((betAmount / 8 + collected / 15) * config.xpMultiplier * prestigeBonus);
+                addXP(xpGain);
+                // Achievements
+                if (collected >= 5000 && !currentUser.earnedAchievements.includes('gold_baron')) {
+                    currentUser.earnedAchievements.push('gold_baron');
+                    showToast('🏆 ACHIEVEMENT: GOLD BARON! (5,000+ in one game) +300 XP', false, true);
+                    addXP(300);
+                }
+                if (collected >= 200 && !currentUser.earnedAchievements.includes('gold_digger')) {
+                    currentUser.earnedAchievements.push('gold_digger');
+                    showToast('🏆 ACHIEVEMENT: GOLD DIGGER! (200+ in one game) +150 XP', false);
+                    addXP(150);
+                }
+                if (safeRevealCount >= 8 && !currentUser.earnedAchievements.includes('risk_taker')) {
+                    currentUser.earnedAchievements.push('risk_taker');
+                    showToast('🏆 ACHIEVEMENT: RISK TAKER! (8+ safe reveals) +250 XP', false, true);
+                    addXP(250);
+                }
+                if (collected >= 25000 && !currentUser.earnedAchievements.includes('legendary_haul')) {
+                    currentUser.earnedAchievements.push('legendary_haul');
+                    showToast('🏆 ACHIEVEMENT: LEGENDARY HAUL! (25,000+ in one game) +1000 XP', false, true);
+                    addXP(1000);
+                }
+                // Daily challenge bonus
+                if (!dailyChallengeCompleted && collected > 0) {
+                    markDailyChallenge();
+                    const dailyBonus = Math.floor(collected * 0.1);
+                    currentUser.balance += dailyBonus;
+                    showToast('📅 DAILY CHALLENGE BONUS! +' + dailyBonus.toLocaleString() + ' GOLD extra!', false,
+                    true);
+                }
+                addTransaction('Golden Keys - Collected ' + collected.toLocaleString() + ' GOLD (' + currentMultiplier
+                    .toFixed(2) + 'x multiplier) [' + config.label + ']', collected, 'game_win');
+                recordGamePlay();
+                currentUser.gameOutcomes.unshift({
+                    game: 'Golden Keys',
+                    result: 'win',
+                    profit: collected - betAmount,
+                    bet: betAmount,
+                    potCollected: collected,
+                    basePot: basePot,
+                    multiplier: currentMultiplier,
+                    safeReveals: safeRevealCount,
+                    difficulty: currentDifficulty,
+                    date: new Date().toISOString(),
+                });
+                if (currentUser.gameOutcomes.length > 80) currentUser.gameOutcomes.pop();
+                await saveUser();
+                updateBalanceUI();
+                updateStatsUI();
+                triggerGoldenFlash();
+                gameMessage.innerHTML = '🏆 <b>CHEST UNLOCKED!</b> ' + collected.toLocaleString() +
+                    ' GOLD collected! (' + currentMultiplier.toFixed(2) + 'x multiplier)';
+                playTone('collect');
+                spawnFloatReward('+' + collected.toLocaleString() + ' GOLD!', '#ffd966', window.innerWidth / 2, window
+                    .innerHeight / 2);
+                keysData.forEach(k => k.revealed = true);
+                renderKeysGrid();
+                collectBtn.disabled = true;
+                startRoundBtn.disabled = false;
+                buyMasterKeyBtn.disabled = false;
+                maxBetBtn.disabled = false;
+                difficultySelector.querySelectorAll('.diff-btn').forEach(b => b.disabled = false);
+                fairHash.textContent = 'Seed: ' + roundSeed.substring(0, 24) +
+                    '... | Verify with SHA-256 online';
+                updateRiskMeterReset();
+                updateMultiplier();
+                if (masterKeyUsedThisRound) {
+                    masterKeyOwned = false;
+                    masterKeyUsedThisRound = false;
+                    updateMasterKeyStatus();
+                    await saveUser();
+                }
+            }
+
+            function updateRiskMeterReset() {
+                riskBarInner.style.width = '5%';
+                riskBarInner.style.backgroundPosition = '0% 50%';
+                riskPercent.textContent = '5%';
+                riskPercent.style.color = 'var(--gold)';
+                multiplierValue.textContent = '1.00x';
+                currentMultiplier = 1.0;
+                safeRevealCount = 0;
+            }
+
+            function recordGamePlay() {
+                currentUser.gamePlayCount['goldenkeys'] = (currentUser.gamePlayCount['goldenkeys'] || 0) + 1;
+            }
+
+            function addTransaction(desc, amount, type) {
+                currentUser.transactions.unshift({ desc, amount, type, date: new Date().toISOString() });
+                if (currentUser.transactions.length > 120) currentUser.transactions.pop();
+            }
+
+            // ── RENDER ────────────────────────────────────────────────
+            function renderKeysGrid() {
+                keysGrid.innerHTML = '';
+                keysData.forEach((key, i) => {
+                    const card = document.createElement('div');
+                    card.className = 'key-card';
+                    if (key.revealed) {
+                        card.classList.add('revealed');
+                        if (key.isSkeleton) card.classList.add('skeleton');
+                        if (key.isSpecial) {
+                            card.classList.add('special-reveal');
+                            card.setAttribute('data-key-type', key.specialType);
+                        }
+                    }
+                    card.setAttribute('role', 'button');
+                    card.setAttribute('tabindex', key.revealed || !gameActive || !roundStarted ? '-1' : '0');
+                    card.setAttribute('aria-label', key.revealed ?
+                        (key.isSkeleton ? 'Skeleton key revealed' :
+                            key.isSpecial ? 'Special ' + (SPECIAL_KEY_LABELS[key.specialType] || 'key') + ' worth ' +
+                            key.value :
+                            'Gold key worth ' + key.value) :
+                        'Hidden key');
+                    let innerHtml = '';
+                    if (!key.revealed) {
+                        innerHtml =
+                            '<i class="fas fa-key" aria-hidden="true"></i><div class="key-value">???</div>';
+                    } else if (key.isSkeleton) {
+                        innerHtml =
+                            '<i class="fas fa-skull" aria-hidden="true"></i><div class="key-value">💀 SKELETON</div>';
+                    } else if (key.isSpecial) {
+                        const iconClass = SPECIAL_KEY_ICONS[key.specialType] || 'fa-star';
+                        innerHtml = '<i class="fas ' + iconClass +
+                            '" aria-hidden="true"></i><div class="key-value">' + (SPECIAL_KEY_LABELS[key
+                                .specialType] || 'SPECIAL') + '<br><small>' + key.value.toLocaleString() +
+                            ' GOLD</small></div>';
+                    } else {
+                        innerHtml =
+                            '<i class="fas fa-coins" aria-hidden="true"></i><div class="key-value">' + key.value
+                            .toLocaleString() + ' GOLD</div>';
+                    }
+                    card.innerHTML = innerHtml;
+                    card.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        revealKey(i);
+                    });
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            revealKey(i);
+                        }
+                    });
+                    keysGrid.appendChild(card);
+                });
+            }
+
+            // ── DIFFICULTY UI ─────────────────────────────────────────
+            function setDifficulty(diff) {
+                if (gameActive) { showToast('Cannot change difficulty during a round', true); return; }
+                currentDifficulty = diff;
+                const config = DIFFICULTY_CONFIG[diff];
+                // Update buttons
+                difficultySelector.querySelectorAll('.diff-btn').forEach(b => {
+                    b.classList.remove('active', 'danger-active');
+                    b.setAttribute('aria-checked', 'false');
+                    if (b.dataset.diff === diff) {
+                        b.classList.add('active');
+                        if (diff === 'nightmare') b.classList.add('danger-active');
+                        b.setAttribute('aria-checked', 'true');
+                    }
+                });
+                // Update info
+                const infoMap = {
+                    easy: '🟢 Safer · Lower payouts · 1 skeleton · Great for learning',
+                    normal: '🟡 Balanced risk & reward · 1 skeleton · Standard payouts',
+                    hard: '🟠 High risk · 2 skeletons · Bigger payouts · Intense',
+                    nightmare: '🔴 Extreme risk · 3 skeletons · Massive jackpots · Deadly',
+                };
+                diffInfo.textContent = infoMap[diff] || '';
+                // Update master key cost display
+                mkCost.textContent = config.masterKeyCost;
+                // Update body & card classes
+                document.body.classList.remove('hard-mode', 'nightmare-mode');
+                gameCard.classList.remove('hard-border', 'nightmare-border');
+                if (config.bodyClass) document.body.classList.add(config.bodyClass);
+                if (config.colorClass) gameCard.classList.add(config.colorClass);
+                difficultyLabel.textContent = config.label.toUpperCase() + ' MODE';
+                updateRiskMeterReset();
+                updateMasterKeyStatus();
+                // Update MK button cost
+                buyMasterKeyBtn.innerHTML =
+                    '<i class="fas fa-crown" aria-hidden="true"></i> Master Key (' + config.masterKeyCost +
+                    ' GOLD)';
+                showToast('Difficulty: ' + config.label, false);
+            }
+
+            // ── SPARKLES ──────────────────────────────────────────────
+            function createSparkles() {
+                const container = $('particles');
+                for (let i = 0; i < 40; i++) {
+                    const s = document.createElement('div');
+                    s.className = 'sparkle';
+                    s.setAttribute('aria-hidden', 'true');
+                    s.style.left = Math.random() * 100 + '%';
+                    s.style.bottom = -(Math.random() * 35 + 5) + '%';
+                    s.style.animationDelay = Math.random() * 9 + 's';
+                    s.style.animationDuration = (Math.random() * 6 + 4) + 's';
+                    if (Math.random() < 0.15) s.classList.add('danger-spark');
+                    container.appendChild(s);
+                }
+            }
+
+            // ── EVENT BINDINGS ────────────────────────────────────────
+            startRoundBtn.addEventListener('click', startRound);
+            buyMasterKeyBtn.addEventListener('click', buyMasterKey);
+            collectBtn.addEventListener('click', () => collectPot());
+            soundToggle.addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                soundToggle.innerHTML = soundEnabled ?
+                    '<i class="fas fa-volume-up" aria-hidden="true"></i>' :
+                    '<i class="fas fa-volume-mute" aria-hidden="true"></i>';
+                soundToggle.setAttribute('aria-label', soundEnabled ? 'Mute sound' : 'Unmute sound');
+                localStorage.setItem('gold_sound_enabled', soundEnabled);
+            });
+
+            betInput.addEventListener('input', function() {
+                let val = parseInt(this.value);
+                if (isNaN(val) || val < 10) this.value = 10;
+                if (currentUser && val > currentUser.balance) this.value = currentUser.balance;
+            });
+
+            maxBetBtn.addEventListener('click', () => {
+                if (currentUser) betInput.value = currentUser.balance;
+                betInput.dispatchEvent(new Event('input'));
+            });
+
+            difficultySelector.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.addEventListener('click', () => setDifficulty(btn.dataset.diff));
+            });
+
+            // Prestige on level badge double-click
+            levelBadge.addEventListener('dblclick', () => {
+                if ((currentUser.level || 1) >= MAX_LEVEL) {
+                    prestigeUser();
+                } else {
+                    showToast('Reach level ' + MAX_LEVEL + ' to prestige. Double-click then.', true);
+                }
+            });
+            levelBadge.style.cursor = 'pointer';
+            levelBadge.title = 'Double-click to prestige when level ' + MAX_LEVEL;
+
+            // ── INIT ──────────────────────────────────────────────────
+            async function init() {
+                createSparkles();
+                const soundPref = localStorage.getItem('gold_sound_enabled');
+                if (soundPref === 'false') {
+                    soundEnabled = false;
+                    soundToggle.innerHTML = '<i class="fas fa-volume-mute" aria-hidden="true"></i>';
+                    soundToggle.setAttribute('aria-label', 'Unmute sound');
+                }
+                const loggedIn = await loadUser();
+                if (!loggedIn) return;
+                const resumeAudioOnGesture = () => {
+                    initAudio();
+                    resumeAudio();
+                    document.body.removeEventListener('click', resumeAudioOnGesture);
+                    document.body.removeEventListener('touchstart', resumeAudioOnGesture);
+                };
+                document.body.addEventListener('click', resumeAudioOnGesture);
+                document.body.addEventListener('touchstart', resumeAudioOnGesture);
+                collectBtn.disabled = true;
+                startRoundBtn.disabled = false;
+                buyMasterKeyBtn.disabled = false;
+                maxBetBtn.disabled = false;
+                setDifficulty('normal');
+                renderKeysGrid();
+                updateXPUI();
+                updatePrestigeUI();
+                mkCost.textContent = DIFFICULTY_CONFIG['normal'].masterKeyCost;
+                fairHash.textContent = '';
+                if ((currentUser.level || 1) >= MAX_LEVEL && (currentUser.prestige || 0) < 10) {
+                    showToast('🌟 You can prestige! Double-click your level badge.', false);
+                }
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>

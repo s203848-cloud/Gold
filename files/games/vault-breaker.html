@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GOLD VAULT BREAKER | Break the vault by guessing the code. Least attempts and time, highest reward.</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffd966;
+            --gold-bright: #ffed4e;
+            --gold-deep: #f5b042;
+            --bg-deep: #0a0908;
+            --card-bg: rgba(20, 18, 16, 0.75);
+            --border-gold: rgba(255, 217, 102, 0.4);
+            --shadow-gold: 0 0 30px rgba(255, 217, 102, 0.2);
+            --radius-lg: 2rem;
+            --radius-md: 1.5rem;
+            --radius-full: 60px;
+            --transition-fast: 0.15s ease-out;
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --danger: #ff6b6b;
+            --success: #4caf50;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #0c0b0a 0%, #030202 100%);
+            color: #f5f0e6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 1.5rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .particles-container {
+            position: fixed; inset:0; pointer-events:none; z-index:0;
+        }
+        .particle {
+            position: absolute; background: var(--gold); border-radius:50%;
+            opacity:0; animation: floatUp 7s infinite ease-in;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity:0; }
+            15% { opacity:0.5; transform:scale(1); }
+            50% { transform: translateY(30vh) scale(0.6); opacity:0.2; }
+            100% { transform: translateY(-20vh) scale(0); opacity:0; }
+        }
+        .game-container {
+            max-width: 580px; width:100%; display:flex; flex-direction:column; gap:1rem;
+            position:relative; z-index:1;
+        }
+        .top-nav {
+            display:flex; justify-content:space-between; align-items:center;
+            background:rgba(15,13,11,0.85); backdrop-filter:blur(16px);
+            border-radius:var(--radius-full); padding:0.65rem 1.8rem;
+            border:1px solid var(--border-gold); box-shadow:0 10px 30px rgba(0,0,0,0.5);
+            flex-wrap:wrap; gap:0.6rem;
+            animation: slideDown 0.6s var(--transition-bounce);
+        }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+        .back-home {
+            text-decoration:none; color:var(--gold); font-weight:600;
+            background:rgba(255,217,102,0.12); padding:0.45rem 1.2rem; border-radius:40px;
+            transition:0.3s; display:flex; align-items:center; gap:0.5rem;
+        }
+        .back-home:hover { background:rgba(255,217,102,0.22); transform:translateX(-3px); }
+        .balance-tag {
+            background:rgba(31,28,24,0.9); padding:0.35rem 1.2rem; border-radius:40px;
+            font-weight:700; border:1px solid rgba(255,217,102,0.4);
+            display:flex; align-items:center; gap:0.5rem;
+            transition:box-shadow 0.3s;
+        }
+        .balance-tag.pulse { animation:balancePulse 0.5s ease-out; }
+        @keyframes balancePulse { 0% { box-shadow:0 0 0 0 rgba(255,217,102,0.5); } 100% { box-shadow:0 0 0 20px rgba(255,217,102,0); } }
+        .sound-btn { background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--gold-bright); transition:transform 0.2s; padding:0.3rem; }
+        .sound-btn:hover { transform:scale(1.1); }
+
+        .main-card {
+            background:linear-gradient(145deg, rgba(25,22,19,0.95) 0%, rgba(12,10,8,0.98) 100%);
+            backdrop-filter:blur(20px); border-radius:var(--radius-lg);
+            padding:1.5rem 1.8rem; border:1px solid var(--border-gold);
+            box-shadow:0 30px 50px rgba(0,0,0,0.6), var(--shadow-gold); text-align:center;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+        .vault-display {
+            background: #0d0b07; border-radius:1.8rem; padding:1.2rem; margin:1rem 0;
+            border:2px solid var(--border-gold); box-shadow:inset 0 0 20px rgba(0,0,0,0.8);
+            display:flex; flex-direction:column; align-items:center; gap:0.8rem;
+        }
+        .code-digits {
+            display:flex; gap:0.6rem; justify-content:center;
+        }
+        .digit-box {
+            width:60px; height:72px; background: #1f1a14; border:2px solid #5e5530;
+            border-radius:0.8rem; display:flex; align-items:center; justify-content:center;
+            font-size:2rem; font-weight:800; color:var(--gold-bright);
+            text-shadow:0 0 10px rgba(255,217,102,0.6); transition:all 0.2s;
+            position:relative; overflow:hidden;
+        }
+        .digit-box::after {
+            content:''; position:absolute; inset:0; background:transparent;
+            border-radius:0.8rem; pointer-events:none;
+        }
+        .digit-box.correct { border-color:var(--success); background:#1e3b1a; color:#aaffaa; }
+        .digit-box.correct::after { animation: correctGlow 0.6s ease-out; }
+        @keyframes correctGlow {
+            0% { box-shadow:inset 0 0 20px rgba(76,175,80,0.8); }
+            100% { box-shadow:inset 0 0 0 rgba(76,175,80,0); }
+        }
+        .digit-box.partial { border-color:#ffaa00; background:#3e2e10; color:#ffcc80; }
+        .digit-box.wrong { border-color:var(--danger); background:#3e1a1a; color:#ffaaaa; }
+
+        .keypad {
+            display:grid; grid-template-columns:repeat(3,1fr); gap:0.6rem; max-width:280px; margin:0 auto;
+        }
+        .key-btn {
+            background:linear-gradient(135deg, #2a241e, #1a1712); border:1px solid var(--border-gold);
+            border-radius:1rem; padding:0.8rem; font-size:1.5rem; font-weight:700; color:var(--gold-bright);
+            cursor:pointer; transition:all 0.15s; display:flex; align-items:center; justify-content:center;
+            box-shadow:0 4px 0 #0a0805; position:relative; overflow:hidden;
+        }
+        .key-btn::after {
+            content:''; position:absolute; inset:0; background:rgba(255,255,255,0);
+            transition:background 0.3s;
+        }
+        .key-btn:active { transform:translateY(2px); box-shadow:0 2px 0 #0a0805; }
+        .key-btn:active::after { background:rgba(255,255,255,0.1); }
+        .key-btn.clear-btn { background:#3a1f1f; border-color:#ff6b6b; color:#ffaaaa; }
+        .key-btn.enter-btn { background:#1f3a1f; border-color:var(--success); color:#aaffaa; }
+        .key-btn.enter-btn:hover { box-shadow:0 4px 0 #0a0805, 0 0 15px rgba(76,175,80,0.5); }
+
+        /* Overlay styles */
+        .modal-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center;
+            z-index:100; backdrop-filter:blur(4px);
+            animation: fadeIn 0.2s ease-out;
+        }
+        .modal-overlay.hidden { display:none; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        .modal-card {
+            background: linear-gradient(145deg, #1f1a14, #0d0b07);
+            border:2px solid var(--border-gold); border-radius:1.5rem; padding:2rem;
+            text-align:center; max-width:320px; width:90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+        .guess-digits { display:flex; gap:0.6rem; justify-content:center; margin:1.2rem 0; }
+        .guess-digit {
+            width:60px; height:70px; border-radius:0.8rem; display:flex; align-items:center; justify-content:center;
+            font-size:2.2rem; font-weight:800; border:2px solid;
+        }
+        .guess-digit.green { background:#1e3b1a; border-color:#4caf50; color:#aaffaa; }
+        .guess-digit.yellow { background:#3e2e10; border-color:#ffaa00; color:#ffcc80; }
+        .guess-digit.red { background:#3e1a1a; border-color:#ff6b6b; color:#ffaaaa; }
+
+        .multiplier-preview {
+            background:rgba(0,0,0,0.3); border-radius:1.2rem; padding:0.6rem;
+            display:flex; align-items:center; justify-content:center; gap:0.5rem;
+            font-weight:700; font-size:1.1rem;
+        }
+        .multiplier-preview .preview-value {
+            font-size:2rem; font-weight:900; color:var(--gold-bright);
+            text-shadow:0 0 15px rgba(255,217,102,0.7);
+            transition:color 0.3s;
+        }
+        .multiplier-preview .preview-value.high { color:#ffed4e; text-shadow:0 0 25px gold; }
+
+        .bet-row {
+            display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:0.5rem; margin:0.8rem 0;
+        }
+        .bet-input {
+            background:#0f0d0b; border:2px solid var(--gold); border-radius:40px;
+            padding:0.5rem 0.8rem; width:110px; text-align:center; font-weight:bold;
+            color:var(--gold-bright); font-size:1rem; outline:none; font-family:'Inter', sans-serif;
+            transition:border-color 0.2s;
+        }
+        .bet-input:focus { box-shadow:0 0 0 4px rgba(255,217,102,0.1); }
+        .bet-input.invalid { border-color:var(--danger); }
+
+        .btn {
+            border:none; border-radius:var(--radius-full); font-weight:700; cursor:pointer;
+            transition:all 0.15s; display:inline-flex; align-items:center; gap:0.4rem;
+            padding:0.6rem 1.4rem; font-size:0.9rem; font-family:'Inter', sans-serif;
+            position:relative; overflow:hidden;
+        }
+        .btn:active { transform:translateY(2px); }
+        .btn-outline {
+            background:rgba(255,217,102,0.1); border:1px solid var(--border-gold);
+            color:var(--gold);
+        }
+        .btn-outline:hover { background:rgba(255,217,102,0.2); }
+        .btn-play {
+            background:linear-gradient(135deg, #f5b042, #ffd966); color:#1a150e;
+            box-shadow:0 4px 0 #a05f15;
+        }
+        .btn-play:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 6px 15px rgba(255,217,102,0.5); }
+        .btn:disabled { opacity:0.5; pointer-events:none; transform:none; }
+
+        .result-area {
+            background:rgba(0,0,0,0.5); backdrop-filter:blur(10px); border-radius:1.5rem;
+            padding:0.8rem; font-weight:600; min-height:3rem; margin-top:0.8rem;
+        }
+        .big-mult {
+            font-size:2rem; font-weight:900; color:var(--gold-bright);
+            text-shadow:0 0 20px rgba(255,217,102,0.8); display:none; margin:0.3rem 0;
+            animation: popIn 0.4s var(--transition-bounce);
+        }
+        @keyframes popIn {
+            0% { transform:scale(0.5); opacity:0; }
+            80% { transform:scale(1.1); }
+            100% { transform:scale(1); opacity:1; }
+        }
+        .shake {
+            animation:shake 0.5s ease-out;
+        }
+        @keyframes shake {
+            0%,100% { transform:translateX(0); }
+            15% { transform:translateX(-6px); }
+            30% { transform:translateX(6px); }
+            45% { transform:translateX(-4px); }
+            60% { transform:translateX(4px); }
+            75% { transform:translateX(-2px); }
+        }
+        .vault-flash {
+            animation:flash 0.4s ease-out;
+        }
+        @keyframes flash {
+            0% { box-shadow:0 0 30px rgba(255,0,0,0.6); background:#3a0000; }
+            100% { box-shadow:none; background:none; }
+        }
+
+        #confettiCanvas {
+            position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999;
+        }
+        @media (max-width:450px) {
+            .digit-box { width:48px; height:58px; font-size:1.6rem; }
+            .keypad { max-width:240px; }
+            .key-btn { padding:0.6rem; font-size:1.2rem; }
+            .guess-digit { width:48px; height:56px; font-size:1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confettiCanvas"></canvas>
+    <div class="particles-container" id="particlesContainer"></div>
+
+    <div class="game-container">
+        <div class="top-nav">
+            <a href=".././home.html" class="back-home"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <div class="balance-tag" id="balanceTag">
+                <i class="fas fa-coins"></i> <span id="headerBalance">0</span> GOLD
+            </div>
+            <button id="soundToggleBtn" class="sound-btn"><i class="fas fa-volume-up"></i></button>
+        </div>
+
+        <div class="main-card">
+            <h2 style="color:var(--gold-bright); margin-bottom:0.2rem;">
+                <i class="fas fa-lock"></i> VAULT BREAKER
+            </h2>
+
+            <div class="vault-display" id="vaultDisplay">
+                <div class="code-digits" id="codeDigits">
+                    <div class="digit-box" id="digit0">•</div>
+                    <div class="digit-box" id="digit1">•</div>
+                    <div class="digit-box" id="digit2">•</div>
+                    <div class="digit-box" id="digit3">•</div>
+                </div>
+                <div class="feedback-text" id="feedback">Enter 4 digits & press 🔓</div>
+
+                <div class="multiplier-preview" id="multiplierPreview">
+                    <i class="fas fa-chart-line"></i> Estimated: <span class="preview-value" id="previewMultiplier">-- x</span>
+                </div>
+
+                <div class="keypad" id="keypad">
+                    <button class="key-btn" data-key="1">1</button>
+                    <button class="key-btn" data-key="2">2</button>
+                    <button class="key-btn" data-key="3">3</button>
+                    <button class="key-btn" data-key="4">4</button>
+                    <button class="key-btn" data-key="5">5</button>
+                    <button class="key-btn" data-key="6">6</button>
+                    <button class="key-btn" data-key="7">7</button>
+                    <button class="key-btn" data-key="8">8</button>
+                    <button class="key-btn" data-key="9">9</button>
+                    <button class="key-btn clear-btn" data-key="clear">⌫</button>
+                    <button class="key-btn" data-key="0">0</button>
+                    <button class="key-btn enter-btn" data-key="enter">🔓</button>
+                </div>
+            </div>
+
+            <div class="bet-row">
+                <span style="color:var(--gold); font-weight:600;">BET / GUESS</span>
+                <input type="number" id="betAmount" class="bet-input" value="50" step="5" min="1">
+                <button id="newGameBtn" class="btn btn-play"><i class="fas fa-play"></i> NEW GAME</button>
+            </div>
+
+            <button id="giveUpBtn" class="btn btn-outline" style="display:none; width:100%; justify-content:center;">
+                <i class="fas fa-unlock"></i> GIVE UP (lose cost)
+            </button>
+
+            <div class="result-area" id="resultArea">
+                <span id="resultMessage">✨ Set bet & start a new game</span>
+                <div id="bigWinDisplay" class="big-mult"></div>
+                <div id="sessionProfitDisplay" style="font-size:0.85rem;color:#b5afa4;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guess result overlay -->
+    <div id="guessOverlay" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 style="color:var(--gold-bright); margin-bottom:0.5rem;">🔍 Your Guess</h3>
+            <div class="guess-digits" id="overlayDigits"></div>
+            <p id="overlayFeedbackText" style="color:#ccc; margin-bottom:0.8rem;">...</p>
+            <button class="btn btn-play" id="overlayContinueBtn">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ── AUDIO ENGINE ──
+            let audioCtx = null;
+            let soundEnabled = true;
+            function initAudio() { if (!audioCtx && soundEnabled) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+            function playTone(type) {
+                if (!soundEnabled) return;
+                try {
+                    initAudio();
+                    if (!audioCtx) return;
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.type = 'sine';
+                    if (type === 'click') { gain.gain.setValueAtTime(0.05, now); osc.frequency.value = 600; osc.start(); osc.stop(now+0.05); }
+                    else if (type === 'clear') { gain.gain.setValueAtTime(0.07, now); osc.frequency.value = 300; osc.start(); osc.stop(now+0.1); }
+                    else if (type === 'guess') { gain.gain.setValueAtTime(0.12, now); osc.frequency.value = 440; osc.start(); osc.stop(now+0.15); }
+                    else if (type === 'correct') { gain.gain.setValueAtTime(0.1, now); osc.frequency.value = 880; osc.start(); osc.stop(now+0.3); }
+                    else if (type === 'win') { gain.gain.setValueAtTime(0.12, now); osc.frequency.value = 1100; osc.start(); osc.stop(now+0.5); }
+                    else if (type === 'bigwin') {
+                        gain.gain.setValueAtTime(0.15, now); osc.frequency.value = 880; osc.start(); osc.stop(now+0.5);
+                        const osc2 = audioCtx.createOscillator(); osc2.connect(gain); osc2.frequency.value = 1760; osc2.start(); osc2.stop(now+0.5);
+                    }
+                } catch(e) {}
+            }
+
+            // ── CONFETTI ──
+            function triggerConfetti() {
+                const canvas = document.getElementById('confettiCanvas');
+                canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+                const ctx = canvas.getContext('2d');
+                const particles = [];
+                const colors = ['#ffd966','#f5b042','#ffed4e','#4caf50','#ffaa00','#81c784','#fff'];
+                for (let i=0;i<300;i++) {
+                    particles.push({
+                        x:Math.random()*canvas.width, y:-20,
+                        size:Math.random()*7+3, speedY:Math.random()*7+5,
+                        speedX:(Math.random()-0.5)*6,
+                        color:colors[Math.floor(Math.random()*colors.length)],
+                        rotation:Math.random()*360, rotSpeed:(Math.random()-0.5)*12,
+                        shape:Math.random()>0.5?'star':'rect'
+                    });
+                }
+                let frame; const start=performance.now();
+                function draw(now) {
+                    if (now-start>2800) { ctx.clearRect(0,0,canvas.width,canvas.height); cancelAnimationFrame(frame); return; }
+                    ctx.clearRect(0,0,canvas.width,canvas.height);
+                    particles.forEach(p=>{
+                        p.y+=p.speedY; p.x+=p.speedX; p.rotation+=p.rotSpeed;
+                        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rotation*Math.PI/180);
+                        ctx.fillStyle=p.color;
+                        if (p.shape=='star') {
+                            ctx.beginPath();
+                            for (let i=0;i<5;i++) {
+                                const angle=(i*72)*Math.PI/180;
+                                const x1=Math.cos(angle)*p.size/2;
+                                const y1=Math.sin(angle)*p.size/2;
+                                if (i===0) ctx.moveTo(x1,y1);
+                                else ctx.lineTo(x1,y1);
+                            }
+                            ctx.closePath(); ctx.fill();
+                        } else {
+                            ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);
+                        }
+                        ctx.restore();
+                    });
+                    frame=requestAnimationFrame(draw);
+                }
+                frame=requestAnimationFrame(draw);
+            }
+
+            // ── GAME STATE ──
+            let currentUser = null;
+            let sessionProfit = 0;
+            let bet = 50;
+            let gameActive = false;
+            let combination = [];
+            let currentInput = [];
+            let guesses = 0;
+            let startTime = null;
+            let timerInterval = null;
+            let bestTime = null;
+            let paused = false;               // NEW: timer paused flag
+            let overlayTimeout = null;        // NEW: auto-dismiss timeout
+            let wonThisGuess = false;         // NEW: flag for win processing after overlay
+            let guessTimeSec = 0;             // NEW: elapsed time when guess was made
+
+            // DOM refs
+            const digitBoxes = [0,1,2,3].map(i => document.getElementById(`digit${i}`));
+            const feedbackEl = document.getElementById('feedback');
+            const previewMultiplier = document.getElementById('previewMultiplier');
+            const resultMessage = document.getElementById('resultMessage');
+            const bigWinDisplay = document.getElementById('bigWinDisplay');
+            const sessionDisplay = document.getElementById('sessionProfitDisplay');
+            const betInput = document.getElementById('betAmount');
+            const newGameBtn = document.getElementById('newGameBtn');
+            const giveUpBtn = document.getElementById('giveUpBtn');
+            const balanceTag = document.getElementById('balanceTag');
+            const keypad = document.getElementById('keypad');
+            const vaultDisplay = document.getElementById('vaultDisplay');
+
+            // Overlay elements
+            const overlay = document.getElementById('guessOverlay');
+            const overlayDigits = document.getElementById('overlayDigits');
+            const overlayFeedbackText = document.getElementById('overlayFeedbackText');
+            const overlayContinueBtn = document.getElementById('overlayContinueBtn');
+
+            // ── USER DATA (full sync) ──
+            function initializeUserStats(user) {
+                const defaults = {
+                    globalStats: { totalWagered:0, totalWon:0, totalLosses:0, totalGames:0, currentStreak:0, bestStreak:0, lastGameWin:null, totalWins:0 },
+                    transactions: [], gameOutcomes: [], gamePlayCount: {},
+                    bankBalance:0, xp:0, avatar:'fas fa-crown', theme:'theme-gold',
+                    autoTransfer:false, earnedAchievements:[], dailyBalanceSnapshots:[],
+                    vaultStats: { gamesPlayed:0, totalBet:0, totalWin:0, totalAttempts:0, fastestTime:null }
+                };
+                for (const [k,v] of Object.entries(defaults)) {
+                    if (user[k] === undefined) user[k] = v;
+                }
+                if (!user.vaultStats) user.vaultStats = defaults.vaultStats;
+                return user;
+            }
+            async function loadUser() {
+                const sess = sessionStorage.getItem('gold_current_user');
+                if (!sess) { window.location.href = '../../sign-in.html'; return false; }
+                const sessionUser = JSON.parse(sess);
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                const user = users[sessionUser.username];
+                if (!user) { sessionStorage.removeItem('gold_current_user'); window.location.href = '../../sign-in.html'; return false; }
+                currentUser = initializeUserStats(user);
+                sessionUser.balance = currentUser.balance;
+                sessionStorage.setItem('gold_current_user', JSON.stringify(sessionUser));
+                return true;
+            }
+            async function saveUser() {
+                const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
+                users[currentUser.username] = currentUser;
+                localStorage.setItem('gold_users', JSON.stringify(users));
+                const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
+                if (sess) { sess.balance = currentUser.balance; sessionStorage.setItem('gold_current_user', JSON.stringify(sess)); }
+            }
+            function updateBalanceDisplay() {
+                const balEl = document.getElementById('headerBalance');
+                const prev = parseInt(balEl.textContent.replace(/,/g,'')) || 0;
+                const next = currentUser.balance;
+                if (prev !== next) {
+                    animateNumber(balEl, prev, next, 400);
+                    if (next > prev) { balanceTag.classList.add('pulse'); setTimeout(()=>balanceTag.classList.remove('pulse'),500); }
+                } else balEl.textContent = next.toLocaleString();
+                validateUI();
+            }
+            function animateNumber(el, start, end, duration) {
+                if (start===end) { el.textContent=end.toLocaleString(); return; }
+                const range=end-start; const startTime=performance.now();
+                function step(now){ const progress=Math.min((now-startTime)/duration,1); const eased=1-Math.pow(1-progress,3); el.textContent=Math.round(start+range*eased).toLocaleString(); if(progress<1) requestAnimationFrame(step); else el.textContent=end.toLocaleString(); }
+                requestAnimationFrame(step);
+            }
+            function validateUI() {
+                const b = parseFloat(betInput.value);
+                const invalid = b<=0 || b>(currentUser?.balance||0);
+                betInput.classList.toggle('invalid', invalid);
+                newGameBtn.disabled = gameActive || invalid;
+                giveUpBtn.style.display = gameActive ? 'block' : 'none';
+            }
+
+            function updateTimerDisplay() {
+                if (!gameActive || !startTime) return;
+                const elapsed = (Date.now() - startTime) / 1000;
+                feedbackEl.innerHTML = `⏱ ${elapsed.toFixed(1)}s | 🎯 ${guesses} guess${guesses!==1?'es':''} | ${getMultiplierPreview()}`
+                updateMultiplierPreview();
+            }
+            function updateMultiplierPreview() {
+                const elapsed = (Date.now() - (startTime || Date.now())) / 1000;
+                const multiplier = calculateMultiplier(elapsed, guesses);
+                previewMultiplier.textContent = `${multiplier.toFixed(1)}x`;
+                previewMultiplier.classList.toggle('high', multiplier >= 10);
+            }
+
+            function calculateMultiplier(timeSec, attempts) {
+                const base = 50;
+                const timeFactor = 1 / (1 + timeSec / 30);
+                const attemptFactor = 1 / (1 + attempts / 5);
+                return Math.max(1, Math.floor(base * timeFactor * attemptFactor * 10) / 10);
+            }
+            function getMultiplierPreview() {
+                const elapsed = (Date.now() - (startTime || Date.now())) / 1000;
+                return calculateMultiplier(elapsed, guesses).toFixed(1)+'x preview';
+            }
+
+            // ── TIMER CONTROL ──
+            function pauseTimer() {
+                paused = true;
+                if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            }
+            function resumeTimer() {
+                if (!gameActive || paused) return;
+                timerInterval = setInterval(updateTimerDisplay, 200);
+            }
+
+            // ── NEW GAME ──
+            function startNewGame() {
+                bet = parseFloat(betInput.value);
+                if (isNaN(bet) || bet <= 0) bet = 50;
+                bet = Math.floor(bet*100)/100;
+                if (bet < 1) bet = 1;
+                if (bet > currentUser.balance) {
+                    resultMessage.textContent = '❌ Insufficient balance!';
+                    return;
+                }
+                combination = Array.from({length:4}, ()=>Math.floor(Math.random()*10));
+                currentInput = [];
+                guesses = 0;
+                startTime = Date.now();
+                gameActive = true;
+                paused = false;
+                wonThisGuess = false;
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(updateTimerDisplay, 200);
+                renderDigits();
+                updateMultiplierPreview();
+                feedbackEl.innerHTML = 'Enter 4 digits & press 🔓';
+                resultMessage.innerHTML = '🔒 Vault locked. Start guessing!';
+                bigWinDisplay.style.display = 'none';
+                betInput.disabled = true;
+                giveUpBtn.style.display = 'block';
+                newGameBtn.disabled = true;
+                validateUI();
+                playTone('click');
+                vaultDisplay.classList.remove('shake','vault-flash');
+            }
+
+            function renderDigits() {
+                digitBoxes.forEach((box,i) => {
+                    box.classList.remove('correct','partial','wrong');
+                    box.textContent = currentInput.length > i ? currentInput[i] : '•';
+                });
+            }
+
+            // ── KEYPAD HANDLING ──
+            keypad.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn || !gameActive || paused) return;   // paused blocks keypad
+                const key = btn.dataset.key;
+                if (key === 'clear') {
+                    if (currentInput.length > 0) {
+                        currentInput.pop();
+                        renderDigits();
+                        playTone('clear');
+                    }
+                } else if (key === 'enter') {
+                    if (currentInput.length === 4) {
+                        submitGuess();
+                    } else {
+                        feedbackEl.innerHTML = '🔢 Enter all 4 digits first';
+                        digitBoxes.forEach(b => b.classList.add('shake'));
+                        setTimeout(()=>digitBoxes.forEach(b=>b.classList.remove('shake')), 500);
+                    }
+                } else if (!isNaN(key)) {
+                    if (currentInput.length < 4) {
+                        currentInput.push(parseInt(key));
+                        renderDigits();
+                        playTone('click');
+                    }
+                }
+            });
+
+            function submitGuess() {
+                if (!gameActive || currentInput.length !== 4 || paused) return;
+                if (currentUser.balance < bet) {
+                    resultMessage.textContent = '❌ Not enough balance for another guess!';
+                    vaultDisplay.classList.add('shake');
+                    setTimeout(()=> vaultDisplay.classList.remove('shake'), 500);
+                    return;
+                }
+                // Deduct bet and update stats
+                currentUser.balance -= bet;
+                sessionProfit -= bet;
+                guesses++;
+                currentUser.vaultStats.totalAttempts = (currentUser.vaultStats.totalAttempts||0)+1;
+                saveUser().then(()=>updateBalanceDisplay());
+                updateSessionDisplay();
+                playTone('guess');
+
+                // Pause the game and timer
+                pauseTimer();
+                guessTimeSec = (Date.now() - startTime) / 1000;
+
+                const guess = [...currentInput];
+
+                // Compute per‑digit status (green / yellow / red)
+                let status = ['wrong','wrong','wrong','wrong'];
+                let combTemp = [...combination];
+                let guessTemp = [...guess];
+
+                // Exact matches (green)
+                for (let i=0; i<4; i++) {
+                    if (guessTemp[i] === combTemp[i]) {
+                        status[i] = 'exact';
+                        combTemp[i] = -1;
+                        guessTemp[i] = -2;
+                    }
+                }
+                // Partial matches (yellow)
+                for (let i=0; i<4; i++) {
+                    if (status[i] !== 'exact') {
+                        const idx = combTemp.indexOf(guessTemp[i]);
+                        if (idx !== -1) {
+                            status[i] = 'partial';
+                            combTemp[idx] = -1;
+                        }
+                    }
+                }
+
+                const exactMatches = status.filter(s=>s==='exact').length;
+                const partialMatches = status.filter(s=>s==='partial').length;
+
+                // Build overlay content
+                overlayDigits.innerHTML = '';
+                guess.forEach((digit, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'guess-digit ' + (status[idx]==='exact'?'green':status[idx]==='partial'?'yellow':'red');
+                    div.textContent = digit;
+                    overlayDigits.appendChild(div);
+                });
+                overlayFeedbackText.textContent = `Exact: ${exactMatches} | Out of place: ${partialMatches} | Wrong: ${4-exactMatches-partialMatches} | Time: ${guessTimeSec.toFixed(1)}s`;
+
+                // Show overlay
+                overlay.classList.remove('hidden');
+
+                // Determine if this guess cracked the vault
+                wonThisGuess = (exactMatches === 4);
+
+                // Auto‑dismiss after 2.5s, but allow manual continue
+                if (overlayTimeout) clearTimeout(overlayTimeout);
+                overlayTimeout = setTimeout(dismissOverlay, 2500);
+            }
+
+            function dismissOverlay() {
+                overlay.classList.add('hidden');
+                if (overlayTimeout) { clearTimeout(overlayTimeout); overlayTimeout = null; }
+
+                if (wonThisGuess) {
+                    processWin();
+                } else {
+                    // Resume normal play: clear input and restart timer
+                    currentInput = [];
+                    renderDigits();
+                    digitBoxes.forEach(b => b.classList.remove('correct','partial','wrong'));
+                    paused = false;
+                    resumeTimer();
+                }
+            }
+
+            // ── WIN PROCESSING (called after overlay dismisses on win) ──
+            function processWin() {
+                gameActive = false;
+                if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+                const multiplier = calculateMultiplier(guessTimeSec, guesses);
+                const winAmount = Math.floor(bet * multiplier);
+                currentUser.balance += winAmount;
+                sessionProfit += winAmount;
+
+                // Update global stats
+                currentUser.globalStats.totalGames++;
+                currentUser.globalStats.totalWagered += bet * guesses;
+                currentUser.globalStats.totalWon += winAmount;
+                if (winAmount - bet*guesses > 0) {
+                    currentUser.globalStats.currentStreak = (currentUser.globalStats.currentStreak||0)+1;
+                    if (currentUser.globalStats.currentStreak > currentUser.globalStats.bestStreak) currentUser.globalStats.bestStreak = currentUser.globalStats.currentStreak;
+                    currentUser.globalStats.totalWins = (currentUser.globalStats.totalWins||0)+1;
+                }
+                currentUser.xp = (currentUser.xp||0) + bet * guesses;
+                currentUser.gamePlayCount['vault-breaker'] = (currentUser.gamePlayCount['vault-breaker']||0)+1;
+
+                const vs = currentUser.vaultStats;
+                vs.gamesPlayed++;
+                vs.totalBet += bet * guesses;
+                vs.totalWin += winAmount;
+                if (!vs.fastestTime || guessTimeSec < vs.fastestTime) vs.fastestTime = guessTimeSec;
+
+                currentUser.gameOutcomes.unshift({
+                    game:'VaultBreaker', result:'win', profit: winAmount - bet*guesses,
+                    multiplier, bet, win:winAmount, date:new Date().toISOString(), time:guessTimeSec, guesses
+                });
+                if (currentUser.gameOutcomes.length > 50) currentUser.gameOutcomes.pop();
+                currentUser.transactions.unshift({
+                    desc:`🔓 Vault cracked! ${guesses} guesses, ${guessTimeSec.toFixed(1)}s → ${multiplier}x = +${winAmount} GOLD`,
+                    amount: winAmount - bet*guesses, type:'game_win', date:new Date().toISOString()
+                });
+                if (currentUser.transactions.length > 30) currentUser.transactions.shift();
+                saveUser().then(()=>updateBalanceDisplay());
+
+                playTone('bigwin');
+                triggerConfetti();
+                resultMessage.innerHTML = `<span style="color:#aaffaa;">🎉 VAULT CRACKED!</span>`;
+                bigWinDisplay.style.display = 'block';
+                bigWinDisplay.textContent = `${multiplier}x = +${winAmount} GOLD`;
+                feedbackEl.innerHTML = `⏱ ${guessTimeSec.toFixed(1)}s | 🎯 ${guesses} guesses | Code: ${combination.join('')}`;
+                updateSessionDisplay();
+                revealCombination(true);
+                resetAfterGame();
+            }
+
+            function giveUp() {
+                if (!gameActive || paused) return;   // prevent during pause
+                if (currentUser.balance < bet) {
+                    // still allow
+                } else {
+                    currentUser.balance -= bet;
+                    sessionProfit -= bet;
+                    guesses++;
+                    currentUser.vaultStats.totalAttempts = (currentUser.vaultStats.totalAttempts||0)+1;
+                }
+                gameActive = false;
+                if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+                const totalTimeSec = (Date.now() - startTime) / 1000;
+                feedbackEl.innerHTML = `The code was: ${combination.join(' ')}`;
+                resultMessage.innerHTML = '<span style="color:#ff6b6b;">🏳️ Vault secured. Better luck next time.</span>';
+                bigWinDisplay.style.display = 'none';
+                vaultDisplay.classList.add('vault-flash');
+                setTimeout(()=> vaultDisplay.classList.remove('vault-flash'), 400);
+
+                currentUser.globalStats.totalGames++;
+                currentUser.globalStats.totalWagered += bet * guesses;
+                currentUser.globalStats.currentStreak = 0;
+                currentUser.globalStats.totalLosses = (currentUser.globalStats.totalLosses||0)+1;
+                currentUser.xp = (currentUser.xp||0) + bet * guesses;
+                currentUser.gamePlayCount['vault-breaker'] = (currentUser.gamePlayCount['vault-breaker']||0)+1;
+                const vs = currentUser.vaultStats;
+                vs.gamesPlayed++;
+                vs.totalBet += bet * guesses;
+                currentUser.gameOutcomes.unshift({
+                    game:'VaultBreaker', result:'loss', profit: -(bet*guesses),
+                    bet, win:0, date:new Date().toISOString(), time:totalTimeSec, guesses
+                });
+                if (currentUser.gameOutcomes.length > 50) currentUser.gameOutcomes.pop();
+                currentUser.transactions.unshift({
+                    desc:`🏳️ Vault give up. Code: ${combination.join('')}`,
+                    amount: -(bet*guesses), type:'game_loss', date:new Date().toISOString()
+                });
+                if (currentUser.transactions.length > 30) currentUser.transactions.shift();
+                saveUser().then(()=>updateBalanceDisplay());
+                updateSessionDisplay();
+                revealCombination(false);
+                resetAfterGame();
+            }
+
+            function revealCombination(success) {
+                digitBoxes.forEach((box,i) => {
+                    box.textContent = combination[i];
+                    box.classList.add(success ? 'correct' : 'partial');
+                });
+            }
+
+            function resetAfterGame() {
+                gameActive = false;
+                paused = false;
+                betInput.disabled = false;
+                newGameBtn.disabled = false;
+                giveUpBtn.style.display = 'none';
+                validateUI();
+                if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+                if (overlayTimeout) { clearTimeout(overlayTimeout); overlayTimeout = null; }
+                overlay.classList.add('hidden');
+            }
+
+            function updateSessionDisplay() {
+                sessionDisplay.textContent = `📊 Session P/L: ${sessionProfit>=0?'+':''}${sessionProfit.toFixed(2)} GOLD`;
+            }
+
+            // ── PARTICLES ──
+            function initParticles() {
+                const container = document.getElementById('particlesContainer');
+                for (let i=0;i<30;i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    const size = Math.random()*5+2;
+                    p.style.width = p.style.height = size+'px';
+                    p.style.left = Math.random()*100+'%';
+                    p.style.animationDelay = Math.random()*8+'s';
+                    p.style.animationDuration = (Math.random()*6+5)+'s';
+                    container.appendChild(p);
+                }
+            }
+
+            // ── EVENT BINDINGS ──
+            newGameBtn.addEventListener('click', startNewGame);
+            giveUpBtn.addEventListener('click', giveUp);
+            betInput.addEventListener('input', validateUI);
+            document.getElementById('soundToggleBtn').addEventListener('click', ()=>{
+                soundEnabled = !soundEnabled;
+                document.getElementById('soundToggleBtn').innerHTML = soundEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+                localStorage.setItem('gold_sound_enabled', soundEnabled);
+            });
+            overlayContinueBtn.addEventListener('click', dismissOverlay);
+
+            window.addEventListener('focus', async ()=>{
+                if (currentUser) { await loadUser(); updateBalanceDisplay(); }
+            });
+
+            // ── INIT ──
+            async function init() {
+                initParticles();
+                if (!(await loadUser())) return;
+                updateBalanceDisplay();
+                updateSessionDisplay();
+                validateUI();
+                updateMultiplierPreview();
+                const savedSound = localStorage.getItem('gold_sound_enabled');
+                if (savedSound === 'false') {
+                    soundEnabled = false;
+                    document.getElementById('soundToggleBtn').innerHTML = '<i class="fas fa-volume-mute"></i>';
+                }
+            }
+            init();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>LIMBO | Predict a multiplier. Cash out before the rocket crashes, or multiply your GOLD!</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #f0c850;
+            --gold-bright: #ffe478;
+            --gold-dim: #b89830;
+            --gold-glow: rgba(240, 200, 80, 0.28);
+            --bg-deep: #050505;
+            --bg-card: rgba(18, 16, 13, 0.85);
+            --bg-card-solid: #12100d;
+            --border-subtle: rgba(240, 200, 80, 0.1);
+            --border-medium: rgba(240, 200, 80, 0.28);
+            --text-primary: #f2efe8;
+            --text-secondary: #b8b2a6;
+            --text-muted: #7d776c;
+            --danger: #ff5252;
+            --danger-glow: rgba(255, 82, 82, 0.35);
+            --win: #4caf50;
+            --win-glow: rgba(76, 175, 80, 0.3);
+            --warning: #ff9800;
+            --radius-xl: 26px;
+            --radius-lg: 18px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --radius-full: 60px;
+            --transition-smooth: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-card: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 40px rgba(240, 200, 80, 0.07);
+            --shadow-glow-gold: 0 0 30px rgba(240, 200, 80, 0.2);
+            --font-mono: 'Inter', monospace;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            font-size: 16px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(ellipse at 45% 25%, #100e0a 0%, #030202 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
+            color: var(--text-primary);
+            padding: clamp(0.6rem, 2vw, 1.2rem);
+            padding-bottom: calc(clamp(0.6rem, 2vw, 1.2rem) + var(--safe-bottom));
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            line-height: 1.5;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 25% 35%, rgba(255, 170, 50, 0.04) 0%, transparent 55%),
+                radial-gradient(circle at 70% 60%, rgba(200, 140, 30, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        canvas#particleCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.9;
+        }
+        .game-container {
+            max-width: 1050px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        /* ── TOP BAR ─────────────────────── */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            background: rgba(20, 18, 14, 0.75);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: var(--radius-full);
+            padding: 0.55rem 1.5rem;
+            border: 1px solid var(--border-subtle);
+            transition: var(--transition-fast);
+        }
+        .back-link {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            background: rgba(240, 200, 80, 0.07);
+            padding: 0.35rem 1rem;
+            border-radius: 40px;
+            transition: var(--transition-fast);
+            white-space: nowrap;
+        }
+        .back-link:hover {
+            background: rgba(240, 200, 80, 0.18);
+            color: var(--gold-bright);
+        }
+        .balance-chip {
+            background: #1c1914;
+            border: 1px solid var(--border-subtle);
+            border-radius: 40px;
+            padding: 0.35rem 1.1rem;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            letter-spacing: -0.3px;
+        }
+        .streak-badge {
+            background: rgba(255, 140, 0, 0.12);
+            border-radius: 30px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            white-space: nowrap;
+            letter-spacing: -0.2px;
+        }
+        .sound-toggle {
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 0.4rem;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sound-toggle:hover {
+            transform: scale(1.12);
+            background: rgba(240, 200, 80, 0.08);
+        }
+        .sound-toggle:active {
+            transform: scale(0.94);
+        }
+
+        /* ── MAIN CARD ──────────────────── */
+        .main-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-subtle);
+            padding: clamp(1.2rem, 3vw, 2rem);
+            box-shadow: var(--shadow-card);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        .main-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(240, 200, 80, 0.25), transparent);
+            pointer-events: none;
+        }
+
+        /* ── MULTIPLIER AREA ────────────── */
+        .multiplier-area {
+            text-align: center;
+            margin-bottom: 1.8rem;
+            position: relative;
+            user-select: none;
+        }
+        .multiplier-digit {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 900;
+            font-family: var(--font-mono);
+            background: linear-gradient(135deg, #ffffff, var(--gold-bright));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 30px rgba(240, 200, 80, 0.35);
+            letter-spacing: -2px;
+            transition: color 0.25s ease, text-shadow 0.25s ease;
+            position: relative;
+            display: inline-block;
+        }
+        .multiplier-digit.mid {
+            background: linear-gradient(135deg, #ffe082, #ffb300);
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-shadow: 0 0 35px rgba(255, 179, 0, 0.45);
+        }
+        .multiplier-digit.high {
+            background: linear-gradient(135deg, #ffab40, #ff6d00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(255, 109, 0, 0.5);
+            animation: pulse-warn 0.5s ease-in-out infinite;
+        }
+        .multiplier-digit.crashed {
+            animation: shake-crash 0.45s ease, flash-red 0.6s ease;
+            background: linear-gradient(135deg, #ff5252, #d32f2f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-shadow: 0 0 50px var(--danger-glow);
+        }
+        .multiplier-digit.win-flash {
+            animation: win-glow-pulse 0.6s ease;
+            background: linear-gradient(135deg, #69f0ae, #00c853);
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-shadow: 0 0 45px rgba(0, 200, 83, 0.55);
+        }
+        @keyframes pulse-warn {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.03);
+            }
+        }
+        @keyframes shake-crash {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            15% {
+                transform: translateX(-8px);
+            }
+            30% {
+                transform: translateX(8px);
+            }
+            45% {
+                transform: translateX(-5px);
+            }
+            60% {
+                transform: translateX(5px);
+            }
+            75% {
+                transform: translateX(-2px);
+            }
+            90% {
+                transform: translateX(2px);
+            }
+        }
+        @keyframes flash-red {
+            0%,
+            100% {
+                filter: brightness(1);
+            }
+            40% {
+                filter: brightness(2.2) saturate(0.3);
+            }
+        }
+        @keyframes win-glow-pulse {
+            0%,
+            100% {
+                filter: brightness(1);
+            }
+            50% {
+                filter: brightness(1.8) saturate(1.4);
+            }
+        }
+        .multiplier-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            margin-top: 0.15rem;
+            text-transform: uppercase;
+        }
+        .rocket-icon {
+            font-size: 1.8rem;
+            display: inline-block;
+            animation: hoverRocket 1.8s infinite ease;
+            margin-bottom: 0.2rem;
+        }
+        @keyframes hoverRocket {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-7px);
+            }
+        }
+
+        /* ── BET PANEL ──────────────────── */
+        .bet-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.4rem;
+        }
+        .input-group {
+            background: rgba(0, 0, 0, 0.32);
+            border-radius: var(--radius-lg);
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-subtle);
+            transition: var(--transition-fast);
+        }
+        .input-group:focus-within {
+            border-color: var(--border-medium);
+            box-shadow: 0 0 12px rgba(240, 200, 80, 0.08);
+        }
+        .input-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .input-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .bet-input {
+            background: #1b1712;
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            padding: 0.45rem 0.7rem;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            width: 105px;
+            text-align: center;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: var(--font-mono);
+        }
+        .bet-input:focus {
+            border-color: var(--gold);
+            outline: none;
+            box-shadow: 0 0 12px rgba(240, 200, 80, 0.15);
+        }
+        .bet-input.invalid {
+            border-color: var(--danger);
+            animation: shake-input 0.3s ease;
+        }
+        @keyframes shake-input {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-4px);
+            }
+            75% {
+                transform: translateX(4px);
+            }
+        }
+        .target-slider {
+            flex: 1;
+            min-width: 120px;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--gold);
+            height: 5px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .preset-buttons {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-top: 0.45rem;
+        }
+        .preset {
+            background: rgba(240, 200, 80, 0.08);
+            border: 1px solid var(--border-subtle);
+            border-radius: 28px;
+            padding: 0.22rem 0.75rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            color: var(--text-secondary);
+            white-space: nowrap;
+            user-select: none;
+        }
+        .preset:hover {
+            background: rgba(240, 200, 80, 0.22);
+            color: #fff;
+            border-color: var(--border-medium);
+        }
+        .preset:active {
+            transform: scale(0.94);
+            background: rgba(240, 200, 80, 0.35);
+        }
+
+        /* ── AUTO CASHOUT ──────────────── */
+        .auto-cashout {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+            margin: 0.6rem 0 1rem;
+            background: rgba(0, 0, 0, 0.22);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+        }
+        .auto-cashout label {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            cursor: pointer;
+            font-weight: 600;
+            user-select: none;
+        }
+        .auto-cashout input[type="checkbox"] {
+            accent-color: var(--gold);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .auto-target-input {
+            width: 68px;
+            background: #1b1712;
+            border: 1px solid var(--border-subtle);
+            border-radius: 28px;
+            padding: 0.3rem 0.45rem;
+            color: #fff;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .auto-target-input:focus {
+            border-color: var(--gold);
+            outline: none;
+        }
+
+        /* ── RISK MODE ──────────────────── */
+        .risk-mode-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin: 0.6rem 0 1rem;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+        .risk-btn {
+            padding: 0.28rem 0.8rem;
+            border-radius: 28px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid var(--border-subtle);
+            background: rgba(240, 200, 80, 0.06);
+            color: var(--text-secondary);
+            transition: var(--transition-fast);
+            white-space: nowrap;
+        }
+        .risk-btn.active {
+            background: var(--gold-dim);
+            color: #000;
+            border-color: var(--gold-dim);
+            box-shadow: 0 0 10px rgba(240, 200, 80, 0.2);
+        }
+        .risk-btn:hover:not(.active) {
+            background: rgba(240, 200, 80, 0.16);
+            color: #fff;
+        }
+
+        /* ── BUTTONS ────────────────────── */
+        .action-buttons {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin: 1.2rem 0;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.65rem 1.8rem;
+            border-radius: var(--radius-full);
+            font-weight: 800;
+            font-size: 0.88rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.2px;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #e8a830, #f5d060);
+            color: #1a1510;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), 0 0 20px rgba(240, 200, 80, 0.15);
+            font-size: 0.92rem;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.07);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), 0 0 30px rgba(240, 200, 80, 0.25);
+        }
+        .btn-cashout {
+            background: #2e7d32;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+            font-size: 0.92rem;
+        }
+        .btn-cashout:hover:not(:disabled) {
+            background: #388e3c;
+            transform: scale(1.03);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), 0 0 25px rgba(76, 175, 80, 0.3);
+        }
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none !important;
+            filter: grayscale(0.2);
+        }
+        .btn-cashout.flash-attention {
+            animation: pulse-cashout 0.8s ease-in-out infinite;
+        }
+        @keyframes pulse-cashout {
+            0%,
+            100% {
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+            }
+            50% {
+                box-shadow: 0 4px 28px rgba(76, 175, 80, 0.7), 0 0 40px rgba(76, 175, 80, 0.4);
+            }
+        }
+
+        /* ── RESULT PANEL ──────────────── */
+        .result-panel {
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: var(--radius-md);
+            padding: 0.8rem 1rem;
+            text-align: center;
+            font-weight: 700;
+            margin: 0.8rem 0;
+            transition: background 0.35s, border-color 0.35s;
+            font-size: 0.88rem;
+            border: 1px solid transparent;
+            letter-spacing: -0.2px;
+        }
+        .result-panel.win {
+            background: rgba(76, 175, 80, 0.16);
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+        .result-panel.loss {
+            background: rgba(255, 82, 82, 0.12);
+            border-color: rgba(255, 82, 82, 0.4);
+        }
+
+        /* ── STATS ──────────────────────── */
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin: 0.8rem 0;
+            align-items: center;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.025);
+            padding: 0.5rem 0.8rem;
+            border-radius: var(--radius-sm);
+            flex: 1;
+            text-align: center;
+            min-width: 70px;
+            font-size: 0.75rem;
+            letter-spacing: -0.2px;
+        }
+        .stat-card strong {
+            display: block;
+            font-size: 1rem;
+            color: var(--gold);
+            margin-top: 2px;
+        }
+        .session-reset {
+            font-size: 0.68rem;
+            background: none;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            white-space: nowrap;
+        }
+        .session-reset:hover {
+            background: rgba(255, 82, 82, 0.18);
+            color: var(--danger);
+            border-color: rgba(255, 82, 82, 0.4);
+        }
+
+        /* ── CRASH CHART ────────────────── */
+        .crash-chart {
+            margin-top: 1.2rem;
+        }
+        .chart-label {
+            font-size: 0.68rem;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        canvas.crash-canvas {
+            width: 100%;
+            height: 95px;
+            background: rgba(0, 0, 0, 0.38);
+            border-radius: var(--radius-md);
+            display: block;
+        }
+
+        /* ── HISTORY ────────────────────── */
+        .history-section {
+            margin-top: 0.8rem;
+            background: rgba(0, 0, 0, 0.22);
+            border-radius: var(--radius-md);
+            padding: 0.7rem;
+        }
+        .history-filters {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 0.45rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            background: rgba(240, 200, 80, 0.07);
+            border: 1px solid var(--border-subtle);
+            border-radius: 24px;
+            padding: 0.22rem 0.7rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition-fast);
+            user-select: none;
+        }
+        .filter-btn.active {
+            background: var(--gold-dim);
+            color: #000;
+            border-color: var(--gold-dim);
+        }
+        .filter-btn:hover:not(.active) {
+            background: rgba(240, 200, 80, 0.18);
+        }
+        .history-list {
+            max-height: 190px;
+            overflow-y: auto;
+            font-size: 0.72rem;
+            scroll-behavior: smooth;
+        }
+        .history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .history-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background: rgba(240, 200, 80, 0.2);
+            border-radius: 4px;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.32rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            transition: background 0.15s;
+        }
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .history-item .outcome.win {
+            color: #4caf50;
+            font-weight: 700;
+        }
+        .history-item .outcome.loss {
+            color: #ff5252;
+            font-weight: 700;
+        }
+
+        /* ── MILESTONE ──────────────────── */
+        .milestone-notice {
+            color: var(--gold);
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 0.8rem;
+            letter-spacing: -0.2px;
+        }
+        .milestone-notice button {
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        /* ── PROVABLY FAIR ─────────────── */
+        .provably-fair-toggle {
+            margin-top: 0.4rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            align-items: center;
+            font-size: 0.7rem;
+            flex-wrap: wrap;
+        }
+        .provably-fair-toggle label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .provably-fair-toggle input[type="checkbox"] {
+            accent-color: var(--gold);
+            cursor: pointer;
+        }
+        .provably-panel {
+            background: rgba(0, 0, 0, 0.38);
+            border-radius: var(--radius-md);
+            padding: 0.45rem 0.9rem;
+            margin-top: 0.4rem;
+            font-size: 0.68rem;
+            word-break: break-all;
+            display: none;
+            line-height: 1.6;
+        }
+        .provably-panel.visible {
+            display: block;
+        }
+        .provably-panel span {
+            font-family: var(--font-mono);
+            color: var(--gold-dim);
+            font-size: 0.65rem;
+        }
+
+        /* ── RESPONSIVE ─────────────────── */
+        @media (max-width: 720px) {
+            .multiplier-digit {
+                font-size: 3rem;
+                letter-spacing: -1px;
+            }
+            .main-card {
+                padding: 1rem 0.9rem;
+                border-radius: var(--radius-lg);
+            }
+            .bet-panel {
+                grid-template-columns: 1fr;
+                gap: 0.7rem;
+            }
+            .action-buttons {
+                gap: 0.5rem;
+            }
+            .btn {
+                padding: 0.55rem 1.3rem;
+                font-size: 0.8rem;
+            }
+            .top-bar {
+                padding: 0.45rem 1rem;
+                gap: 0.4rem;
+            }
+            .stats-row {
+                gap: 0.35rem;
+            }
+            .stat-card {
+                font-size: 0.68rem;
+                padding: 0.4rem 0.5rem;
+            }
+            .stat-card strong {
+                font-size: 0.85rem;
+            }
+            .auto-cashout {
+                font-size: 0.7rem;
+                gap: 0.4rem;
+                padding: 0.4rem 0.7rem;
+            }
+            canvas.crash-canvas {
+                height: 75px;
+            }
+        }
+        @media (max-width: 400px) {
+            .multiplier-digit {
+                font-size: 2.4rem;
+            }
+            .bet-input {
+                width: 85px;
+                font-size: 0.82rem;
+            }
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+            .preset {
+                font-size: 0.62rem;
+                padding: 0.18rem 0.55rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+    <div class="game-container">
+        <!-- ── TOP BAR ────────────────────── -->
+        <div class="top-bar">
+            <a href="../home.html" class="back-link"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <div class="balance-chip"><i class="fas fa-coins"></i> <span id="balanceDisplay">0</span> GOLD</div>
+            <div class="streak-badge" id="streakBadge">🔥 Streak: 0</div>
+            <button id="soundToggle" class="sound-toggle" aria-label="Toggle sound"><i class="fas fa-volume-up"></i></button>
+        </div>
+
+        <!-- ── MAIN CARD ──────────────────── -->
+        <div class="main-card" id="mainCard">
+            <div class="multiplier-area">
+                <div class="rocket-icon" id="rocketIcon">🚀</div>
+                <div class="multiplier-digit" id="currentMultiplier">1.00x</div>
+                <div class="multiplier-label">LIVE MULTIPLIER</div>
+            </div>
+
+            <!-- Bet Panel -->
+            <div class="bet-panel">
+                <div class="input-group">
+                    <div class="input-label"><i class="fas fa-coins"></i> BET AMOUNT</div>
+                    <div class="input-value">
+                        <input type="number" id="betAmount" class="bet-input" value="10" min="1" step="1" inputmode="numeric">
+                        <div class="preset-buttons">
+                            <span class="preset" data-bet="10">10</span>
+                            <span class="preset" data-bet="25">25</span>
+                            <span class="preset" data-bet="100">100</span>
+                            <span class="preset" data-bet="500">500</span>
+                            <span class="preset" data-bet="max">MAX</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <div class="input-label"><i class="fas fa-bullseye"></i> TARGET MULTIPLIER</div>
+                    <div class="input-value">
+                        <input type="range" id="targetSlider" class="target-slider" min="1.01" max="100" step="0.1" value="2.0">
+                        <input type="number" id="targetValue" class="bet-input" style="width:85px;" step="0.1" value="2.0" min="1.01" max="100">
+                    </div>
+                    <div class="preset-buttons">
+                        <span class="preset" data-target="1.5">1.5x</span>
+                        <span class="preset" data-target="2">2x</span>
+                        <span class="preset" data-target="3">3x</span>
+                        <span class="preset" data-target="5">5x</span>
+                        <span class="preset" data-target="10">10x</span>
+                        <span class="preset" data-target="25">25x</span>
+                        <span class="preset" data-target="100">100x</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auto Cashout -->
+            <div class="auto-cashout">
+                <label><input type="checkbox" id="autoCashoutToggle"> ✈️ AUTO CASHOUT AT</label>
+                <input type="number" id="autoCashoutValue" class="auto-target-input" value="2.0" step="0.1" min="1.1" max="500">
+                <span style="font-size:0.68rem;color:var(--text-muted);">(auto collects when reached)</span>
+            </div>
+
+            <!-- Risk Mode -->
+            <div class="risk-mode-row">
+                <span>🎚️ RISK:</span>
+                <span class="risk-btn" data-risk="low">Low</span>
+                <span class="risk-btn active" data-risk="normal">Normal</span>
+                <span class="risk-btn" data-risk="high">High</span>
+                <span style="font-size:0.62rem;color:var(--text-muted);">(affects house edge & volatility)</span>
+            </div>
+
+            <!-- Buttons -->
+            <div class="action-buttons">
+                <button id="startBtn" class="btn btn-primary"><i class="fas fa-rocket"></i> LAUNCH</button>
+                <button id="cashoutBtn" class="btn btn-cashout" disabled><i class="fas fa-hand-holding-usd"></i> CASH OUT</button>
+            </div>
+
+            <!-- Result -->
+            <div class="result-panel" id="resultMessage">Ready to launch?</div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card">🎲 Rounds<strong id="roundsCount">0</strong></div>
+                <div class="stat-card">🏆 Wins<strong id="winsCount">0</strong></div>
+                <div class="stat-card">📈 P/L<strong id="sessionPL">0</strong> GOLD</div>
+                <div class="stat-card">🎯 Win Rate<strong id="winRate">0%</strong></div>
+                <button id="sessionResetBtn" class="session-reset">↺ Reset Session</button>
+            </div>
+
+            <!-- Crash Chart -->
+            <div class="crash-chart">
+                <div class="chart-label">📊 RECENT CRASH POINTS</div>
+                <canvas id="crashCanvas" class="crash-canvas"></canvas>
+            </div>
+
+            <!-- History -->
+            <div class="history-section">
+                <div class="history-filters">
+                    <span class="filter-btn active" data-filter="all">All</span>
+                    <span class="filter-btn" data-filter="win">🏆 Wins</span>
+                    <span class="filter-btn" data-filter="loss">💥 Losses</span>
+                </div>
+                <div class="history-list" id="roundHistoryList"></div>
+            </div>
+
+            <!-- Milestone -->
+            <div class="milestone-notice" id="milestoneNotice"></div>
+
+            <!-- Provably Fair -->
+            <div class="provably-fair-toggle">
+                <label><input type="checkbox" id="fairnessToggle"> 🔐 Provably Fair</label>
+                <span style="color:var(--text-muted);font-size:0.62rem;">(Verifiable crash generation)</span>
+            </div>
+            <div class="provably-panel" id="fairnessPanel">
+                <div>🔒 Hash: <span id="fairHash">-</span></div>
+                <div>🔑 Seed (revealed after round): <span id="fairSeed">-</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            // ══════════════════════════════════════
+            //  CONFIGURATION CONSTANTS
+            // ══════════════════════════════════════
+            const CONFIG = Object.freeze({
+                STORAGE_KEY_USERS: 'gold_users',
+                STORAGE_KEY_SESSION: 'gold_current_user',
+                STORAGE_KEY_SOUND: 'limbo_sound_v2',
+                STORAGE_KEY_RISK: 'limbo_risk_mode',
+                HOUSE_EDGE: { low: 0.985, normal: 0.98, high: 0.97 },
+                MIN_CRASH: 1.01,
+                MAX_CRASH: 1000,
+                MAX_HISTORY_CRASHES: 20,
+                MAX_HISTORY_OUTCOMES: 50,
+                MAX_TRANSACTIONS: 100,
+                CRASH_CURVE_BASE_SPEED: 3.8,
+                CRASH_CURVE_ACCEL: 2.2,
+                SMOOTH_SPEED: 14,
+                MILESTONE_PLAYS: 12,
+                MILESTONE_REWARD: 600,
+                PARTICLE_COUNT: 45,
+                ANIMATION_FRAME_RATE: null, // uses RAF
+            });
+
+            // ══════════════════════════════════════
+            //  UTILITY HELPERS
+            // ══════════════════════════════════════
+            const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
+            const safeJsonParse = (str, fallback = {}) => {
+                try { return JSON.parse(str) || fallback; } catch { return fallback; }
+            };
+            const formatGold = (n) => Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+
+            // ══════════════════════════════════════
+            //  STORAGE MANAGER
+            // ══════════════════════════════════════
+            class StorageManager {
+                static getUsers() {
+                    return safeJsonParse(localStorage.getItem(CONFIG.STORAGE_KEY_USERS), {});
+                }
+                static saveUsers(users) {
+                    try { localStorage.setItem(CONFIG.STORAGE_KEY_USERS, JSON.stringify(users)); } catch { /* quota exceeded */ }
+                }
+                static getCurrentSession() {
+                    return safeJsonParse(sessionStorage.getItem(CONFIG.STORAGE_KEY_SESSION), null);
+                }
+                static setCurrentSession(user) {
+                    try {
+                        sessionStorage.setItem(CONFIG.STORAGE_KEY_SESSION, JSON.stringify({
+                            username: user.username,
+                            balance: user.balance
+                        }));
+                    } catch { /* ignore */ }
+                }
+                static clearSession() {
+                    sessionStorage.removeItem(CONFIG.STORAGE_KEY_SESSION);
+                }
+            }
+
+            // ══════════════════════════════════════
+            //  SOUND ENGINE
+            // ══════════════════════════════════════
+            class SoundEngine {
+                constructor() {
+                    this._ctx = null;
+                    this._enabled = localStorage.getItem(CONFIG.STORAGE_KEY_SOUND) !== 'false';
+                    this._boundInit = this._initContext.bind(this);
+                    document.addEventListener('pointerdown', this._boundInit, { once: true });
+                    document.addEventListener('keydown', this._boundInit, { once: true });
+                }
+                _initContext() {
+                    if (!this._ctx && this._enabled) {
+                        try {
+                            this._ctx = new(window.AudioContext || window.webkitAudioContext)();
+                            if (this._ctx.state === 'suspended') this._ctx.resume();
+                        } catch { /* no audio support */ }
+                    }
+                }
+                get enabled() { return this._enabled; }
+                toggle() {
+                    this._enabled = !this._enabled;
+                    localStorage.setItem(CONFIG.STORAGE_KEY_SOUND, this._enabled);
+                    if (this._enabled && !this._ctx) this._initContext();
+                    return this._enabled;
+                }
+                play(type) {
+                    if (!this._enabled || !this._ctx) return;
+                    if (this._ctx.state === 'suspended') this._ctx.resume();
+                    const now = this._ctx.currentTime;
+                    const osc = this._ctx.createOscillator();
+                    const gain = this._ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(this._ctx.destination);
+                    const configs = {
+                        start: { freq: 620, dur: 0.14, vol: 0.1, type: 'sine' },
+                        cashout: { freq: 900, dur: 0.11, vol: 0.12, type: 'sine' },
+                        crash: { freq: 200, dur: 0.45, vol: 0.16, type: 'sawtooth' },
+                        win: { freq: 1150, dur: 0.18, vol: 0.11, type: 'sine' },
+                        lose: { freq: 310, dur: 0.22, vol: 0.13, type: 'triangle' },
+                    };
+                    const cfg = configs[type] || configs.start;
+                    osc.type = cfg.type;
+                    osc.frequency.setValueAtTime(cfg.freq, now);
+                    osc.frequency.exponentialRampToValueAtTime(cfg.freq * 0.7, now + cfg.dur);
+                    gain.gain.setValueAtTime(cfg.vol, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + cfg.dur);
+                    osc.start(now);
+                    osc.stop(now + cfg.dur + 0.02);
+                }
+                destroy() {
+                    document.removeEventListener('pointerdown', this._boundInit);
+                    document.removeEventListener('keydown', this._boundInit);
+                    if (this._ctx) { this._ctx.close().catch(() => {}); }
+                }
+            }
+
+            // ══════════════════════════════════════
+            //  FAIRNESS PROVIDER
+            // ══════════════════════════════════════
+            class FairnessProvider {
+                static async generateSeed() {
+                    const arr = new Uint8Array(16);
+                    crypto.getRandomValues(arr);
+                    return Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
+                }
+                static async hashSeed(seed) {
+                    const enc = new TextEncoder().encode(seed);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', enc);
+                    return Array.from(new Uint8Array(hashBuffer), b => b.toString(16).padStart(2, '0')).join('');
+                }
+                static computeCrashPoint(seed, houseEdge = 0.98) {
+                    const hex = seed.substring(0, 8);
+                    const r = parseInt(hex, 16) / 0xFFFFFFFF;
+                    const crash = 1.0 / (1.0 - houseEdge * r);
+                    return clamp(Math.floor(crash * 100) / 100, CONFIG.MIN_CRASH, CONFIG.MAX_CRASH);
+                }
+                static verifyCrashPoint(seed, houseEdge, expectedCrash) {
+                    const computed = FairnessProvider.computeCrashPoint(seed, houseEdge);
+                    return Math.abs(computed - expectedCrash) < 0.01;
+                }
+            }
+
+            // ══════════════════════════════════════
+            //  USER SESSION
+            // ══════════════════════════════════════
+            class UserSession {
+                constructor() {
+                    this.user = null;
+                }
+                async load() {
+                    const sess = StorageManager.getCurrentSession();
+                    if (!sess) { this._redirectSignIn(); return false; }
+                    const users = StorageManager.getUsers();
+                    let u = users[sess.username];
+                    if (!u) { this._redirectSignIn(); return false; }
+                    u.globalStats = u.globalStats || { totalWagered: 0, totalWon: 0, totalGames: 0, totalWins: 0,
+                        currentStreak: 0, bestStreak: 0 };
+                    u.gamePlayCount = u.gamePlayCount || {};
+                    u.gameOutcomes = u.gameOutcomes || [];
+                    u.transactions = u.transactions || [];
+                    u.bankBalance = u.bankBalance ?? 0;
+                    u.xp = u.xp ?? 0;
+                    u.limboStats = u.limboStats || { totalPlays: 0, totalWins: 0, totalLosses: 0, totalWagered: 0,
+                        totalPayout: 0, bestCrash: 1, crashHistory: [] };
+                    u.earnedAchievements = u.earnedAchievements || [];
+                    this.user = u;
+                    StorageManager.setCurrentSession(u);
+                    return true;
+                }
+                _redirectSignIn() {
+                    StorageManager.clearSession();
+                    try { window.location.href = '../../sign-in.html'; } catch { /* navigation blocked */ }
+                }
+                async save() {
+                    if (!this.user) return;
+                    const users = StorageManager.getUsers();
+                    users[this.user.username] = this.user;
+                    StorageManager.saveUsers(users);
+                    StorageManager.setCurrentSession(this.user);
+                }
+                get balance() { return this.user?.balance ?? 0; }
+                set balance(val) { if (this.user) this.user.balance = Math.max(0, val); }
+                addTransaction(desc, amount, type) {
+                    if (!this.user) return;
+                    this.user.transactions.unshift({ desc, amount, type, date: new Date().toISOString() });
+                    if (this.user.transactions.length > CONFIG.MAX_TRANSACTIONS) this.user.transactions.length = CONFIG
+                        .MAX_TRANSACTIONS;
+                }
+                resetSessionStats() {
+                    if (!this.user) return;
+                    this.user.limboStats = { totalPlays: 0, totalWins: 0, totalLosses: 0, totalWagered: 0, totalPayout: 0,
+                        bestCrash: 1, crashHistory: [] };
+                    this.user.globalStats.currentStreak = 0;
+                    this.save();
+                }
+                get sessionStats() {
+                    const ls = this.user?.limboStats;
+                    if (!ls) return { rounds: 0, wins: 0, profit: 0, winRate: '0' };
+                    const profit = (ls.totalPayout || 0) - (ls.totalWagered || 0);
+                    return {
+                        rounds: ls.totalPlays || 0,
+                        wins: ls.totalWins || 0,
+                        profit,
+                        winRate: ls.totalPlays > 0 ? ((ls.totalWins / ls.totalPlays) * 100).toFixed(1) : '0',
+                    };
+                }
+            }
+
+            // ══════════════════════════════════════
+            //  CRASH ENGINE
+            // ══════════════════════════════════════
+            class CrashEngine {
+                constructor(userSession, soundEngine) {
+                    this._user = userSession;
+                    this._audio = soundEngine;
+                    this._fairnessEnabled = false;
+                    this._riskMode = localStorage.getItem(CONFIG.STORAGE_KEY_RISK) || 'normal';
+                    this._houseEdge = CONFIG.HOUSE_EDGE[this._riskMode] || CONFIG.HOUSE_EDGE.normal;
+
+                    // Round state
+                    this.roundActive = false;
+                    this._cashedOut = false;
+                    this.currentMultiplier = 1.0;
+                    this.smoothedMultiplier = 1.0;
+                    this.secretCrashPoint = 1.0;
+                    this.currentBet = 0;
+                    this.currentTarget = 2.0;
+                    this.autoCashoutEnabled = false;
+                    this.autoCashoutTarget = 2.0;
+                    this.roundStartTime = 0;
+                    this._animFrameId = null;
+                    this._lastTickTime = 0;
+                    this.fairSeed = null;
+                    this.fairHash = null;
+                    this.onUpdate = null;
+                }
+                get fairnessEnabled() { return this._fairnessEnabled; }
+                set fairnessEnabled(v) { this._fairnessEnabled = !!v; }
+                get riskMode() { return this._riskMode; }
+                set riskMode(mode) {
+                    if (CONFIG.HOUSE_EDGE[mode]) {
+                        this._riskMode = mode;
+                        this._houseEdge = CONFIG.HOUSE_EDGE[mode];
+                        localStorage.setItem(CONFIG.STORAGE_KEY_RISK, mode);
+                    }
+                }
+                get houseEdge() { return this._houseEdge; }
+
+                _generateCrashPoint() {
+                    const r = Math.random();
+                    const crash = 1.0 / (1.0 - this._houseEdge * r);
+                    return clamp(Math.floor(crash * 100) / 100, CONFIG.MIN_CRASH, CONFIG.MAX_CRASH);
+                }
+
+                async startRound(bet, target, autoEnabled, autoTarget) {
+                    if (this.roundActive) return false;
+                    if (!this._user.user) return false;
+                    if (bet <= 0 || bet > this._user.balance || !Number.isFinite(bet)) return false;
+                    if (target < CONFIG.MIN_CRASH || target > CONFIG.MAX_CRASH) return false;
+
+                    this.currentBet = Math.floor(bet);
+                    this.currentTarget = clamp(parseFloat(target), CONFIG.MIN_CRASH, CONFIG.MAX_CRASH);
+                    this.autoCashoutEnabled = !!autoEnabled;
+                    this.autoCashoutTarget = clamp(parseFloat(autoTarget) || 2.0, 1.1, CONFIG.MAX_CRASH);
+                    this._cashedOut = false;
+
+                    this._user.balance -= this.currentBet;
+                    this._user.user.globalStats.totalWagered += this.currentBet;
+                    await this._user.save();
+
+                    if (this._fairnessEnabled) {
+                        this.fairSeed = await FairnessProvider.generateSeed();
+                        this.fairHash = await FairnessProvider.hashSeed(this.fairSeed);
+                        this.secretCrashPoint = FairnessProvider.computeCrashPoint(this.fairSeed, this._houseEdge);
+                    } else {
+                        this.fairSeed = null;
+                        this.fairHash = null;
+                        this.secretCrashPoint = this._generateCrashPoint();
+                    }
+
+                    this.currentMultiplier = CONFIG.MIN_CRASH;
+                    this.smoothedMultiplier = CONFIG.MIN_CRASH;
+                    this.roundActive = true;
+                    this.roundStartTime = performance.now();
+                    this._lastTickTime = this.roundStartTime;
+                    this._audio.play('start');
+                    this._loop();
+                    return true;
+                }
+
+                cashout(isAuto = false) {
+                    if (!this.roundActive || this._cashedOut) return;
+                    this._cashedOut = true;
+                    this.roundActive = false;
+                    this._cancelAnimFrame();
+                    const mult = clamp(this.currentMultiplier, CONFIG.MIN_CRASH, this.secretCrashPoint);
+                    const totalPayout = Math.floor(this.currentBet * mult);
+                    const profit = totalPayout - this.currentBet;
+                    this._user.balance += totalPayout;
+                    this._recordResult(true, profit, mult);
+                    this._audio.play('cashout');
+                    if (this.onUpdate) this.onUpdate({ type: 'cashout', mult, profit, auto: isAuto });
+                }
+
+                crash() {
+                    if (!this.roundActive || this._cashedOut) return;
+                    this._cashedOut = true;
+                    this.roundActive = false;
+                    this._cancelAnimFrame();
+                    const crashMult = this.secretCrashPoint;
+                    const winByTarget = this.currentTarget <= crashMult;
+                    let profit = 0;
+                    if (winByTarget) {
+                        const winAmount = Math.floor(this.currentBet * this.currentTarget);
+                        profit = winAmount - this.currentBet;
+                        this._user.balance += winAmount;
+                        this._recordResult(true, profit, crashMult);
+                        this._audio.play('win');
+                    } else {
+                        profit = -this.currentBet;
+                        this._recordResult(false, profit, crashMult);
+                        this._audio.play('crash');
+                    }
+                    if (this.onUpdate) this.onUpdate({ type: 'crash', mult: crashMult, win: winByTarget, profit });
+                }
+
+                _recordResult(win, profit, crashPoint) {
+                    const u = this._user.user;
+                    u.globalStats.totalGames++;
+                    if (win) {
+                        u.globalStats.totalWins++;
+                        u.globalStats.totalWon += (profit + this.currentBet);
+                    }
+                    const ls = u.limboStats;
+                    ls.totalPlays++;
+                    ls.totalWagered += this.currentBet;
+                    if (win) { ls.totalWins++;
+                        ls.totalPayout += (profit + this.currentBet); } else { ls.totalLosses++; }
+                    if (crashPoint > ls.bestCrash) ls.bestCrash = crashPoint;
+                    ls.crashHistory.unshift(Number(crashPoint.toFixed(2)));
+                    if (ls.crashHistory.length > CONFIG.MAX_HISTORY_CRASHES) ls.crashHistory.length = CONFIG
+                    .MAX_HISTORY_CRASHES;
+                    u.globalStats.currentStreak = win ? (u.globalStats.currentStreak || 0) + 1 : 0;
+                    if (u.globalStats.currentStreak > u.globalStats.bestStreak) u.globalStats.bestStreak = u.globalStats
+                        .currentStreak;
+                    u.xp += Math.floor(this.currentBet * (win ? 0.7 : 0.4));
+                    if (!u.gamePlayCount.limbo) u.gamePlayCount.limbo = 0;
+                    u.gamePlayCount.limbo++;
+                    u.gameOutcomes.unshift({
+                        game: 'Limbo',
+                        result: win ? 'win' : 'loss',
+                        profit,
+                        multiplier: crashPoint,
+                        bet: this.currentBet,
+                        date: new Date().toISOString(),
+                    });
+                    if (u.gameOutcomes.length > 200) u.gameOutcomes.length = 200;
+                    this._user.addTransaction(
+                        win ?
+                        `Limbo ${profit >= 0 ? 'Win' : 'Loss'} @ ${crashPoint.toFixed(2)}x +${formatGold(profit)} GOLD` :
+                        `Limbo Crash @ ${crashPoint.toFixed(2)}x -${formatGold(this.currentBet)} GOLD`,
+                        profit,
+                        win ? 'game_win' : 'game_loss'
+                    );
+                    this._user.save();
+                }
+
+                _loop() {
+                    if (!this.roundActive) return;
+                    const now = performance.now();
+                    const elapsed = (now - this.roundStartTime) / 1000;
+                    let raw = CONFIG.MIN_CRASH + (elapsed * CONFIG.CRASH_CURVE_BASE_SPEED) + (elapsed ** 2 * CONFIG
+                        .CRASH_CURVE_ACCEL);
+                    raw = Math.min(raw, this.secretCrashPoint);
+                    this.currentMultiplier = Math.floor(raw * 100) / 100;
+                    const dt = Math.min((now - this._lastTickTime) / 1000, 0.1);
+                    this._lastTickTime = now;
+                    const alpha = 1 - Math.exp(-CONFIG.SMOOTH_SPEED * dt);
+                    this.smoothedMultiplier += (this.currentMultiplier - this.smoothedMultiplier) * alpha;
+                    if (this.onUpdate) {
+                        this.onUpdate({ type: 'tick', mult: this.currentMultiplier, smooth: this.smoothedMultiplier });
+                    }
+                    // Check auto-cashout BEFORE crash so auto-cashout wins on exact match
+                    if (this.autoCashoutEnabled && this.currentMultiplier >= this.autoCashoutTarget && !this._cashedOut) {
+                        this.cashout(true);
+                        return;
+                    }
+                    if (this.currentMultiplier >= this.secretCrashPoint && !this._cashedOut) {
+                        this.crash();
+                        return;
+                    }
+                    this._animFrameId = requestAnimationFrame(() => this._loop());
+                }
+
+                _cancelAnimFrame() {
+                    if (this._animFrameId !== null) {
+                        cancelAnimationFrame(this._animFrameId);
+                        this._animFrameId = null;
+                    }
+                }
+                destroy() {
+                    this._cancelAnimFrame();
+                    this.roundActive = false;
+                    this.onUpdate = null;
+                }
+            }
+
+            // ══════════════════════════════════════
+            //  PARTICLE SYSTEM
+            // ══════════════════════════════════════
+            class ParticleSystem {
+                constructor(canvasId) {
+                    this._canvas = document.getElementById(canvasId);
+                    if (!this._canvas) return;
+                    this._ctx = this._canvas.getContext('2d');
+                    this._animFrameId = null;
+                    this._particles = [];
+                    this._resizeBound = this._onResize.bind(this);
+                    this._resizeTimer = null;
+                    this._init();
+                }
+                _init() {
+                    this._onResize();
+                    this._particles = Array.from({ length: CONFIG.PARTICLE_COUNT }, () => ({
+                        x: Math.random() * this._canvas.width,
+                        y: Math.random() * this._canvas.height,
+                        vx: (Math.random() - 0.5) * 0.35,
+                        vy: (Math.random() - 0.5) * 0.35,
+                        r: Math.random() * 2.2 + 0.8,
+                        alpha: Math.random() * 0.35 + 0.15,
+                    }));
+                    window.addEventListener('resize', this._resizeBound);
+                    this._draw();
+                }
+                _onResize() {
+                    if (this._resizeTimer) clearTimeout(this._resizeTimer);
+                    this._resizeTimer = setTimeout(() => {
+                        if (this._canvas) {
+                            this._canvas.width = window.innerWidth;
+                            this._canvas.height = window.innerHeight;
+                        }
+                    }, 150);
+                }
+                _draw() {
+                    if (!this._canvas || !this._ctx) return;
+                    const ctx = this._ctx;
+                    const w = this._canvas.width;
+                    const h = this._canvas.height;
+                    ctx.clearRect(0, 0, w, h);
+                    for (const p of this._particles) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        if (p.x < -10) p.x = w + 10;
+                        if (p.x > w + 10) p.x = -10;
+                        if (p.y < -10) p.y = h + 10;
+                        if (p.y > h + 10) p.y = -10;
+                        ctx.fillStyle = `rgba(240,200,80,${p.alpha})`;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    this._animFrameId = requestAnimationFrame(() => this._draw());
+                }
+                destroy() {
+                    if (this._animFrameId) cancelAnimationFrame(this._animFrameId);
+                    window.removeEventListener('resize', this._resizeBound);
+                    if (this._resizeTimer) clearTimeout(this._resizeTimer);
+                }
+            }
+
+            // ══════════════════════════════════════
+            //  CHART RENDERER
+            // ══════════════════════════════════════
+            class ChartRenderer {
+                constructor(canvasId) {
+                    this._canvas = document.getElementById(canvasId);
+                    this._resizeObserver = null;
+                    this._initCanvas();
+                }
+                _initCanvas() {
+                    if (!this._canvas) return;
+                    this._syncCanvasSize();
+                    this._resizeObserver = new ResizeObserver(() => this._syncCanvasSize());
+                    this._resizeObserver.observe(this._canvas.parentElement || this._canvas);
+                }
+                _syncCanvasSize() {
+                    if (!this._canvas) return;
+                    const rect = this._canvas.getBoundingClientRect();
+                    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                    const w = rect.width * dpr;
+                    const h = rect.height * dpr;
+                    if (this._canvas.width !== w || this._canvas.height !== h) {
+                        this._canvas.width = w;
+                        this._canvas.height = h;
+                        this._canvas.style.width = rect.width + 'px';
+                        this._canvas.style.height = rect.height + 'px';
+                    }
+                }
+                render(crashHistory) {
+                    if (!this._canvas) return;
+                    const ctx = this._canvas.getContext('2d');
+                    const w = this._canvas.width;
+                    const h = this._canvas.height;
+                    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                    ctx.clearRect(0, 0, w, h);
+                    if (!crashHistory || crashHistory.length === 0) {
+                        ctx.fillStyle = '#7d776c';
+                        ctx.font = `${11 * dpr}px Inter, sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.fillText('No crashes yet', w / 2, h / 2);
+                        return;
+                    }
+                    const history = [...crashHistory].reverse();
+                    const maxCrash = Math.max(...history, 2.5);
+                    const paddingX = 8 * dpr;
+                    const paddingY = 10 * dpr;
+                    const plotW = w - paddingX * 2;
+                    const plotH = h - paddingY * 2;
+                    // Grid lines
+                    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+                    ctx.lineWidth = 0.5 * dpr;
+                    for (let i = 1; i < 4; i++) {
+                        const gy = paddingY + (plotH / 4) * i;
+                        ctx.beginPath();
+                        ctx.moveTo(paddingX, gy);
+                        ctx.lineTo(w - paddingX, gy);
+                        ctx.stroke();
+                    }
+                    // Line
+                    const step = history.length > 1 ? plotW / (history.length - 1) : plotW;
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#f0c850';
+                    ctx.lineWidth = 2 * dpr;
+                    ctx.lineJoin = 'round';
+                    ctx.lineCap = 'round';
+                    history.forEach((val, idx) => {
+                        const x = paddingX + idx * step;
+                        const y = paddingY + plotH - (val / maxCrash) * plotH;
+                        if (idx === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    });
+                    ctx.stroke();
+                    // Gradient fill under line
+                    const lastX = paddingX + (history.length - 1) * step;
+                    const lastY = paddingY + plotH - (history[history.length - 1] / maxCrash) * plotH;
+                    ctx.lineTo(lastX, h - paddingY);
+                    ctx.lineTo(paddingX, h - paddingY);
+                    ctx.closePath();
+                    const grad = ctx.createLinearGradient(0, paddingY, 0, h - paddingY);
+                    grad.addColorStop(0, 'rgba(240,200,80,0.18)');
+                    grad.addColorStop(1, 'rgba(240,200,80,0.01)');
+                    ctx.fillStyle = grad;
+                    ctx.fill();
+                    // Dots
+                    history.forEach((val, idx) => {
+                        const x = paddingX + idx * step;
+                        const y = paddingY + plotH - (val / maxCrash) * plotH;
+                        ctx.fillStyle = val >= 10 ? '#ff5252' : val >= 5 ? '#ff9800' : '#ffe478';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2.8 * dpr, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                }
+                destroy() {
+                    if (this._resizeObserver) this._resizeObserver.disconnect();
+                }
+            }
+
+            // ══════════════════════════════════════
+            //  UI MANAGER
+            // ══════════════════════════════════════
+            class UIManager {
+                constructor(engine, userSession, audio) {
+                    this._engine = engine;
+                    this._user = userSession;
+                    this._audio = audio;
+                    this._currentFilter = 'all';
+                    this._notificationTimer = null;
+                    this._dom = this._cacheDom();
+                    this._bindEvents();
+                    this._particles = new ParticleSystem('particleCanvas');
+                    this._chart = new ChartRenderer('crashCanvas');
+                    // Engine callback
+                    this._engine.onUpdate = (state) => this._handleEngineUpdate(state);
+                    // Initial render
+                    this._refreshAll();
+                }
+
+                _cacheDom() {
+                    const q = (sel) => document.querySelector(sel);
+                    const qa = (sel) => document.querySelectorAll(sel);
+                    return {
+                        balance: q('#balanceDisplay'),
+                        betInput: q('#betAmount'),
+                        targetSlider: q('#targetSlider'),
+                        targetValue: q('#targetValue'),
+                        startBtn: q('#startBtn'),
+                        cashoutBtn: q('#cashoutBtn'),
+                        multiplierDiv: q('#currentMultiplier'),
+                        rocketIcon: q('#rocketIcon'),
+                        resultDiv: q('#resultMessage'),
+                        roundsSpan: q('#roundsCount'),
+                        winsSpan: q('#winsCount'),
+                        plSpan: q('#sessionPL'),
+                        winRateSpan: q('#winRate'),
+                        streakBadge: q('#streakBadge'),
+                        milestoneNotice: q('#milestoneNotice'),
+                        autoToggle: q('#autoCashoutToggle'),
+                        autoValue: q('#autoCashoutValue'),
+                        soundToggle: q('#soundToggle'),
+                        fairnessToggle: q('#fairnessToggle'),
+                        fairnessPanel: q('#fairnessPanel'),
+                        fairHash: q('#fairHash'),
+                        fairSeed: q('#fairSeed'),
+                        sessionResetBtn: q('#sessionResetBtn'),
+                        historyList: q('#roundHistoryList'),
+                        filterBtns: qa('.filter-btn'),
+                        presetBets: qa('.preset[data-bet]'),
+                        presetTargets: qa('.preset[data-target]'),
+                        riskBtns: qa('.risk-btn'),
+                    };
+                }
+
+                _bindEvents() {
+                    const d = this._dom;
+                    d.betInput.addEventListener('input', () => this._validateBet());
+                    d.betInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') this._startGame(); });
+                    d.targetSlider.addEventListener('input', () => {
+                        const v = parseFloat(d.targetSlider.value);
+                        d.targetValue.value = v.toFixed(2);
+                        this._engine.currentTarget = v;
+                    });
+                    d.targetValue.addEventListener('input', () => {
+                        let v = parseFloat(d.targetValue.value);
+                        if (!isNaN(v)) {
+                            v = clamp(v, CONFIG.MIN_CRASH, CONFIG.MAX_CRASH);
+                            d.targetSlider.value = v;
+                            d.targetValue.value = v.toFixed(2);
+                            this._engine.currentTarget = v;
+                        }
+                    });
+                    d.targetValue.addEventListener('blur', () => {
+                        let v = parseFloat(d.targetValue.value);
+                        if (isNaN(v) || v < CONFIG.MIN_CRASH) v = 2.0;
+                        v = clamp(v, CONFIG.MIN_CRASH, CONFIG.MAX_CRASH);
+                        d.targetValue.value = v.toFixed(2);
+                        d.targetSlider.value = v;
+                        this._engine.currentTarget = v;
+                    });
+                    d.presetBets.forEach(btn => btn.addEventListener('click', () => {
+                        const val = btn.dataset.bet;
+                        if (val === 'max') d.betInput.value = Math.floor(this._user.balance);
+                        else d.betInput.value = parseInt(val);
+                        this._validateBet();
+                    }));
+                    d.presetTargets.forEach(btn => btn.addEventListener('click', () => {
+                        const t = parseFloat(btn.dataset.target);
+                        d.targetSlider.value = t;
+                        d.targetValue.value = t.toFixed(2);
+                        this._engine.currentTarget = t;
+                    }));
+                    d.startBtn.addEventListener('click', () => this._startGame());
+                    d.cashoutBtn.addEventListener('click', () => this._engine.cashout(false));
+                    d.soundToggle.addEventListener('click', () => {
+                        const on = this._audio.toggle();
+                        d.soundToggle.innerHTML = on ? '<i class="fas fa-volume-up"></i>' :
+                            '<i class="fas fa-volume-mute"></i>';
+                    });
+                    d.autoToggle.addEventListener('change', () => {
+                        this._engine.autoCashoutEnabled = d.autoToggle.checked;
+                    });
+                    d.fairnessToggle.addEventListener('change', () => {
+                        this._engine.fairnessEnabled = d.fairnessToggle.checked;
+                        d.fairnessPanel.classList.toggle('visible', d.fairnessToggle.checked);
+                        if (!d.fairnessToggle.checked) {
+                            d.fairHash.textContent = '-';
+                            d.fairSeed.textContent = '-';
+                        }
+                    });
+                    d.sessionResetBtn.addEventListener('click', () => {
+                        if (confirm('Reset session stats? (Your balance & profile remain intact)')) {
+                            this._user.resetSessionStats();
+                            this._refreshAll();
+                        }
+                    });
+                    d.filterBtns.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            d.filterBtns.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            this._currentFilter = btn.dataset.filter;
+                            this._renderHistory();
+                        });
+                    });
+                    d.riskBtns.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            if (this._engine.roundActive) return;
+                            d.riskBtns.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            this._engine.riskMode = btn.dataset.risk;
+                        });
+                    });
+                    // Set initial risk button state
+                    this._syncRiskButtons();
+                    // Keyboard shortcut for cashout
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === ' ' && this._engine.roundActive && !e.target.closest('input')) {
+                            e.preventDefault();
+                            this._engine.cashout(false);
+                        }
+                    });
+                }
+
+                _syncRiskButtons() {
+                    const mode = this._engine.riskMode;
+                    this._dom.riskBtns.forEach(b => {
+                        b.classList.toggle('active', b.dataset.risk === mode);
+                    });
+                }
+
+                async _startGame() {
+                    if (this._engine.roundActive) return;
+                    const bet = parseInt(this._dom.betInput.value);
+                    const target = parseFloat(this._dom.targetValue.value) || 2.0;
+                    const autoEnabled = this._dom.autoToggle.checked;
+                    const autoTarget = parseFloat(this._dom.autoValue.value) || 2.0;
+                    if (isNaN(bet) || bet <= 0 || bet > this._user.balance) {
+                        this._flashNotification('Invalid bet or insufficient balance', true);
+                        return;
+                    }
+                    const started = await this._engine.startRound(bet, target, autoEnabled, autoTarget);
+                    if (!started) {
+                        this._flashNotification('Could not start round. Check your balance.', true);
+                        return;
+                    }
+                    this._dom.startBtn.disabled = true;
+                    this._dom.cashoutBtn.disabled = false;
+                    this._dom.cashoutBtn.classList.add('flash-attention');
+                    this._dom.resultDiv.innerHTML = '🚀 ROCKET LIFT OFF!';
+                    this._dom.resultDiv.className = 'result-panel';
+                    this._dom.multiplierDiv.classList.remove('mid', 'high', 'crashed', 'win-flash');
+                    this._dom.multiplierDiv.textContent = '1.00x';
+                    this._dom.rocketIcon.style.animationDuration = '1.2s';
+                    if (this._engine.fairnessEnabled && this._engine.fairHash) {
+                        this._dom.fairHash.textContent = this._engine.fairHash;
+                        this._dom.fairSeed.textContent = '-';
+                    }
+                    this._clearNotificationTimer();
+                    this._refreshStats();
+                }
+
+                _handleEngineUpdate(state) {
+                    switch (state.type) {
+                        case 'tick':
+                            this._updateMultiplierDisplay(state.smooth);
+                            break;
+                        case 'cashout':
+                            this._onCashout(state.mult, state.profit, state.auto);
+                            break;
+                        case 'crash':
+                            this._onCrash(state.mult, state.win, state.profit);
+                            break;
+                    }
+                }
+
+                _updateMultiplierDisplay(smooth) {
+                    const val = smooth.toFixed(2);
+                    this._dom.multiplierDiv.textContent = val + 'x';
+                    const mult = this._engine.currentMultiplier;
+                    this._dom.multiplierDiv.classList.remove('mid', 'high', 'crashed', 'win-flash');
+                    if (mult >= 8) this._dom.multiplierDiv.classList.add('high');
+                    else if (mult >= 3.5) this._dom.multiplierDiv.classList.add('mid');
+                    // Rocket speed increases with multiplier
+                    if (mult > 5) this._dom.rocketIcon.style.animationDuration = '0.6s';
+                    else if (mult > 2) this._dom.rocketIcon.style.animationDuration = '0.9s';
+                }
+
+                _onCashout(mult, profit, auto) {
+                    this._dom.resultDiv.innerHTML =
+                        `💰 CASHED OUT! Won <strong>${formatGold(profit)}</strong> GOLD (${mult.toFixed(2)}x)${auto ? ' <em>(AUTO)</em>' : ''}`;
+                    this._dom.resultDiv.className = 'result-panel win';
+                    this._dom.multiplierDiv.classList.add('win-flash');
+                    this._flashNotification(`🎉 +${formatGold(profit)} GOLD!`, false);
+                    this._endRound();
+                }
+
+                _onCrash(mult, win, profit) {
+                    if (win) {
+                        this._dom.resultDiv.innerHTML =
+                            `🎯 TARGET REACHED! +<strong>${formatGold(profit)}</strong> GOLD (${mult.toFixed(2)}x)`;
+                        this._dom.resultDiv.className = 'result-panel win';
+                        this._dom.multiplierDiv.classList.add('win-flash');
+                        this._flashNotification(`🎯 Target hit! +${formatGold(profit)} GOLD`, false);
+                    } else {
+                        this._dom.resultDiv.innerHTML =
+                            `💥 CRASHED at ${mult.toFixed(2)}x! Lost <strong>${formatGold(Math.abs(profit))}</strong> GOLD`;
+                        this._dom.resultDiv.className = 'result-panel loss';
+                        this._dom.multiplierDiv.classList.add('crashed');
+                        this._flashNotification(`💥 Crash at ${mult.toFixed(2)}x`, true);
+                    }
+                    if (this._engine.fairnessEnabled && this._engine.fairSeed) {
+                        this._dom.fairSeed.textContent = this._engine.fairSeed;
+                    }
+                    this._endRound();
+                }
+
+                _endRound() {
+                    this._dom.startBtn.disabled = false;
+                    this._dom.cashoutBtn.disabled = true;
+                    this._dom.cashoutBtn.classList.remove('flash-attention');
+                    this._dom.multiplierDiv.classList.remove('mid', 'high');
+                    this._dom.rocketIcon.style.animationDuration = '1.8s';
+                    this._refreshAll();
+                    this._validateBet();
+                    this._scheduleResultReset();
+                }
+
+                _scheduleResultReset() {
+                    this._clearNotificationTimer();
+                    this._notificationTimer = setTimeout(() => {
+                        if (!this._engine.roundActive) {
+                            this._dom.resultDiv.innerHTML = 'Ready to launch?';
+                            this._dom.resultDiv.className = 'result-panel';
+                            this._dom.multiplierDiv.classList.remove('crashed', 'win-flash');
+                        }
+                    }, 3500);
+                }
+
+                _clearNotificationTimer() {
+                    if (this._notificationTimer) {
+                        clearTimeout(this._notificationTimer);
+                        this._notificationTimer = null;
+                    }
+                }
+
+                _flashNotification(msg, isErr) {
+                    const notif = this._dom.resultDiv;
+                    notif.innerHTML = msg;
+                    notif.className = isErr ? 'result-panel loss' : 'result-panel win';
+                }
+
+                _validateBet() {
+                    const bet = parseInt(this._dom.betInput.value);
+                    const invalid = isNaN(bet) || bet <= 0 || bet > this._user.balance;
+                    this._dom.startBtn.disabled = invalid || this._engine.roundActive;
+                    if (invalid && document.activeElement === this._dom.betInput) {
+                        this._dom.betInput.classList.add('invalid');
+                        setTimeout(() => this._dom.betInput.classList.remove('invalid'), 400);
+                    }
+                }
+
+                _refreshStats() {
+                    const stats = this._user.sessionStats;
+                    const u = this._user.user;
+                    if (!u) return;
+                    this._dom.balance.textContent = formatGold(u.balance);
+                    this._dom.roundsSpan.textContent = stats.rounds;
+                    this._dom.winsSpan.textContent = stats.wins;
+                    this._dom.plSpan.textContent = (stats.profit >= 0 ? '+' : '') + formatGold(stats.profit);
+                    this._dom.winRateSpan.textContent = stats.winRate + '%';
+                    const streak = u.globalStats.currentStreak || 0;
+                    const best = u.globalStats.bestStreak || 0;
+                    this._dom.streakBadge.innerHTML = `🔥 Streak: ${streak}${best > 0 ? ` (best ${best})` : ''}`;
+                }
+
+                _renderCrashChart() {
+                    const history = this._user.user?.limboStats?.crashHistory || [];
+                    this._chart.render(history);
+                }
+
+                _renderHistory() {
+                    const outcomes = this._user.user?.gameOutcomes || [];
+                    let filtered = outcomes;
+                    if (this._currentFilter === 'win') filtered = outcomes.filter(o => o.result === 'win');
+                    else if (this._currentFilter === 'loss') filtered = outcomes.filter(o => o.result === 'loss');
+                    const items = filtered.slice(0, CONFIG.MAX_HISTORY_OUTCOMES);
+                    this._dom.historyList.innerHTML = items.map(o => {
+                        const cls = o.result === 'win' ? 'win' : 'loss';
+                        const mult = o.multiplier ? ` @ ${o.multiplier.toFixed(2)}x` : '';
+                        const time = new Date(o.date).toLocaleTimeString([], { hour: '2-digit',
+                            minute: '2-digit', second: '2-digit' });
+                        return `<div class="history-item">
+                            <span>${time}</span>
+                            <span class="outcome ${cls}">${o.result === 'win' ? '+' + formatGold(o.profit) : formatGold(o.profit)} GOLD${mult}</span>
+                        </div>`;
+                    }).join('') || '<div style="text-align:center;color:var(--text-muted);padding:1rem;">No history yet</div>';
+                }
+
+                _updateMilestoneNotice() {
+                    const plays = this._user.user?.gamePlayCount?.limbo || 0;
+                    const claimed = this._user.user?.earnedAchievements?.includes('milestone_limbo_12');
+                    const notice = this._dom.milestoneNotice;
+                    if (plays >= CONFIG.MILESTONE_PLAYS && !claimed) {
+                        notice.innerHTML =
+                            `🎁 MILESTONE: ${CONFIG.MILESTONE_PLAYS} PLAYS! <button id="claimMilestoneBtn" class="preset" style="margin-left:8px;cursor:pointer;">CLAIM ${formatGold(CONFIG.MILESTONE_REWARD)} GOLD</button>`;
+                        const claimBtn = document.getElementById('claimMilestoneBtn');
+                        if (claimBtn) claimBtn.addEventListener('click', () => this._claimMilestone(), { once: true });
+                    } else if (plays >= CONFIG.MILESTONE_PLAYS && claimed) {
+                        notice.innerHTML =
+                            `✅ Milestone claimed: +${formatGold(CONFIG.MILESTONE_REWARD)} GOLD (${CONFIG.MILESTONE_PLAYS} plays)`;
+                    } else {
+                        const remaining = CONFIG.MILESTONE_PLAYS - plays;
+                        notice.innerHTML =
+                            `🏆 ${remaining} more play${remaining !== 1 ? 's' : ''} for ${formatGold(CONFIG.MILESTONE_REWARD)} GOLD milestone.`;
+                    }
+                }
+
+                async _claimMilestone() {
+                    const u = this._user.user;
+                    const plays = u.gamePlayCount?.limbo || 0;
+                    const achievementKey = 'milestone_limbo_12';
+                    if (plays >= CONFIG.MILESTONE_PLAYS && !(u.earnedAchievements || []).includes(achievementKey)) {
+                        u.balance += CONFIG.MILESTONE_REWARD;
+                        if (!u.earnedAchievements) u.earnedAchievements = [];
+                        u.earnedAchievements.push(achievementKey);
+                        this._user.addTransaction(
+                            `Limbo Milestone ${CONFIG.MILESTONE_PLAYS} plays +${formatGold(CONFIG.MILESTONE_REWARD)} GOLD`,
+                            CONFIG.MILESTONE_REWARD, 'deposit');
+                        await this._user.save();
+                        this._refreshAll();
+                        this._flashNotification(`🎉 Milestone reward: +${formatGold(CONFIG.MILESTONE_REWARD)} GOLD!`, false);
+                        this._audio.play('win');
+                    }
+                }
+
+                _refreshAll() {
+                    this._refreshStats();
+                    this._renderCrashChart();
+                    this._renderHistory();
+                    this._updateMilestoneNotice();
+                }
+
+                destroy() {
+                    this._clearNotificationTimer();
+                    this._particles.destroy();
+                    this._chart.destroy();
+                    this._engine.onUpdate = null;
+                }
+            }
+
+            // ══════════════════════════════════════
+            //  APPLICATION INITIALIZATION
+            // ══════════════════════════════════════
+            async function initApp() {
+                const audio = new SoundEngine();
+                const userSession = new UserSession();
+                const loaded = await userSession.load();
+                if (!loaded) return;
+
+                const engine = new CrashEngine(userSession, audio);
+                const ui = new UIManager(engine, userSession, audio);
+
+                // Set initial sound icon
+                const soundToggle = document.getElementById('soundToggle');
+                if (soundToggle) {
+                    soundToggle.innerHTML = audio.enabled ? '<i class="fas fa-volume-up"></i>' :
+                        '<i class="fas fa-volume-mute"></i>';
+                }
+
+                // Set initial fairness panel state
+                const fairnessPanel = document.getElementById('fairnessPanel');
+                const fairnessToggle = document.getElementById('fairnessToggle');
+                if (fairnessPanel && fairnessToggle && engine.fairnessEnabled) {
+                    fairnessPanel.classList.add('visible');
+                    fairnessToggle.checked = true;
+                }
+
+                // Cleanup on page unload
+                const cleanup = () => {
+                    ui.destroy();
+                    engine.destroy();
+                    audio.destroy();
+                };
+                window.addEventListener('beforeunload', cleanup, { once: true });
+                window.addEventListener('pagehide', cleanup, { once: true });
+
+                // Expose for debugging only in development
+                if (typeof window.__LIMBO_DEV__ !== 'undefined') {
+                    window.__limboApp = { engine, userSession, audio, ui };
+                }
+            }
+
+            // Start the application
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initApp);
+            } else {
+                initApp();
+            }
+        })();
+    </script>
+</body>
+</html>
