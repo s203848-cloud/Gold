@@ -3654,16 +3654,6 @@
                 if (!isNaN(amt)) transferToWallet(amt);
                 else showToast('Enter a valid amount', true);
             });
-            document.getElementById('depositBtn').addEventListener('click', () => {
-                const amt = parseInt(document.getElementById('depositAmount').value);
-                if (!isNaN(amt)) deposit(amt);
-                else showToast('Enter a valid amount', true);
-            });
-            document.getElementById('withdrawBtn').addEventListener('click', () => {
-                const amt = parseInt(document.getElementById('withdrawAmount').value);
-                if (!isNaN(amt)) withdraw(amt);
-                else showToast('Enter a valid amount', true);
-            });
             document.getElementById('logoutBtn').addEventListener('click', (e) => {
                 e.stopPropagation();
                 sessionStorage.removeItem('gold_current_user');
