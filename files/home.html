@@ -2293,7 +2293,6 @@
     <button class="floating-btn" id="quickActionBtn" title="Quick Deposit/Withdraw">+🪙</button>
 
     <!-- Modals -->
-<<<<<<< HEAD
     <div class="modal" id="quickModal">
         <div class="modal-content">
             <h3>Quick Deposit / Withdraw</h3>
@@ -2305,17 +2304,18 @@
                 <button class="chip-btn" data-target="quickAmount" data-amount="1000">+1000</button>
             </div>
             <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+                <button id="quickDepositModalBtn" class="gold-btn">Deposit</button>
+                <button id="quickWithdrawModalBtn" class="gold-btn gold-btn-outline">Withdraw</button>
             </div>
             <button class="transfer-btn" id="closeQuickModal" style="margin-top:0.8rem;width:100%;">Close</button>
         </div>
     </div>
-=======
->>>>>>> 94f404805962fca6be35e02ef921cb98641b5075
     <div class="modal" id="txModal">
         <div class="modal-content">
             <h3>Transaction History</h3>
             <select id="txFilter">
                 <option value="all">All</option><option value="deposit">Deposits</option><option value="withdraw">Withdrawals</option><option value="transfer">Transfers</option>
+                <option value="all">All</option><option value="transfer">Transfers</option>
             </select>
             <div id="txList" style="max-height:300px;overflow-y:auto;margin-top:0.5rem;"></div>
             <button class="transfer-btn" id="closeTxModal" style="margin-top:0.8rem;width:100%;">Close</button>
@@ -3631,6 +3631,16 @@
                 if (!isNaN(amt)) transferToWallet(amt);
                 else showToast('Enter a valid amount', true);
             });
+            document.getElementById('depositBtn').addEventListener('click', () => {
+                const amt = parseInt(document.getElementById('depositAmount').value);
+                if (!isNaN(amt)) deposit(amt);
+                else showToast('Enter a valid amount', true);
+            });
+            document.getElementById('withdrawBtn').addEventListener('click', () => {
+                const amt = parseInt(document.getElementById('withdrawAmount').value);
+                if (!isNaN(amt)) withdraw(amt);
+                else showToast('Enter a valid amount', true);
+            });
             document.getElementById('logoutBtn').addEventListener('click', (e) => {
                 e.stopPropagation();
                 sessionStorage.removeItem('gold_current_user');
@@ -3685,6 +3695,14 @@
                 const amt = parseInt(document.getElementById('quickAmount').value);
                 if (!isNaN(amt) && amt > 0) {
                     deposit(amt);
+                    document.getElementById('quickModal').classList.remove('active');
+                    document.getElementById('quickAmount').value = '';
+                } else showToast('Enter a valid amount', true);
+            });
+            document.getElementById('quickWithdrawModalBtn').addEventListener('click', () => {
+                const amt = parseInt(document.getElementById('quickAmount').value);
+                if (!isNaN(amt) && amt > 0) {
+                    withdraw(amt);
                     document.getElementById('quickModal').classList.remove('active');
                     document.getElementById('quickAmount').value = '';
                 } else showToast('Enter a valid amount', true);
