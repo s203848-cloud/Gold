@@ -2293,6 +2293,24 @@
     <button class="floating-btn" id="quickActionBtn" title="Quick Deposit/Withdraw">+🪙</button>
 
     <!-- Modals -->
+<<<<<<< HEAD
+    <div class="modal" id="quickModal">
+        <div class="modal-content">
+            <h3>Quick Deposit / Withdraw</h3>
+            <input type="number" id="quickAmount" class="transfer-input" placeholder="Amount" style="width:100%;">
+            <div style="margin-top:0.8rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                <button class="chip-btn" data-target="quickAmount" data-amount="50">+50</button>
+                <button class="chip-btn" data-target="quickAmount" data-amount="100">+100</button>
+                <button class="chip-btn" data-target="quickAmount" data-amount="500">+500</button>
+                <button class="chip-btn" data-target="quickAmount" data-amount="1000">+1000</button>
+            </div>
+            <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+            </div>
+            <button class="transfer-btn" id="closeQuickModal" style="margin-top:0.8rem;width:100%;">Close</button>
+        </div>
+    </div>
+=======
+>>>>>>> 94f404805962fca6be35e02ef921cb98641b5075
     <div class="modal" id="txModal">
         <div class="modal-content">
             <h3>Transaction History</h3>
@@ -3662,6 +3680,14 @@
             });
             document.getElementById('closeQuickModal').addEventListener('click', () => {
                 document.getElementById('quickModal').classList.remove('active');
+            });
+            document.getElementById('quickDepositModalBtn').addEventListener('click', () => {
+                const amt = parseInt(document.getElementById('quickAmount').value);
+                if (!isNaN(amt) && amt > 0) {
+                    deposit(amt);
+                    document.getElementById('quickModal').classList.remove('active');
+                    document.getElementById('quickAmount').value = '';
+                } else showToast('Enter a valid amount', true);
             });
             document.getElementById('closeSessionModal').addEventListener('click', () => {
                 document.getElementById('sessionSummaryModal').classList.remove('active');
