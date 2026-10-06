@@ -955,6 +955,39 @@
         .loan-tag.late { background: rgba(255, 80, 80, 0.2); color: #ff8a8a; }
         .loan-note { font-size: 0.74rem; color: var(--theme-text-muted); line-height: 1.6; margin-top: 0.6rem; }
 
+        /* ── DEBT POPOVER ── */
+        .debt-tag { cursor: pointer; transition: var(--transition-fast); user-select: none; }
+        .debt-tag:hover { background: rgba(255, 80, 80, 0.25); transform: translateY(-1px); }
+        .debt-popover {
+            position: fixed;
+            z-index: 2500;
+            width: 290px;
+            max-width: calc(100vw - 16px);
+            background: rgba(22, 20, 17, 0.97);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 120, 100, 0.4);
+            border-radius: var(--radius-md);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+            padding: 1rem 1.1rem;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(6px);
+            transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+        }
+        .debt-popover.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .debt-popover input, .debt-popover button { margin: 0.2rem; }
+        .dp-head { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--theme-text-muted); font-weight: 700; }
+        .dp-close { background: transparent; border: none; color: var(--theme-text-muted); font-size: 1.1rem; cursor: pointer; line-height: 1; }
+        .dp-close:hover { color: #fff; }
+        .dp-rows { text-align: left; font-size: 0.78rem; color: var(--theme-text-secondary); margin: 0.5rem 0; }
+        .dp-row { display: flex; justify-content: space-between; padding: 0.15rem 0; }
+        .dp-row strong { color: var(--theme-text-primary); }
+        .dp-row.good strong { color: #50c878; }
+        .dp-row.bad strong { color: #ff8a8a; }
+        .dp-chips { display: flex; gap: 0.3rem; justify-content: center; flex-wrap: wrap; margin-top: 0.3rem; }
+
         /* ── SEARCH / FILTER BAR ── */
         .games-filter-bar {
             display: flex;
@@ -1611,7 +1644,7 @@
             <div class="balance-card" id="walletCard">
                 <h3><i class="fas fa-wallet"></i> WALLET MONEY <span id="streakFire" style="display:none;" class="streak-fire">🔥</span></h3>
                 <div class="balance-amount"><span id="userBalance">0</span><span class="currency-label"> GOLD</span></div>
-                <div class="gold-badge">| Betting |</div><span class="debt-tag" id="walletDebtTag"></span>
+                <div class="gold-badge">| Betting |</div><span class="debt-tag" id="walletDebtTag" role="button" tabindex="0" title="Hover or click to manage your loan"></span>
                 <div class="transfer-buttons">
                     <input type="number" id="transferToBankAmount" class="transfer-input" placeholder="Amount" value="10" min="1" step="1" inputmode="numeric">
                     <button id="toBankBtn" class="transfer-btn"><i class="fas fa-arrow-right"></i> To Bank</button>
@@ -1909,6 +1942,7 @@
                 { days: 14, adj: 0.05, label: 'Long' }
             ];
             const LOAN_MIN_FEE = 0.05;
+            const LEVEL_INTEREST_STEP = 0.01;    // interest multiplier grows by 0.01 per player level (Lv.10 = x1.10)
             const EARLY_WINDOW = 0.5;            // repay in full in the first 50% of the term...
             const EARLY_REBATE = 0.25;           // ...and get 25% of the fee back
             const LATE_FEE_RATE = 0.05;          // +5% of principal for every full day overdue
@@ -1930,40 +1964,40 @@
             ];
 
             const gameDefinitions = [
-                { id: 'slots', name: 'GOLD SLOTS', icon: 'fas fa-gem', desc: 'Classic 3-reel, high volatility', href: 'games/slots.html', milestonePlays: 10, milestoneReward: 500000 },
-                { id: 'dice', name: 'DICE DUEL', icon: 'fas fa-dice', desc: 'Predict the roll, multiply your GOLD', href: 'games/dice.html', milestonePlays: 15, milestoneReward: 600000 },
-                { id: 'crash', name: 'CRASH ROCKET', icon: 'fas fa-chart-line', desc: 'Cash out before it explodes!', href: 'games/crash.html', milestonePlays: 8, milestoneReward: 400000 },
-                { id: 'roulette', name: 'ROULETTE ROYAL', icon: 'far fa-circle', desc: 'Spin the wheel, win big', href: 'games/roulette.html', milestonePlays: 12, milestoneReward: 550000 },
-                { id: 'blackjack', name: 'BLACKJACK', icon: 'fas fa-coins', desc: '21 classic, dealer stands on soft 17', href: 'games/blackjack.html', milestonePlays: 10, milestoneReward: 500000 },
-                { id: 'mines', name: 'GOLD MINES', icon: 'fas fa-bomb', desc: 'Uncover gems, avoid mines', href: 'games/mines.html', milestonePlays: 20, milestoneReward: 800000 },
-                { id: 'coin-flip', name: 'COIN FLIP', icon: 'far fa-circle-question', desc: 'Flip the coin, double or nothing', href: 'games/coin-flip.html', milestonePlays: 40, milestoneReward: 1600000 },
-                { id: 'plinko-drop', name: 'PLINKO DROP', icon: 'fas fa-circle', desc: 'Drop the coin, multiply your gold', href: 'games/plinko-drop.html', milestonePlays: 10, milestoneReward: 500000 },
-                { id: 'hi-lo', name: 'HiLo', icon: 'fas fa-arrows-up-down', desc: 'Draw a card, then guess whether the next card is Higher or Lower.', href: 'games/hilo.html', milestonePlays: 30, milestoneReward: 1200000 },
-                { id: 'baccarat', name: 'BACCARAT', icon: 'fas fa-coins', desc: 'Bet on the hand that the total value, try be Closest to Nine.', href: 'games/baccarat.html', milestonePlays: 30, milestoneReward: 1200000 },
-                { id: 'tower-climb', name: 'TOWER CLIMB', icon: 'far fa-building', desc: 'Higher you climb, more multiplier increases. Cash out anytime.', href: 'games/tower-climb.html', milestonePlays: 10, milestoneReward: 400000 },
-                { id: 'ladder', name: 'LADDER', icon: 'fas fa-arrow-up-short-wide', desc: 'Each step adds more risk with increasing probability. Cash out when necessary.', href: 'games/ladder.html', milestonePlays: 10, milestoneReward: 400000 },
-                { id: 'keno', name: 'KENO', icon: 'fas fa-shuffle', desc: 'Pick a card any card, lower the chances higher the reward.', href: 'games/keno.html', milestonePlays: 20, milestoneReward: 600000 },
-                { id: 'scratch-card', name: 'SCRATCH CARD', icon: 'fas fa-layer-group', desc: 'Scratch off 3. If all match the same symbol, win.', href: 'games/scratch-card.html', milestonePlays: 30, milestoneReward: 800000 },
-                { id: 'gold-tile-path', name: 'GOLD TILE PATH', icon: 'fas fa-gem', desc: 'Navigate the tile path and collect gold!', href: 'games/gold-tile-path.html', milestonePlays: 15, milestoneReward: 300000 },
-                { id: 'card-match', name: 'CARD MATCH', icon: 'fas fa-arrow-right-arrow-left', desc: 'Flip cards, find pairs. More pairs, more gold, Avoid the bombs.', href: 'games/card-match.html', milestonePlays: 20, milestoneReward: 500000 },
-                { id: 'vault-breaker', name: 'VAULT BREAKER', icon: 'fas fa-vault', desc: 'Break the vault by guessing the code. Least attempts and time, highest reward.', href: 'games/vault-breaker.html', milestonePlays: 10, milestoneReward: 400000 },
-                { id: 'texas-holdem-poker', name: "TEXAS HOLD'EM POKER", icon: 'fas fa-coins', desc: 'Competitive card game combining skill, Strategy, Luck, Where players bet on having the best 5-card hand.', href: 'games/texas-holdem-poker.html', milestonePlays: 10, milestoneReward: 400000 },
-                { id: 'horse-racing', name: 'HORSE RACING', icon: 'fas fa-horse', desc: 'Bet on the horse you think will win, For a prize. Each horse has different odds and payout multipliers.', href: 'games/horse-racing.html', milestonePlays: 3, milestoneReward: 300000 },
-                { id: 'sic-bo', name: 'SIC BO', icon: 'fas fa-random', desc: 'Guess the number, win the prize.', href: 'games/sic-bo.html', milestonePlays: 10, milestoneReward: 300000 },
-                { id: 'snake-eyes', name: 'SNAKE EYES', icon: 'fas fa-dice-two', desc: 'Bet on any total. Rare doubles pay huge!', href: 'games/snake-eyes.html', milestonePlays: 15, milestoneReward: 600000 },
-                { id: 'bingo', name: 'GOLD RUSH BINGO', icon: 'fas fa-table-cells', desc: 'Mark off numbers and hit the jackpot!', href: 'games/bingo.html', milestonePlays: 5, milestoneReward: 1000000 },
-                { id: 'war', name: 'WAR', icon: 'fas fa-crosshairs', desc: 'Higher card wins. Tie? Go to WAR!', href: 'games/war.html', milestonePlays: 20, milestoneReward: 500000 },
-                { id: 'cash-or-crash', name: 'CASH OR CRASH', icon: 'fas fa-suitcase', desc: 'Pick a Case, Win Gold or Lose Big!', href: 'games/cash-or-crash.html', milestonePlays: 10, milestoneReward: 500000 },
-                { id: 'gold-miner', name: 'GOLD MINER', icon: 'fas fa-gem', desc: 'Mine gold in the mines!', href: 'games/gold-miner.html', milestonePlays: 15, milestoneReward: 300000 },
-                { id: 'mystery-crate', name: 'MYSTERY CRATE', icon: 'fas fa-box', desc: 'Open mystery crates and find hidden treasures!', href: 'games/mystery-crate.html', milestonePlays: 15, milestoneReward: 300000 },
-                { id: 'crystal-push', name: 'CRYSTAL PUSH', icon: 'fas fa-gem', desc: 'Match Crytstals, Enlarge your payout!', href: 'games/crystal-push.html', milestonePlays: 20, milestoneReward: 800000 },
-                { id: 'bank-heist', name: 'BANK HEIST', icon: 'fas fa-bank', desc: 'Rob the bank and steal all the gold!', href: 'games/bank-heist.html', milestonePlays: 25, milestoneReward: 1000000 },
-                { id: 'craps', name: 'CRAPS', icon: 'fas fa-dice', desc: 'Roll the dice and win big!', href: 'games/craps.html', milestonePlays: 10, milestoneReward: 500000 },
-                { id: 'golden-keys', name: 'GOLDEN KEYS', icon: 'fas fa-key', desc: 'Pick the key that matches, and earn big!', href: 'games/golden-keys.html', milestonePlays: 10, milestoneReward: 500000 },
-                { id: 'limbo', name: 'LIMBO', icon: 'far fa-question-circle', desc: 'Predict a multiplier. Cash out before the rocket crashes, or multiply your GOLD!', href: 'games/limbo.html', milestonePlays: 12, milestoneReward: 600000 },
-                { id: 'wheel-of-fortune', name: 'WHEEL OF FORTUNE', icon: 'far fa-dot-circle', desc: 'Spin the wheel, land on a multiplier, bet on a color or number for extra thrill.', href: 'games/wheel-of-fortune.html', milestonePlays: 10, milestoneReward: 500000 },
-                { id: 'darts', name: 'DARTS', icon: 'fas fa-bullseye', desc: 'Aim at the dartboard. Each ring has a multiplier. Hit the bullseye to multiply your bet up to 50x. Miss and lose.', href: 'games/darts.html', milestonePlays: 12, milestoneReward: 600000 },
-                { id: 'snakes', name: 'SNAKES', icon: 'fab fa-shoelace', desc: 'Climb the ladder one step at a time. Each step increases your multiplier. But watch out, snakes can bite and send you down to zero.', href: 'games/snakes.html', milestonePlays: 10, milestoneReward: 500000 }
+                { id: 'slots', name: 'GOLD SLOTS', icon: 'fas fa-gem', desc: 'Classic 3-reel, high volatility', href: 'games/slots.html', milestonePlays: 10, milestoneReward: 500 },
+                { id: 'dice', name: 'DICE DUEL', icon: 'fas fa-dice', desc: 'Predict the roll, multiply your GOLD', href: 'games/dice.html', milestonePlays: 15, milestoneReward: 600 },
+                { id: 'crash', name: 'CRASH ROCKET', icon: 'fas fa-chart-line', desc: 'Cash out before it explodes!', href: 'games/crash.html', milestonePlays: 8, milestoneReward: 400 },
+                { id: 'roulette', name: 'ROULETTE ROYAL', icon: 'far fa-circle', desc: 'Spin the wheel, win big', href: 'games/roulette.html', milestonePlays: 12, milestoneReward: 550 },
+                { id: 'blackjack', name: 'BLACKJACK', icon: 'fas fa-coins', desc: '21 classic, dealer stands on soft 17', href: 'games/blackjack.html', milestonePlays: 10, milestoneReward: 500 },
+                { id: 'mines', name: 'GOLD MINES', icon: 'fas fa-bomb', desc: 'Uncover gems, avoid mines', href: 'games/mines.html', milestonePlays: 20, milestoneReward: 800 },
+                { id: 'coin-flip', name: 'COIN FLIP', icon: 'far fa-circle-question', desc: 'Flip the coin, double or nothing', href: 'games/coin-flip.html', milestonePlays: 40, milestoneReward: 1600 },
+                { id: 'plinko-drop', name: 'PLINKO DROP', icon: 'fas fa-circle', desc: 'Drop the coin, multiply your gold', href: 'games/plinko-drop.html', milestonePlays: 10, milestoneReward: 500 },
+                { id: 'hi-lo', name: 'HiLo', icon: 'fas fa-arrows-up-down', desc: 'Draw a card, then guess whether the next card is Higher or Lower.', href: 'games/hilo.html', milestonePlays: 30, milestoneReward: 1200 },
+                { id: 'baccarat', name: 'BACCARAT', icon: 'fas fa-coins', desc: 'Bet on the hand that the total value, try be Closest to Nine.', href: 'games/baccarat.html', milestonePlays: 30, milestoneReward: 1200 },
+                { id: 'tower-climb', name: 'TOWER CLIMB', icon: 'far fa-building', desc: 'Higher you climb, more multiplier increases. Cash out anytime.', href: 'games/tower-climb.html', milestonePlays: 10, milestoneReward: 400 },
+                { id: 'ladder', name: 'LADDER', icon: 'fas fa-arrow-up-short-wide', desc: 'Each step adds more risk with increasing probability. Cash out when necessary.', href: 'games/ladder.html', milestonePlays: 10, milestoneReward: 400 },
+                { id: 'keno', name: 'KENO', icon: 'fas fa-shuffle', desc: 'Pick a card any card, lower the chances higher the reward.', href: 'games/keno.html', milestonePlays: 20, milestoneReward: 600 },
+                { id: 'scratch-card', name: 'SCRATCH CARD', icon: 'fas fa-layer-group', desc: 'Scratch off 3. If all match the same symbol, win.', href: 'games/scratch-card.html', milestonePlays: 30, milestoneReward: 800 },
+                { id: 'gold-tile-path', name: 'GOLD TILE PATH', icon: 'fas fa-gem', desc: 'Navigate the tile path and collect gold!', href: 'games/gold-tile-path.html', milestonePlays: 15, milestoneReward: 300 },
+                { id: 'card-match', name: 'CARD MATCH', icon: 'fas fa-arrow-right-arrow-left', desc: 'Flip cards, find pairs. More pairs, more gold, Avoid the bombs.', href: 'games/card-match.html', milestonePlays: 20, milestoneReward: 500 },
+                { id: 'vault-breaker', name: 'VAULT BREAKER', icon: 'fas fa-vault', desc: 'Break the vault by guessing the code. Least attempts and time, highest reward.', href: 'games/vault-breaker.html', milestonePlays: 10, milestoneReward: 400 },
+                { id: 'texas-holdem-poker', name: "TEXAS HOLD'EM POKER", icon: 'fas fa-coins', desc: 'Competitive card game combining skill, Strategy, Luck, Where players bet on having the best 5-card hand.', href: 'games/texas-holdem-poker.html', milestonePlays: 10, milestoneReward: 400 },
+                { id: 'horse-racing', name: 'HORSE RACING', icon: 'fas fa-horse', desc: 'Bet on the horse you think will win, For a prize. Each horse has different odds and payout multipliers.', href: 'games/horse-racing.html', milestonePlays: 3, milestoneReward: 300 },
+                { id: 'sic-bo', name: 'SIC BO', icon: 'fas fa-random', desc: 'Guess the number, win the prize.', href: 'games/sic-bo.html', milestonePlays: 10, milestoneReward: 300 },
+                { id: 'snake-eyes', name: 'SNAKE EYES', icon: 'fas fa-dice-two', desc: 'Bet on any total. Rare doubles pay huge!', href: 'games/snake-eyes.html', milestonePlays: 15, milestoneReward: 600 },
+                { id: 'bingo', name: 'GOLD RUSH BINGO', icon: 'fas fa-table-cells', desc: 'Mark off numbers and hit the jackpot!', href: 'games/bingo.html', milestonePlays: 5, milestoneReward: 1000 },
+                { id: 'war', name: 'WAR', icon: 'fas fa-crosshairs', desc: 'Higher card wins. Tie? Go to WAR!', href: 'games/war.html', milestonePlays: 20, milestoneReward: 500 },
+                { id: 'cash-or-crash', name: 'CASH OR CRASH', icon: 'fas fa-suitcase', desc: 'Pick a Case, Win Gold or Lose Big!', href: 'games/cash-or-crash.html', milestonePlays: 10, milestoneReward: 500 },
+                { id: 'gold-miner', name: 'GOLD MINER', icon: 'fas fa-gem', desc: 'Mine gold in the mines!', href: 'games/gold-miner.html', milestonePlays: 15, milestoneReward: 300 },
+                { id: 'mystery-crate', name: 'MYSTERY CRATE', icon: 'fas fa-box', desc: 'Open mystery crates and find hidden treasures!', href: 'games/mystery-crate.html', milestonePlays: 15, milestoneReward: 300 },
+                { id: 'crystal-push', name: 'CRYSTAL PUSH', icon: 'fas fa-gem', desc: 'Match Crytstals, Enlarge your payout!', href: 'games/crystal-push.html', milestonePlays: 20, milestoneReward: 800 },
+                { id: 'bank-heist', name: 'BANK HEIST', icon: 'fas fa-bank', desc: 'Rob the bank and steal all the gold!', href: 'games/bank-heist.html', milestonePlays: 25, milestoneReward: 1000 },
+                { id: 'craps', name: 'CRAPS', icon: 'fas fa-dice', desc: 'Roll the dice and win big!', href: 'games/craps.html', milestonePlays: 10, milestoneReward: 500 },
+                { id: 'golden-keys', name: 'GOLDEN KEYS', icon: 'fas fa-key', desc: 'Pick the key that matches, and earn big!', href: 'games/golden-keys.html', milestonePlays: 10, milestoneReward: 500 },
+                { id: 'limbo', name: 'LIMBO', icon: 'far fa-question-circle', desc: 'Predict a multiplier. Cash out before the rocket crashes, or multiply your GOLD!', href: 'games/limbo.html', milestonePlays: 12, milestoneReward: 600 },
+                { id: 'wheel-of-fortune', name: 'WHEEL OF FORTUNE', icon: 'far fa-dot-circle', desc: 'Spin the wheel, land on a multiplier, bet on a color or number for extra thrill.', href: 'games/wheel-of-fortune.html', milestonePlays: 10, milestoneReward: 500 },
+                { id: 'darts', name: 'DARTS', icon: 'fas fa-bullseye', desc: 'Aim at the dartboard. Each ring has a multiplier. Hit the bullseye to multiply your bet up to 50x. Miss and lose.', href: 'games/darts.html', milestonePlays: 12, milestoneReward: 600 },
+                { id: 'snakes', name: 'SNAKES', icon: 'fab fa-shoelace', desc: 'Climb the ladder one step at a time. Each step increases your multiplier. But watch out, snakes can bite and send you down to zero.', href: 'games/snakes.html', milestonePlays: 10, milestoneReward: 500 }
             ];
 
             const achievementsList = [
@@ -2345,9 +2379,12 @@
                     const od = isOverdue(currentUser.loan);
                     debtTag.style.display = 'inline-block';
                     debtTag.classList.toggle('overdue', od);
-                    debtTag.textContent = `${od ? '⚠️ Overdue' : '💳 Debt'}: ${currentUser.loan.owed.toLocaleString()} GOLD`;
+                    debtTag.textContent = `${od ? '⚠️ Overdue' : '💳 Debt'}: ${currentUser.loan.owed.toLocaleString()} GOLD ▾`;
+                    const pop = document.getElementById('debtPopover');
+                    if (pop && pop.classList.contains('show')) { renderDebtPopover(); positionDebtPopover(); }
                 } else {
                     debtTag.style.display = 'none';
+                    hideDebtPopover(true);
                 }
 
                 const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
@@ -2430,8 +2467,13 @@
             function feeRateFor(termDays) {
                 const tier = creditTier(currentUser.creditScore || CREDIT_START);
                 const term = LOAN_TERMS.find(t => t.days === termDays) || LOAN_TERMS[1];
-                return Math.max(LOAN_MIN_FEE, Math.round((tier.fee + term.adj) * 100) / 100);
+                const base = Math.max(LOAN_MIN_FEE, tier.fee + term.adj);
+                return Math.round(base * levelInterestMult() * 1000) / 1000;
             }
+
+            function playerLevel() { return getLevel(currentUser.xp || 0).level; }
+            function levelInterestMult() { return 1 + LEVEL_INTEREST_STEP * playerLevel(); }
+            function fmtPct(r) { return (Math.round(r * 1000) / 10) + '%'; }
 
             function loanOwedFor(amount, rate) { return Math.ceil(amount * (1 + rate)); }
 
@@ -2674,7 +2716,7 @@
                     <div class="credit-box">
                         <div class="credit-top"><span>Credit score</span><strong style="color:${tier.color};">${score} · ${tier.name}</strong></div>
                         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${tier.color};"></div></div>
-                        <div class="loan-meta" style="margin:0;">Borrowing limit <strong>${maxLoanAllowed().toLocaleString()}</strong> GOLD · base fee <strong>${Math.round(tier.fee * 100)}%</strong>. Repay on time to raise your score, lower your fees and unlock bigger loans.</div>
+                        <div class="loan-meta" style="margin:0;">Borrowing limit <strong>${maxLoanAllowed().toLocaleString()}</strong> GOLD · base fee <strong>${Math.round(tier.fee * 100)}%</strong> × <strong>${levelInterestMult().toFixed(2)}</strong> level multiplier (Lv.${playerLevel()}, +${LEVEL_INTEREST_STEP} per level). Repay on time to raise your score, lower your fees and unlock bigger loans.</div>
                     </div>`;
 
                 if (loan) {
@@ -2686,7 +2728,7 @@
                         <div class="loan-section-title">Current loan</div>
                         <div class="loan-detail-grid">
                             <div class="loan-detail"><div class="loan-detail-val" style="color:#ff9a9a;">${loan.owed.toLocaleString()}</div><div class="loan-detail-label">Owed now</div></div>
-                            <div class="loan-detail"><div class="loan-detail-val">${loan.principal.toLocaleString()}</div><div class="loan-detail-label">Borrowed (${Math.round(loan.feeRate * 100)}% fee)</div></div>
+                            <div class="loan-detail"><div class="loan-detail-val">${loan.principal.toLocaleString()}</div><div class="loan-detail-label">Borrowed (${fmtPct(loan.feeRate)} fee)</div></div>
                             <div class="loan-detail"><div class="loan-detail-val" style="${overdue ? 'color:#ff7a7a;' : ''}">${overdue ? 'Overdue ' + fmtDur(Date.now() - due) : fmtDur(due - Date.now())}</div><div class="loan-detail-label">${overdue ? 'Past due' : 'Time left'}</div></div>
                             <div class="loan-detail"><div class="loan-detail-val">${payoff.toLocaleString()}</div><div class="loan-detail-label">Pay-off today${rebate > 0 ? ` (-${rebate.toLocaleString()} rebate)` : ''}</div></div>
                         </div>
@@ -2705,7 +2747,7 @@
                     html += `
                         <div class="loan-section-title">Choose a term</div>
                         <div class="term-row">
-                            ${LOAN_TERMS.map(t => `<button class="term-pill ${t.days === loanSelectedTerm ? 'active' : ''}" data-term="${t.days}"><b>${t.days} days</b>${Math.round(feeRateFor(t.days) * 100)}% fee</button>`).join('')}
+                            ${LOAN_TERMS.map(t => `<button class="term-pill ${t.days === loanSelectedTerm ? 'active' : ''}" data-term="${t.days}"><b>${t.days} days</b>${fmtPct(feeRateFor(t.days))} fee</button>`).join('')}
                         </div>
                         <div class="loan-section-title">Choose an amount</div>
                         ${options.map(a => `
@@ -2729,6 +2771,132 @@
                         </div>`).join('');
                 }
                 body.innerHTML = html;
+            }
+
+            // ── Debt popover (hover or click the debt tag) ──
+            let debtPopoverPinned = false;
+            let debtHideTimer = null;
+
+            function renderDebtPopover() {
+                const pop = document.getElementById('debtPopover');
+                if (!pop || !currentUser || !currentUser.loan) return;
+                const loan = currentUser.loan;
+                const prev = document.getElementById('debtPayAmt');
+                const prevVal = prev ? prev.value : '';
+                const start = new Date(loan.takenAt).getTime();
+                const due = new Date(loan.dueAt).getTime();
+                const overdue = isOverdue(loan);
+                const elapsed = Math.min(1, Math.max(0, (Date.now() - start) / Math.max(1, due - start)));
+                const rebate = loanRebateNow(loan);
+                const payoff = payoffNow(loan);
+                const fee = Math.max(0, loan.baseOwed - loan.principal);
+                pop.innerHTML = `
+                    <div class="dp-head"><span><i class="fas fa-landmark"></i> Your loan</span><button class="dp-close" data-dp="close" aria-label="Close">×</button></div>
+                    <div class="loan-owed">${loan.owed.toLocaleString()} GOLD</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${(elapsed * 100).toFixed(0)}%;background:${overdue ? '#ff5a5a' : 'var(--theme-gold)'};"></div></div>
+                    <div class="loan-meta ${overdue ? 'overdue' : ''}">${overdue ? `⚠️ Overdue by ${fmtDur(Date.now() - due)}` : `Due in <strong>${fmtDur(due - Date.now())}</strong>`}</div>
+                    <div class="dp-rows">
+                        <div class="dp-row"><span>Borrowed</span><strong>${loan.principal.toLocaleString()}</strong></div>
+                        <div class="dp-row"><span>Interest (${fmtPct(loan.feeRate)})</span><strong>${fee.toLocaleString()}</strong></div>
+                        ${(loan.lateFees || 0) > 0 ? `<div class="dp-row bad"><span>Late fees</span><strong>${loan.lateFees.toLocaleString()}</strong></div>` : ''}
+                        ${rebate > 0 ? `<div class="dp-row good"><span>Early rebate</span><strong>-${rebate.toLocaleString()}</strong></div>` : ''}
+                        <div class="dp-row"><span>Pay off today</span><strong>${payoff.toLocaleString()}</strong></div>
+                        <div class="dp-row"><span>Your wallet</span><strong>${Math.floor(currentUser.balance).toLocaleString()}</strong></div>
+                    </div>
+                    <div class="loan-repay-row">
+                        <input type="number" id="debtPayAmt" class="transfer-input" min="1" step="1" placeholder="Amount" value="${prevVal}">
+                        <button class="gold-btn" data-dp="pay">Pay</button>
+                    </div>
+                    <div class="dp-chips">
+                        <button class="chip-btn" data-dp="q25">25%</button>
+                        <button class="chip-btn" data-dp="q50">50%</button>
+                        <button class="chip-btn" data-dp="max">Max</button>
+                        <button class="chip-btn" data-dp="payoff">Pay off</button>
+                    </div>
+                    <button class="transfer-btn" data-dp="desk" style="margin-top:0.5rem;width:100%;">Open Loan Desk</button>`;
+            }
+
+            function positionDebtPopover() {
+                const tag = document.getElementById('walletDebtTag');
+                const pop = document.getElementById('debtPopover');
+                if (!tag || !pop) return;
+                const r = tag.getBoundingClientRect();
+                const w = pop.offsetWidth || 290;
+                const h = pop.offsetHeight || 0;
+                const left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), window.innerWidth - w - 8);
+                let top = r.bottom + 8;
+                if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 8);
+                pop.style.left = left + 'px';
+                pop.style.top = top + 'px';
+            }
+
+            function showDebtPopover() {
+                const pop = document.getElementById('debtPopover');
+                if (!pop || !currentUser || !currentUser.loan) return;
+                clearTimeout(debtHideTimer);
+                renderDebtPopover();
+                pop.classList.add('show');
+                positionDebtPopover();
+            }
+
+            function hideDebtPopover(force) {
+                const pop = document.getElementById('debtPopover');
+                if (!pop) return;
+                if (debtPopoverPinned && !force) return;
+                if (force) debtPopoverPinned = false;
+                pop.classList.remove('show');
+            }
+
+            function setupDebtPopover() {
+                const tag = document.getElementById('walletDebtTag');
+                const pop = document.createElement('div');
+                pop.id = 'debtPopover';
+                pop.className = 'debt-popover';
+                document.body.appendChild(pop);
+                const scheduleHide = () => { clearTimeout(debtHideTimer); debtHideTimer = setTimeout(() => hideDebtPopover(false), 250); };
+
+                tag.addEventListener('mouseenter', showDebtPopover);
+                tag.addEventListener('mouseleave', scheduleHide);
+                pop.addEventListener('mouseenter', () => clearTimeout(debtHideTimer));
+                pop.addEventListener('mouseleave', scheduleHide);
+                tag.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (pop.classList.contains('show') && debtPopoverPinned) { hideDebtPopover(true); return; }
+                    showDebtPopover();
+                    debtPopoverPinned = true;
+                });
+                tag.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tag.click(); }
+                });
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('#debtPopover') && !e.target.closest('#walletDebtTag')) hideDebtPopover(true);
+                });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideDebtPopover(true); });
+                const reposition = () => { if (pop.classList.contains('show')) positionDebtPopover(); };
+                window.addEventListener('resize', reposition);
+                window.addEventListener('scroll', reposition, true);
+
+                pop.addEventListener('click', (e) => {
+                    e.stopPropagation(); // the popover re-renders after payments, so keep this click away from the outside-click handler
+                    const btn = e.target.closest('[data-dp]');
+                    if (!btn || !currentUser.loan) return;
+                    const loan = currentUser.loan;
+                    const wallet = Math.floor(currentUser.balance);
+                    const payoff = payoffNow(loan);
+                    const act = btn.dataset.dp;
+                    if (act === 'close') { hideDebtPopover(true); return; }
+                    if (act === 'desk') { hideDebtPopover(true); loanPromptDismissed = false; openLoanModal(); return; }
+                    if (act === 'pay') { repayLoan(parseFloat(document.getElementById('debtPayAmt').value)); return; }
+                    if (act === 'payoff') {
+                        if (wallet < payoff) { showToast(`You need ${payoff.toLocaleString()} GOLD in your wallet to pay off the loan.`, true); return; }
+                        repayLoan(payoff);
+                        return;
+                    }
+                    const amount = act === 'max' ? Math.min(wallet, payoff)
+                        : Math.min(wallet, payoff, Math.ceil(loan.owed * (act === 'q25' ? 0.25 : 0.5)));
+                    if (amount < 1) { showToast('Your wallet is empty. Move funds from the bank first.', true); return; }
+                    repayLoan(amount);
+                });
             }
 
             function openLoanModal() {
@@ -3800,6 +3968,8 @@
                     if (!currentUser || !currentUser.loan) return;
                     renderLoanCard();
                     if (document.getElementById('loanModal').classList.contains('active')) renderLoanModal();
+                    const dp = document.getElementById('debtPopover');
+                    if (dp && dp.classList.contains('show')) renderDebtPopover();
                     await processLoanStatus();
                 }, 60000);
 
@@ -3914,6 +4084,7 @@
             // START
             // ══════════════════════════════════════════
             setupLoanModalListeners();
+            setupDebtPopover();
             initSearchFilter();
             initInventory();
             initAll();
