@@ -2290,7 +2290,35 @@
             // ══════════════════════════════════════════
             // CLOCK & GOLD RUSH COUNTDOWN
             // ══════════════════════════════════════════
-
+            function updateClock() {
+                const now = new Date();
+                const clockDisplay = document.getElementById('clockDisplay');
+                const countdownDisplay = document.getElementById('goldRushCountdown');
+                if (clockDisplay) {
+                    clockDisplay.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }
+                if (countdownDisplay) {
+                    const goldRushHour = 20;
+                    let rushStart = new Date(now);
+                    rushStart.setHours(goldRushHour, 0, 0, 0);
+                    let rushEnd = new Date(now);
+                    rushEnd.setHours(goldRushHour + 1, 0, 0, 0);
+                    if (now >= rushStart && now < rushEnd) {
+                        const remaining = rushEnd - now;
+                        const mins = Math.floor(remaining / 60000);
+                        const secs = Math.floor((remaining % 60000) / 1000);
+                        countdownDisplay.textContent = `⚡ GOLD RUSH! ${mins}m ${secs}s`;
+                        countdownDisplay.classList.add('gold-rush-active');
+                    } else {
+                        if (now >= rushEnd) rushStart.setDate(rushStart.getDate() + 1);
+                        const diff = rushStart - now;
+                        const hrs = Math.floor(diff / 3600000);
+                        const mins = Math.floor((diff % 3600000) / 60000);
+                        countdownDisplay.textContent = `⏳ Rush in ${hrs}h ${mins}m`;
+                        countdownDisplay.classList.remove('gold-rush-active');
+                    }
+                }
+            }
 
             // ══════════════════════════════════════════
             // BALANCE DISPLAY
