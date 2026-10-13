@@ -181,25 +181,101 @@
         .drop-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 #a05f15; transition: 0.08s; }
         .drop-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(30%); }
 
-        .auto-drop-btn {
-            width: 100%; border: none; border-radius: var(--radius-full);
-            font-weight: 800; font-size: 1.15rem; padding: 0.95rem;
-            cursor: pointer; transition: all 0.15s;
-            text-transform: uppercase; letter-spacing: 1.5px;
-            background: linear-gradient(135deg, #f5b042 0%, #ffd966 40%, #ffed4e 100%);
-            color: #1a150e;
-            box-shadow: 0 5px 0 #a05f15, 0 8px 20px rgba(255,180,40,0.3);
-            position: relative; overflow: hidden;
+        :root {
+        --widget-width: 160px;
+        --widget-height: 44px;
+        --pill-width: 76px; /* Slightly less than half to leave a margin */
         }
-        .auto-drop-btn::after {
-            content: ''; position: absolute; top: -50%; left: -60%;
-            width: 40%; height: 200%; background: rgba(255,255,255,0.2);
-            transform: rotate(25deg); transition: left 0.6s;
+
+        .auto-drop-widget {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: var(--widget-width);
+        height: var(--widget-height);
+        background-color: #2a2d32; /* Dark theme background */
+        border-radius: 30px;
+        padding: 0 8px;
+        box-sizing: border-box;
+        cursor: pointer;
+        user-select: none;
+        border: 2px solid #3f444e;
         }
-        .auto-drop-btn:hover:not(:disabled)::after { left: 120%; }
-        .auto-drop-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 0 #a05f15, 0 14px 30px rgba(255,180,40,0.45); }
-        .auto-drop-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 #a05f15; transition: 0.08s; }
-        .auto-drop-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(30%); }
+
+        /* The sliding capsule background */
+        .slider-pill {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        width: var(--pill-width);
+        height: calc(var(--widget-height) - 12px);
+        background-color: #4e5564; /* Off state color */
+        border-radius: 20px;
+        transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.3s;
+        z-index: 1;
+        }
+
+        /* Smooth Slide and Color Shift to ON State */
+        .auto-drop-widget.is-active .slider-pill {
+        transform: translateX(calc(var(--widget-width) - var(--pill-width) - 12px));
+        background-color: #ffb700; /* Gold theme color when active */
+        }
+
+        /* Text labels */
+        .status-text {
+        font-family: sans-serif;
+        font-size: 12px;
+        font-weight: bold;
+        color: #8e94a0;
+        z-index: 2;
+        pointer-events: none; /* Clicks pass through to the widget */
+        transition: color 0.3s;
+        width: 30px;
+        text-align: center;
+        }
+
+        .auto-drop-widget.is-active .right-text { color: #000; }
+        .auto-drop-widget:not(.is-active) .left-text { color: #fff; }
+
+        /* Central Input Textbox styling */
+        .input-wrapper {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3; /* Sits completely on top so you can type */
+        display: flex;
+        align-items: center;
+        background: #1a1c1f;
+        border-radius: 6px;
+        padding: 2px 4px;
+        border: 1px solid #444;
+        }
+
+        .input-wrapper input {
+        width: 35px;
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-weight: bold;
+        text-align: center;
+        font-size: 14px;
+        outline: none;
+        }
+
+        /* Hide standard HTML spinner arrows for clean look */
+        .input-wrapper input::-webkit-outer-spin-button,
+        .input-wrapper input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+        }
+
+        .unit-text {
+        color: #666;
+        font-size: 12px;
+        margin-left: 1px;
+        }
+
         .result-panel {
             background: rgba(0,0,0,0.5); border-radius: var(--radius-md);
             padding: 0.8rem 1.2rem; text-align: center; font-weight: 600;
@@ -281,7 +357,22 @@
             
             <div class="drop-row">
                 <button id="dropBtn" class="drop-btn" disabled><i class="fas fa-circle-down"></i> DROP BALL</button>
-                <button id="autoDropBtn" class="auto-drop-btn" disabled><i class="fas fa-circle-down"></i> AUTO DROP </button>
+                <div class="auto-drop-widget" id="autoDropWidget">
+                <!-- Left Side Label -->
+                <span class="status-text left-text">OFF</span>
+                
+                <!-- Central Dynamic Input -->
+                <div class="input-wrapper">
+                    <input type="number" id="dropIntervalInput" value="0.1" step="0.1" min="0.05" max="10">
+                    <span class="unit-text">s</span>
+                </div>
+                
+                <!-- Right Side Label -->
+                <span class="status-text right-text">ON</span>
+                
+                <!-- The Sliding Capsule Background -->
+                <div class="slider-pill"></div>
+                </div>
             </div>
 
             <div class="result-panel" id="resultMessage"><i class="fas fa-info-circle"></i> Select risk & bet, then drop the ball!</div>
@@ -462,6 +553,60 @@
             if (bet > 0 && currentUser && bet > currentUser.balance) inp.classList.add('invalid');
             else inp.classList.remove('invalid');
         }
+
+        const widget = document.getElementById('autoDropWidget');
+        const intervalInput = document.getElementById('dropIntervalInput');
+
+        let autoDropInterval = null;
+        let isActive = false;
+
+        // Simulated function for dropping your game ball
+        function dropBall() {
+        console.log("Ball dropped automatically!");
+        }
+
+        // Start or restart the loop with the fresh input value
+        function startLoop() {
+        if (autoDropInterval) clearInterval(autoDropInterval);
+        
+        // Read value (e.g. 0.1) and convert seconds to milliseconds
+        const seconds = parseFloat(intervalInput.value) || 0.1;
+        const milliseconds = Math.max(seconds * 1000, 50); // Safe minimum cap at 50ms
+        
+        autoDropInterval = setInterval(dropBall, milliseconds);
+        }
+
+        // Stop the loop
+        function stopLoop() {
+        if (autoDropInterval) {
+            clearInterval(autoDropInterval);
+            autoDropInterval = null;
+        }
+        }
+
+        // Toggle logic handler
+        widget.addEventListener('click', (e) => {
+        // CRITICAL: If the user clicked inside the text box, do not flip the switch!
+        if (e.target === intervalInput) return;
+
+        isActive = !isActive;
+        
+        if (isActive) {
+            widget.classList.add('is-active');
+            startLoop();
+        } else {
+            widget.classList.remove('is-active');
+            stopLoop();
+        }
+        });
+
+        // Update the rate immediately on-the-fly if the user types a new number while ON
+        intervalInput.addEventListener('input', () => {
+        if (isActive) {
+            startLoop();
+        }
+        });
+
 
         // ── BOARD CONSTANTS ──
         const canvas = document.getElementById('plinkoCanvas');
