@@ -194,13 +194,13 @@
         justify-content: space-between;
         width: var(--widget-width);
         height: var(--widget-height);
-        background-color: #2a2d32; /* Dark theme background */
+        background-color: linear-gradient(135deg, #f5b042 0%, #ffd966 40%, #ffed4e 100%); /* Dark theme background */
         border-radius: 30px;
         padding: 0 8px;
         box-sizing: border-box;
         cursor: pointer;
         user-select: none;
-        border: 2px solid #3f444e;
+        border: 2px solid #ce8e28;
         }
 
         /* The sliding capsule background */
@@ -210,7 +210,7 @@
         left: 4px;
         width: var(--pill-width);
         height: calc(var(--widget-height) - 12px);
-        background-color: #4e5564; /* Off state color */
+        background-color: #f5b042; /* Off state color */
         border-radius: 20px;
         transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.3s;
         z-index: 1;
@@ -219,7 +219,7 @@
         /* Smooth Slide and Color Shift to ON State */
         .auto-drop-widget.is-active .slider-pill {
         transform: translateX(calc(var(--widget-width) - var(--pill-width) - 12px));
-        background-color: #ffb700; /* Gold theme color when active */
+        background-color: linear-gradient(135deg, #f5b042 0%, #ffd966 40%, #ffed4e 100%); /* Gold theme color when active */
         }
 
         /* Text labels */
@@ -227,7 +227,7 @@
         font-family: sans-serif;
         font-size: 12px;
         font-weight: bold;
-        color: #8e94a0;
+        color: #ffd966;
         z-index: 2;
         pointer-events: none; /* Clicks pass through to the widget */
         transition: color 0.3s;
@@ -246,17 +246,17 @@
         z-index: 3; /* Sits completely on top so you can type */
         display: flex;
         align-items: center;
-        background: #1a1c1f;
+        background: linear-gradient(135deg, #f5b042 0%, #ffd966 40%, #ffed4e 100%);
         border-radius: 6px;
         padding: 2px 4px;
-        border: 1px solid #444;
+        border: 1px solid #ce8e28;
         }
 
         .input-wrapper input {
         width: 35px;
         background: transparent;
         border: none;
-        color: #fff;
+        color: linear-gradient(135deg, #f5b042 0%, #ffd966 40%, #ffed4e 100%);
         font-weight: bold;
         text-align: center;
         font-size: 14px;
