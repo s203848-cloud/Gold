@@ -1390,7 +1390,7 @@
                     const overallRating = (speed * 0.45 + stamina * 0.3 + form * 0.25);
                     const baseOdds = Math.max(1.3, Math.round((2.5 / (overallRating + 0.3)) * 100) / 100);
                     const oddsVariation = (Math.random() - 0.5) * 1.5;
-                    const odds = Math.max(1.2, Math.round((baseOdds + oddsVariation) * 100) / 100);
+                    const odds = Math.max(1.2, Math.round((baseOdds + oddsVariation) * 100) / 10);
 
                     horses.push({
                         name: HORSE_NAMES[i],
