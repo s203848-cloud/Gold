@@ -1,1 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GOLD | The Ledger — Changelog</title>
+    <link rel="icon" type="image/x-icon" href="../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        :root {
+            --gold: #ffd966;
+            --gold-dim: #c9a840;
+            --gold-glow: rgba(255, 217, 102, 0.25);
+            --gold-soft: rgba(255, 217, 102, 0.08);
+            --gold-hover: rgba(255, 217, 102, 0.18);
+            --bg-deep: #030303;
+            --border-subtle: rgba(255, 217, 102, 0.15);
+            --border-medium: rgba(255, 217, 102, 0.3);
+            --border-strong: rgba(255, 217, 102, 0.5);
+            --text-primary: #f5f0e6;
+            --text-secondary: #bbb6aa;
+            --text-muted: #8a8478;
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --radius-xl: 40px;
+            --radius-full: 60px;
+            --shadow-glow: 0 0 40px -5px rgba(255, 217, 102, 0.15);
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --theme-card: rgba(20, 18, 16, 0.75);
+            --theme-gold: #ffd966;
+            --theme-border-subtle: rgba(255, 217, 102, 0.15);
+            --theme-text-secondary: #bbb6aa;
+            --theme-text-muted: #8a8478;
+            --scrollbar-thumb: #ffd96640;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(ellipse at 30% 20%, #0f0d08 0%, #060508 55%, #020103 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0805; }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+
+        .bg-glow {
+            position: fixed; width: 60vw; height: 60vw; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 217, 102, 0.06) 0%, transparent 70%);
+            pointer-events: none; z-index: 0; filter: blur(80px);
+            animation: orbFloat 16s ease-in-out infinite alternate;
+        }
+        @keyframes orbFloat { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(40px,-30px) scale(1.1); } }
+
+        .particles-container { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+        .particle {
+            position: absolute; border-radius: 50%; background: var(--gold); opacity: 0;
+            animation: floatUp 7s infinite ease-in; box-shadow: 0 0 6px var(--gold);
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0); opacity: 0; }
+            15% { opacity: 0.7; }
+            40% { transform: translateY(-160px) scale(1); opacity: 0.3; }
+            70% { transform: translateY(-320px) scale(0.5); opacity: 0.1; }
+            100% { transform: translateY(-460px) scale(0); opacity: 0; }
+        }
+
+        .grid-overlay {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+            background-image: linear-gradient(rgba(255,217,102,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,217,102,0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* NAVBAR */
+        .tab-nav-wrapper {
+            position: sticky; top: 0; z-index: 500;
+            background: rgba(3,3,3,0.92); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--theme-border-subtle); padding: 0 2rem;
+        }
+        .tab-nav-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: stretch; justify-content: space-between; }
+        .tab-nav-brand { display: flex; align-items: center; gap: 0.7rem; padding: 1rem 0; }
+        .tab-nav-brand span { font-size: 1.2rem; font-weight: 800; color: var(--theme-gold); letter-spacing: 2px; }
+        .tab-list { display: flex; align-items: center; gap: 0.8rem; }
+        .nav-link {
+            background: none; border: none; color: var(--theme-text-muted); font-weight: 600;
+            font-size: 0.85rem; letter-spacing: 1px; padding: 0.5rem 1rem; border-radius: var(--radius-full);
+            text-decoration: none; transition: all var(--transition-fast); cursor: pointer;
+        }
+        .nav-link:hover, .nav-link.active { color: var(--theme-gold); background: var(--gold-soft); }
+        .tab-nav-actions { display: flex; align-items: center; gap: 0.8rem; }
+        .nav-icon-btn {
+            background: rgba(255,217,102,0.08); border: 1px solid var(--theme-border-subtle);
+            color: var(--theme-gold); border-radius: 50%; width: 38px; height: 38px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .nav-icon-btn:hover { background: var(--gold-hover); transform: scale(1.05); }
+
+        .page-container { max-width: 1000px; margin: 0 auto; padding: 2rem 2rem 6rem; position: relative; z-index: 2; }
+
+        /* Hero */
+        .cl-hero { text-align: center; margin: 2rem 0 2.5rem; animation: fadeUp 0.8s var(--transition-bounce); }
+        .hero-eyebrow { font-size: 0.75rem; letter-spacing: 5px; color: var(--theme-gold); font-weight: 700; margin-bottom: 0.7rem; }
+        .hero-title {
+            font-size: 3.6rem; font-weight: 800;
+            background: linear-gradient(135deg, #ffd966, #ffb347, #ffd966);
+            background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent;
+            margin-bottom: 1rem; font-family: 'Playfair Display', serif; line-height: 1.2;
+        }
+        .hero-sub { font-size: 1.05rem; color: var(--theme-text-secondary); max-width: 650px; margin: 0 auto; line-height: 1.6; }
+        .current-version {
+            display: inline-flex; align-items: center; gap: 0.6rem; margin-top: 1.5rem;
+            padding: 0.5rem 1.2rem; border-radius: var(--radius-full);
+            border: 1px solid var(--border-medium); background: var(--gold-soft);
+            font-weight: 700; font-size: 0.85rem; letter-spacing: 1.5px; color: var(--gold);
+        }
+        .current-version .dot { width: 8px; height: 8px; border-radius: 50%; background: #5dd68a; box-shadow: 0 0 8px #5dd68a; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+        /* Stats */
+        .stats-row {
+            display: flex; flex-wrap: wrap; justify-content: space-around;
+            background: rgba(0,0,0,0.35); border-radius: var(--radius-xl);
+            padding: 1.5rem 2rem; margin: 2rem 0; gap: 1.5rem; border: 1px solid var(--theme-border-subtle);
+        }
+        .stat-item { text-align: center; min-width: 120px; }
+        .stat-number { font-size: 2rem; font-weight: 800; color: var(--theme-gold); }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--theme-text-muted); }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        .search-box {
+            position: relative; flex: 1 1 260px; max-width: 360px;
+        }
+        .search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem; }
+        .search-box input {
+            width: 100%; background: var(--theme-card); border: 1px solid var(--border-subtle);
+            color: var(--text-primary); border-radius: var(--radius-full); padding: 0.7rem 1rem 0.7rem 2.6rem;
+            font-family: inherit; font-size: 0.85rem; outline: none; transition: all var(--transition-fast);
+        }
+        .search-box input:focus { border-color: var(--border-strong); box-shadow: 0 0 0 3px var(--gold-soft); }
+        .filter-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .chip {
+            background: transparent; border: 1px solid var(--border-subtle); color: var(--text-secondary);
+            padding: 0.4rem 0.9rem; border-radius: var(--radius-full); font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 1px; cursor: pointer; font-family: inherit; transition: all var(--transition-fast);
+            display: inline-flex; align-items: center; gap: 0.4rem;
+        }
+        .chip:hover { border-color: var(--border-medium); color: var(--gold); }
+        .chip.active { background: var(--gold-soft); border-color: var(--border-strong); color: var(--gold); }
+        .toolbar-actions { display: flex; gap: 0.5rem; }
+        .mini-btn {
+            background: none; border: 1px solid var(--border-subtle); color: var(--text-muted);
+            padding: 0.4rem 0.8rem; border-radius: var(--radius-full); font-size: 0.72rem; font-weight: 600;
+            cursor: pointer; font-family: inherit; transition: all var(--transition-fast);
+        }
+        .mini-btn:hover { color: var(--gold); border-color: var(--border-medium); }
+
+        /* Timeline */
+        .cl-timeline { position: relative; padding-left: 2.2rem; }
+        .cl-timeline::before {
+            content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px;
+            background: linear-gradient(to bottom, var(--border-medium), var(--border-subtle) 70%, transparent);
+        }
+        .cl-entry { position: relative; margin-bottom: 1.5rem; animation: fadeUp 0.5s ease both; }
+        .cl-entry::before {
+            content: ''; position: absolute; left: -2.2rem; top: 1.6rem; width: 16px; height: 16px;
+            background: var(--gold); border-radius: 50%; border: 3px solid var(--bg-deep); z-index: 3;
+            box-shadow: 0 0 0 1px var(--border-medium);
+        }
+        .cl-entry.latest::before { box-shadow: 0 0 14px var(--gold), 0 0 0 1px var(--gold); }
+        .cl-entry.upcoming::before { background: transparent; border: 2px dashed var(--gold-dim); }
+        .cl-entry.hidden { display: none; }
+
+        .cl-card {
+            background: var(--theme-card); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--theme-border-subtle); border-radius: var(--radius-lg);
+            transition: all var(--transition-smooth); overflow: hidden;
+        }
+        .cl-card:hover { border-color: var(--border-medium); box-shadow: var(--shadow-glow); }
+        .cl-entry.latest .cl-card { border-color: var(--border-medium); box-shadow: 0 0 30px rgba(255,217,102,0.1); }
+        .cl-entry.upcoming .cl-card { border-style: dashed; }
+
+        .cl-head { padding: 1.3rem 1.6rem; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+        .cl-head:hover { background: rgba(255,217,102,0.03); }
+        .cl-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; }
+        .cl-version { font-weight: 800; letter-spacing: 1.5px; color: var(--gold); font-size: 0.95rem; }
+        .cl-date { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 1px; }
+        .badge {
+            font-size: 0.62rem; font-weight: 800; letter-spacing: 1.5px; padding: 0.2rem 0.65rem;
+            border-radius: var(--radius-full); text-transform: uppercase; border: 1px solid;
+        }
+        .badge.latest { color: #5dd68a; border-color: rgba(93,214,138,0.4); background: rgba(93,214,138,0.1); }
+        .badge.beta { color: #ffb347; border-color: rgba(255,179,71,0.4); background: rgba(255,179,71,0.1); }
+        .badge.hotfix { color: #ff7a7a; border-color: rgba(255,122,122,0.4); background: rgba(255,122,122,0.1); }
+        .badge.upcoming { color: #8ab4ff; border-color: rgba(138,180,255,0.4); background: rgba(138,180,255,0.1); }
+        .badge.stable { color: var(--text-muted); border-color: var(--border-subtle); background: transparent; }
+
+        .cl-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .cl-summary { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.55; }
+        .cl-toggle { color: var(--gold); transition: transform var(--transition-smooth); margin-top: 0.4rem; flex-shrink: 0; }
+        .cl-entry.open .cl-toggle { transform: rotate(180deg); }
+
+        .cl-type-summary { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.7rem; }
+        .type-pill { font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.6rem; border-radius: var(--radius-full); background: rgba(255,255,255,0.04); color: var(--text-secondary); }
+        .type-pill i { margin-right: 0.3rem; }
+
+        .cl-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .cl-entry.open .cl-body { max-height: 2400px; }
+        .cl-body-inner { padding: 0 1.6rem 1.4rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem; }
+        .cl-group { margin-bottom: 1rem; }
+        .cl-group:last-child { margin-bottom: 0; }
+        .cl-group h5 { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .cl-group ul { list-style: none; }
+        .cl-group li {
+            position: relative; padding: 0.3rem 0 0.3rem 1.2rem; font-size: 0.86rem;
+            color: var(--text-secondary); line-height: 1.55;
+        }
+        .cl-group li::before { content: ''; position: absolute; left: 0; top: 0.85rem; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.6; }
+        .cl-group li code {
+            background: rgba(255,217,102,0.1); color: var(--gold); padding: 0.05rem 0.4rem;
+            border-radius: 6px; font-size: 0.8rem; font-family: 'SF Mono', Consolas, monospace;
+        }
+        .cl-group li mark { background: rgba(255,217,102,0.3); color: var(--text-primary); border-radius: 3px; padding: 0 2px; }
+        .cl-permalink { margin-top: 1rem; font-size: 0.72rem; color: var(--text-muted); cursor: pointer; background: none; border: none; font-family: inherit; }
+        .cl-permalink:hover { color: var(--gold); }
+
+        .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); display: none; }
+        .empty-state i { font-size: 2rem; color: var(--gold-dim); margin-bottom: 0.8rem; display: block; }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #f5b042, #ffd966); border: none; color: #1a1712; font-weight: 800;
+            padding: 0.8rem 2rem; border-radius: var(--radius-full); cursor: pointer; transition: all 0.2s;
+            font-size: 1rem; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;
+        }
+        .btn-gold:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(255,217,102,0.3); filter: brightness(1.05); }
+        .cta-section {
+            background: linear-gradient(145deg, rgba(255,217,102,0.1), transparent);
+            border-radius: var(--radius-xl); padding: 2.5rem; text-align: center; margin-top: 3rem;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .footer {
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); border-top: 1px solid var(--border-subtle);
+            padding: 3rem 2rem 1.5rem; margin-top: 4rem; display: flex; flex-wrap: wrap;
+            justify-content: space-between; gap: 2rem; position: relative; z-index: 2;
+        }
+        .footer-col h4 { color: var(--gold); margin-bottom: 1rem; font-size: 0.9rem; letter-spacing: 1px; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li a { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; line-height: 1.8; transition: color 0.2s; }
+        .footer-col ul li a:hover { color: var(--gold); }
+        .footer-bottom { width: 100%; text-align: center; color: var(--text-muted); font-size: 0.7rem; margin-top: 2rem; }
+
+        .back-to-top {
+            position: fixed; bottom: 30px; right: 30px; z-index: 999; background: var(--gold-soft);
+            border: 1px solid var(--border-subtle); color: var(--gold); width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0;
+            transform: translateY(20px); transition: 0.3s; pointer-events: none; backdrop-filter: blur(10px);
+        }
+        .back-to-top.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .back-to-top:hover { background: var(--gold-hover); border-color: var(--border-medium); }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 20px); z-index: 1000;
+            background: var(--theme-card); backdrop-filter: blur(16px); border: 1px solid var(--border-medium);
+            color: var(--gold); padding: 0.6rem 1.4rem; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600;
+            opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 800px) {
+            .page-container { padding: 1rem 1.2rem 4rem; }
+            .hero-title { font-size: 2.4rem; }
+            .tab-nav-brand span { font-size: 0.9rem; }
+            .tab-list { gap: 0.3rem; }
+            .nav-link { font-size: 0.7rem; padding: 0.3rem 0.6rem; }
+            .stats-row { gap: 1rem; padding: 1.2rem; }
+            .cl-timeline { padding-left: 1.8rem; }
+            .cl-entry::before { left: -1.8rem; }
+            .cl-head { padding: 1.1rem; }
+            .cl-body-inner { padding: 1rem 1.1rem 1.2rem; }
+            .footer { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow" style="top: -10%; left: -15%;"></div>
+    <div class="bg-glow" style="bottom: -5%; right: -20%;"></div>
+    <div class="grid-overlay"></div>
+    <div class="particles-container" id="particlesContainer"></div>
+
+    <!-- Navigation -->
+    <div class="tab-nav-wrapper">
+        <div class="tab-nav-inner">
+            <div class="tab-nav-brand">
+                <i class="fas fa-crown" style="color: var(--theme-gold);"></i>
+                <span>GOLD</span>
+            </div>
+            <div class="tab-list">
+                <a href="home.html" class="nav-link">HOME</a>
+                <a href="dashboard.html" class="nav-link">DASHBOARD</a>
+                <a href="shop.html" class="nav-link">EMPORIUM</a>
+                <a href="about.html" class="nav-link">ABOUT</a>
+                <a href="changelog.html" class="nav-link active">CHANGELOG</a>
+            </div>
+            <div class="tab-nav-actions">
+                <div class="nav-icon-btn" id="ambienceToggle"><i class="fas fa-volume-mute"></i></div>
+                <a href="../sign-in.html" class="nav-link" style="background: var(--gold-soft);">SIGN IN</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-container">
+        <div class="cl-hero">
+            <div class="hero-eyebrow" id="heroEyebrow"></div>
+            <h1 class="hero-title" id="heroTitle"></h1>
+            <p class="hero-sub" id="heroSub"></p>
+            <div class="current-version"><span class="dot"></span><span id="currentVersion"></span></div>
+        </div>
+
+        <div class="stats-row" id="statsRow"></div>
+
+        <div class="toolbar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search updates..." autocomplete="off">
+            </div>
+            <div class="filter-chips" id="filterChips"></div>
+            <div class="toolbar-actions">
+                <button class="mini-btn" id="expandAll"><i class="fas fa-angles-down"></i> Expand</button>
+                <button class="mini-btn" id="collapseAll"><i class="fas fa-angles-up"></i> Collapse</button>
+            </div>
+        </div>
+
+        <div class="cl-timeline" id="timeline"></div>
+        <div class="empty-state" id="emptyState"><i class="fas fa-magnifying-glass"></i>No updates match your search.</div>
+
+        <div class="cta-section">
+            <i class="fas fa-lightbulb" style="font-size: 2rem; color: var(--theme-gold); margin-bottom: 0.5rem; display: inline-block;"></i>
+            <h2 style="margin-bottom: 0.5rem;">Got a suggestion?</h2>
+            <p style="margin-bottom: 1.5rem; color: var(--text-secondary); max-width: 520px; margin-left: auto; margin-right: auto;">GOLD is shaped by its players. Tell us what you want to see in the next update.</p>
+            <a href="about.html" class="btn-gold"><i class="fas fa-paper-plane"></i> SEND FEEDBACK</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-col">
+            <h4>GOLD CASINO</h4>
+            <ul>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="#">Careers</a></li>
+                <li><a href="#">Press Kit</a></li>
+                <li><a href="#">Responsible Gaming</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>GAMES</h4>
+            <ul>
+                <li><a href="#">Slots</a></li>
+                <li><a href="#">Table Games</a></li>
+                <li><a href="#">Live Dealer</a></li>
+                <li><a href="#">Crash</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>SUPPORT</h4>
+            <ul>
+                <li><a href="#">Help Center</a></li>
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">Provably Fair</a></li>
+                <li><a href="#">FAQ</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>LEGAL</h4>
+            <ul>
+                <li><a href="#">Terms &amp; Conditions</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Cookie Policy</a></li>
+                <li><a href="#">KYC/AML</a></li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 GOLD CASINO — A PREMIUM GAMING EXPERIENCE. ALL RIGHTS RESERVED.</p>
+            <p style="margin-top: 0.3rem;">18+ Only. Terms apply. Play responsibly. Gambling can be addictive. Please play responsibly.</p>
+        </div>
+    </div>
+
+    <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+    /* ════════════════════════════════════════════════════════════════
+       ✦ EDIT THIS SECTION ONLY — everything below it is the engine ✦
+       ════════════════════════════════════════════════════════════════
+
+       HOW TO ADD AN UPDATE
+       Copy any block inside CHANGELOG, paste it anywhere in the array
+       (order doesn't matter — entries auto-sort by date, newest first),
+       then change the fields:
+
+         version : text shown as the version tag, e.g. 'ALPHA.1.9.2'
+         date    : 'YYYY-MM-DD'
+         title   : headline of the update
+         summary : one or two sentences (optional)
+         status  : 'stable' | 'beta' | 'hotfix' | 'upcoming'
+         changes : list of  [ type, 'text' ]
+                   types   : 'added' | 'changed' | 'fixed' | 'removed' | 'security'
+                   in text : `backticks` make inline code
+
+       The newest non-upcoming entry is automatically marked LATEST and
+       also drives the "current version" badge at the top.
+       ════════════════════════════════════════════════════════════════ */
+
+    const SITE = {
+        eyebrow:  '✦ PATCH NOTES ✦',
+        title:    'The Gold Ledger',
+        subtitle: 'Every upgrade, fix and new feature in the kingdom — recorded for the royal court.',
+        footerToastCopied: 'Link copied to clipboard'
+    };
+
+    const CHANGELOG = [
+        {
+            version: 'ALPHA.1.9.1',
+            date: '2026-10-06',
+            title: 'Loan System Overhaul',
+            summary: 'Loans now scale with your progression, and debt is easier to manage straight from your wallet.',
+            status: 'stable',
+            changes: [
+                ['added',   'Loan interest now scales with player level — the multiplier grows by `0.01` per level.'],
+                ['added',   'Clicking or hovering the wallet **Debt** tag opens a menu where you can repay your loan.'],
+                ['changed', 'General upgrade pass on the loan system for clearer terms and balances.'],
+                ['removed', 'Deposit / withdraw feature and the floating quick-action button removed from the dashboard.']
+            ]
+        },
+        {
+            version: 'ALPHA.1.9.0',
+            date: '2026-09-20',
+            title: 'Dashboard Refresh',
+            summary: 'A cleaner, shorter dashboard that loads faster.',
+            status: 'stable',
+            changes: [
+                ['changed', 'Dashboard streamlined into a single lightweight file.'],
+                ['changed', 'Wallet and balance display redesigned.'],
+                ['fixed',   'Balance occasionally not saving to `localStorage` after a page refresh.']
+            ]
+        },
+        {
+            version: 'ALPHA.1.8.2',
+            date: '2026-09-08',
+            title: 'Hotfix',
+            summary: 'Quick patch for a couple of nasty bugs.',
+            status: 'hotfix',
+            changes: [
+                ['fixed', 'Crash game multiplier display freezing on some browsers.'],
+                ['fixed', 'Navigation bar overlapping content on small screens.']
+            ]
+        },
+        {
+            version: 'ALPHA.2.0.0',
+            date: '2026-11-15',
+            title: 'The Golden Update',
+            summary: 'Our biggest release yet — currently in development.',
+            status: 'upcoming',
+            changes: [
+                ['added', 'New VIP tier system with the Golden Circle rewards.'],
+                ['added', 'Daily tournaments and global leaderboards.'],
+                ['added', 'More games for the Signature Collection.']
+            ]
+        },
+        {
+            version: 'ALPHA.1.0.0',
+            date: '2026-06-01',
+            title: 'Alpha Release',
+            summary: 'GOLD enters alpha with a revamped UI and an expanded game library.',
+            status: 'stable',
+            changes: [
+                ['added', 'Revamped royal UI with the gold-dust aesthetic.'],
+                ['added', 'The Emporium shop and VIP-ready account system.'],
+                ['added', 'Provably fair verification for supported games.'],
+                ['security', 'Session handling hardened across all pages.']
+            ]
+        }
+    ];
+
+    /* Change type look & labels (add your own type here if you want one) */
+    const TYPES = {
+        added:    { label: 'Added',    icon: 'fa-plus',               color: '#5dd68a' },
+        changed:  { label: 'Changed',  icon: 'fa-rotate',             color: '#8ab4ff' },
+        fixed:    { label: 'Fixed',    icon: 'fa-wrench',             color: '#ffb347' },
+        removed:  { label: 'Removed',  icon: 'fa-trash-can',          color: '#ff7a7a' },
+        security: { label: 'Security', icon: 'fa-shield-halved',      color: '#c79bff' }
+    };
+
+    const STATUS_LABELS = { stable: 'Stable', beta: 'Beta', hotfix: 'Hotfix', upcoming: 'Upcoming' };
+
+    /* ════════════════════ ENGINE — no need to edit below ════════════════════ */
+    (function () {
+        'use strict';
+
+        // ---- helpers ----
+        const $ = id => document.getElementById(id);
+        const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        const slug = v => 'v' + String(v).toLowerCase().replace(/[^a-z0-9.]+/g, '-');
+        function fmtDate(d) {
+            const dt = new Date(d + 'T00:00:00');
+            if (isNaN(dt)) return esc(d);
+            return dt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).toUpperCase();
+        }
+        // minimal markup: `code` and **bold** (input is escaped first, so it's safe)
+        function fmtText(t, q) {
+            let s = esc(t)
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:var(--text-primary)">$1</strong>');
+            if (q) {
+                const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')(?![^<]*>)', 'gi');
+                s = s.replace(re, '<mark>$1</mark>');
+            }
+            return s;
+        }
+
+        // ---- prepare data ----
+        const entries = CHANGELOG.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+        const latest = entries.find(e => e.status !== 'upcoming');
+        const released = entries.filter(e => e.status !== 'upcoming');
+
+        // ---- hero ----
+        $('heroEyebrow').textContent = SITE.eyebrow;
+        $('heroTitle').textContent = SITE.title;
+        $('heroSub').textContent = SITE.subtitle;
+        $('currentVersion').textContent = latest ? 'CURRENT: ' + latest.version : 'NO RELEASES YET';
+        if (latest) document.title = 'GOLD | Changelog — ' + latest.version;
+
+        // ---- stats ----
+        const totalChanges = released.reduce((n, e) => n + e.changes.length, 0);
+        const stats = [
+            { n: released.length, l: 'RELEASES' },
+            { n: totalChanges, l: 'TOTAL CHANGES' },
+            { n: released.reduce((n, e) => n + e.changes.filter(c => c[0] === 'added').length, 0), l: 'FEATURES ADDED' },
+            { n: released.reduce((n, e) => n + e.changes.filter(c => c[0] === 'fixed').length, 0), l: 'BUGS SQUASHED' }
+        ];
+        $('statsRow').innerHTML = stats.map(s =>
+            `<div class="stat-item"><div class="stat-number" data-target="${s.n}">0</div><div class="stat-label">${s.l}</div></div>`
+        ).join('');
+        document.querySelectorAll('.stat-number').forEach(el => {
+            const target = +el.dataset.target;
+            if (!target) { el.textContent = '0'; return; }
+            let cur = 0;
+            const step = Math.max(1, Math.ceil(target / 40));
+            const iv = setInterval(() => {
+                cur += step;
+                if (cur >= target) { cur = target; clearInterval(iv); }
+                el.textContent = cur;
+            }, 25);
+        });
+
+        // ---- filter chips (only types actually used) ----
+        let activeType = 'all';
+        const usedTypes = Object.keys(TYPES).filter(t => entries.some(e => e.changes.some(c => c[0] === t)));
+        $('filterChips').innerHTML =
+            `<button class="chip active" data-type="all">ALL</button>` +
+            usedTypes.map(t => `<button class="chip" data-type="${t}"><i class="fas ${TYPES[t].icon}" style="color:${TYPES[t].color}"></i>${TYPES[t].label.toUpperCase()}</button>`).join('');
+        $('filterChips').addEventListener('click', e => {
+            const btn = e.target.closest('.chip');
+            if (!btn) return;
+            activeType = btn.dataset.type;
+            document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === btn));
+            render();
+        });
+
+        // ---- render timeline ----
+        const timeline = $('timeline');
+        let query = '';
+
+        function render() {
+            const q = query.trim().toLowerCase();
+            let visible = 0;
+            const html = entries.map((e, idx) => {
+                // filter changes
+                const changes = e.changes.filter(c => {
+                    if (activeType !== 'all' && c[0] !== activeType) return false;
+                    return true;
+                });
+                const headText = (e.version + ' ' + e.title + ' ' + (e.summary || '')).toLowerCase();
+                const matchedChanges = q ? changes.filter(c => c[1].toLowerCase().includes(q)) : changes;
+                const headMatch = q && headText.includes(q);
+                const show = (activeType === 'all' || changes.length > 0) && (!q || headMatch || matchedChanges.length > 0);
+                if (!show) return '';
+                visible++;
+
+                const shownChanges = (q && !headMatch) ? matchedChanges : changes;
+                const isLatest = latest && e === latest;
+                const status = e.status || 'stable';
+
+                // group by type, keeping TYPES order
+                const groups = Object.keys(TYPES).map(t => ({ t, items: shownChanges.filter(c => c[0] === t) })).filter(g => g.items.length);
+                const pills = groups.map(g =>
+                    `<span class="type-pill"><i class="fas ${TYPES[g.t].icon}" style="color:${TYPES[g.t].color}"></i>${g.items.length} ${TYPES[g.t].label}</span>`).join('');
+                const body = groups.map(g => `
+                    <div class="cl-group" style="color:${TYPES[g.t].color}">
+                        <h5><i class="fas ${TYPES[g.t].icon}"></i>${TYPES[g.t].label}</h5>
+                        <ul>${g.items.map(c => `<li style="color:var(--text-secondary)"><span style="color:${TYPES[g.t].color};position:absolute;left:0;top:0;"></span>${fmtText(c[1], q)}</li>`).join('')}</ul>
+                    </div>`).join('');
+
+                const autoOpen = isLatest || q || location.hash === '#' + slug(e.version);
+                return `
+                <div class="cl-entry ${isLatest ? 'latest' : ''} ${status === 'upcoming' ? 'upcoming' : ''} ${autoOpen ? 'open' : ''}" id="${slug(e.version)}" style="animation-delay:${Math.min(idx * 0.06, 0.4)}s">
+                    <div class="cl-card">
+                        <div class="cl-head">
+                            <div>
+                                <div class="cl-meta">
+                                    <span class="cl-version">${fmtText(e.version, q).replace(/<code>|<\/code>/g, '')}</span>
+                                    ${isLatest ? '<span class="badge latest">Latest</span>' : ''}
+                                    ${status !== 'stable' ? `<span class="badge ${status}">${STATUS_LABELS[status] || esc(status)}</span>` : ''}
+                                    <span class="cl-date">${status === 'upcoming' ? 'PLANNED · ' : ''}${fmtDate(e.date)}</span>
+                                </div>
+                                <div class="cl-title">${fmtText(e.title, q)}</div>
+                                ${e.summary ? `<div class="cl-summary">${fmtText(e.summary, q)}</div>` : ''}
+                                <div class="cl-type-summary">${pills}</div>
+                            </div>
+                            <i class="fas fa-chevron-down cl-toggle"></i>
+                        </div>
+                        <div class="cl-body"><div class="cl-body-inner">
+                            ${body}
+                            <button class="cl-permalink" data-slug="${slug(e.version)}"><i class="fas fa-link"></i> Copy link to this update</button>
+                        </div></div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            timeline.innerHTML = html;
+            $('emptyState').style.display = visible ? 'none' : 'block';
+        }
+
+        // ---- interactions ----
+        timeline.addEventListener('click', e => {
+            const link = e.target.closest('.cl-permalink');
+            if (link) {
+                const url = location.href.split('#')[0] + '#' + link.dataset.slug;
+                (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+                    .then(() => toast(SITE.footerToastCopied)).catch(() => { location.hash = link.dataset.slug; });
+                return;
+            }
+            const head = e.target.closest('.cl-head');
+            if (head) head.closest('.cl-entry').classList.toggle('open');
+        });
+        $('expandAll').addEventListener('click', () => document.querySelectorAll('.cl-entry').forEach(x => x.classList.add('open')));
+        $('collapseAll').addEventListener('click', () => document.querySelectorAll('.cl-entry').forEach(x => x.classList.remove('open')));
+        $('searchInput').addEventListener('input', e => { query = e.target.value; render(); });
+
+        let toastTimer;
+        function toast(msg) {
+            const t = $('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        render();
+        if (location.hash) {
+            const target = document.querySelector(location.hash);
+            if (target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+        }
+
+        // ---- particles ----
+        const pc = $('particlesContainer');
+        for (let i = 0; i < 55; i++) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
+            const size = Math.random() * 5 + 1.5;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.bottom = -(Math.random() * 40 + 10) + '%';
+            p.style.animationDelay = Math.random() * 12 + 's';
+            p.style.animationDuration = (Math.random() * 9 + 6) + 's';
+            if (Math.random() > 0.7) p.style.background = 'radial-gradient(circle, #ffb347, #ffd966)';
+            pc.appendChild(p);
+        }
+
+        // ---- ambience toggle (muted by default) ----
+        let audioCtx = null, ambienceNode = null, ambienceGain = null, ambienceOn = false;
+        const ambienceBtn = $('ambienceToggle');
+        function startAmbience() {
+            try {
+                audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                ambienceGain = audioCtx.createGain();
+                ambienceGain.gain.value = 0.008;
+                ambienceGain.connect(audioCtx.destination);
+                const size = 4096;
+                const node = audioCtx.createScriptProcessor(size, 1, 1);
+                node.onaudioprocess = ev => {
+                    const out = ev.outputBuffer.getChannelData(0);
+                    for (let i = 0; i < size; i++) out[i] = (Math.random() * 2 - 1) * 0.12;
+                };
+                node.connect(ambienceGain);
+                ambienceNode = node;
+            } catch (err) {}
+        }
+        function stopAmbience() {
+            if (ambienceNode) { ambienceNode.disconnect(); ambienceNode = null; }
+            if (ambienceGain) { ambienceGain.disconnect(); ambienceGain = null; }
+        }
+        ambienceBtn.addEventListener('click', () => {
+            ambienceOn = !ambienceOn;
+            if (ambienceOn) startAmbience(); else stopAmbience();
+            ambienceBtn.innerHTML = '<i class="fas ' + (ambienceOn ? 'fa-volume-up' : 'fa-volume-mute') + '"></i>';
+        });
+
+        // ---- back to top ----
+        const backBtn = $('backToTop');
+        window.addEventListener('scroll', () => backBtn.classList.toggle('show', window.scrollY > 600));
+        backBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    })();
+    </script>
+</body>
+</html>
