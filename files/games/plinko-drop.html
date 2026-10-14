@@ -160,7 +160,13 @@
         }
         .risk-btn:hover { border-color: var(--border-active); background: rgba(255,217,102,0.1); color: #fff; transform: translateY(-2px); }
         .risk-btn.selected { border-color: var(--gold) !important; background: rgba(255,217,102,0.18) !important; color: var(--gold) !important; box-shadow: 0 0 20px rgba(255,217,102,0.3); }
-        .drop-row { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+        .drop-row {
+          display: flex;         /* Aligns items side-by-side */
+          flex-direction: row;   /* Ensures they stay in a horizontal row */
+          align-items: center;   /* Centers them vertically against each other */
+          gap: 15px;             /* Adds space between the two buttons */
+        }
+
         .drop-btn {
             width: 100%; border: none; border-radius: var(--radius-full);
             font-weight: 800; font-size: 1.15rem; padding: 0.95rem;
