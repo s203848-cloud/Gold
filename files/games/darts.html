@@ -1311,6 +1311,46 @@
                     for (const ring of rings) { cum += ring.prob; if (r < cum) return ring; }
                     return rings[rings.length - 1];
                 }
+                // 1. Reference the existing elements and the new button
+const autoBtn = document.getElementById('auto-throw-btn');
+const throwBtn = document.getElementById('throw-dart-btn'); // Replace with your actual Throw Dart ID/class
+
+let autoInterval = null;
+let isAutoOn = false;
+
+// 2. Toggle Auto function
+function toggleAutoThrow() {
+    isAutoOn = !isAutoOn;
+
+    if (isAutoOn) {
+        // Turn Auto ON
+        autoBtn.textContent = "🤖 Auto ON";
+        autoBtn.classList.add('active');
+
+        // Start throwing automatically every 1.5 seconds (1500ms)
+        autoInterval = setInterval(() => {
+            // Check if the throw button exists and is not disabled before clicking
+            if (throwBtn && !throwBtn.disabled) {
+                throwBtn.click();
+            }
+        }, 1500); 
+    } else {
+        // Turn Auto OFF
+        stopAutoThrow();
+    }
+}
+
+// 3. Stop Auto function (call this if darts run out or user clicks collect)
+function stopAutoThrow() {
+    isAutoOn = false;
+    autoBtn.textContent = "🤖 Auto Off";
+    autoBtn.classList.remove('active');
+    clearInterval(autoInterval);
+}
+
+// 4. Attach event listener to the button
+autoBtn.addEventListener('click', toggleAutoThrow);
+
                 async processThrow(bet, aimRadius) {
                     const ring = this.getEffectiveRing(aimRadius);
                     const mult = ring.multiplier;
