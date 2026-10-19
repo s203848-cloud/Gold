@@ -121,9 +121,9 @@ select{background:#1b1712;color:var(--t);border:1px solid var(--line2);border-ra
     <button class="btn autob" id="auto"><i class="fas fa-bolt"></i> Auto</button>
    </div>
    <div class="row" style="justify-content:center">
-    <span style="font-size:.64rem;color:var(--t3)">Auto rounds</span>
-    <select id="autoN"><option value="0">∞</option><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option><option value="100">100</option></select>
-    <label class="chk"><input type="checkbox" id="stopBig" checked> Stop on 10×+</label>
+    <span style="font-size:.64rem;color:var(--t3)">Every</span><input type="number" id="autoInt" value="0.1" step="0.05" min="0.05" max="10" style="width:68px;padding:.25rem .4rem;font-size:.75rem"><span style="font-size:.64rem;color:var(--t3)">s · rounds</span>
+    <select id="autoN"><option value="0" selected>∞</option><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select>
+    <label class="chk"><input type="checkbox" id="stopBig"> Stop on 10×+</label>
     <label class="chk"><input type="checkbox" id="stopLoss"> Stop if broke</label>
    </div>
    <div class="info" id="skillInfo">Stop the ring near the center · <b id="grade">—</b></div>
@@ -147,10 +147,10 @@ select{background:#1b1712;color:var(--t);border:1px solid var(--line2);border-ra
 const $=id=>document.getElementById(id);
 const K={U:'gold_users',S:'gold_current_user',SND:'darts_sound_v2',LB:'darts_weekly_lb'};
 const RINGS=[
- {n:'Golden Bull',r:10,m:50,p:.001,c:'#ffd24a'},{n:'Bullseye',r:22,m:10,p:.008,c:'#d83a34'},
- {n:'Double Ring',r:50,m:5,p:.03,c:'#c9a227'},{n:'Triple Ring',r:88,m:3,p:.07,c:'#b8742c'},
- {n:'Inner Single',r:130,m:2,p:.14,c:'#7d6347'},{n:'Outer Single',r:172,m:1.5,p:.13,c:'#5e7a50'},
- {n:'Miss',r:200,m:0,p:.621,c:'#2b2723'}];
+ {n:'Golden Bull',r:10,m:50,p:.0015,c:'#ffd24a'},{n:'Bullseye',r:22,m:10,p:.01,c:'#d83a34'},
+ {n:'Double Ring',r:50,m:5,p:.035,c:'#c9a227'},{n:'Triple Ring',r:88,m:3,p:.08,c:'#b8742c'},
+ {n:'Inner Single',r:130,m:2,p:.14,c:'#7d6347'},{n:'Outer Single',r:172,m:1.5,p:.15,c:'#5e7a50'},
+ {n:'Miss',r:200,m:0,p:.5835,c:'#2b2723'}];
 const RANKS=['Beginner','Amateur','Skilled','Expert','Master','Elite','Champion','Legend'],RT=[0,10,30,70,150,300,600,1000];
 const DSTYLES=['Classic','Gold','Diamond','Plasma','Cyber','Dragon'],DCOL=['#c8c8c8','#ffd700','#b9f2ff','#e040fb','#00e5ff','#ff6d3a'];
 const SKINS=[
@@ -162,11 +162,11 @@ const SKINS=[
 {n:'Void',lv:20,c:['#ffffff','#e040fb','#7c4dff','#3d1a8a','#241150','#160a33','#07030f'],bg:'#050208'}];
 const SK=()=>SKINS[U.dartCosmetics.boardSkin]||SKINS[0];
 const NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
-const SURV_P=.62,MS_PLAYS=12,MS_REWARD=600,KB=.94,FLIGHT=650;
+const SURV_P=.62,MS_PLAYS=12,MS_REWARD=600,KB=.94,FLIGHT=380;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a),wait=ms=>new Promise(r=>setTimeout(r,ms));
 const fmt=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:2});
 const jp=(s,f)=>{try{return JSON.parse(s)||f}catch{return f}};
-const survMult=n=>Math.min(1000,.96/Math.pow(SURV_P,n));
+const survMult=n=>Math.min(1000,1.08/Math.pow(SURV_P,n));
 
 /* ---------- audio ---------- */
 let ac=null,sndOn=localStorage.getItem(K.SND)!=='false';
@@ -210,7 +210,7 @@ const fee=b=>(mode==='quick'||mode==='skill')?activePw()*Math.max(1,Math.round(b
 function pick(f=1,skillQ=null){
  const p=RINGS.map(r=>r.p);
  if(pw.scope&&mode==='quick'){p[0]+=.0005;p[1]+=.004;p[6]-=.0045}
- if(skillQ!==null){const k=.8+.25*skillQ;let s=0;for(let i=0;i<6;i++){p[i]*=k;s+=p[i]}p[6]=Math.max(0,1-s)}
+ if(skillQ!==null){const k=.9+.3*skillQ;let s=0;for(let i=0;i<6;i++){p[i]*=k;s+=p[i]}p[6]=Math.max(0,1-s)}
  let x=Math.random(),i=6;for(let j=0;j<7;j++){x-=p[j];if(x<0){i=j;break}}
  if(pw.lucky&&mode==='quick'&&i>0&&Math.random()<.06)i--;
  return i;
@@ -294,7 +294,7 @@ function frame(ts){
 function landDart(t,onHit){
  const d={r:t.r,a:t.a,t0:performance.now(),w:Math.random()>.5?1:-1,hit:false};
  d.onHit=()=>{ripple={r:d.r,a:d.a,t0:performance.now()};hl=t.i;onHit&&onHit()};
- if(darts.length>=3)darts.shift();darts.push(d);
+ if(darts.length>=10)darts.shift();darts.push(d);
 }
 
 /* ---------- effects ---------- */
@@ -352,8 +352,9 @@ function showRing(t,b,payout,extra=''){
  else{sfx.lose();banner('MISS','#ff8a80');say(`💔 Miss ${extra}`,'loss')}
 }
 async function act(){
- if(busy)return false;
- const b=bet();busy=true;sync();let round=null;
+ const conc=mode==='quick'||mode==='skill';
+ if(busy&&!conc)return false;
+ const b=bet();if(!conc){busy=true;sync()}let round=null;
  try{
   if(mode==='quick'||mode==='skill'){
    const f=fee(b),cost=b+f;
@@ -363,7 +364,7 @@ async function act(){
    sfx.throw();if(pay)earn(pay,`Darts ${RINGS[t.i].n} +${fmt(pay)}`);
    landDart(t,()=>showRing(t,b,pay,pay?'':`· lost ${fmt(b)}`));
    record(cost,pay,RINGS[t.i].m,RINGS[t.i].n);
-   await wait(FLIGHT+250);round={mult:RINGS[t.i].m,loss:!pay};
+   round={mult:RINGS[t.i].m,loss:!pay};
   }else if(mode==='challenge'){
    if(!R){if(b*3>U.balance){say('Need 3× your bet for a Challenge.','loss');return false}
     spend(b*3,`Darts Challenge -${fmt(b*3)}`);R={mode,bet:b,left:3,acc:0,best:0,ring:'Miss'};darts.length=0}
@@ -384,7 +385,7 @@ async function act(){
     say(`🔥 Hit! Streak ${R.streak} · cash-out ${fmt(Math.floor(R.bet*survMult(R.streak)))} GOLD`,'win')}
    else{const d=R;R=null;record(d.bet,0,0,'Miss',d.streak+1);say(`💔 Survival ended at streak ${d.streak} · lost ${fmt(d.bet)} GOLD`,'loss');round={mult:0,loss:true}}
   }
- }finally{busy=false;sync()}
+ }finally{if(!conc)busy=false;sync()}
  return round||{mult:0,pending:true};
 }
 async function collect(){
@@ -397,6 +398,7 @@ async function collect(){
 
 /* ---------- auto ---------- */
 function autoStop(msg){auto.on=false;sync();if(msg)say(msg,'')}
+const autoMs=()=>Math.max(50,(parseFloat($('autoInt').value)||.1)*1000);
 async function autoTick(){
  if(!auto.on)return;
  if(busy){setTimeout(autoTick,200);return}
@@ -411,7 +413,7 @@ async function autoTick(){
  if(auto.left>0&&auto.rounds>=auto.left){autoStop(`⚡ Auto finished ${auto.rounds} rounds.`);return}
  if($('stopBig').checked&&r.mult>=10){autoStop(`⚡ Auto stopped on a ${r.mult}× hit!`);return}
  if($('stopLoss').checked&&U.balance<bet()){autoStop('⚡ Auto stopped — balance too low.');return}
- setTimeout(autoTick,mode==='quick'||mode==='skill'?350:250);
+ setTimeout(autoTick,autoMs());
 }
 function toggleAuto(){
  if(auto.on){autoStop('⚡ Auto stopped.');return}
@@ -435,7 +437,7 @@ function sync(){
  else if(mode==='skill')label='<i class="fas fa-crosshairs"></i> Stop Ring & Throw';
  else if(mode==='challenge')label=active?`<i class="fas fa-bullseye"></i> Throw (${R.left} left)`:'<i class="fas fa-play"></i> Start Challenge (3×)';
  else label=active?'<i class="fas fa-bullseye"></i> Throw':'<i class="fas fa-play"></i> Start Survival';
- t.innerHTML=label;t.disabled=busy||auto.on;
+ t.innerHTML=label;t.disabled=busy;
  const col=$('collect');col.style.display=(R&&((R.mode==='challenge'&&R.left<3)||(R.mode==='survival'&&R.streak>0)))?'inline-flex':'none';col.disabled=busy||auto.on;
  const ab=$('auto');ab.classList.toggle('on',auto.on);
  ab.innerHTML=auto.on?`<i class="fas fa-stop"></i> Stop${auto.left?` (${auto.rounds}/${auto.left})`:` (${auto.rounds})`}`:'<i class="fas fa-bolt"></i> Auto';
@@ -469,7 +471,7 @@ function claim(){
  say(`🎉 Milestone: +${fmt(MS_REWARD)} GOLD!`,'win');sfx.win();confetti(120);
 }
 function throwAction(){
- if(busy||auto.on)return;
+ if(busy)return;
  if(!R&&(bet()<=0)){say('Invalid bet.','loss');return}
  act();
 }
