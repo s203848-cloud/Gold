@@ -1,509 +1,1914 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>DARTS | GOLD</title>
-<link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-:root{--g:#f0c850;--gb:#ffe478;--gd:#b89830;--line:rgba(240,200,80,.14);--line2:rgba(240,200,80,.35);--t:#f2efe8;--t2:#b8b2a6;--t3:#7d776c;--bad:#ff5a5a;--ok:#5fd068}
-*{margin:0;padding:0;box-sizing:border-box}
-html{-webkit-tap-highlight-color:transparent}
-body{font-family:Inter,system-ui,sans-serif;color:var(--t);min-height:100dvh;padding:clamp(.5rem,2vw,1.1rem);padding-bottom:calc(1rem + env(safe-area-inset-bottom,0px));background:radial-gradient(ellipse at 50% 0%,#1c160b 0%,#070605 60%,#030302 100%);overflow-x:hidden}
-#bg{position:fixed;inset:0;pointer-events:none;z-index:0}
-.wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:.85rem}
-.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;background:rgba(22,19,14,.8);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:60px;padding:.45rem 1rem}
-.top a,.chip,.rank{border-radius:40px;padding:.3rem .9rem;font-size:.8rem;font-weight:700;white-space:nowrap}
-.top a{color:var(--g);text-decoration:none;background:rgba(240,200,80,.08)}.top a:hover{background:rgba(240,200,80,.2)}
-.chip{background:#1c1914;border:1px solid var(--line);color:var(--g);font-weight:800;transition:.25s}
-.chip.up{color:var(--ok);transform:scale(1.08)}.chip.down{color:var(--bad)}
-.rank{font-size:.68rem;background:rgba(240,200,80,.12);color:var(--g);border:1px solid var(--line2)}
-.icon{background:none;border:0;color:var(--g);font-size:1.1rem;width:34px;height:34px;border-radius:50%;cursor:pointer}.icon:hover{background:rgba(240,200,80,.1)}
-.card{background:rgba(18,16,12,.88);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:26px;padding:clamp(.9rem,2.5vw,1.5rem);box-shadow:0 24px 60px rgba(0,0,0,.6),0 0 50px rgba(240,200,80,.05);position:relative;overflow:hidden}
-.card::before{content:"";position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--g),transparent);opacity:.5}
-.layout{display:grid;grid-template-columns:minmax(300px,440px) 1fr;gap:1.5rem;align-items:start}
-@media(max-width:780px){.layout{grid-template-columns:1fr}}
-.bw{position:relative;width:100%;max-width:440px;margin:0 auto;aspect-ratio:1}
-#cv{width:100%;height:100%;border-radius:50%;display:block;box-shadow:0 0 0 6px #14100a,0 0 0 8px rgba(240,200,80,.35),0 20px 60px rgba(0,0,0,.8),0 0 80px rgba(240,200,80,.12);cursor:pointer}
-#cv.skill{animation:pulse 1.6s ease-in-out infinite}
-@keyframes pulse{50%{box-shadow:0 0 0 6px #14100a,0 0 0 8px var(--g),0 20px 60px rgba(0,0,0,.8),0 0 110px rgba(240,200,80,.3)}}
-#banner{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;text-align:center;font-weight:900;font-size:clamp(1.1rem,5vw,1.7rem);text-shadow:0 2px 14px #000,0 0 30px currentColor;transition:.3s cubic-bezier(.3,1.5,.5,1);white-space:nowrap;z-index:3}
-#banner small{display:block;font-size:.55em;font-weight:700;opacity:.9}
-#banner.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-.hint{text-align:center;font-size:.66rem;color:var(--t3);margin-top:.7rem;letter-spacing:.4px}
-.panel{display:flex;flex-direction:column;gap:.7rem}
-.box{background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:18px;padding:.8rem}
-.lbl{font-size:.6rem;font-weight:800;letter-spacing:1.4px;color:var(--t3);margin-bottom:.4rem;text-transform:uppercase}
-.row{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
-input[type=number]{background:#1b1712;border:2px solid var(--line);border-radius:60px;padding:.4rem .6rem;width:105px;text-align:center;color:#fff;font:700 .9rem Inter;transition:.2s}
-input[type=number]:focus{border-color:var(--g);outline:0;box-shadow:0 0 12px rgba(240,200,80,.15)}
-.pill{background:rgba(240,200,80,.06);border:1px solid var(--line);border-radius:22px;padding:.25rem .65rem;font-size:.65rem;font-weight:700;cursor:pointer;color:var(--t2);user-select:none;transition:.2s;white-space:nowrap}
-.pill:hover{background:rgba(240,200,80,.18);color:#fff}
-.pill.on{background:linear-gradient(135deg,#b89830,#e6b800);color:#1a1405;border-color:var(--g);box-shadow:0 0 14px rgba(240,200,80,.25)}
-.pill.dis{opacity:.35;pointer-events:none}
-.btn{border:0;border-radius:60px;font:800 .85rem Inter;padding:.7rem 1.4rem;cursor:pointer;color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:.45rem;transition:.2s;user-select:none}
-.btn:active{transform:scale(.95)}.btn:disabled{opacity:.4;cursor:not-allowed}
-.throw{flex:1;min-width:160px;background:linear-gradient(135deg,#b8860b,#f0c020);color:#1a1200;box-shadow:0 6px 20px rgba(0,0,0,.5),0 0 24px rgba(240,200,80,.2)}
-.throw:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.5),0 0 36px rgba(240,200,80,.35)}
-.collect{background:#2e7d32}.collect:hover{background:#3a9340}
-.autob{background:rgba(240,200,80,.1);border:2px solid var(--line2);color:var(--g)}
-.autob:hover{background:rgba(240,200,80,.2)}
-.autob.on{background:linear-gradient(135deg,#7a1f1f,#c0392b);border-color:#ff7b6b;color:#fff;animation:ap 1s infinite}
-@keyframes ap{50%{box-shadow:0 0 22px rgba(255,90,70,.5)}}
-select{background:#1b1712;color:var(--t);border:1px solid var(--line2);border-radius:20px;padding:.3rem .5rem;font:700 .68rem Inter}
-.chk{font-size:.66rem;color:var(--t2);display:flex;align-items:center;gap:.3rem;cursor:pointer}.chk input{accent-color:var(--g)}
-.info{display:none;text-align:center;font-size:.76rem;background:rgba(0,0,0,.4);border:1px solid var(--line);border-radius:14px;padding:.55rem}
-.info b{color:var(--gb)}
-.res{min-height:2.6rem;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.78rem;font-weight:600;border-radius:14px;border:1px solid transparent;background:rgba(0,0,0,.4);padding:.5rem;transition:.3s}
-.res.win{background:rgba(76,175,80,.14);border-color:rgba(76,175,80,.4);color:#a5d6a7}
-.res.loss{background:rgba(255,82,82,.1);border-color:rgba(255,82,82,.35);color:#ef9a9a}
-.res.jp{background:rgba(240,200,80,.16);border-color:var(--g);color:var(--gb)}
-.xp{height:6px;border-radius:20px;background:rgba(255,255,255,.06);overflow:hidden}.xp i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gd),var(--gb));transition:width .5s}
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem}
-.st{background:rgba(255,255,255,.03);border-radius:10px;padding:.35rem .2rem;text-align:center;font-size:.58rem;color:var(--t3)}
-.st b{display:block;font-size:.8rem;color:var(--g);margin-top:1px}
-.lb{font-size:.64rem;color:var(--t2);max-height:110px;overflow:auto;line-height:1.7}
-.dots{display:flex;gap:.4rem}.dot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.2s}.dot:hover{transform:scale(1.2)}.dot.sel{border-color:#fff;box-shadow:0 0 10px #fff8}
-.ms{text-align:center;font-size:.64rem;color:var(--g)}
-.ach{position:fixed;top:18px;right:18px;z-index:99;background:rgba(20,16,10,.96);border:1px solid var(--g);border-radius:14px;padding:.55rem .9rem;font-size:.7rem;font-weight:700;color:var(--gb);box-shadow:0 0 30px rgba(240,200,80,.4);animation:ai .5s,ao .5s 2.6s forwards}
-@keyframes ai{from{transform:translateX(130%)}}@keyframes ao{to{transform:translateX(130%);opacity:0}}
-.shake{animation:sh .45s}@keyframes sh{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
-@media(max-width:480px){.stats{grid-template-columns:repeat(3,1fr)}}
-.title{text-align:center;font-weight:900;font-size:clamp(1.8rem,6vw,2.8rem);letter-spacing:.35em;text-indent:.35em;line-height:1.1;background:linear-gradient(90deg,#b89830,#fff3b0,#b89830);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shim 4s linear infinite;filter:drop-shadow(0 0 18px rgba(240,200,80,.35))}
-.title small{display:block;font-size:.2em;letter-spacing:.5em;-webkit-text-fill-color:var(--t3)}
-@keyframes shim{to{background-position:-200% 0}}
-.hist{display:flex;gap:.3rem;justify-content:center;flex-wrap:wrap;margin-top:.5rem;min-height:1.5rem}
-.hc{font-size:.62rem;font-weight:800;padding:.15rem .5rem;border-radius:12px;animation:pop .3s}
-.h1{background:rgba(255,82,82,.12);color:#ff8a80}.h2{background:rgba(76,175,80,.15);color:#a5d6a7}.h3{background:rgba(240,200,80,.2);color:var(--gb);box-shadow:0 0 10px rgba(240,200,80,.3)}
-@keyframes pop{from{transform:scale(.4);opacity:0}}
-.skins{display:flex;gap:.4rem}.sk{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.2s}.sk:hover{transform:scale(1.15)}.sk.sel{border-color:#fff;box-shadow:0 0 10px #fff8}.sk.lock{opacity:.3;filter:grayscale(.6)}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>DARTS | Aim at the dartboard. Each ring has a multiplier. Hit the bullseye to multiply your bet up to 50x. Miss and lose.</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #f0c850;
+            --gold-bright: #ffe478;
+            --gold-dim: #b89830;
+            --gold-glow: rgba(240, 200, 80, 0.3);
+            --bg-deep: #050505;
+            --bg-card: rgba(18, 16, 13, 0.88);
+            --border-subtle: rgba(240, 200, 80, 0.12);
+            --border-medium: rgba(240, 200, 80, 0.3);
+            --text-primary: #f2efe8;
+            --text-secondary: #b8b2a6;
+            --text-muted: #7d776c;
+            --danger: #ff5252;
+            --win: #4caf50;
+            --rare: #e040fb;
+            --radius-xl: 26px;
+            --radius-lg: 18px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --radius-full: 60px;
+            --transition-smooth: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-card: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 40px rgba(240, 200, 80, 0.06);
+            --font-mono: 'Inter', monospace;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            font-size: 16px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(ellipse at 45% 25%, #100e0a 0%, #030202 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
+            color: var(--text-primary);
+            padding: clamp(0.5rem, 2vw, 1.1rem);
+            padding-bottom: calc(clamp(0.5rem, 2vw, 1.1rem) + var(--safe-bottom));
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            line-height: 1.5;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 22% 28%, rgba(255, 170, 50, 0.04) 0%, transparent 55%),
+                radial-gradient(circle at 72% 62%, rgba(200, 140, 30, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        canvas#particleCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.8;
+        }
+        .game-container {
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            background: rgba(20, 18, 14, 0.75);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: var(--radius-full);
+            padding: 0.45rem 1.4rem;
+            border: 1px solid var(--border-subtle);
+            transition: var(--transition-fast);
+        }
+        .back-link {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(240, 200, 80, 0.07);
+            padding: 0.28rem 0.9rem;
+            border-radius: 40px;
+            transition: var(--transition-fast);
+            white-space: nowrap;
+        }
+        .back-link:hover {
+            background: rgba(240, 200, 80, 0.18);
+            color: var(--gold-bright);
+        }
+        .balance-chip {
+            background: #1c1914;
+            border: 1px solid var(--border-subtle);
+            border-radius: 40px;
+            padding: 0.28rem 0.9rem;
+            font-weight: 800;
+            font-size: 0.82rem;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+            letter-spacing: -0.3px;
+        }
+        .rank-badge {
+            border-radius: 40px;
+            padding: 0.2rem 0.7rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            background: rgba(240, 200, 80, 0.15);
+            color: var(--gold);
+            border: 1px solid rgba(240, 200, 80, 0.3);
+        }
+        .sound-toggle {
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 1.15rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 0.3rem;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sound-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(240, 200, 80, 0.08);
+        }
+        .main-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-subtle);
+            padding: clamp(0.9rem, 2.5vw, 1.5rem);
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+        .main-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(240, 200, 80, 0.2), transparent);
+            pointer-events: none;
+        }
+        .darts-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .board-panel {
+            flex: 1;
+            min-width: 300px;
+            max-width: 440px;
+            text-align: center;
+            position: relative;
+        }
+        .board-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            aspect-ratio: 1/1;
+        }
+        canvas#dartCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.7), 0 0 60px rgba(240, 200, 80, 0.1), inset 0 0 30px rgba(0, 0, 0, 0.5);
+            cursor: crosshair;
+            transition: filter 0.3s;
+        }
+        canvas#dartCanvas.skill-active {
+            cursor: crosshair;
+            animation: board-glow-pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes board-glow-pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.7), 0 0 60px rgba(240, 200, 80, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.7), 0 0 80px rgba(240, 200, 80, 0.25);
+            }
+        }
+        .board-label {
+            margin-top: 6px;
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+        .controls-panel {
+            flex: 1.2;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .bet-area {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: var(--radius-lg);
+            padding: 0.8rem;
+            border: 1px solid var(--border-subtle);
+        }
+        .input-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 0.4rem 0;
+        }
+        .bet-input {
+            background: #1b1712;
+            border: 2px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            padding: 0.38rem 0.6rem;
+            width: 95px;
+            text-align: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            transition: border-color 0.2s;
+        }
+        .bet-input:focus {
+            border-color: var(--gold);
+            outline: none;
+            box-shadow: 0 0 10px rgba(240, 200, 80, 0.12);
+        }
+        .preset-sm {
+            background: rgba(240, 200, 80, 0.06);
+            border: 1px solid var(--border-subtle);
+            border-radius: 22px;
+            padding: 0.18rem 0.5rem;
+            font-size: 0.6rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition-fast);
+            white-space: nowrap;
+            user-select: none;
+        }
+        .preset-sm:hover {
+            background: rgba(240, 200, 80, 0.18);
+            color: #fff;
+        }
+        .mode-buttons {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+            margin: 0.4rem 0;
+        }
+        .mode-btn {
+            padding: 0.32rem 0.7rem;
+            border-radius: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-subtle);
+            font-weight: 700;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            user-select: none;
+        }
+        .mode-btn.active {
+            background: var(--gold-dim);
+            color: #1a1712;
+            border-color: var(--gold);
+            box-shadow: 0 0 12px rgba(240, 200, 80, 0.2);
+        }
+        .mode-btn:hover:not(.active) {
+            background: rgba(240, 200, 80, 0.12);
+            color: #fff;
+        }
+        .powerup-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            margin: 0.4rem 0;
+        }
+        .powerup-btn {
+            background: rgba(240, 200, 80, 0.06);
+            border: 1px solid var(--border-subtle);
+            border-radius: 28px;
+            padding: 0.22rem 0.55rem;
+            font-size: 0.58rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            user-select: none;
+            white-space: nowrap;
+            color: var(--text-muted);
+        }
+        .powerup-btn:hover {
+            background: rgba(240, 200, 80, 0.15);
+            color: #fff;
+            border-color: var(--border-medium);
+        }
+        .powerup-btn.active {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: #4caf50;
+            color: #4caf50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0.4rem 0;
+        }
+        .btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: var(--radius-full);
+            font-weight: 800;
+            font-size: 0.78rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            letter-spacing: -0.2px;
+            user-select: none;
+        }
+        .btn:active {
+            transform: scale(0.94);
+        }
+        .btn-throw {
+            background: linear-gradient(135deg, #b8860b, #daa520);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+            font-size: 0.84rem;
+            padding: 0.55rem 1.6rem;
+        }
+        .btn-throw:hover:not(:disabled) {
+            background: linear-gradient(135deg, #c99718, #e6b800);
+            transform: scale(1.03);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(240, 200, 80, 0.2);
+        }
+        .btn-cashout {
+            background: #2e7d32;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+        .btn-cashout:hover:not(:disabled) {
+            background: #388e3c;
+            transform: scale(1.03);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border-medium);
+            color: var(--text-primary);
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+            filter: grayscale(0.2);
+        }
+        .skill-info {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-md);
+            padding: 0.6rem;
+            text-align: center;
+            font-size: 0.7rem;
+            border: 1px solid var(--border-subtle);
+            display: none;
+        }
+        .skill-info .aim-grade {
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: var(--gold-bright);
+        }
+        .result-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--radius-md);
+            padding: 0.5rem 0.7rem;
+            text-align: center;
+            font-size: 0.76rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+            min-height: 2.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .result-panel.win {
+            background: rgba(76, 175, 80, 0.14);
+            border-color: rgba(76, 175, 80, 0.4);
+            color: #a5d6a7;
+        }
+        .result-panel.loss {
+            background: rgba(255, 82, 82, 0.1);
+            border-color: rgba(255, 82, 82, 0.35);
+            color: #ef9a9a;
+        }
+        .result-panel.jackpot {
+            background: rgba(240, 200, 80, 0.15);
+            border-color: rgba(240, 200, 80, 0.5);
+            animation: jackpot-flash 0.4s ease-in-out 3;
+        }
+        @keyframes jackpot-flash {
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(240, 200, 80, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(240, 200, 80, 0.6);
+            }
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.022);
+            padding: 0.3rem 0.5rem;
+            border-radius: var(--radius-sm);
+            flex: 1;
+            text-align: center;
+            font-size: 0.62rem;
+            letter-spacing: -0.2px;
+            min-width: 50px;
+        }
+        .stat-card strong {
+            display: block;
+            font-size: 0.78rem;
+            color: var(--gold);
+            margin-top: 1px;
+        }
+        .leaderboard-mini {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-md);
+            padding: 0.5rem;
+            font-size: 0.6rem;
+            border: 1px solid var(--border-subtle);
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .xp-bar-outer {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            height: 6px;
+            margin: 0.3rem 0;
+            overflow: hidden;
+        }
+        .xp-bar-inner {
+            background: linear-gradient(90deg, #b89830, #ffe478);
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+        .cosmetic-row {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            margin: 0.3rem 0;
+        }
+        .cosmetic-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .cosmetic-dot:hover {
+            transform: scale(1.2);
+        }
+        .cosmetic-dot.selected {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        .floating-score {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10001;
+            font-weight: 900;
+            font-size: 1.6rem;
+            color: #ffe478;
+            text-shadow: 0 0 20px rgba(240, 200, 80, 0.8);
+            animation: float-up 1.2s ease-out forwards;
+        }
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1.5);
+            }
+        }
+        .shake {
+            animation: screen-shake 0.4s ease;
+        }
+        @keyframes screen-shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            15% {
+                transform: translateX(-6px);
+            }
+            30% {
+                transform: translateX(6px);
+            }
+            45% {
+                transform: translateX(-4px);
+            }
+            60% {
+                transform: translateX(4px);
+            }
+            75% {
+                transform: translateX(-2px);
+            }
+            90% {
+                transform: translateX(2px);
+            }
+        }
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: rgba(20, 16, 10, 0.95);
+            border: 1px solid var(--gold);
+            border-radius: var(--radius-md);
+            padding: 0.5rem 0.9rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--gold-bright);
+            box-shadow: 0 0 30px rgba(240, 200, 80, 0.4);
+            animation: achieve-in 0.5s ease, achieve-out 0.5s ease 2.5s forwards;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        @keyframes achieve-in {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes achieve-out {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+        @media (max-width: 750px) {
+            .darts-layout {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.8rem;
+            }
+            .board-panel {
+                max-width: 320px;
+                min-width: auto;
+            }
+            .controls-panel {
+                min-width: auto;
+                width: 100%;
+            }
+            .btn {
+                padding: 0.4rem 0.9rem;
+                font-size: 0.7rem;
+            }
+            .btn-throw {
+                padding: 0.45rem 1.2rem;
+                font-size: 0.74rem;
+            }
+            .mode-btn {
+                font-size: 0.58rem;
+                padding: 0.25rem 0.5rem;
+            }
+            .top-bar {
+                padding: 0.35rem 0.8rem;
+                gap: 0.3rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<canvas id="bg"></canvas>
-<div class="wrap">
- <div class="top">
-  <a href="../home.html"><i class="fas fa-arrow-left"></i> Lobby</a>
-  <div class="chip"><i class="fas fa-coins"></i> <span id="bal">0</span> GOLD</div>
-  <span class="rank" id="rank">🎯 Beginner</span>
-  <button class="icon" id="snd" aria-label="Sound"><i class="fas fa-volume-up"></i></button>
- </div>
- <h1 class="title">DARTS<small>GOLD CASINO</small></h1>
- <div class="card" id="card"><div class="layout">
-  <div>
-   <div class="bw"><canvas id="cv" width="440" height="440" aria-label="Dartboard"></canvas><div id="banner"></div></div>
-   <div class="hint" id="hint"></div><div class="hist" id="hist"></div>
-  </div>
-  <div class="panel">
-   <div class="box">
-    <div class="lbl">Bet</div>
-    <div class="row">
-     <input type="number" id="bet" value="10" min="1" step="1" inputmode="numeric">
-     <span class="pill" data-b="half">½</span><span class="pill" data-b="dbl">2×</span>
-     <span class="pill" data-b="10">10</span><span class="pill" data-b="50">50</span><span class="pill" data-b="100">100</span><span class="pill" data-b="max">MAX</span>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+    <div class="game-container">
+        <div class="top-bar">
+            <a href="../home.html" class="back-link"><i class="fas fa-arrow-left"></i> Lobby</a>
+            <div class="balance-chip"><i class="fas fa-coins"></i> <span id="balanceDisplay">0</span> GOLD</div>
+            <span class="rank-badge" id="rankBadge">🎯 Beginner</span>
+            <button id="soundToggle" class="sound-toggle" aria-label="Toggle sound"><i class="fas fa-volume-up"></i></button>
+        </div>
+        <div class="main-card" id="mainCard">
+            <div class="darts-layout">
+                <div class="board-panel">
+                    <div class="board-wrapper" id="boardWrapper">
+                        <canvas id="dartCanvas" width="400" height="400" aria-label="Dartboard"></canvas>
+                    </div>
+                    <div class="board-label" id="boardLabel">🎯 Click board for Skill Shot | Bullseye: 10x | Golden Bull: 50x</div>
+                </div>
+                <div class="controls-panel">
+                    <div class="bet-area">
+                        <div class="input-row">
+                            <i class="fas fa-coins" style="color:var(--gold);"></i> Bet:
+                            <input type="number" id="betAmount" class="bet-input" value="10" min="1" step="1" inputmode="numeric">
+                            <span class="preset-sm" data-bet="half">½</span>
+                            <span class="preset-sm" data-bet="double">2×</span>
+                            <span class="preset-sm" data-bet="10">10</span>
+                            <span class="preset-sm" data-bet="50">50</span>
+                            <span class="preset-sm" data-bet="100">100</span>
+                            <span class="preset-sm" data-bet="max">MAX</span>
+                        </div>
+                        <div class="mode-buttons">
+                            <span class="mode-btn active" data-mode="quick">🎲 Quick Throw</span>
+                            <span class="mode-btn" data-mode="skill">🎯 Skill Shot</span>
+                            <span class="mode-btn" data-mode="challenge">🏆 Challenge (3)</span>
+                            <span class="mode-btn" data-mode="survival">🔥 Survival</span>
+                        </div>
+                        <div class="powerup-row">
+                            <span class="powerup-btn" id="scopePw" data-pw="scope">🔭 Scope</span>
+                            <span class="powerup-btn" id="visionPw" data-pw="vision">👁️ Vision</span>
+                            <span class="powerup-btn" id="stabilizerPw" data-pw="stabilizer">💨 Stabilizer</span>
+                            <span class="powerup-btn" id="featherPw" data-pw="feather">🪶 Lucky</span>
+                            <span class="powerup-btn" id="freezePw" data-pw="freeze">❄️ Freeze</span>
+                        </div>
+                        <div class="action-buttons">
+                            <button id="throwBtn" class="btn btn-throw"><i class="fas fa-dart"></i> Throw Dart</button>
+                            <button id="cashoutSurvivalBtn" class="btn btn-cashout" style="display:none;">💰 Collect</button>
+                            <button id="cashoutChallengeBtn" class="btn btn-cashout" style="display:none;">💰 Collect Challenge</button>
+                        </div>
+                    </div>
+                    <div class="skill-info" id="skillInfo">
+                        <div>🎯 <span id="skillStatus">Click the dartboard to stop the aim ring!</span></div>
+                        <div class="aim-grade" id="aimGrade"></div>
+                    </div>
+                    <div id="challengeInfo" style="display:none;background:rgba(0,0,0,0.4);border-radius:var(--radius-md);padding:0.5rem;text-align:center;font-size:0.7rem;">
+                        🏆 Darts left: <strong id="challengeDartsLeft">3</strong> | Total: <strong id="challengeTotal">0</strong> GOLD
+                    </div>
+                    <div id="survivalInfo" style="display:none;background:rgba(0,0,0,0.4);border-radius:var(--radius-md);padding:0.5rem;text-align:center;font-size:0.7rem;">
+                        🔥 Streak: <strong id="survivalStreak">0</strong> | Multiplier: <strong id="survivalMult">1.00x</strong> | Best: <strong id="survivalBest">0</strong>
+                    </div>
+                    <div class="result-panel" id="resultMessage">🎯 Select mode, place bet, and throw!</div>
+                    <div class="xp-bar-outer"><div class="xp-bar-inner" id="xpBar" style="width:0%;"></div></div>
+                    <div style="font-size:0.55rem;color:var(--text-muted);text-align:center;">Level <span id="levelDisplay">1</span> · XP: <span id="xpDisplay">0</span></div>
+                    <div class="stats-row">
+                        <div class="stat-card">🎯 Games<strong id="gamesCount">0</strong></div>
+                        <div class="stat-card">🏆 Wins<strong id="winsCount">0</strong></div>
+                        <div class="stat-card">📈 P/L<strong id="sessionPL">0</strong></div>
+                        <div class="stat-card">💎 Best<strong id="bestHit">-</strong></div>
+                        <div class="stat-card">🎯 Rate<strong id="winRate">0%</strong></div>
+                    </div>
+                    <div class="leaderboard-mini" id="leaderboardMini">🏅 Weekly Leaderboard: Loading...</div>
+                    <div style="font-size:0.55rem;color:var(--text-muted);margin-top:2px;">🎨 Dart Style:
+                        <span class="cosmetic-row" id="dartStyles"></span>
+                    </div>
+                    <div class="milestone-note" id="milestoneNote" style="text-align:center;font-size:0.6rem;color:var(--gold);"></div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="lbl" style="margin-top:.7rem">Mode</div>
-    <div class="row" id="modes">
-     <span class="pill on" data-m="quick">🎲 Quick</span><span class="pill" data-m="skill">🎯 Skill Shot</span>
-     <span class="pill" data-m="challenge">🏆 Challenge ×3</span><span class="pill" data-m="survival">🔥 Survival</span>
-    </div>
-    <div class="lbl" style="margin-top:.7rem">Power-ups <span style="text-transform:none;letter-spacing:0;font-weight:600">(5% of bet each, per throw)</span></div>
-    <div class="row" id="pws">
-     <span class="pill" data-p="scope" data-for="quick">🔭 Scope</span><span class="pill" data-p="lucky" data-for="quick">🍀 Lucky</span>
-     <span class="pill" data-p="steady" data-for="skill">💨 Steady</span><span class="pill" data-p="freeze" data-for="skill">❄️ Freeze</span>
-    </div>
-   </div>
-   <div class="row" style="gap:.5rem">
-    <button class="btn throw" id="throw"></button>
-    <button class="btn collect" id="collect" style="display:none">💰 Collect</button>
-    <button class="btn autob" id="auto"><i class="fas fa-bolt"></i> Auto</button>
-   </div>
-   <div class="row" style="justify-content:center">
-    <span style="font-size:.64rem;color:var(--t3)">Every</span><input type="number" id="autoInt" value="0.1" step="0.05" min="0.05" max="10" style="width:68px;padding:.25rem .4rem;font-size:.75rem"><span style="font-size:.64rem;color:var(--t3)">s · rounds</span>
-    <select id="autoN"><option value="0" selected>∞</option><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select>
-    <label class="chk"><input type="checkbox" id="stopBig"> Stop on 10×+</label>
-    <label class="chk"><input type="checkbox" id="stopLoss"> Stop if broke</label>
-   </div>
-   <div class="info" id="skillInfo">Stop the ring near the center · <b id="grade">—</b></div>
-   <div class="info" id="chInfo">🏆 Darts left <b id="chLeft">3</b> · Banked <b id="chAcc">0</b> GOLD</div>
-   <div class="info" id="svInfo">🔥 Streak <b id="svStreak">0</b> · <b id="svMult">1.00×</b> · Cash-out <b id="svCash">0</b> · Best <b id="svBest">0</b></div>
-   <div class="res" id="res">🎯 Pick a mode, set your bet and throw!</div>
-   <div class="xp"><i id="xpb"></i></div>
-   <div style="font-size:.58rem;color:var(--t3);text-align:center;margin-top:-.35rem">Level <span id="lv">1</span> · XP <span id="xpv">0</span></div>
-   <div class="stats">
-    <div class="st">Games<b id="sG">0</b></div><div class="st">Wins<b id="sW">0</b></div><div class="st">P/L<b id="sP">0</b></div><div class="st">Best<b id="sB">-</b></div><div class="st">Rate<b id="sR">0%</b></div>
-   </div>
-   <div class="box"><div class="lbl">🏅 Top bullseyes</div><div class="lb" id="lb"></div></div>
-   <div class="row" style="justify-content:space-between"><span class="lbl" style="margin:0">Dart style</span><div class="dots" id="dots"></div></div>
-   <div class="row" style="justify-content:space-between"><span class="lbl" style="margin:0">Board skin</span><div class="skins" id="skins"></div></div>
-   <div class="ms" id="ms"></div>
-  </div>
- </div></div>
-</div>
-<script>
-(()=>{
-const $=id=>document.getElementById(id);
-const K={U:'gold_users',S:'gold_current_user',SND:'darts_sound_v2',LB:'darts_weekly_lb'};
-const RINGS=[
- {n:'Golden Bull',r:10,m:50,p:.0015,c:'#ffd24a'},{n:'Bullseye',r:22,m:10,p:.01,c:'#d83a34'},
- {n:'Double Ring',r:50,m:5,p:.035,c:'#c9a227'},{n:'Triple Ring',r:88,m:3,p:.08,c:'#b8742c'},
- {n:'Inner Single',r:130,m:2,p:.14,c:'#7d6347'},{n:'Outer Single',r:172,m:1.5,p:.15,c:'#5e7a50'},
- {n:'Miss',r:200,m:0,p:.5835,c:'#2b2723'}];
-const RANKS=['Beginner','Amateur','Skilled','Expert','Master','Elite','Champion','Legend'],RT=[0,10,30,70,150,300,600,1000];
-const DSTYLES=['Classic','Gold','Diamond','Plasma','Cyber','Dragon'],DCOL=['#c8c8c8','#ffd700','#b9f2ff','#e040fb','#00e5ff','#ff6d3a'];
-const SKINS=[
-{n:'Classic',lv:1,c:['#ffd24a','#d83a34','#c9a227','#b8742c','#7d6347','#5e7a50','#2b2723'],bg:'#0c0907'},
-{n:'Royal',lv:3,c:['#fff1a8','#8e1b3a','#d4af37','#5b1e7a','#2a1740','#3d2a63','#150d22'],bg:'#0a0612'},
-{n:'Diamond',lv:6,c:['#ffffff','#5ad2ff','#b9f2ff','#7aa8d6','#41607f','#2b4660','#101a26'],bg:'#070b10'},
-{n:'Temple',lv:10,c:['#ffe27a','#c0392b','#e0a030','#8a5a2b','#5a4a2a','#3f5a34','#1c1a10'],bg:'#0d0b05'},
-{n:'Cyber',lv:15,c:['#fffb7a','#ff2d95','#00e5ff','#7a2dff','#142a5a','#0b1d3a','#050a18'],bg:'#03060f'},
-{n:'Void',lv:20,c:['#ffffff','#e040fb','#7c4dff','#3d1a8a','#241150','#160a33','#07030f'],bg:'#050208'}];
-const SK=()=>SKINS[U.dartCosmetics.boardSkin]||SKINS[0];
-const NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
-const SURV_P=.62,MS_PLAYS=12,MS_REWARD=600,KB=.94,FLIGHT=380;
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a),wait=ms=>new Promise(r=>setTimeout(r,ms));
-const fmt=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:2});
-const jp=(s,f)=>{try{return JSON.parse(s)||f}catch{return f}};
-const survMult=n=>Math.min(1000,1.08/Math.pow(SURV_P,n));
+    <script>
+        (() => {
+            // ═══════════════════════════════════
+            //  CONFIGURATION
+            // ═══════════════════════════════════
+            const CONFIG = Object.freeze({
+                STORAGE_KEY_USERS: 'gold_users',
+                STORAGE_KEY_SESSION: 'gold_current_user',
+                STORAGE_KEY_SOUND: 'darts_sound_v2',
+                STORAGE_KEY_LEADERBOARD: 'darts_weekly_lb',
+                CANVAS_SIZE: 400,
+                RINGS: [
+                    { name: 'Golden Bull', radiusMax: 10, multiplier: 50, prob: 0.008, color: '#ffd700',
+                        glowColor: '#fff8c0' },
+                    { name: 'Bullseye', radiusMax: 22, multiplier: 10, prob: 0.04, color: '#e53935',
+                    glowColor: '#ff6b6b' },
+                    { name: 'Double Ring', radiusMax: 50, multiplier: 5, prob: 0.10, color: '#d4af37',
+                        glowColor: '#ffe082' },
+                    { name: 'Triple Ring', radiusMax: 88, multiplier: 3, prob: 0.16, color: '#cd7f32',
+                        glowColor: '#e8a860' },
+                    { name: 'Inner Single', radiusMax: 130, multiplier: 2, prob: 0.22, color: '#8d6e4c',
+                        glowColor: '#b8956e' },
+                    { name: 'Outer Single', radiusMax: 172, multiplier: 1.5, prob: 0.25, color: '#6d8a5e',
+                        glowColor: '#8faa7e' },
+                    { name: 'Miss', radiusMax: 200, multiplier: 0, prob: 0.222, color: '#3a3530',
+                glowColor: '#555' },
+                ],
+                RANKS: ['Beginner', 'Amateur', 'Skilled', 'Expert', 'Master', 'Elite', 'Champion', 'Legend'],
+                RANK_THRESHOLDS: [0, 10, 30, 70, 150, 300, 600, 1000],
+                DART_STYLES: ['Classic', 'Gold', 'Diamond', 'Plasma', 'Cyber', 'Dragon'],
+                DART_COLORS: ['#c0c0c0', '#ffd700', '#b9f2ff', '#e040fb', '#00e5ff', '#ff6d3a'],
+                TRAIL_COLORS: ['#aaa', '#ffe478', '#e0f0ff', '#e040fb', '#00e5ff', '#ff6d3a'],
+                BOARD_SKINS: ['Classic', 'Royal Gold', 'Diamond Elite', 'Ancient Temple', 'Cyber Arena',
+                'Cosmic Void'],
+                POWERUP_COST: 30,
+                SURVIVAL_MULTIPLIERS: [1, 1.5, 2, 3, 5, 8, 12, 18, 25, 35, 50, 75, 100],
+                MILESTONE_PLAYS: 12,
+                MILESTONE_REWARD: 600,
+            });
 
-/* ---------- audio ---------- */
-let ac=null,sndOn=localStorage.getItem(K.SND)!=='false';
-document.addEventListener('pointerdown',()=>{if(!ac&&sndOn)try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch{}},{once:true});
-function tone(f,d,v=.06,t='sine',delay=0){if(!sndOn||!ac)return;setTimeout(()=>{const n=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.type=t;o.connect(g);g.connect(ac.destination);o.frequency.setValueAtTime(f,n);g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.start(n);o.stop(n+d+.02)},delay)}
-const sfx={throw:()=>tone(500,.18,.05,'sawtooth'),hit:()=>tone(180,.08,.12,'square'),win:()=>{tone(880,.12,.07);tone(1100,.14,.07,'sine',110)},
- big:()=>[0,1,2,3].forEach(i=>tone(600+i*220,.2,.09,'sine',i*110)),lose:()=>tone(240,.3,.06,'triangle'),click:()=>tone(850,.04,.03),
- ach:()=>{tone(1200,.2,.08);tone(1600,.2,.08,'sine',150)}};
+            // ═══════════════════════════════════
+            //  UTILITY
+            // ═══════════════════════════════════
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+            const rand = (min, max) => min + Math.random() * (max - min);
+            const safeJson = (str, fb = {}) => { try { return JSON.parse(str) || fb; } catch { return fb; } };
+            const fmtGold = (n) => Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
 
-/* ---------- user ---------- */
-let U=null;
-function load(){
- const s=jp(sessionStorage.getItem(K.S),null),users=jp(localStorage.getItem(K.U),{});
- if(!s||!users[s.username]){try{sessionStorage.removeItem(K.S);location.href='../../sign-in.html'}catch{}return false}
- U=users[s.username];
- U.globalStats=U.globalStats||{totalWagered:0,totalWon:0,totalGames:0,totalWins:0,currentStreak:0,bestStreak:0,totalLosses:0};
- U.gamePlayCount=U.gamePlayCount||{};U.gameOutcomes=U.gameOutcomes||[];U.transactions=U.transactions||[];
- U.balance=U.balance??0;U.xp=U.xp??0;
- U.dartsStats=Object.assign({gamesPlayed:0,wins:0,totalWagered:0,totalPayout:0,bestMultiplier:0,bullseyeCount:0,goldenBullCount:0,bestStreak:0,totalDartsThrown:0},U.dartsStats||{});
- U.earnedAchievements=U.earnedAchievements||[];
- U.dartCosmetics=U.dartCosmetics||{dartStyle:0,boardSkin:0,trailStyle:0};
- U.unlockedCosmetics=U.unlockedCosmetics||{darts:[0],boards:[0],trails:[0]};
- return true;
-}
-function save(){try{const u=jp(localStorage.getItem(K.U),{});u[U.username]=U;localStorage.setItem(K.U,JSON.stringify(u));sessionStorage.setItem(K.S,JSON.stringify({username:U.username,balance:U.balance}))}catch{}}
-const level=()=>Math.floor(Math.sqrt((U.xp||0)/80))+1;
-const rankName=()=>{const l=level();for(let i=RT.length-1;i>=0;i--)if(l>=RT[i])return RANKS[i];return RANKS[0]};
-function tx(desc,amount,type){U.transactions.unshift({desc,amount,type,date:new Date().toISOString()});if(U.transactions.length>120)U.transactions.length=120}
-function setBal(v){U.balance=Math.max(0,Math.floor(v))}
+            // ═══════════════════════════════════
+            //  STORAGE MANAGER
+            // ═══════════════════════════════════
+            class StorageMgr {
+                static getUsers() { return safeJson(localStorage.getItem(CONFIG.STORAGE_KEY_USERS), {}); }
+                static saveUsers(u) { try { localStorage.setItem(CONFIG.STORAGE_KEY_USERS, JSON.stringify(
+                    u)); } catch {} }
+                static getSession() { return safeJson(sessionStorage.getItem(CONFIG.STORAGE_KEY_SESSION), null); }
+                static setSession(u) { try { sessionStorage.setItem(CONFIG.STORAGE_KEY_SESSION, JSON.stringify({ username: u
+                            .username, balance: u.balance })); } catch {} }
+                static clearSession() { sessionStorage.removeItem(CONFIG.STORAGE_KEY_SESSION); }
+                static getLeaderboard() { return safeJson(localStorage.getItem(CONFIG.STORAGE_KEY_LEADERBOARD), []); }
+                static setLeaderboard(lb) { localStorage.setItem(CONFIG.STORAGE_KEY_LEADERBOARD, JSON.stringify(lb)); }
+            }
 
-/* ---------- state ---------- */
-let mode='quick',R=null,busy=false,lastBal=null;const hist=[];
-const pw={scope:false,lucky:false,steady:false,freeze:false};
-const auto={on:false,left:0,rounds:0};
-const AUTO_SURV_COLLECT=3;
-const bet=()=>Math.max(1,parseInt($('bet').value)||1);
-const activePw=()=>Object.keys(pw).filter(k=>pw[k]&&document.querySelector(`[data-p=${k}]`).dataset.for===mode).length;
-const fee=b=>(mode==='quick'||mode==='skill')?activePw()*Math.max(1,Math.round(b*.05)):0;
+            // ═══════════════════════════════════
+            //  AUDIO MANAGER
+            // ═══════════════════════════════════
+            class AudioMgr {
+                constructor() {
+                    this._ctx = null;
+                    this._enabled = localStorage.getItem(CONFIG.STORAGE_KEY_SOUND) !== 'false';
+                    this._bound = this._init.bind(this);
+                    document.addEventListener('pointerdown', this._bound, { once: true });
+                }
+                _init() {
+                    if (!this._ctx && this._enabled) { try { this._ctx = new(window.AudioContext || window
+                            .webkitAudioContext)(); if (this._ctx.state === 'suspended') this._ctx
+                        .resume(); } catch {} }
+                }
+                get enabled() { return this._enabled; }
+                toggle() { this._enabled = !this._enabled;
+                    localStorage.setItem(CONFIG.STORAGE_KEY_SOUND, this._enabled); if (this._enabled && !this._ctx) this
+                        ._init(); return this._enabled; }
+                _tone(f, d, v = 0.07, t = 'sine') {
+                    if (!this._enabled || !this._ctx) return;
+                    if (this._ctx.state === 'suspended') this._ctx.resume();
+                    const n = this._ctx.currentTime;
+                    const o = this._ctx.createOscillator();
+                    const g = this._ctx.createGain();
+                    o.type = t;
+                    o.connect(g);
+                    g.connect(this._ctx.destination);
+                    o.frequency.setValueAtTime(f, n);
+                    g.gain.setValueAtTime(v, n);
+                    g.gain.exponentialRampToValueAtTime(0.001, n + d);
+                    o.start(n);
+                    o.stop(n + d + 0.01);
+                }
+                play(type) {
+                    switch (type) {
+                        case 'throw':
+                            this._tone(400, 0.15, 0.06, 'sawtooth');
+                            break;
+                        case 'hit':
+                            this._tone(700, 0.06, 0.05);
+                            break;
+                        case 'bullseye':
+                            this._tone(900, 0.15, 0.09);
+                            setTimeout(() => this._tone(1200, 0.15, 0.09), 120);
+                            break;
+                        case 'golden':
+                            for (let i = 0; i < 4; i++) setTimeout(() => this._tone(600 + i * 250, 0.18, 0.1), i *
+                                130);
+                            break;
+                        case 'win':
+                            this._tone(880, 0.12, 0.08);
+                            setTimeout(() => this._tone(1100, 0.12, 0.08), 120);
+                            break;
+                        case 'lose':
+                            this._tone(260, 0.3, 0.07, 'triangle');
+                            break;
+                        case 'click':
+                            this._tone(850, 0.04, 0.03);
+                            break;
+                        case 'achievement':
+                            this._tone(1200, 0.2, 0.09);
+                            setTimeout(() => this._tone(1600, 0.2, 0.09), 160);
+                            break;
+                    }
+                }
+                destroy() { document.removeEventListener('pointerdown', this._bound); if (this._ctx) { this._ctx.close()
+                        .catch(() => {}); } }
+            }
 
-/* ---------- ring logic ---------- */
-function pick(f=1,skillQ=null){
- const p=RINGS.map(r=>r.p);
- if(pw.scope&&mode==='quick'){p[0]+=.0005;p[1]+=.004;p[6]-=.0045}
- if(skillQ!==null){const k=.9+.3*skillQ;let s=0;for(let i=0;i<6;i++){p[i]*=k;s+=p[i]}p[6]=Math.max(0,1-s)}
- let x=Math.random(),i=6;for(let j=0;j<7;j++){x-=p[j];if(x<0){i=j;break}}
- if(pw.lucky&&mode==='quick'&&i>0&&Math.random()<.06)i--;
- return i;
-}
-function place(i){const lo=i?RINGS[i-1].r:0,hi=RINGS[i].r,pad=Math.min(2,(hi-lo)/4);return{i,r:rnd(lo+pad,hi-pad),a:rnd(0,Math.PI*2)}}
-const aimQ=()=>clamp(1-aim.r/175,0,1);
-const gradeOf=q=>q>.9?'Perfect':q>.78?'Great':q>.5?'Good':q>.25?'Poor':'Weak';
+            // ═══════════════════════════════════
+            //  USER SESSION
+            // ═══════════════════════════════════
+            class UserSession {
+                constructor() { this.user = null; }
+                async load() {
+                    const s = StorageMgr.getSession();
+                    if (!s) { this._redirect(); return false; }
+                    const users = StorageMgr.getUsers();
+                    let u = users[s.username];
+                    if (!u) { this._redirect(); return false; }
+                    u.globalStats = u.globalStats || { totalWagered: 0, totalWon: 0, totalGames: 0, totalWins: 0,
+                        currentStreak: 0, bestStreak: 0, totalLosses: 0 };
+                    u.gamePlayCount = u.gamePlayCount || {};
+                    u.gameOutcomes = u.gameOutcomes || [];
+                    u.transactions = u.transactions || [];
+                    u.bankBalance = u.bankBalance ?? 0;
+                    u.xp = u.xp ?? 0;
+                    u.dartsStats = u.dartsStats || { gamesPlayed: 0, wins: 0, totalWagered: 0, totalPayout: 0,
+                        bestMultiplier: 0, bullseyeCount: 0, goldenBullCount: 0, bestStreak: 0,
+                        totalDartsThrown: 0 };
+                    u.earnedAchievements = u.earnedAchievements || [];
+                    u.dartCosmetics = u.dartCosmetics || { dartStyle: 0, boardSkin: 0, trailStyle: 0 };
+                    u.unlockedCosmetics = u.unlockedCosmetics || { darts: [0], boards: [0], trails: [0] };
+                    this.user = u;
+                    StorageMgr.setSession(u);
+                    return true;
+                }
+                _redirect() { StorageMgr.clearSession(); try { window.location.href =
+                    '../../sign-in.html'; } catch {} }
+                async save() {
+                    const users = StorageMgr.getUsers();
+                    users[this.user.username] = this.user;
+                    StorageMgr.saveUsers(users);
+                    StorageMgr.setSession(this.user);
+                }
+                get balance() { return this.user?.balance ?? 0; }
+                set balance(v) { if (this.user) this.user.balance = Math.max(0, Math.floor(v)); }
+                get level() { const xp = this.user?.xp || 0; return Math.floor(Math.sqrt(xp / 80)) + 1; }
+                get rank() {
+                    const lv = this.level;
+                    const ranks = CONFIG.RANK_THRESHOLDS;
+                    for (let i = ranks.length - 1; i >= 0; i--) { if (lv >= ranks[i]) return CONFIG.RANKS[i]; }
+                    return CONFIG.RANKS[0];
+                }
+                get xpForNextLevel() { const lv = this.level; return Math.floor(((lv + 1) ** 2) * 80) - (this.user?.xp ||
+                    0); }
+                get xpProgress() { const lv = this.level; const curr = (lv ** 2) * 80; const nxt = ((lv + 1) ** 2) * 80;
+                    return clamp(((this.user?.xp || 0) - curr) / (nxt - curr), 0, 1); }
+                get stats() { return this.user?.dartsStats || {}; }
+                get sessionStats() {
+                    const s = this.stats;
+                    const profit = (s.totalPayout || 0) - (s.totalWagered || 0);
+                    return { games: s.gamesPlayed || 0, wins: s.wins || 0, profit, bestMultiplier: s.bestMultiplier || 0,
+                        winRate: s.gamesPlayed > 0 ? ((s.wins / s.gamesPlayed) * 100).toFixed(1) : '0',
+                        bullseyeCount: s.bullseyeCount || 0, bestStreak: s.bestStreak || 0 };
+                }
+                addTransaction(desc, amount, type) {
+                    if (!this.user) return;
+                    this.user.transactions.unshift({ desc, amount, type, date: new Date().toISOString() });
+                    if (this.user.transactions.length > 120) this.user.transactions.length = 120;
+                }
+                addXP(amount) { if (this.user) this.user.xp = (this.user.xp || 0) + Math.floor(amount); }
+                unlockCosmetic(category, index) {
+                    const key = category === 'darts' ? 'darts' : category === 'boards' ? 'boards' : 'trails';
+                    if (!this.user.unlockedCosmetics) this.user.unlockedCosmetics = { darts: [0], boards: [0],
+                    trails: [0] };
+                    if (!this.user.unlockedCosmetics[key].includes(index)) this.user.unlockedCosmetics[key].push(
+                    index);
+                }
+            }
 
-/* ---------- board renderer ---------- */
-const cv=$('cv'),cx=cv.getContext('2d');
-const aim={r:100,dir:1,t:0};
-const darts=[];let ripple=null,hl=-1,lastTs=0;
-function fit(){const d=Math.min(devicePixelRatio||1,2),s=cv.clientWidth||440;cv.width=cv.height=Math.round(s*d)}
-const P=(r,a)=>[Math.cos(a)*r*KB,Math.sin(a)*r*KB];
-function drawDart(x,y,sc,tilt,col,al){
- cx.save();cx.globalAlpha=al;cx.translate(x,y);cx.rotate(tilt);cx.scale(sc,sc);
- cx.fillStyle='rgba(0,0,0,.35)';cx.beginPath();cx.ellipse(6,4,10,3,0,0,7);cx.fill();
- cx.fillStyle='#d9d9d9';cx.beginPath();cx.moveTo(0,0);cx.lineTo(-1.6,-9);cx.lineTo(1.6,-9);cx.fill();
- cx.fillStyle=col;cx.beginPath();cx.moveTo(-3,-9);cx.lineTo(3,-9);cx.lineTo(2.4,-26);cx.lineTo(-2.4,-26);cx.fill();
- cx.fillStyle='rgba(255,255,255,.35)';cx.fillRect(-.8,-25,1,15);
- cx.fillStyle='#222';cx.fillRect(-1,-32,2,6);
- cx.fillStyle=col;cx.globalAlpha=al*.9;cx.beginPath();cx.moveTo(0,-30);cx.lineTo(-9,-42);cx.lineTo(-2,-40);cx.lineTo(0,-46);cx.lineTo(2,-40);cx.lineTo(9,-42);cx.closePath();cx.fill();
- cx.restore();
-}
-function frame(ts){
- const dt=Math.min(.05,(ts-lastTs)/1000||0);lastTs=ts;
- const s=cv.width/400;cx.setTransform(s,0,0,s,0,0);cx.clearRect(0,0,400,400);cx.translate(200,200);
- // outer
- cx.beginPath();cx.arc(0,0,199,0,7);cx.fillStyle=SK().bg;cx.fill();
- cx.strokeStyle='rgba(240,200,80,.4)';cx.lineWidth=1;cx.stroke();
- // bands
- for(let i=6;i>=0;i--){cx.beginPath();cx.arc(0,0,RINGS[i].r*KB,0,7);cx.fillStyle=SK().c[i];cx.fill()}
- // wedges
- for(let i=0;i<20;i++){
-  const a0=(i-.5)/20*Math.PI*2-Math.PI/2,a1=(i+.5)/20*Math.PI*2-Math.PI/2;
-  cx.beginPath();cx.moveTo(0,0);cx.arc(0,0,RINGS[6].r*KB,a0,a1);cx.closePath();
-  cx.fillStyle=i%2?'rgba(0,0,0,.3)':'rgba(255,255,255,.04)';cx.fill();
-  cx.strokeStyle='rgba(240,200,80,.16)';cx.lineWidth=.6;cx.beginPath();cx.moveTo(0,0);cx.lineTo(Math.cos(a0)*RINGS[6].r*KB,Math.sin(a0)*RINGS[6].r*KB);cx.stroke();
- }
- // glossy light
- const gl=cx.createRadialGradient(-50,-70,10,0,0,190);gl.addColorStop(0,'rgba(255,255,255,.12)');gl.addColorStop(1,'rgba(0,0,0,.25)');
- cx.beginPath();cx.arc(0,0,RINGS[6].r*KB,0,7);cx.fillStyle=gl;cx.fill();
- // wires
- RINGS.forEach(r=>{cx.beginPath();cx.arc(0,0,r.r*KB,0,7);cx.strokeStyle='rgba(255,230,140,.55)';cx.lineWidth=1.2;cx.stroke()});
- // numbers
- cx.fillStyle='#e8d9a8';cx.font='800 9px Inter,sans-serif';cx.textAlign='center';cx.textBaseline='middle';
- for(let i=0;i<20;i++){const a=i/20*Math.PI*2-Math.PI/2;cx.fillText(NUMS[i],Math.cos(a)*193.5,Math.sin(a)*193.5)}
- // multiplier labels
- cx.font='900 8px Inter,sans-serif';cx.shadowColor='#000';cx.shadowBlur=3;cx.fillStyle='#fff';
- for(let i=1;i<=5;i++){const mid=(RINGS[i-1].r+RINGS[i].r)/2*KB;cx.fillText(RINGS[i].m+'×',mid,0)}
- cx.shadowBlur=0;
- cx.beginPath();cx.arc(0,0,RINGS[0].r*KB,0,7);cx.fillStyle='rgba(255,240,150,.9)';cx.fill();
- // hit highlight
- if(ripple){
-  const t=(ts-ripple.t0)/700;
-  if(t>=0&&t<1){
-   cx.beginPath();cx.arc(0,0,RINGS[hl].r*KB,0,7);cx.strokeStyle=`rgba(255,240,170,${1-t})`;cx.lineWidth=3;cx.stroke();
-   const [x,y]=P(ripple.r,ripple.a);cx.beginPath();cx.arc(x,y,4+t*38,0,7);cx.strokeStyle=`rgba(255,255,210,${1-t})`;cx.lineWidth=2;cx.stroke();
-  }
- }
- // aim ring
- if(mode==='skill'){
-  const frozen=pw.freeze,spd=frozen?55:150;
-  aim.r+=aim.dir*spd*dt;if(aim.r>=175){aim.r=175;aim.dir=-1}if(aim.r<=6){aim.r=6;aim.dir=1}
-  const q=aimQ(),col=q>.78?'#7dff8a':q>.5?'#ffe478':q>.25?'#ffb04a':'#ff6b6b';
-  cx.save();cx.shadowColor=col;cx.shadowBlur=16;cx.strokeStyle=col;cx.lineWidth=3.2;cx.beginPath();cx.arc(0,0,aim.r*KB,0,7);cx.stroke();cx.restore();
-  cx.strokeStyle='rgba(255,255,255,.55)';cx.lineWidth=1;cx.setLineDash([6,6]);cx.beginPath();cx.arc(0,0,aim.r*KB,0,7);cx.stroke();cx.setLineDash([]);
-  $('grade').textContent=gradeOf(q);$('grade').style.color=col;
- }
- // darts
- const dc=DCOL[U.dartCosmetics.dartStyle]||DCOL[0];
- for(const d of darts){
-  const p=clamp((ts-d.t0)/FLIGHT,0,1),e=1-Math.pow(1-p,3),[x,y]=P(d.r,d.a);
-  if(p>=1&&!d.hit){d.hit=true;d.onHit&&d.onHit()}
-  for(let k=1;k<=5&&p<1;k++){const pk=p-k*.035;if(pk<=0)break;const ek=1-Math.pow(1-pk,3);cx.globalAlpha=.16*(6-k)/5;cx.fillStyle=dc;cx.beginPath();cx.arc(x,y+(1-ek)*160,3.2*(1+(1-ek)*1.5)*(1-k*.1),0,7);cx.fill()}cx.globalAlpha=1;
-  drawDart(x,y+(1-e)*160,1+(1-e)*1.5,.12+(1-e)*.5*d.w,dc,.35+.65*e);
- }
- cx.setTransform(1,0,0,1,0,0);
- requestAnimationFrame(frame);
-}
-function landDart(t,onHit){
- const d={r:t.r,a:t.a,t0:performance.now(),w:Math.random()>.5?1:-1,hit:false};
- d.onHit=()=>{ripple={r:d.r,a:d.a,t0:performance.now()};hl=t.i;onHit&&onHit()};
- if(darts.length>=10)darts.shift();darts.push(d);
-}
+            // ═══════════════════════════════════
+            //  DARTBOARD RENDERER
+            // ═══════════════════════════════════
+            class DartboardRenderer {
+                constructor(canvasId, userSession) {
+                    this._c = document.getElementById(canvasId);
+                    this._ctx = this._c?.getContext('2d');
+                    this._user = userSession;
+                    this._size = CONFIG.CANVAS_SIZE;
+                    this._animId = null;
+                    this._aimRadius = 100;
+                    this._aimDir = 1;
+                    this._aimSpeed = 0.8;
+                    this._aimActive = false;
+                    this._dartLanded = null;
+                    this._dartAnimProgress = 0;
+                    this._dartAnimTarget = null;
+                    this._impactRipple = 0;
+                    this._impactPos = null;
+                    this._highlightRing = -1;
+                    this._freezeActive = false;
+                    this._freezeTimer = 0;
+                }
+                get aimRadius() { return this._aimRadius; }
+                set aimActive(v) { this._aimActive = v; if (v) { this._aimRadius = rand(30, 160);
+                        this._aimDir = Math.random() > 0.5 ? 1 : -1; } }
+                get aimActive() { return this._aimActive; }
+                set freezeActive(v) { this._freezeActive = v; if (v) this._freezeTimer = 180; }
+                animateDartLanding(radius, angle) {
+                    this._dartAnimTarget = { radius: clamp(radius, 0, 195), angle: angle || rand(0, Math.PI * 2) };
+                    this._dartAnimProgress = 0;
+                    this._dartLanded = null;
+                    this._impactPos = null;
+                    this._impactRipple = 0;
+                }
+                triggerImpact(radius, angle, ringIndex) {
+                    this._impactPos = { radius: clamp(radius, 0, 195), angle: angle || rand(0, Math.PI * 2) };
+                    this._impactRipple = 1;
+                    this._highlightRing = ringIndex;
+                    this._dartLanded = { ...this._impactPos };
+                    this._dartAnimTarget = null;
+                    this._dartAnimProgress = 1;
+                }
+                render() {
+                    if (!this._c || !this._ctx) return;
+                    const ctx = this._ctx;
+                    const sz = this._size;
+                    const cx = sz / 2;
+                    const cy = sz / 2;
+                    const skin = this._user.user?.dartCosmetics?.boardSkin || 0;
+                    ctx.clearRect(0, 0, sz, sz);
+                    // Board background
+                    const bgGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 210);
+                    bgGrad.addColorStop(0, '#2a2018');
+                    bgGrad.addColorStop(1, '#0d0a06');
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 205, 0, Math.PI * 2);
+                    ctx.fillStyle = bgGrad;
+                    ctx.fill();
+                    // Rings
+                    const rings = CONFIG.RINGS;
+                    for (let i = rings.length - 1; i >= 0; i--) {
+                        const r = rings[i];
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, r.radiusMax, 0, Math.PI * 2);
+                        ctx.fillStyle = r.color;
+                        ctx.fill();
+                        ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+                        ctx.lineWidth = 1.2;
+                        ctx.stroke();
+                    }
+                    // Segment lines (20 segments for visual effect)
+                    for (let i = 0; i < 20; i++) {
+                        const a = (i / 20) * Math.PI * 2 - Math.PI / 2;
+                        ctx.beginPath();
+                        ctx.moveTo(cx, cy);
+                        ctx.lineTo(cx + Math.cos(a) * 200, cy + Math.sin(a) * 200);
+                        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                        ctx.lineWidth = 0.6;
+                        ctx.stroke();
+                    }
+                    // Numbers around edge
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 10px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const nums = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
+                    for (let i = 0; i < 20; i++) {
+                        const a = (i / 20) * Math.PI * 2 - Math.PI / 2;
+                        const tx = cx + Math.cos(a) * 188;
+                        const ty = cy + Math.sin(a) * 188;
+                        ctx.fillText(nums[i], tx, ty);
+                    }
+                    // Skill aim ring
+                    if (this._aimActive) {
+                        if (!this._freezeActive) {
+                            this._aimRadius += this._aimDir * this._aimSpeed;
+                            if (this._aimRadius >= 175) { this._aimRadius = 175;
+                                this._aimDir = -1; }
+                            if (this._aimRadius <= 8) { this._aimRadius = 8;
+                                this._aimDir = 1; }
+                        } else {
+                            this._freezeTimer--;
+                            if (this._freezeTimer <= 0) this._freezeActive = false;
+                        }
+                        const ar = this._aimRadius;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, ar, 0, Math.PI * 2);
+                        ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+                        ctx.lineWidth = 3;
+                        ctx.shadowColor = 'rgba(255,255,255,0.6)';
+                        ctx.shadowBlur = 14;
+                        ctx.stroke();
+                        ctx.shadowBlur = 0;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, ar, 0, Math.PI * 2);
+                        ctx.strokeStyle = 'rgba(240,200,80,0.5)';
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash([8, 6]);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                    // Dart animation
+                    if (this._dartAnimTarget && this._dartAnimProgress < 1) {
+                        this._dartAnimProgress += 0.025;
+                        if (this._dartAnimProgress >= 1) {
+                            this._dartAnimProgress = 1;
+                            this.triggerImpact(this._dartAnimTarget.radius, this._dartAnimTarget.angle, -1);
+                        } else {
+                            const t = this._easeOut(this._dartAnimProgress);
+                            const r = 220 - t * (220 - this._dartAnimTarget.radius);
+                            const a = this._dartAnimTarget.angle;
+                            const dx = cx + Math.cos(a) * r;
+                            const dy = cy + Math.sin(a) * r;
+                            this._drawDart(ctx, dx, dy, a + Math.PI / 2, t);
+                        }
+                    }
+                    // Landed dart
+                    if (this._dartLanded) {
+                        const dx = cx + Math.cos(this._dartLanded.angle) * this._dartLanded.radius;
+                        const dy = cy + Math.sin(this._dartLanded.angle) * this._dartLanded.radius;
+                        this._drawDart(ctx, dx, dy, this._dartLanded.angle + Math.PI / 2, 1);
+                    }
+                    // Impact ripple
+                    if (this._impactRipple > 0 && this._impactPos) {
+                        this._impactRipple -= 0.04;
+                        if (this._impactRipple < 0) this._impactRipple = 0;
+                        const rippleR = (1 - this._impactRipple) * 50 + 5;
+                        const alpha = this._impactRipple;
+                        ctx.beginPath();
+                        ctx.arc(cx + Math.cos(this._impactPos.angle) * this._impactPos.radius, cy + Math.sin(this._impactPos
+                            .angle) * this._impactPos.radius, rippleR, 0, Math.PI * 2);
+                        ctx.strokeStyle = `rgba(255,255,200,${alpha})`;
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                    // Highlight ring
+                    if (this._highlightRing >= 0 && this._impactRipple > 0) {
+                        const ring = CONFIG.RINGS[this._highlightRing];
+                        if (ring) {
+                            ctx.beginPath();
+                            ctx.arc(cx, cy, ring.radiusMax, 0, Math.PI * 2);
+                            ctx.strokeStyle = `rgba(255,255,200,${this._impactRipple})`;
+                            ctx.lineWidth = 3;
+                            ctx.stroke();
+                        }
+                    }
+                    // Center dot
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#fff';
+                    ctx.fill();
+                    this._animId = requestAnimationFrame(() => this.render());
+                }
+                _drawDart(ctx, x, y, angle, alpha) {
+                    ctx.save();
+                    ctx.globalAlpha = alpha;
+                    ctx.translate(x, y);
+                    ctx.rotate(angle);
+                    const style = this._user.user?.dartCosmetics?.dartStyle || 0;
+                    const dartColor = CONFIG.DART_COLORS[style] || '#c0c0c0';
+                    ctx.fillStyle = dartColor;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -14);
+                    ctx.lineTo(-4, 6);
+                    ctx.lineTo(0, 3);
+                    ctx.lineTo(4, 6);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.fillStyle = '#333';
+                    ctx.fillRect(-1.5, 6, 3, 8);
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.moveTo(-3, 14);
+                    ctx.lineTo(3, 14);
+                    ctx.lineTo(0, 20);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                }
+                _easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+                getRingFromRadius(r) {
+                    for (const ring of CONFIG.RINGS) { if (r <= ring.radiusMax) return ring; }
+                    return CONFIG.RINGS[CONFIG.RINGS.length - 1];
+                }
+                destroy() { if (this._animId) cancelAnimationFrame(this._animId); }
+            }
 
-/* ---------- effects ---------- */
-function confetti(n=140,gold=false){
- const c=document.createElement('canvas');c.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:98';
- document.body.appendChild(c);c.width=innerWidth;c.height=innerHeight;const x=c.getContext('2d');
- const cols=gold?['#ffd700','#ffe478','#fff8c0','#ffab00']:['#ffd966','#ff5252','#4caf50','#ff8c42','#e040fb'];
- const ps=Array.from({length:n},()=>({x:innerWidth/2+rnd(-60,60),y:innerHeight*.45,vx:rnd(-8,8),vy:rnd(-12,-2),s:rnd(3,8),c:cols[Math.random()*cols.length|0],r:rnd(0,6),rv:rnd(-.3,.3),l:1}));
- const t0=performance.now();
- (function d(ts){x.clearRect(0,0,c.width,c.height);let al=false;
-  for(const p of ps){p.vy+=.25;p.x+=p.vx;p.y+=p.vy;p.r+=p.rv;p.l-=.007;if(p.l>0&&p.y<c.height+30){al=true;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.globalAlpha=p.l;x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()}}
-  if(al&&ts-t0<4500)requestAnimationFrame(d);else c.remove()})(t0);
-}
-let bannerT=0;
-function banner(html,col){const b=$('banner');b.innerHTML=html;b.style.color=col;b.classList.add('show');clearTimeout(bannerT);bannerT=setTimeout(()=>b.classList.remove('show'),1700)}
-function ach(name){const e=document.createElement('div');e.className='ach';e.innerHTML='🏆 '+name;document.body.appendChild(e);setTimeout(()=>e.remove(),3300);sfx.ach()}
-function shake(){const c=$('card');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake')}
-let resT=0;
-function say(msg,cls=''){const r=$('res');r.innerHTML=msg;r.className='res '+cls;clearTimeout(resT);resT=setTimeout(()=>{if(!R&&!auto.on){r.className='res';r.innerHTML='🎯 Pick a mode, set your bet and throw!'}},4500)}
+            // ═══════════════════════════════════
+            //  EFFECTS SYSTEM
+            // ═══════════════════════════════════
+            class EffectsSystem {
+                static confetti(intensity = 'normal') {
+                    const c = document.createElement('canvas');
+                    c.style.cssText =
+                        'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;';
+                    document.body.appendChild(c);
+                    c.width = window.innerWidth;
+                    c.height = window.innerHeight;
+                    const ctx = c.getContext('2d');
+                    const counts = { low: 50, normal: 140, high: 280, golden: 400 };
+                    const count = counts[intensity] || 140;
+                    const parts = [];
+                    const colors = intensity === 'golden' ? ['#ffd700', '#ffe478', '#fff8c0', '#ffab00', '#ffea00'] : [
+                        '#ffd966', '#ffe478', '#ff5252', '#4caf50', '#ff8c42', '#e040fb'
+                    ];
+                    for (let i = 0; i < count; i++) parts.push({ x: Math.random() * c.width, y: -Math.random() * c.height *
+                            0.5, vx: (Math.random() - 0.5) * 7, vy: Math.random() * 5 + 2, s: Math.random() * 6 + 2,
+                            col: colors[Math.floor(Math.random() * colors.length)], rot: Math.random() * 360, rv: (Math
+                                .random() - 0.5) * 12, life: 1, dec: 0.004 + Math.random() * 0.005 });
+                    const start = performance.now();
+                    const maxD = 4000;
 
-/* ---------- accounting ---------- */
-function record(wager,payout,mult,ringName,darts=1){
- const s=U.dartsStats,g=U.globalStats,profit=payout-wager,win=profit>=0&&payout>0;hist.unshift({m:mult,w:win});if(hist.length>12)hist.pop();
- s.gamesPlayed++;s.totalWagered+=wager;s.totalPayout+=payout;s.totalDartsThrown+=darts;
- g.totalGames++;g.totalWagered+=wager;
- if(win){s.wins++;g.totalWins++;g.totalWon+=payout;g.currentStreak=(g.currentStreak||0)+1;g.bestStreak=Math.max(g.bestStreak||0,g.currentStreak);
-  if(mult>s.bestMultiplier)s.bestMultiplier=mult;
-  if(ringName==='Golden Bull'){s.goldenBullCount++;s.bullseyeCount++}else if(ringName==='Bullseye')s.bullseyeCount++}
- else{g.totalLosses=(g.totalLosses||0)+wager;g.currentStreak=0}
- U.xp+=Math.floor(wager*.6);U.gamePlayCount.darts=(U.gamePlayCount.darts||0)+1;
- U.gameOutcomes.unshift({game:'Darts',result:win?'win':'loss',profit,multiplier:mult,ring:ringName,bet:wager,date:new Date().toISOString()});
- if(U.gameOutcomes.length>100)U.gameOutcomes.length=100;
- if(mult>=10){const lb=jp(localStorage.getItem(K.LB),[]);lb.push({username:U.username,multiplier:+mult.toFixed(2),date:new Date().toISOString()});lb.sort((a,b)=>b.multiplier-a.multiplier);localStorage.setItem(K.LB,JSON.stringify(lb.slice(0,10)))}
- save();achievements();
-}
-function achievements(){
- const s=U.dartsStats,a=U.earnedAchievements,n=[];
- const c=(k,ok,name)=>{if(ok&&!a.includes(k)){a.push(k);n.push(name)}};
- c('first_throw',s.gamesPlayed>=1,'First Throw');c('first_win',s.wins>=1,'First Win');c('triple_hunter',s.bestMultiplier>=3,'Triple Ring Hunter');
- c('bullseye_master',s.bullseyeCount>=3,'Bullseye Master');c('golden_bull',s.goldenBullCount>=1,'Golden Bull Collector');
- c('50_games',s.gamesPlayed>=50,'50 Games Played');c('100_games',s.gamesPlayed>=100,'100 Games Played');
- c('big_winner',s.bestMultiplier>=50,'Golden Bullseye Hit');c('survivor',s.bestStreak>=5,'Survival Expert (5 streak)');
- if(n.length){save();n.forEach((x,i)=>setTimeout(()=>ach(x),i*900))}
-}
-function earn(v,desc){setBal(U.balance+v);tx(desc,v,'game_win')}
-function spend(v,desc){setBal(U.balance-v);tx(desc,-v,'withdraw')}
+                    function draw(ts) {
+                        ctx.clearRect(0, 0, c.width, c.height);
+                        let alive = false;
+                        for (const p of parts) { p.vy += 0.07;
+                            p.x += p.vx;
+                            p.y += p.vy;
+                            p.rot += p.rv;
+                            p.life -= p.dec; if (p.life > 0 && p.y < c.height + 50 && ts - start < maxD) { alive = true;
+                                ctx.save();
+                                ctx.translate(p.x, p.y);
+                                ctx.rotate((p.rot * Math.PI) / 180);
+                                ctx.globalAlpha = Math.max(0, p.life);
+                                ctx.fillStyle = p.col;
+                                ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.5);
+                                ctx.restore(); } }
+                        if (alive) requestAnimationFrame(draw);
+                        else c.remove();
+                    }
+                    requestAnimationFrame(draw);
+                    setTimeout(() => { if (c.parentNode) c.remove(); }, maxD + 500);
+                }
+                static floatingText(msg, x = '50%', y = '40%') {
+                    const el = document.createElement('div');
+                    el.className = 'floating-score';
+                    el.textContent = msg;
+                    el.style.left = x;
+                    el.style.top = y;
+                    el.style.transform = 'translateX(-50%)';
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 1300);
+                }
+                static shake(el) { el.classList.add('shake');
+                    setTimeout(() => el.classList.remove('shake'), 450); }
+                static achievementPopup(name) {
+                    const el = document.createElement('div');
+                    el.className = 'achievement-popup';
+                    el.innerHTML = `🏆 <strong>${name}</strong>`;
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 3200);
+                }
+            }
 
-/* ---------- game actions ---------- */
-function showRing(t,b,payout,extra=''){
- const ring=RINGS[t.i],m=ring.m;
- sfx.hit();
- if(m>=50){sfx.big();confetti(380,true);shake();banner('🌟 GOLDEN BULL!<small>'+m+'× · +'+fmt(payout)+'</small>','#ffe478');say(`🌟 GOLDEN BULLSEYE! ${m}× → +${fmt(payout)} GOLD!`,'jp')}
- else if(m>=10){sfx.big();confetti(220);banner('🎯 BULLSEYE!<small>'+m+'× · +'+fmt(payout)+'</small>','#ff8a80');say(`🎯 BULLSEYE! ${m}× → +${fmt(payout)} GOLD!`,'win')}
- else if(m>0){sfx.win();if(m>=5)confetti(60);banner(ring.n+'<small>'+m+'× · +'+fmt(payout)+'</small>','#ffe478');say(`🎯 ${ring.n} ${m}× → +${fmt(payout)} GOLD ${extra}`,'win')}
- else{sfx.lose();banner('MISS','#ff8a80');say(`💔 Miss ${extra}`,'loss')}
-}
-async function act(){
- const conc=mode==='quick'||mode==='skill';
- if(busy&&!conc)return false;
- const b=bet();if(!conc){busy=true;sync()}let round=null;
- try{
-  if(mode==='quick'||mode==='skill'){
-   const f=fee(b),cost=b+f;
-   if(cost>U.balance){say('Insufficient balance for this bet.','loss');return false}
-   spend(cost,`Darts throw -${fmt(cost)}`);
-   const t=place(pick(1,mode==='skill'?aimQ():null)),pay=Math.floor(b*RINGS[t.i].m);
-   sfx.throw();if(pay)earn(pay,`Darts ${RINGS[t.i].n} +${fmt(pay)}`);
-   landDart(t,()=>showRing(t,b,pay,pay?'':`· lost ${fmt(b)}`));
-   record(cost,pay,RINGS[t.i].m,RINGS[t.i].n);
-   round={mult:RINGS[t.i].m,loss:!pay};
-  }else if(mode==='challenge'){
-   if(!R){if(b*3>U.balance){say('Need 3× your bet for a Challenge.','loss');return false}
-    spend(b*3,`Darts Challenge -${fmt(b*3)}`);R={mode,bet:b,left:3,acc:0,best:0,ring:'Miss'};darts.length=0}
-   const t=place(pick()),pay=Math.floor(R.bet*RINGS[t.i].m);R.acc+=pay;R.left--;
-   if(RINGS[t.i].m>R.best){R.best=RINGS[t.i].m;R.ring=RINGS[t.i].n}
-   sfx.throw();landDart(t,()=>showRing(t,R?R.bet:b,pay,`· ${R?R.left:0} left`));
-   await wait(FLIGHT+250);
-   if(R.left<=0){const done=R;R=null;earn(done.acc,`Darts Challenge +${fmt(done.acc)}`);record(done.bet*3,done.acc,done.acc/(done.bet*3),done.ring,3);
-    const net=done.acc-done.bet*3;say(`🏆 Challenge over! Payout ${fmt(done.acc)} GOLD (${net>=0?'+':''}${fmt(net)})`,net>=0?'win':'loss');if(net>=0)confetti(120);round={mult:done.acc/(done.bet*3),loss:net<0}}
-  }else if(mode==='survival'){
-   if(!R){if(b>U.balance){say('Insufficient balance.','loss');return false}
-    spend(b,`Darts Survival -${fmt(b)}`);R={mode,bet:b,streak:0,best:U.dartsStats.bestStreak||0};darts.length=0}
-   const ok=Math.random()<SURV_P,i=ok?pick():6;let ii=i;if(ok&&ii===6)ii=5-Math.floor(Math.random()*3);
-   const t=place(ok?Math.min(ii,5):6);
-   sfx.throw();landDart(t,()=>{sfx.hit();ok?(sfx.win(),banner('SURVIVED<small>streak '+(R?R.streak:0)+'</small>','#9dffa8')):(sfx.lose(),banner('MISS','#ff8a80'))});
-   await wait(FLIGHT+250);
-   if(ok){R.streak++;if(R.streak>R.best){R.best=R.streak;U.dartsStats.bestStreak=R.streak;save()}
-    say(`🔥 Hit! Streak ${R.streak} · cash-out ${fmt(Math.floor(R.bet*survMult(R.streak)))} GOLD`,'win')}
-   else{const d=R;R=null;record(d.bet,0,0,'Miss',d.streak+1);say(`💔 Survival ended at streak ${d.streak} · lost ${fmt(d.bet)} GOLD`,'loss');round={mult:0,loss:true}}
-  }
- }finally{if(!conc)busy=false;sync()}
- return round||{mult:0,pending:true};
-}
-async function collect(){
- if(busy||!R)return;
- if(R.mode==='challenge'&&R.left<3){const d=R;R=null;earn(d.acc,`Darts Challenge collect +${fmt(d.acc)}`);record(d.bet*3,d.acc,d.acc/(d.bet*3),d.ring,3-d.left);say(`💰 Challenge collected: +${fmt(d.acc)} GOLD`,d.acc>=d.bet*3?'win':'loss');sfx.win()}
- else if(R.mode==='survival'&&R.streak>0){const d=R,m=survMult(d.streak),p=Math.floor(d.bet*m);R=null;earn(p,`Darts Survival collect +${fmt(p)}`);record(d.bet,p,m,'Survival',d.streak);
-  say(`💰 Survival collected: +${fmt(p)} GOLD (${d.streak} hits · ${m.toFixed(2)}×)`,'win');sfx.win();confetti(100);banner('+'+fmt(p)+'<small>'+m.toFixed(2)+'×</small>','#9dffa8')}
- sync();
-}
+            // ═══════════════════════════════════
+            //  GAME ENGINE
+            // ═══════════════════════════════════
+            class GameEngine {
+                constructor(userSession, audio, renderer) {
+                    this._user = userSession;
+                    this._audio = audio;
+                    this._renderer = renderer;
+                    this._mode = 'quick';
+                    this._challengeActive = false;
+                    this._challengeDartsLeft = 0;
+                    this._challengeAccumulated = 0;
+                    this._challengeBetPerDart = 0;
+                    this._survivalActive = false;
+                    this._survivalStreak = 0;
+                    this._survivalBest = 0;
+                    this._survivalAccumulated = 0;
+                    this._survivalBet = 0;
+                    this._powerups = { scope: false, vision: false, stabilizer: false, feather: false, freeze: false };
+                    this._currentBet = 10;
+                }
+                get mode() { return this._mode; }
+                set mode(v) { this._mode = v; }
+                get challengeActive() { return this._challengeActive; }
+                get survivalActive() { return this._survivalActive; }
+                get survivalStreak() { return this._survivalStreak; }
+                get survivalBest() { return this._survivalBest; }
+                get survivalMultiplier() {
+                    const mults = CONFIG.SURVIVAL_MULTIPLIERS;
+                    return this._survivalStreak < mults.length ? mults[this._survivalStreak] : mults[mults.length -
+                        1] * Math.pow(1.5, this._survivalStreak - mults.length + 1);
+                }
+                get powerups() { return this._powerups; }
+                togglePowerup(type) {
+                    if (this._challengeActive || this._survivalActive) return false;
+                    this._powerups[type] = !this._powerups[type];
+                    return true;
+                }
+                async startChallenge(bet) {
+                    if (this._challengeActive || this._survivalActive) return false;
+                    const total = bet * 3;
+                    if (total > this._user.balance) return false;
+                    this._user.balance -= total;
+                    this._user.addTransaction(`Darts Challenge (3 darts) -${fmtGold(total)}`, -total, 'withdraw');
+                    await this._user.save();
+                    this._challengeActive = true;
+                    this._challengeDartsLeft = 3;
+                    this._challengeAccumulated = 0;
+                    this._challengeBetPerDart = bet;
+                    return true;
+                }
+                async startSurvival(bet) {
+                    if (this._survivalActive || this._challengeActive) return false;
+                    if (bet > this._user.balance) return false;
+                    this._user.balance -= bet;
+                    this._user.addTransaction(`Darts Survival start -${fmtGold(bet)}`, -bet, 'withdraw');
+                    await this._user.save();
+                    this._survivalActive = true;
+                    this._survivalStreak = 0;
+                    this._survivalAccumulated = 0;
+                    this._survivalBet = bet;
+                    this._survivalBest = this._user.stats.bestStreak || 0;
+                    return true;
+                }
+                getEffectiveRing(aimRadius) {
+                    let ring;
+                    if (this._mode === 'quick') {
+                        ring = this._randomRing();
+                    } else {
+                        const variance = this._powerups.stabilizer ? (Math.random() - 0.5) * 10 : (Math.random() -
+                            0.5) * 22;
+                        const finalR = clamp(aimRadius + variance, 0, 198);
+                        ring = this._renderer.getRingFromRadius(finalR);
+                    }
+                    if (this._powerups.feather && ring.multiplier < 50 && Math.random() < 0.12) {
+                        const idx = CONFIG.RINGS.findIndex(r => r === ring);
+                        if (idx > 0) ring = CONFIG.RINGS[idx - 1];
+                    }
+                    return ring;
+                }
+                _randomRing() {
+                    let r = Math.random();
+                    let rings = [...CONFIG.RINGS];
+                    if (this._powerups.scope) {
+                        rings[0].prob += 0.015;
+                        rings[1].prob += 0.04;
+                        rings[6].prob -= 0.055;
+                    }
+                    if (this._powerups.vision) {
+                        rings[2].prob += 0.02;
+                        rings[3].prob += 0.02;
+                        rings[6].prob -= 0.04;
+                    }
+                    let cum = 0;
+                    for (const ring of rings) { cum += ring.prob; if (r < cum) return ring; }
+                    return rings[rings.length - 1];
+                }
+                async processThrow(bet, aimRadius) {
+                    const ring = this.getEffectiveRing(aimRadius);
+                    const mult = ring.multiplier;
+                    const winAmount = Math.floor(bet * mult);
+                    // Add random angle for dartboard display
+                    const angle = rand(0, Math.PI * 2);
+                    const radius = ring.radiusMax > 0 ? rand(ring === CONFIG.RINGS[0] ? 0 : (CONFIG.RINGS.findIndex(r => r ===
+                        ring) > 0 ? CONFIG.RINGS[CONFIG.RINGS.findIndex(r => r === ring) - 1].radiusMax : 0), ring
+                        .radiusMax) : rand(0, 8);
+                    this._renderer.animateDartLanding(radius, angle);
+                    return { ring, mult, winAmount, radius, angle, ringIndex: CONFIG.RINGS.indexOf(ring) };
+                }
+                async finishChallengeThrow(result) {
+                    this._challengeAccumulated += result.winAmount;
+                    this._challengeDartsLeft--;
+                    if (this._challengeDartsLeft <= 0) {
+                        const totalPayout = this._challengeAccumulated;
+                        const totalBet = this._challengeBetPerDart * 3;
+                        const profit = totalPayout - totalBet;
+                        this._user.balance += totalPayout;
+                        this._user.addTransaction(`Darts Challenge win +${fmtGold(totalPayout)}`, totalPayout,
+                            'game_win');
+                        this._recordGame(true, result.ring, result.mult, profit, this._challengeBetPerDart);
+                        this._challengeActive = false;
+                        await this._user.save();
+                        return { finished: true, totalPayout, profit, won: profit >= 0 };
+                    }
+                    await this._user.save();
+                    return { finished: false, accumulated: this._challengeAccumulated, dartsLeft: this
+                            ._challengeDartsLeft };
+                }
+                async collectChallenge() {
+                    if (!this._challengeActive) return null;
+                    const totalPayout = this._challengeAccumulated;
+                    const totalBet = this._challengeBetPerDart * 3;
+                    const profit = totalPayout - totalBet;
+                    this._user.balance += totalPayout;
+                    this._user.addTransaction(`Darts Challenge collect +${fmtGold(totalPayout)}`, totalPayout,
+                    'game_win');
+                    this._recordGame(true, { name: 'Challenge', multiplier: totalPayout / totalBet || 1 }, totalPayout /
+                        totalBet || 1, profit, this._challengeBetPerDart);
+                    this._challengeActive = false;
+                    await this._user.save();
+                    return { totalPayout, profit };
+                }
+                async finishSurvivalThrow(result) {
+                    if (result.mult > 0) {
+                        this._survivalStreak++;
+                        this._survivalAccumulated += result.winAmount;
+                        if (this._survivalStreak > this._survivalBest) {
+                            this._survivalBest = this._survivalStreak;
+                            this._user.stats.bestStreak = this._survivalBest;
+                        }
+                        await this._user.save();
+                        return { alive: true, streak: this._survivalStreak, accumulated: this._survivalAccumulated,
+                            multiplier: this.survivalMultiplier };
+                    } else {
+                        const lost = this._survivalBet;
+                        this._survivalActive = false;
+                        this._recordGame(false, result.ring, 0, -lost, this._survivalBet);
+                        await this._user.save();
+                        return { alive: false, lost, streak: this._survivalStreak };
+                    }
+                }
+                async collectSurvival() {
+                    if (!this._survivalActive || this._survivalStreak === 0) return null;
+                    const payout = this._survivalAccumulated;
+                    const profit = payout - this._survivalBet;
+                    this._user.balance += payout;
+                    this._user.addTransaction(`Darts Survival collect +${fmtGold(payout)}`, payout, 'game_win');
+                    this._recordGame(true, { name: 'Survival', multiplier: this.survivalMultiplier }, this
+                        .survivalMultiplier, profit, this._survivalBet);
+                    this._survivalActive = false;
+                    await this._user.save();
+                    return { payout, profit, streak: this._survivalStreak };
+                }
+                _recordGame(isWin, ring, multiplier, profit, bet) {
+                    const stats = this._user.stats;
+                    stats.gamesPlayed++;
+                    stats.totalWagered += bet;
+                    stats.totalDartsThrown = (stats.totalDartsThrown || 0) + 1;
+                    if (isWin && profit >= 0) {
+                        stats.wins++;
+                        stats.totalPayout += bet + profit;
+                        if (multiplier > stats.bestMultiplier) stats.bestMultiplier = multiplier;
+                        if (ring.name?.includes('Bull')) stats.bullseyeCount++;
+                        if (ring.name?.includes('Golden')) stats.goldenBullCount = (stats.goldenBullCount || 0) + 1;
+                        this._user.user.globalStats.totalWins++;
+                        this._user.user.globalStats.totalWon += (bet + profit);
+                        this._user.user.globalStats.currentStreak = (this._user.user.globalStats.currentStreak || 0) +
+                            1;
+                        if (this._user.user.globalStats.currentStreak > (this._user.user.globalStats.bestStreak || 0))
+                            this._user.user.globalStats.bestStreak = this._user.user.globalStats.currentStreak;
+                    } else {
+                        this._user.user.globalStats.totalLosses = (this._user.user.globalStats.totalLosses || 0) + bet;
+                        this._user.user.globalStats.currentStreak = 0;
+                    }
+                    this._user.user.globalStats.totalGames++;
+                    this._user.user.globalStats.totalWagered += bet;
+                    this._user.addXP(bet * 0.6);
+                    if (!this._user.user.gamePlayCount.darts) this._user.user.gamePlayCount.darts = 0;
+                    this._user.user.gamePlayCount.darts++;
+                    this._user.user.gameOutcomes.unshift({ game: 'Darts', result: isWin ? 'win' : 'loss', profit,
+                        multiplier, ring: ring.name, bet, date: new Date().toISOString() });
+                    if (this._user.user.gameOutcomes.length > 100) this._user.user.gameOutcomes.length = 100;
+                }
+                async processStandardThrow(bet, aimRadius) {
+                    if (bet > this._user.balance) return null;
+                    this._user.balance -= bet;
+                    this._user.addTransaction(`Darts throw -${fmtGold(bet)}`, -bet, 'withdraw');
+                    const result = await this.processThrow(bet, aimRadius);
+                    if (result.mult > 0) {
+                        const winAmount = result.winAmount;
+                        this._user.balance += winAmount;
+                        const profit = winAmount - bet;
+                        this._user.addTransaction(`Darts win ${result.ring.name} +${fmtGold(winAmount)}`, winAmount,
+                            'game_win');
+                        this._recordGame(true, result.ring, result.mult, profit, bet);
+                    } else {
+                        this._recordGame(false, result.ring, 0, -bet, bet);
+                    }
+                    await this._user.save();
+                    return result;
+                }
+                cancelAll() { this._challengeActive = false;
+                    this._survivalActive = false; }
+            }
 
-/* ---------- auto ---------- */
-function autoStop(msg){auto.on=false;sync();if(msg)say(msg,'')}
-const autoMs=()=>Math.max(50,(parseFloat($('autoInt').value)||.1)*1000);
-async function autoTick(){
- if(!auto.on)return;
- if(busy){setTimeout(autoTick,200);return}
- const r=await act();
- if(!auto.on)return;
- if(r===false){autoStop('⚡ Auto stopped — not enough balance.');return}
- // survival cash-out
- if(mode==='survival'&&R&&R.streak>=AUTO_SURV_COLLECT)await collect();
- const finished=r.pending?(!R):true;
- if(r&&!r.pending&&!R)finished&&auto.rounds++;
- else if(!R&&mode!=='challenge'&&mode!=='survival')auto.rounds++;
- if(auto.left>0&&auto.rounds>=auto.left){autoStop(`⚡ Auto finished ${auto.rounds} rounds.`);return}
- if($('stopBig').checked&&r.mult>=10){autoStop(`⚡ Auto stopped on a ${r.mult}× hit!`);return}
- if($('stopLoss').checked&&U.balance<bet()){autoStop('⚡ Auto stopped — balance too low.');return}
- setTimeout(autoTick,autoMs());
-}
-function toggleAuto(){
- if(auto.on){autoStop('⚡ Auto stopped.');return}
- auto.on=true;auto.rounds=0;auto.left=parseInt($('autoN').value)||0;sync();sfx.click();autoTick();
-}
+            // ═══════════════════════════════════
+            //  UI MANAGER
+            // ═══════════════════════════════════
+            class UIManager {
+                constructor(userSession, audio) {
+                    this._user = userSession;
+                    this._audio = audio;
+                    this._renderer = new DartboardRenderer('dartCanvas', userSession);
+                    this._engine = new GameEngine(userSession, audio, this._renderer);
+                    this._resultTimer = null;
+                    this._dom = this._cacheDom();
+                    this._bgParticles = this._initBgParticles();
+                    this._renderer.render();
+                    this._bindEvents();
+                    this._refreshAll();
+                    this._checkAchievements();
+                }
+                _cacheDom() {
+                    const g = (s) => document.getElementById(s);
+                    return {
+                        balance: g('balanceDisplay'),
+                        betInput: g('betAmount'),
+                        throwBtn: g('throwBtn'),
+                        cashoutSurvivalBtn: g('cashoutSurvivalBtn'),
+                        cashoutChallengeBtn: g('cashoutChallengeBtn'),
+                        resultDiv: g('resultMessage'),
+                        gamesCount: g('gamesCount'),
+                        winsCount: g('winsCount'),
+                        sessionPL: g('sessionPL'),
+                        bestHit: g('bestHit'),
+                        winRate: g('winRate'),
+                        leaderboardMini: g('leaderboardMini'),
+                        milestoneNote: g('milestoneNote'),
+                        rankBadge: g('rankBadge'),
+                        xpBar: g('xpBar'),
+                        levelDisplay: g('levelDisplay'),
+                        xpDisplay: g('xpDisplay'),
+                        skillInfo: g('skillInfo'),
+                        skillStatus: g('skillStatus'),
+                        aimGrade: g('aimGrade'),
+                        challengeInfo: g('challengeInfo'),
+                        challengeDartsLeft: g('challengeDartsLeft'),
+                        challengeTotal: g('challengeTotal'),
+                        survivalInfo: g('survivalInfo'),
+                        survivalStreak: g('survivalStreak'),
+                        survivalMult: g('survivalMult'),
+                        survivalBest: g('survivalBest'),
+                        soundToggle: g('soundToggle'),
+                        boardLabel: g('boardLabel'),
+                        boardWrapper: g('boardWrapper'),
+                        mainCard: g('mainCard'),
+                        dartStyles: g('dartStyles'),
+                        dartCanvas: g('dartCanvas'),
+                    };
+                }
+                _bindEvents() {
+                    const d = this._dom;
+                    d.throwBtn.addEventListener('click', () => this._handleThrow());
+                    d.cashoutChallengeBtn.addEventListener('click', () => this._handleCollectChallenge());
+                    d.cashoutSurvivalBtn.addEventListener('click', () => this._handleCollectSurvival());
+                    d.soundToggle.addEventListener('click', () => { const on = this._audio.toggle();
+                        d.soundToggle.innerHTML = on ? '<i class="fas fa-volume-up"></i>' :
+                            '<i class="fas fa-volume-mute"></i>'; });
+                    d.betInput.addEventListener('input', () => this._updateUI());
+                    document.querySelectorAll('.preset-sm[data-bet]').forEach(b => b.addEventListener('click', () => {
+                        const v = b.dataset.bet;
+                        const cur = parseInt(d.betInput.value) || 10;
+                        if (v === 'half') d.betInput.value = Math.max(1, Math.floor(cur / 2));
+                        else if (v === 'double') d.betInput.value = Math.min(100000, cur * 2);
+                        else if (v === 'max') d.betInput.value = Math.floor(this._user.balance) || 1;
+                        else d.betInput.value = parseInt(v);
+                        this._updateUI();
+                        this._audio.play('click');
+                    }));
+                    document.querySelectorAll('.mode-btn').forEach(b => b.addEventListener('click', () => {
+                        if (this._engine.challengeActive || this._engine.survivalActive) return;
+                        document.querySelectorAll('.mode-btn').forEach(x => x.classList.remove('active'));
+                        b.classList.add('active');
+                        const mode = b.dataset.mode;
+                        this._engine.mode = mode;
+                        this._renderer.aimActive = (mode === 'skill');
+                        this._updateModeUI();
+                        this._audio.play('click');
+                    }));
+                    ['scope', 'vision', 'stabilizer', 'feather', 'freeze'].forEach(pw => {
+                        const el = document.getElementById(pw + 'Pw');
+                        if (el) el.addEventListener('click', () => {
+                            if (this._engine.togglePowerup(pw)) {
+                                el.classList.toggle('active', this._engine.powerups[pw]);
+                                this._audio.play('click');
+                            }
+                        });
+                    });
+                    d.dartCanvas.addEventListener('click', (e) => {
+                        if (this._engine.mode === 'skill' && this._renderer.aimActive && !this._engine
+                            .challengeActive && !this._engine.survivalActive) {
+                            this._handleSkillShotClick();
+                        }
+                    });
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === ' ' && this._engine.mode === 'skill' && this._renderer.aimActive && !this
+                            ._engine.challengeActive && !this._engine.survivalActive && !e.target.closest(
+                                'input')) {
+                            e.preventDefault();
+                            this._handleSkillShotClick();
+                        }
+                    });
+                }
+                _handleSkillShotClick() {
+                    const aimR = this._renderer.aimRadius;
+                    this._renderer.aimActive = false;
+                    const grade = aimR < 12 ? 'Perfect' : aimR < 25 ? 'Great' : aimR < 60 ? 'Good' : aimR < 120 ?
+                        'Poor' : 'Missed';
+                    this._dom.aimGrade.textContent = grade;
+                    this._dom.skillStatus.textContent = `Aim: ${Math.round(aimR)}px from center · Grade: ${grade}`;
+                    this._executeThrow(aimR);
+                }
+                async _handleThrow() {
+                    if (this._engine.challengeActive) {
+                        const result = await this._engine.processThrow(this._engine._challengeBetPerDart, this._renderer
+                            .aimRadius);
+                        const fr = await this._engine.finishChallengeThrow(result);
+                        this._handleThrowResult(result, this._engine._challengeBetPerDart);
+                        if (fr.finished) this._onChallengeEnd(fr);
+                        else this._updateChallengeUI();
+                    } else if (this._engine.survivalActive) {
+                        const result = await this._engine.processThrow(this._engine._survivalBet, this._renderer.aimRadius);
+                        const sr = await this._engine.finishSurvivalThrow(result);
+                        this._handleThrowResult(result, this._engine._survivalBet);
+                        if (!sr.alive) this._onSurvivalEnd(sr);
+                        else this._updateSurvivalUI();
+                    } else {
+                        const bet = parseInt(this._dom.betInput.value);
+                        if (isNaN(bet) || bet <= 0 || bet > this._user.balance) {
+                            this._showResult('Invalid bet or insufficient balance.', true);
+                            return;
+                        }
+                        this._executeThrow(this._renderer.aimRadius);
+                    }
+                }
+                async _executeThrow(aimRadius) {
+                    const bet = parseInt(this._dom.betInput.value);
+                    if (isNaN(bet) || bet <= 0 || bet > this._user.balance) {
+                        this._showResult('Invalid bet amount.', true);
+                        return;
+                    }
+                    this._audio.play('throw');
+                    const result = await this._engine.processStandardThrow(bet, aimRadius);
+                    if (!result) { this._showResult('Error processing throw.', true); return; }
+                    this._handleThrowResult(result, bet);
+                }
+                _handleThrowResult(result, bet) {
+                    const ring = result.ring;
+                    const mult = result.mult;
+                    this._renderer.aimActive = false;
+                    setTimeout(() => {
+                        this._renderer.triggerImpact(result.radius, result.angle, result.ringIndex);
+                    }, 350);
+                    if (mult >= 50) {
+                        this._audio.play('golden');
+                        EffectsSystem.confetti('golden');
+                        EffectsSystem.shake(this._dom.mainCard);
+                        EffectsSystem.floatingText('🌟 GOLDEN BULL!', '50%', '35%');
+                        this._showResult(`🌟 GOLDEN BULLSEYE! ${mult}x → +${fmtGold(result.winAmount)} GOLD!`, false,
+                            'jackpot');
+                    } else if (mult >= 10) {
+                        this._audio.play('bullseye');
+                        EffectsSystem.confetti('high');
+                        EffectsSystem.floatingText('🎯 BULLSEYE!', '50%', '35%');
+                        this._showResult(`🎯 BULLSEYE! ${ring.name} ${mult}x → +${fmtGold(result.winAmount)} GOLD!`,
+                            false, 'win');
+                    } else if (mult > 0) {
+                        this._audio.play('win');
+                        if (mult >= 5) EffectsSystem.confetti('low');
+                        this._showResult(`🎯 ${ring.name} ${mult}x → +${fmtGold(result.winAmount)} GOLD!`, false,
+                        'win');
+                    } else {
+                        this._audio.play('lose');
+                        this._showResult(`💔 ${ring.name} → Lost ${fmtGold(bet)} GOLD`, true, 'loss');
+                    }
+                    this._refreshAll();
+                    this._checkAchievements();
+                    this._updateLeaderboard(result);
+                }
+                async _handleCollectChallenge() {
+                    const r = await this._engine.collectChallenge();
+                    if (r) { this._showResult(`💰 Challenge collected: +${fmtGold(r.totalPayout)} GOLD`, false, 'win');
+                        this._audio.play('win');
+                        EffectsSystem.confetti('normal');
+                        this._updateChallengeUI();
+                        this._refreshAll(); }
+                }
+                async _handleCollectSurvival() {
+                    const r = await this._engine.collectSurvival();
+                    if (r) { this._showResult(
+                            `💰 Survival collected: +${fmtGold(r.payout)} GOLD (${r.streak} hits)`, false,
+                        'win');
+                        this._audio.play('win');
+                        EffectsSystem.confetti('normal');
+                        this._updateSurvivalUI();
+                        this._refreshAll(); }
+                }
+                _onChallengeEnd(fr) {
+                    this._audio.play(fr.won ? 'win' : 'lose');
+                    if (fr.won) EffectsSystem.confetti('high');
+                    this._showResult(
+                        `🏆 Challenge ended! Payout: ${fmtGold(fr.totalPayout)} GOLD (${fr.profit >= 0 ? '+' : ''}${fmtGold(fr.profit)})`,
+                        !fr.won, fr.won ? 'win' : 'loss');
+                    this._updateChallengeUI();
+                    this._refreshAll();
+                }
+                _onSurvivalEnd(sr) {
+                    this._audio.play('lose');
+                    this._showResult(`💔 Survival ended! Streak: ${sr.streak} · Lost ${fmtGold(sr.lost)} GOLD`, true,
+                    'loss');
+                    this._updateSurvivalUI();
+                    this._refreshAll();
+                }
+                _updateModeUI() {
+                    const mode = this._engine.mode;
+                    const d = this._dom;
+                    d.skillInfo.style.display = mode === 'skill' ? 'block' : 'none';
+                    d.boardLabel.textContent = mode === 'skill' ? '🎯 Click board to stop aim ring!' : mode ===
+                        'challenge' ? '🏆 Challenge Mode' : mode === 'survival' ? '🔥 Survival Mode' :
+                        '🎲 Quick Throw · Bullseye: 10x | Golden: 50x';
+                    d.dartCanvas.classList.toggle('skill-active', mode === 'skill');
+                    d.throwBtn.style.display = 'inline-flex';
+                    d.cashoutChallengeBtn.style.display = 'none';
+                    d.cashoutSurvivalBtn.style.display = 'none';
+                    d.challengeInfo.style.display = 'none';
+                    d.survivalInfo.style.display = 'none';
+                    if (mode === 'skill') this._renderer.aimActive = true;
+                }
+                _updateChallengeUI() {
+                    const d = this._dom;
+                    if (this._engine.challengeActive) {
+                        d.challengeInfo.style.display = 'block';
+                        d.challengeDartsLeft.textContent = this._engine._challengeDartsLeft;
+                        d.challengeTotal.textContent = fmtGold(this._engine._challengeAccumulated);
+                        d.cashoutChallengeBtn.style.display = 'inline-flex';
+                        d.throwBtn.style.display = 'inline-flex';
+                    } else {
+                        d.challengeInfo.style.display = 'none';
+                        d.cashoutChallengeBtn.style.display = 'none';
+                        d.throwBtn.style.display = 'inline-flex';
+                    }
+                }
+                _updateSurvivalUI() {
+                    const d = this._dom;
+                    if (this._engine.survivalActive) {
+                        d.survivalInfo.style.display = 'block';
+                        d.survivalStreak.textContent = this._engine.survivalStreak;
+                        d.survivalMult.textContent = this._engine.survivalMultiplier.toFixed(2) + 'x';
+                        d.survivalBest.textContent = this._engine.survivalBest;
+                        d.cashoutSurvivalBtn.style.display = 'inline-flex';
+                        d.throwBtn.style.display = 'inline-flex';
+                    } else {
+                        d.survivalInfo.style.display = 'none';
+                        d.cashoutSurvivalBtn.style.display = 'none';
+                        d.throwBtn.style.display = 'inline-flex';
+                    }
+                }
+                _showResult(msg, isErr, extraClass = '') {
+                    const d = this._dom.resultDiv;
+                    d.innerHTML = msg;
+                    d.className = 'result-panel';
+                    if (extraClass) d.classList.add(extraClass);
+                    d.style.color = isErr ? '#ef9a9a' : '';
+                    this._clearTimer();
+                    this._resultTimer = setTimeout(() => { if (!this._engine.challengeActive && !this._engine
+                            .survivalActive && !this._renderer.aimActive) { d.innerHTML =
+                                '🎯 Select mode, place bet, and throw!';
+                            d.className = 'result-panel';
+                            d.style.color = ''; } }, 3500);
+                }
+                _clearTimer() { if (this._resultTimer) { clearTimeout(this._resultTimer);
+                        this._resultTimer = null; } }
+                _refreshAll() {
+                    this._updateBalanceUI();
+                    this._refreshStats();
+                    this._updateProgressionUI();
+                    this._updateMilestoneNote();
+                    this._updateCosmeticsUI();
+                    this._renderLeaderboard();
+                    this._updateUI();
+                }
+                _updateBalanceUI() { this._dom.balance.textContent = fmtGold(this._user.balance); }
+                _updateUI() {
+                    const bet = parseInt(this._dom.betInput.value) || 0;
+                    const mode = this._engine.mode;
+                    const canThrow = bet > 0 && bet <= this._user.balance;
+                    this._dom.throwBtn.disabled = !canThrow && !this._engine.challengeActive && !this._engine
+                        .survivalActive;
+                }
+                _refreshStats() {
+                    const s = this._user.sessionStats;
+                    this._dom.gamesCount.textContent = s.games;
+                    this._dom.winsCount.textContent = s.wins;
+                    this._dom.sessionPL.textContent = (s.profit >= 0 ? '+' : '') + fmtGold(s.profit);
+                    this._dom.sessionPL.style.color = s.profit >= 0 ? '#4caf50' : '#ff5252';
+                    this._dom.bestHit.textContent = s.bestMultiplier > 0 ? s.bestMultiplier + 'x' : '-';
+                    this._dom.winRate.textContent = s.winRate + '%';
+                }
+                _updateProgressionUI() {
+                    const lv = this._user.level;
+                    const xp = this._user.user?.xp || 0;
+                    const rank = this._user.rank;
+                    const prog = this._user.xpProgress;
+                    this._dom.levelDisplay.textContent = lv;
+                    this._dom.xpDisplay.textContent = fmtGold(xp);
+                    this._dom.xpBar.style.width = (prog * 100).toFixed(1) + '%';
+                    this._dom.rankBadge.textContent = '🎯 ' + rank;
+                }
+                _updateMilestoneNote() {
+                    const plays = this._user.user?.gamePlayCount?.darts || 0;
+                    const claimed = this._user.user?.earnedAchievements?.includes('darts_milestone');
+                    const note = this._dom.milestoneNote;
+                    if (plays >= CONFIG.MILESTONE_PLAYS && !claimed) {
+                        note.innerHTML =
+                            `🎁 MILESTONE: ${CONFIG.MILESTONE_PLAYS} PLAYS! <button id="claimMilestone" class="preset-sm">CLAIM ${fmtGold(CONFIG.MILESTONE_REWARD)}</button>`;
+                        const btn = document.getElementById('claimMilestone');
+                        if (btn) btn.addEventListener('click', () => this._claimMilestone(), { once: true });
+                    } else if (plays >= CONFIG.MILESTONE_PLAYS && claimed) note.innerHTML =
+                        `✅ Milestone claimed: +${fmtGold(CONFIG.MILESTONE_REWARD)} GOLD`;
+                    else note.innerHTML =
+                        `🏆 ${CONFIG.MILESTONE_PLAYS - plays} more plays → ${fmtGold(CONFIG.MILESTONE_REWARD)} GOLD`;
+                }
+                async _claimMilestone() {
+                    const plays = this._user.user?.gamePlayCount?.darts || 0;
+                    const key = 'darts_milestone';
+                    if (plays >= CONFIG.MILESTONE_PLAYS && !(this._user.user.earnedAchievements || []).includes(key)) {
+                        this._user.balance += CONFIG.MILESTONE_REWARD;
+                        if (!this._user.user.earnedAchievements) this._user.user.earnedAchievements = [];
+                        this._user.user.earnedAchievements.push(key);
+                        this._user.addTransaction(
+                            `Darts Milestone +${fmtGold(CONFIG.MILESTONE_REWARD)}`, CONFIG.MILESTONE_REWARD, 'deposit');
+                        await this._user.save();
+                        this._refreshAll();
+                        this._showResult(`🎉 Milestone: +${fmtGold(CONFIG.MILESTONE_REWARD)} GOLD!`, false, 'win');
+                        this._audio.play('win');
+                        EffectsSystem.confetti('normal');
+                    }
+                }
+                _checkAchievements() {
+                    const u = this._user.user;
+                    const achieved = u.earnedAchievements || [];
+                    const stats = this._user.stats;
+                    const newA = [];
+                    const check = (key, cond, name) => { if (!achieved.includes(key) && cond) { newA.push(name);
+                            achieved.push(key); } };
+                    check('first_throw', stats.gamesPlayed >= 1, 'First Throw');
+                    check('first_win', stats.wins >= 1, 'First Win');
+                    check('triple_hunter', stats.bestMultiplier >= 3, 'Triple Ring Hunter');
+                    check('bullseye_master', (stats.bullseyeCount || 0) >= 3, 'Bullseye Master');
+                    check('golden_bull', (stats.goldenBullCount || 0) >= 1, 'Golden Bull Collector');
+                    check('precision_expert', stats.winRate >= 60 && stats.gamesPlayed >= 20, 'Precision Expert');
+                    check('50_games', stats.gamesPlayed >= 50, '50 Games Played');
+                    check('100_games', stats.gamesPlayed >= 100, '100 Games Played');
+                    check('big_winner', stats.bestMultiplier >= 50, 'Golden Bullseye Hit');
+                    check('survivor', stats.bestStreak >= 5, 'Survival Expert (5 streak)');
+                    if (newA.length > 0) { u.earnedAchievements = achieved;
+                        this._user.save(); for (const n of newA) { EffectsSystem.achievementPopup(n);
+                            this._audio.play('achievement'); } }
+                }
+                _updateLeaderboard(result) {
+                    if (result && result.mult >= 10) {
+                        const lb = StorageMgr.getLeaderboard();
+                        lb.push({ username: this._user.user.username, multiplier: result.mult, date: new Date()
+                                .toISOString() });
+                        lb.sort((a, b) => b.multiplier - a.multiplier);
+                        StorageMgr.setLeaderboard(lb.slice(0, 10));
+                        this._renderLeaderboard();
+                    }
+                }
+                _renderLeaderboard() {
+                    const lb = StorageMgr.getLeaderboard();
+                    const d = this._dom.leaderboardMini;
+                    if (lb.length === 0) d.innerHTML = '🏅 Weekly Leaderboard: No entries yet';
+                    else {
+                        let html = '🏅 Top Bullseyes:<br>';
+                        lb.slice(0, 8).forEach((e, i) => { html +=
+                                `${i + 1}. ${e.username} — ${e.multiplier}x<br>`; });
+                        d.innerHTML = html;
+                    }
+                }
+                _updateCosmeticsUI() {
+                    const styles = CONFIG.DART_STYLES;
+                    const colors = CONFIG.DART_COLORS;
+                    const current = this._user.user?.dartCosmetics?.dartStyle || 0;
+                    const unlocked = this._user.user?.unlockedCosmetics?.darts || [0];
+                    let html = '';
+                    styles.forEach((name, i) => {
+                        const isUnlocked = unlocked.includes(i);
+                        const isSelected = i === current;
+                        html +=
+                            `<span class="cosmetic-dot${isSelected ? ' selected' : ''}" style="background:${colors[i]};${!isUnlocked ? 'opacity:0.3;' : ''}" data-dart="${i}" title="${name}${!isUnlocked ? ' (Locked)' : ''}"></span>`;
+                    });
+                    this._dom.dartStyles.innerHTML = html;
+                    this._dom.dartStyles.querySelectorAll('.cosmetic-dot').forEach(dot => {
+                        dot.addEventListener('click', () => {
+                            const idx = parseInt(dot.dataset.dart);
+                            const unlockedList = this._user.user?.unlockedCosmetics?.darts || [0];
+                            if (unlockedList.includes(idx)) {
+                                if (!this._user.user.dartCosmetics) this._user.user.dartCosmetics = {
+                                    dartStyle: 0, boardSkin: 0, trailStyle: 0 };
+                                this._user.user.dartCosmetics.dartStyle = idx;
+                                this._user.save();
+                                this._updateCosmeticsUI();
+                                this._audio.play('click');
+                            }
+                        });
+                    });
+                }
+                _initBgParticles() {
+                    const c = document.getElementById('particleCanvas');
+                    if (!c) return;
+                    c.width = window.innerWidth;
+                    c.height = window.innerHeight;
+                    const ctx = c.getContext('2d');
+                    const parts = Array.from({ length: 40 }, () => ({ x: Math.random() * c.width, y: Math.random() * c
+                            .height, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, r: Math.random() *
+                            2 + 0.7, a: Math.random() * 0.3 + 0.1, l: Math.random() * 100 }));
+                    const draw = () => {
+                        ctx.clearRect(0, 0, c.width, c.height);
+                        for (const p of parts) { p.x += p.vx;
+                            p.y += p.vy;
+                            p.l += 0.01; if (p.x < -20) p.x = c.width + 20; if (p.x > c.width + 20) p.x = -20; if (p.y <
+                                -20) p.y = c.height + 20; if (p.y > c.height + 20) p.y = -20;
+                            const f = 0.6 + 0.4 * Math.sin(p.l * 2);
+                            ctx.fillStyle = `rgba(240,200,80,${p.a * f})`;
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                            ctx.fill(); }
+                        requestAnimationFrame(draw);
+                    };
+                    draw();
+                }
+                async startChallengeMode() {
+                    const bet = parseInt(this._dom.betInput.value);
+                    if (isNaN(bet) || bet <= 0) { this._showResult('Invalid bet amount.', true); return; }
+                    const started = await this._engine.startChallenge(bet);
+                    if (!started) { this._showResult('Insufficient balance for 3 darts.', true); return; }
+                    this._updateChallengeUI();
+                    this._updateBalanceUI();
+                    this._showResult('🏆 Challenge started! 3 darts. Throw carefully!', false);
+                }
+                async startSurvivalMode() {
+                    const bet = parseInt(this._dom.betInput.value);
+                    if (isNaN(bet) || bet <= 0) { this._showResult('Invalid bet amount.', true); return; }
+                    const started = await this._engine.startSurvival(bet);
+                    if (!started) { this._showResult('Insufficient balance.', true); return; }
+                    this._updateSurvivalUI();
+                    this._updateBalanceUI();
+                    this._showResult('🔥 Survival mode! Keep hitting to build streak!', false);
+                }
+                destroy() { this._clearTimer();
+                    this._renderer.destroy(); }
+            }
 
-/* ---------- UI ---------- */
-function sync(){
- const d=$('bal');d.textContent=fmt(U.balance);
- if(lastBal!==null&&U.balance!==lastBal){const c=d.parentNode;c.classList.remove('up','down');c.classList.add(U.balance>lastBal?'up':'down');setTimeout(()=>c.classList.remove('up','down'),700)}
- lastBal=U.balance;
- const s=U.dartsStats,profit=s.totalPayout-s.totalWagered;
- $('sG').textContent=s.gamesPlayed;$('sW').textContent=s.wins;$('sP').textContent=(profit>=0?'+':'')+fmt(profit);$('sP').style.color=profit>=0?'#5fd068':'#ff5a5a';
- $('sB').textContent=s.bestMultiplier>0?+s.bestMultiplier.toFixed(2)+'×':'-';$('sR').textContent=(s.gamesPlayed?(s.wins/s.gamesPlayed*100).toFixed(1):0)+'%';
- const lv=level(),cur=lv*lv*80,nxt=(lv+1)*(lv+1)*80;
- $('lv').textContent=lv;$('xpv').textContent=fmt(U.xp);$('xpb').style.width=(clamp((U.xp-cur)/(nxt-cur),0,1)*100).toFixed(1)+'%';$('rank').textContent='🎯 '+rankName();
- // buttons
- const t=$('throw'),active=!!R;
- let label;
- if(mode==='quick')label='<i class="fas fa-bullseye"></i> Throw Dart';
- else if(mode==='skill')label='<i class="fas fa-crosshairs"></i> Stop Ring & Throw';
- else if(mode==='challenge')label=active?`<i class="fas fa-bullseye"></i> Throw (${R.left} left)`:'<i class="fas fa-play"></i> Start Challenge (3×)';
- else label=active?'<i class="fas fa-bullseye"></i> Throw':'<i class="fas fa-play"></i> Start Survival';
- t.innerHTML=label;t.disabled=busy;
- const col=$('collect');col.style.display=(R&&((R.mode==='challenge'&&R.left<3)||(R.mode==='survival'&&R.streak>0)))?'inline-flex':'none';col.disabled=busy||auto.on;
- const ab=$('auto');ab.classList.toggle('on',auto.on);
- ab.innerHTML=auto.on?`<i class="fas fa-stop"></i> Stop${auto.left?` (${auto.rounds}/${auto.left})`:` (${auto.rounds})`}`:'<i class="fas fa-bolt"></i> Auto';
- $('bet').disabled=!!R;
- document.querySelectorAll('#modes .pill').forEach(p=>p.classList.toggle('dis',!!R&&p.dataset.m!==mode));
- document.querySelectorAll('#pws .pill').forEach(p=>{p.classList.toggle('on',pw[p.dataset.p]);p.classList.toggle('dis',p.dataset.for!==mode)});
- $('skillInfo').style.display=mode==='skill'?'block':'none';cv.classList.toggle('skill',mode==='skill');
- $('chInfo').style.display=R&&R.mode==='challenge'?'block':'none';
- $('svInfo').style.display=R&&R.mode==='survival'?'block':'none';
- if(R&&R.mode==='challenge'){$('chLeft').textContent=R.left;$('chAcc').textContent=fmt(R.acc)}
- if(R&&R.mode==='survival'){$('svStreak').textContent=R.streak;$('svMult').textContent=survMult(R.streak).toFixed(2)+'×';$('svCash').textContent=fmt(Math.floor(R.bet*survMult(R.streak)));$('svBest').textContent=R.best}
- $('hint').textContent={quick:'Quick Throw · random ring · Bullseye 10× · Golden Bull 50×',skill:'Click the board or press Space to stop the ring — closer to center boosts your odds',challenge:'3 darts for 3× your bet — collect early any time',survival:`Each dart has a ${Math.round(SURV_P*100)}% survival chance — cash out before a miss`}[mode];
- // milestone
- const plays=U.gamePlayCount.darts||0,claimed=U.earnedAchievements.includes('darts_milestone'),ms=$('ms');
- if(plays>=MS_PLAYS&&!claimed){ms.innerHTML=`🎁 Milestone: ${MS_PLAYS} plays! <span class="pill" id="claim">CLAIM ${fmt(MS_REWARD)}</span>`;$('claim').onclick=claim}
- else if(claimed)ms.textContent=`✅ Milestone claimed: +${fmt(MS_REWARD)} GOLD`;
- else ms.textContent=`🏆 ${MS_PLAYS-plays} more plays → ${fmt(MS_REWARD)} GOLD`;
- // leaderboard
- const lb=jp(localStorage.getItem(K.LB),[]);
- $('lb').innerHTML=lb.length?lb.slice(0,8).map((e,i)=>`${i+1}. ${String(e.username).replace(/[<>&]/g,'')} — ${e.multiplier}×`).join('<br>'):'No entries yet — hit a 10×+!';
- U.unlockedCosmetics.boards=U.unlockedCosmetics.boards||[0];
- SKINS.forEach((k,i)=>{if(lv>=k.lv&&!U.unlockedCosmetics.boards.includes(i))U.unlockedCosmetics.boards.push(i)});
- $('skins').innerHTML=SKINS.map((k,i)=>{const ok=U.unlockedCosmetics.boards.includes(i);return `<span class="sk${i===U.dartCosmetics.boardSkin?' sel':''}${ok?'':' lock'}" data-s="${i}" title="${k.n}${ok?'':' (Level '+k.lv+')'}" style="background:radial-gradient(circle,${k.c[0]} 0 18%,${k.c[1]} 18% 38%,${k.c[3]} 38% 66%,${k.c[5]} 66%)"></span>`}).join('');
- $('hist').innerHTML=hist.map(h=>`<span class="hc ${h.m>=10?'h3':h.m>0?'h2':'h1'}">${h.m>0?+h.m.toFixed(1)+'×':'✕'}</span>`).join('');
- // cosmetics
- $('dots').innerHTML=DSTYLES.map((n,i)=>`<span class="dot${i===U.dartCosmetics.dartStyle?' sel':''}" style="background:${DCOL[i]};${U.unlockedCosmetics.darts.includes(i)?'':'opacity:.3'}" data-d="${i}" title="${n}${U.unlockedCosmetics.darts.includes(i)?'':' (locked)'}"></span>`).join('');
-}
-function claim(){
- if((U.gamePlayCount.darts||0)<MS_PLAYS||U.earnedAchievements.includes('darts_milestone'))return;
- U.earnedAchievements.push('darts_milestone');setBal(U.balance+MS_REWARD);tx(`Darts Milestone +${fmt(MS_REWARD)}`,MS_REWARD,'deposit');save();sync();
- say(`🎉 Milestone: +${fmt(MS_REWARD)} GOLD!`,'win');sfx.win();confetti(120);
-}
-function throwAction(){
- if(busy)return;
- if(!R&&(bet()<=0)){say('Invalid bet.','loss');return}
- act();
-}
-function bindUI(){
- $('throw').onclick=throwAction;$('collect').onclick=collect;$('auto').onclick=toggleAuto;
- $('snd').onclick=()=>{sndOn=!sndOn;localStorage.setItem(K.SND,sndOn);$('snd').innerHTML=`<i class="fas fa-volume-${sndOn?'up':'mute'}"></i>`;if(sndOn&&!ac)try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch{}};
- $('snd').innerHTML=`<i class="fas fa-volume-${sndOn?'up':'mute'}"></i>`;
- $('bet').oninput=sync;
- document.querySelectorAll('[data-b]').forEach(p=>p.onclick=()=>{if(R)return;const v=p.dataset.b,c=bet(),i=$('bet');
-  i.value=v==='half'?Math.max(1,Math.floor(c/2)):v==='dbl'?Math.min(1e6,c*2):v==='max'?Math.max(1,Math.floor(U.balance)):parseInt(v);sfx.click();sync()});
- document.querySelectorAll('#modes .pill').forEach(p=>p.onclick=()=>{if(R||p.classList.contains('dis'))return;
-  mode=p.dataset.m;document.querySelectorAll('#modes .pill').forEach(x=>x.classList.toggle('on',x===p));sfx.click();sync()});
- document.querySelectorAll('#pws .pill').forEach(p=>p.onclick=()=>{pw[p.dataset.p]=!pw[p.dataset.p];sfx.click();sync()});
- $('dots').onclick=e=>{const i=e.target.dataset?.d;if(i==null)return;const n=+i;if(U.unlockedCosmetics.darts.includes(n)){U.dartCosmetics.dartStyle=n;save();sync();sfx.click()}};
- cv.onclick=()=>{if(mode==='skill')throwAction()};
- document.addEventListener('keydown',e=>{if((e.key===' '||e.key==='Enter')&&!e.target.closest('input,select,button')){e.preventDefault();throwAction()}});
- addEventListener('resize',fit);
- $('skins').onclick=e=>{const i=e.target.dataset?.s;if(i==null)return;const n=+i;if(U.unlockedCosmetics.boards.includes(n)){U.dartCosmetics.boardSkin=n;save();sync();sfx.click()}};
-}
-function bgParticles(){
- const c=$('bg'),x=c.getContext('2d');let W,H;const rs=()=>{W=c.width=innerWidth;H=c.height=innerHeight};rs();addEventListener('resize',rs);
- const ps=Array.from({length:45},()=>({x:Math.random()*W,y:Math.random()*H,vx:rnd(-.2,.2),vy:rnd(-.35,-.05),r:rnd(.6,2.2),a:rnd(.1,.4),p:rnd(0,9)}));
- (function d(){x.clearRect(0,0,W,H);for(const p of ps){p.x+=p.vx;p.y+=p.vy;p.p+=.02;if(p.y<-10){p.y=H+10;p.x=Math.random()*W}
-  x.fillStyle=`rgba(240,200,80,${p.a*(.6+.4*Math.sin(p.p))})`;x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill()}requestAnimationFrame(d)})();
-}
-function init(){
- if(!load())return;
- fit();bindUI();bgParticles();sync();achievements();requestAnimationFrame(frame);
- addEventListener('pagehide',()=>{auto.on=false;save()});
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();
-</script>
+            // ═══════════════════════════════════
+            //  INITIALIZATION
+            // ═══════════════════════════════════
+            async function initApp() {
+                const audio = new AudioMgr();
+                const userSession = new UserSession();
+                const loaded = await userSession.load();
+                if (!loaded) return;
+                const ui = new UIManager(userSession, audio);
+                const soundToggle = document.getElementById('soundToggle');
+                if (soundToggle) soundToggle.innerHTML = audio.enabled ? '<i class="fas fa-volume-up"></i>' :
+                    '<i class="fas fa-volume-mute"></i>';
+                // Override mode button handlers for challenge/survival
+                document.querySelectorAll('.mode-btn').forEach(b => {
+                    b.addEventListener('click', () => {
+                        if (ui._engine.challengeActive || ui._engine.survivalActive) return;
+                        const mode = b.dataset.mode;
+                        if (mode === 'challenge') ui.startChallengeMode();
+                        else if (mode === 'survival') ui.startSurvivalMode();
+                    }, { once: false });
+                });
+                const cleanup = () => { ui.destroy();
+                    audio.destroy(); };
+                window.addEventListener('beforeunload', cleanup, { once: true });
+                window.addEventListener('pagehide', cleanup, { once: true });
+                if (typeof window.__DARTS_DEV__ !== 'undefined') window.__dartsApp = { userSession, audio, ui };
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
+            else initApp();
+        })();
+    </script>
 </body>
 </html>
