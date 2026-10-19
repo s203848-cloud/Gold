@@ -409,6 +409,11 @@
             transform: scale(0.94);
         }
 
+        .auto-btn{width:100%;border:2px solid rgba(255,217,102,.4);border-radius:var(--radius-full);font-family:'Inter',sans-serif;font-weight:800;font-size:1rem;padding:.8rem;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;background:rgba(255,217,102,.08);color:var(--gold);transition:all .2s;touch-action:manipulation}
+        .auto-btn:hover{background:rgba(255,217,102,.2);transform:translateY(-2px)}
+        .auto-btn.on{background:linear-gradient(135deg,#7a1f1f,#c0392b);border-color:#ff7b6b;color:#fff;animation:autoPulse 1s infinite}
+        @keyframes autoPulse{50%{box-shadow:0 0 22px rgba(255,90,70,.5)}}
+
         /* ── Choice Buttons ── */
         .choice-row {
             display: flex;
@@ -724,6 +729,7 @@
             <!-- Flip Button -->
             <button id="flipBtn" class="flip-btn" disabled aria-label="Flip the coin">
                 <span class="btn-text"><i class="fas fa-hand-pointer"></i> FLIP COIN</span>
+                <button id="autoBtn" class="auto-btn" type="button"><i class="fas fa-bolt"></i> AUTO: OFF</button>
             </button>
 
             <!-- Result (with aria-live for screen readers) -->
@@ -888,6 +894,33 @@
                         opacity: 1
                     });
                 }
+                // ── AUTO FLIP ──
+                const autoBtn = document.getElementById('autoBtn');
+                let autoTimer = null;
+                function setAuto(on) {
+                    if (on) {
+                        if (!state.selectedChoice) { showError('Choose HEADS or TAILS first to use Auto!'); return; }
+                        autoBtn.classList.add('on');
+                        autoBtn.innerHTML = '<i class="fas fa-stop"></i> AUTO: ON';
+                        autoTimer = setInterval(() => {
+                            if (state.isFlipping) return;
+                            if (!state.selectedChoice) { setAuto(false); return; }
+                            const bet = parseFloat(DOM.betInput.value) || 1;
+                            if (bet > state.currentUser.balance) {
+                                setAuto(false);
+                                showError('Auto stopped — insufficient balance!');
+                                return;
+                            }
+                            if (!DOM.flipBtn.disabled) DOM.flipBtn.click();
+                        }, 150);
+                    } else {
+                        clearInterval(autoTimer);
+                        autoTimer = null;
+                        autoBtn.classList.remove('on');
+                        autoBtn.innerHTML = '<i class="fas fa-bolt"></i> AUTO: OFF';
+                    }
+                }
+                autoBtn.addEventListener('click', () => { setAuto(!autoTimer); autoBtn.blur(); });
 
                 let frame;
                 const start = performance.now();
