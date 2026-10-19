@@ -381,24 +381,6 @@
             transform: scale(1.03);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(240, 200, 80, 0.2);
         }
-        /* Base button styling */
-.auto-btn {
-    background-color: #4a5568;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
-}
-
-/* Active "ON" state styling */
-.auto-btn.active {
-    background-color: #38a169; /* Green to indicate it is running */
-    box-shadow: 0 0 8px rgba(56, 161, 105, 0.6);
-}
-
         .btn-cashout {
             background: #2e7d32;
             color: #fff;
@@ -700,7 +682,6 @@
                         </div>
                         <div class="action-buttons">
                             <button id="throwBtn" class="btn btn-throw"><i class="fas fa-dart"></i> Throw Dart</button>
-                            <button id="auto-throw-btn" class="game-btn auto-btn">🤖 Auto Off</button>
                             <button id="cashoutSurvivalBtn" class="btn btn-cashout" style="display:none;">💰 Collect</button>
                             <button id="cashoutChallengeBtn" class="btn btn-cashout" style="display:none;">💰 Collect Challenge</button>
                         </div>
@@ -1311,46 +1292,6 @@
                     for (const ring of rings) { cum += ring.prob; if (r < cum) return ring; }
                     return rings[rings.length - 1];
                 }
-                // 1. Reference the existing elements and the new button
-const autoBtn = document.getElementById('auto-throw-btn');
-const throwBtn = document.getElementById('throw-dart-btn'); // Replace with your actual Throw Dart ID/class
-
-let autoInterval = null;
-let isAutoOn = false;
-
-// 2. Toggle Auto function
-function toggleAutoThrow() {
-    isAutoOn = !isAutoOn;
-
-    if (isAutoOn) {
-        // Turn Auto ON
-        autoBtn.textContent = "🤖 Auto ON";
-        autoBtn.classList.add('active');
-
-        // Start throwing automatically every 1.5 seconds (1500ms)
-        autoInterval = setInterval(() => {
-            // Check if the throw button exists and is not disabled before clicking
-            if (throwBtn && !throwBtn.disabled) {
-                throwBtn.click();
-            }
-        }, 1500); 
-    } else {
-        // Turn Auto OFF
-        stopAutoThrow();
-    }
-}
-
-// 3. Stop Auto function (call this if darts run out or user clicks collect)
-function stopAutoThrow() {
-    isAutoOn = false;
-    autoBtn.textContent = "🤖 Auto Off";
-    autoBtn.classList.remove('active');
-    clearInterval(autoInterval);
-}
-
-// 4. Attach event listener to the button
-autoBtn.addEventListener('click', toggleAutoThrow);
-
                 async processThrow(bet, aimRadius) {
                     const ring = this.getEffectiveRing(aimRadius);
                     const mult = ring.multiplier;
