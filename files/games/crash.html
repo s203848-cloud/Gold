@@ -425,6 +425,56 @@
       <button id="cashoutBtn" class="btn btn-cashout" disabled><i class="fas fa-hand-holding-usd"></i> CASH OUT</button>
     </div>
 
+    <!-- Main Control Panel Container -->
+    <div class="panel-container" style="background: #1e1e1e; border: 1px solid #2d2d2d; padding: 15px; border-radius: 8px; width: 280px; font-family: sans-serif; box-sizing: border-box;">
+        
+        <!-- Risk / Mode indicator if needed, or title -->
+        <div style="display: flex; gap: 5px; margin-bottom: 15px;">
+            <button style="flex: 1; background: #2d2d2d; color: #888; border: none; padding: 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer;">MANUAL</button>
+            <button style="flex: 1; background: #e0b034; color: #000; border: none; padding: 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer;">AUTO CRASH</button>
+        </div>
+
+        <!-- Bet Input Field Setup -->
+        <div style="margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; color: #888; font-size: 11px; margin-bottom: 5px; font-weight: bold;">
+                <span>Bet</span>
+                <span>25</span>
+            </div>
+            <div style="display: flex; background: #151515; border-radius: 4px; padding: 2px;">
+                <input type="number" value="25" style="width: 50%; background: transparent; border: none; color: #fff; padding: 8px; font-size: 14px; font-weight: bold; outline: none;">
+                <div style="display: flex; gap: 2px; width: 50%; justify-content: flex-end;">
+                    <button style="background: #2d2d2d; color: #fff; border: none; font-size: 10px; padding: 0 6px; border-radius: 2px; cursor: pointer;">+10</button>
+                    <button style="background: #2d2d2d; color: #fff; border: none; font-size: 10px; padding: 0 6px; border-radius: 2px; cursor: pointer;">½</button>
+                    <button style="background: #2d2d2d; color: #fff; border: none; font-size: 10px; padding: 0 6px; border-radius: 2px; cursor: pointer;">MAX</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Launch Action Button -->
+        <button id="launchBtn" style="width: 100%; background: #e0b034; color: #000; border: none; padding: 12px; font-weight: bold; border-radius: 4px; font-size: 14px; cursor: pointer; letter-spacing: 0.5px; margin-bottom: 15px; text-transform: uppercase;">
+            LAUNCH CASH OUT
+        </button>
+
+        <!-- Dedicated Auto Cash Out Controller (Identical to Plinko dynamic footer) -->
+        <div style="display: flex; align-items: center; justify-content: space-between; background: #151515; padding: 8px 12px; border-radius: 4px; border: 1px solid #252525;">
+            <!-- Left Side: Toggle Switch State -->
+            <button id="autoToggleBtn" style="background: #ff3b30; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; min-width: 45px; transition: background 0.2s;">
+                OFF
+            </button>
+            
+            <!-- Center/Right Side: Cash Out Multiplier Input Element -->
+            <div style="display: flex; align-items: center; gap: 5px;">
+                <input type="number" id="autoCashoutAmount" value="2.00" step="0.10" min="1.01" style="width: 60px; background: #222; color: #fff; border: 1px solid #333; padding: 5px; border-radius: 3px; font-size: 13px; font-weight: bold; text-align: center; outline: none;">
+                <span style="color: #888; font-size: 12px; font-weight: bold;">x</span>
+            </div>
+        </div>
+
+        <div style="color: #666; font-size: 10px; text-align: center; margin-top: 10px;">
+            Set cash out multiplier & toggle engine auto mode!
+        </div>
+    </div>
+
+
     <div class="result-panel" id="resultMessage"><i class="fas fa-info-circle"></i> Place your bet & launch!</div>
 
     <div class="stats-grid">
@@ -946,6 +996,67 @@
       state.displayMaxMult = Math.max(state.crashPoint * 1.08, state.autoCashTarget * 1.08, 3.0);
       startCountdown();
     }
+
+    // --- Control System State Variables ---
+    let isAutoModeActive = false;
+
+    // --- DOM Element Reference Hooks ---
+    const autoToggleBtn = document.getElementById('autoToggleBtn');
+    const autoCashoutAmountInput = document.getElementById('autoCashoutAmount');
+    const launchBtn = document.getElementById('launchBtn');
+
+    // --- Switch Activation State Engine ---
+    autoToggleBtn.addEventListener('click', () => {
+        isAutoModeActive = !isAutoModeActive;
+        
+        if (isAutoModeActive) {
+            autoToggleBtn.textContent = 'ON';
+            autoToggleBtn.style.backgroundColor = '#34c759'; // True Match Green color
+            console.log(`[Auto Engine] Enabled. Target Target: ${autoCashoutAmountInput.value}x`);
+        } else {
+            autoToggleBtn.textContent = 'OFF';
+            autoToggleBtn.style.backgroundColor = '#ff3b30'; // True Match Red color
+            console.log('[Auto Engine] Disabled.');
+        }
+    });
+
+    /**
+    * CORE COMPONENT LOOP INTEGRATION
+    * Insert this tracker invocation straight into your ticker function 
+    * (where the live rocket/multiplier climbs upward frame-by-frame).
+ * 
+ * @param {number} currentLiveMultiplier - The climbing multiplier value (e.g. 1.74)
+ */
+function handleTickAutoCashoutCheck(currentLiveMultiplier) {
+    // Drop execution immediately if user flipped the engine off
+    if (!isAutoModeActive) return;
+    
+    // Parse the value directly from your user config interface box
+    const userTargetValue = parseFloat(autoCashoutAmountInput.value) || 2.0;
+
+    // Check if the climbing line has touched or breached the target line
+    if (currentLiveMultiplier >= userTargetValue) {
+        triggerSystemCashout();
+    }
+}
+
+/**
+ * Executes standard cash out cleanup events.
+ */
+function triggerSystemCashout() {
+    // Double safeguard to make sure we don't spam requests if already triggered
+    if (isAutoModeActive) {
+        // Fire click action straight onto the primary interaction node
+        if (launchBtn) {
+            launchBtn.click();
+            
+            // Optional: Automatically toggle the switch off after cashing out 
+            // if you don't want it to run indefinitely across future rounds:
+            // autoToggleBtn.click(); 
+        }
+    }
+}
+
 
     // ---------- DATA PERSISTENCE ----------
     async function saveUser() {
