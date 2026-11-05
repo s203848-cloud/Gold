@@ -1045,10 +1045,11 @@
                 </select>
                 <input type="number" id="betAmount" class="bet-input" value="50" step="5" min="5" max="99999">
                 <div style="display:flex; gap:0.3rem; flex-wrap:wrap; justify-content:center;">
-                    <span class="chip-quick" data-bet="25">+25</span>
-                    <span class="chip-quick" data-bet="50">+50</span>
-                    <span class="chip-quick" data-bet="100">+100</span>
-                    <span class="chip-quick" data-bet="250">+250</span>
+                    <span class="chip-quick" data-bet="10" aria-label="Add 10 to bet">+10</span>
+                    <span class="chip-quick" data-bet="25" aria-label="Add 25 to bet">+25</span>
+                    <span class="chip-quick" data-bet="50" aria-label="Add 50 to bet">+50</span>
+                    <span class="chip-quick" id="halfBetBtn" aria-label="Halve the bet">½</span>
+                    <span class="chip-quick" id="maxBetBtn" aria-label="Bet maximum balance">MAX</span>
                 </div>
                 <button class="btn btn-play" id="startRaceBtn" disabled>
                     <i class="fas fa-flag-checkered"></i> START RACE
@@ -1881,19 +1882,25 @@
                 updateStartButtonState();
             });
 
-            document.querySelectorAll('.chip-quick').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    playTone('click');
-                    const add = parseInt(chip.dataset.bet);
-                    const inp = document.getElementById('betAmount');
-                    let val = (parseInt(inp.value) || 0) + add;
-                    if (currentUser && val > currentUser.balance && getFreeRacesLeft() === 0) {
-                        val = Math.max(5, Math.floor(currentUser.balance));
-                    }
-                    inp.value = val;
-                    updateStartButtonState();
+            // Quick bet buttons
+                document.querySelectorAll('.chip-quick').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        if (btn.id === 'halfBetBtn') {
+                            const val = parseFloat(DOM.betInput.value) || 0;
+                            DOM.betInput.value = Math.max(1, Math.floor(val / 2));
+                        } else if (btn.id === 'maxBetBtn') {
+                            if (state.currentUser) DOM.betInput.value = Math.floor(state.currentUser.balance);
+                        } else {
+                            const add = parseFloat(btn.dataset.bet);
+                            const val = parseFloat(DOM.betInput.value) || 0;
+                            let newVal = val + add;
+                            if (state.currentUser && newVal > state.currentUser.balance) newVal = state.currentUser.balance;
+                            DOM.betInput.value = Math.max(1, Math.floor(newVal));
+                        }
+                        clampAndValidateBet();
+                        playTone('click');
+                    });
                 });
-            });
 
             // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
