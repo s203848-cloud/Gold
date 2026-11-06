@@ -115,7 +115,7 @@
 
         /* ── GAME CONTAINER ── */
         .game-container {
-            max-width: 800px;
+            max-width: 1180px;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -1045,6 +1045,21 @@
         }
         @media (min-width:900px) { .horses-grid { grid-template-columns:repeat(4,minmax(0,1fr)); } }
 
+
+
+        /* GOLD full-width betting board and betting slip */
+        .betting-board{margin:1.15rem 0 1rem;background:linear-gradient(150deg,#15120d,#090807 72%);border:1px solid rgba(245,176,66,.27);border-radius:18px;padding:1rem;box-shadow:0 16px 38px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.035)}
+        .board-heading{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.2rem .25rem .9rem}.board-heading h2{font:700 1.25rem var(--font-display);color:var(--gold-200);margin:.2rem 0}.board-heading p{font-size:.75rem;color:var(--text-muted)}.eyebrow{font-size:.62rem;letter-spacing:.18em;font-weight:900;color:var(--gold-500)}
+        .field-count{font-size:.65rem;letter-spacing:.12em;font-weight:900;color:var(--gold-300);border:1px solid var(--border-subtle);border-radius:30px;padding:.55rem .8rem;white-space:nowrap;background:rgba(255,217,102,.05)}
+        .horse-list-head,.horse-list-row{display:grid;grid-template-columns:minmax(145px,1.05fr) minmax(220px,1.5fr) minmax(75px,.5fr) 76px;align-items:center;gap:1rem}.horse-list-head{padding:.65rem 1rem;color:#b99a58;background:#211c12;border:1px solid rgba(255,217,102,.13);border-radius:9px 9px 0 0;font-size:.58rem;font-weight:900;letter-spacing:.12em}
+        .horses-list{height:500px;overflow-y:auto;overscroll-behavior:contain;border:1px solid rgba(255,217,102,.12);border-top:0;border-radius:0 0 10px 10px;scrollbar-width:thin;scrollbar-color:#94702d #15120d}.horse-list-row{position:relative;min-height:72px;padding:.7rem 1rem;background:rgba(18,16,13,.92);border-bottom:1px solid rgba(255,255,255,.055);transition:background .2s,border-color .2s,transform .2s}.horse-list-row:nth-child(even){background:rgba(27,23,16,.92)}.horse-list-row:hover{background:rgba(70,53,22,.42)}.horse-list-row.selected{background:rgba(255,210,90,.09);box-shadow:inset 3px 0 var(--gold-300)}.horse-list-row.bet-placed::after{content:'BET PLACED';position:absolute;right:5.8rem;top:4px;color:#81c784;font-size:.48rem;font-weight:900;letter-spacing:.1em}.horse-identity{display:flex;align-items:center;gap:.7rem;min-width:0}.horse-silhouette{width:38px;height:38px;display:grid;place-items:center;flex:none;border-radius:10px;background:linear-gradient(145deg,rgba(255,217,102,.13),rgba(0,0,0,.2));border:1px solid rgba(255,217,102,.13);font-size:1.3rem}.horse-identity-copy{min-width:0}.horse-list-name{font-weight:900;color:#f4e7c5;font-size:.83rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.horse-jockey-line{font-size:.59rem;color:#8c8476;margin-top:.18rem;white-space:nowrap}.rarity-tag{display:inline-block;margin-top:.25rem;padding:.13rem .38rem;border-radius:4px;font-size:.48rem;letter-spacing:.08em;font-weight:900;text-transform:uppercase}.rarity-common{color:#c2c2c2;background:rgba(180,180,180,.1);border:1px solid rgba(180,180,180,.25)}.rarity-uncommon{color:#83d69a;background:rgba(70,180,100,.1);border:1px solid rgba(70,180,100,.3)}.rarity-rare{color:#79baff;background:rgba(70,140,255,.1);border:1px solid rgba(70,140,255,.3)}.rarity-epic{color:#c69aff;background:rgba(150,90,230,.12);border:1px solid rgba(150,90,230,.35)}.rarity-legendary{color:#ffd966;background:linear-gradient(90deg,rgba(255,190,40,.17),rgba(255,235,150,.08));border:1px solid rgba(255,210,80,.48);box-shadow:0 0 12px rgba(255,190,40,.1)}
+        .horse-list-stats{display:grid;gap:5px}.list-stat{display:grid;grid-template-columns:47px 1fr 22px;align-items:center;gap:6px}.list-stat label{font-size:.5rem;letter-spacing:.07em;font-weight:900;color:#8e877a}.list-stat-track{height:5px;border-radius:9px;background:#34302a;overflow:hidden}.list-stat-fill{height:100%;border-radius:9px}.list-stat b{font-size:.55rem;color:#c8c0b2;text-align:right}.stat-form{background:#e5b94d}.stat-speed{background:#67bd7b}.stat-stamina{background:#65a8e8}.horse-list-odds{font:900 1.02rem var(--font-display);color:var(--gold-300);white-space:nowrap}.horse-list-odds small{display:block;font:700 .48rem var(--font-body);color:#827967;letter-spacing:.12em;margin-bottom:2px}.horse-bet-btn{border:1px solid #b98a2c;background:linear-gradient(145deg,#f3ca68,#c58a27);color:#171108;border-radius:7px;padding:.55rem .65rem;font-size:.62rem;font-weight:1000;letter-spacing:.08em;cursor:pointer;transition:filter .18s,transform .18s}.horse-bet-btn:hover{filter:brightness(1.13);transform:translateY(-1px)}.horse-bet-btn:disabled{opacity:.4;cursor:not-allowed}.board-footer{display:flex;align-items:center;justify-content:center;gap:.45rem;color:#716a5e;font-size:.59rem;padding:.7rem .2rem .05rem}.board-footer span{color:#a98a4b;margin-left:.3rem}
+        .bet-modal-backdrop{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;padding:1rem;background:rgba(0,0,0,.56);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}.bet-modal-backdrop.open{display:flex;animation:modalFade .18s ease}.bet-modal{position:relative;width:min(490px,100%);max-height:92vh;overflow-y:auto;padding:1.55rem;border:1px solid rgba(255,217,102,.48);border-radius:19px;background:radial-gradient(ellipse at 50% 0%,rgba(177,128,35,.17),transparent 50%),linear-gradient(155deg,#1c1810,#090807 75%);box-shadow:0 28px 90px rgba(0,0,0,.8),0 0 45px rgba(218,166,55,.12);animation:modalRise .25s var(--transition-bounce)}@keyframes modalFade{from{opacity:0}to{opacity:1}}@keyframes modalRise{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}.modal-close{position:absolute;right:1rem;top:1rem;width:34px;height:34px;border:1px solid rgba(255,255,255,.12);border-radius:50%;background:#17140f;color:#d9cba9;cursor:pointer}.modal-kicker{font-size:.58rem;font-weight:900;letter-spacing:.16em;color:#bd9444}.bet-modal h2{font:700 1.35rem var(--font-display);color:#f8e8c2;margin:.45rem 0 1rem}.selected-horse-summary{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 1rem;margin-bottom:1rem;border:1px solid rgba(255,217,102,.2);border-radius:11px;background:rgba(255,217,102,.055)}.selected-horse-name{font-weight:900;color:#fff0c8}.selected-horse-meta{font-size:.62rem;color:#958a76;margin-top:.2rem}.selected-horse-odds{font:900 1.2rem var(--font-display);color:var(--gold-300)}.modal-label{display:block;color:#b7a477;font-size:.58rem;font-weight:900;letter-spacing:.12em;margin:.9rem 0 .4rem}.bet-modal .bet-type-select,.bet-modal .bet-input{width:100%;border:1px solid rgba(255,217,102,.25);background:#100e0b;color:#f7edda;border-radius:8px;padding:.8rem;font:700 .8rem var(--font-body);outline:none}.bet-amount-row{display:flex;align-items:center;gap:.7rem}.bet-amount-row span{color:#d5ad4d;font-size:.67rem;font-weight:900}.bet-modal .quick-bet-controls{display:flex;gap:.4rem;margin-top:.55rem}.bet-modal .chip-quick{flex:1;border:1px solid rgba(255,217,102,.23);border-radius:7px;background:#211b10;color:#e9c66f;padding:.55rem .3rem;font-weight:900;cursor:pointer}.payout-preview{display:flex;justify-content:space-between;align-items:center;padding:.9rem 0;margin:.8rem 0;border-top:1px solid rgba(255,255,255,.08);color:#958c7c;font-size:.7rem}.payout-preview strong{font:900 1rem var(--font-display);color:var(--gold-300)}.bet-modal .btn-play{width:100%;padding:.9rem}.modal-footnote{text-align:center;color:#777064;font-size:.58rem;margin-top:.7rem}.multi-pick-wrap[hidden]{display:none}.multi-pick-option{display:flex;justify-content:space-between;padding:.5rem .65rem;border:1px solid rgba(255,255,255,.08);border-radius:7px;margin:.3rem 0;color:#d9cfb8;font-size:.68rem;cursor:pointer}.multi-pick-option.active{border-color:#d8ae4e;background:rgba(255,217,102,.08)}
+        /* Step 7 race broadcast, live leaderboard and finish presentation */
+        .race-track-wrapper{max-width:100%;padding:1rem;background:linear-gradient(180deg,#1c3218,#263f1d 45%,#172a14);border:2px solid rgba(255,217,102,.3);box-shadow:inset 0 0 30px rgba(0,0,0,.55),0 12px 28px rgba(0,0,0,.25)}.race-live-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.2rem .25rem .8rem}.race-live-header h3{font:700 1.05rem var(--font-display);color:#f4dfad;margin-top:.2rem}.race-status{font-size:.58rem;font-weight:1000;letter-spacing:.13em;color:#ffe29a;border:1px solid rgba(255,217,102,.3);padding:.45rem .7rem;border-radius:30px;background:rgba(0,0,0,.2)}.race-commentary{min-height:42px;display:flex;align-items:center;gap:.6rem;padding:.65rem .8rem;margin-bottom:.85rem;border-radius:8px;background:rgba(0,0,0,.34);border-left:3px solid #d9ad4c;color:#f0e5ca;font-size:.72rem;line-height:1.4}.race-commentary i{color:#e8c45e}.live-leaderboard{padding:.65rem .8rem;margin-bottom:.85rem;border:1px solid rgba(255,217,102,.18);border-radius:9px;background:rgba(0,0,0,.25)}.leaderboard-title{display:flex;justify-content:space-between;color:#e6c36b;font-size:.58rem;font-weight:1000;letter-spacing:.12em;margin-bottom:.5rem}.leaderboard-title span{color:#8d826e}.leaderboard-rows{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}.leader-card{display:flex;align-items:center;gap:.5rem;min-width:0;padding:.48rem .55rem;border-radius:7px;background:rgba(255,255,255,.045)}.leader-rank{font:900 .8rem var(--font-display);color:#e9c66d}.leader-name{font-weight:800;font-size:.67rem;color:#f1e8d5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.leader-progress{font-size:.55rem;color:#9b927f;margin-left:auto;white-space:nowrap}.track-distance-label{display:flex;justify-content:space-between;margin:0 42px .35rem 128px;color:#c6b98e;font-size:.5rem;font-weight:900;letter-spacing:.16em}.track-lane{min-height:39px;padding:.42rem .5rem;margin:.34rem 0;background:rgba(0,0,0,.14);border-bottom:1px dashed rgba(255,255,255,.1)}.lane-horse{width:118px;min-width:118px;font-size:.65rem}.progress-bg::after{content:'';position:absolute;right:-8px;top:-5px;height:29px;width:7px;border-radius:1px;background:repeating-linear-gradient(0deg,#f5f0e6 0 4px,#17130c 4px 8px);box-shadow:0 0 8px rgba(255,255,255,.35);z-index:3}.progress-bg{height:19px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 2px,transparent 2px 34px),rgba(0,0,0,.52);border:1px solid rgba(255,255,255,.15);overflow:visible}.progress-fill{box-shadow:0 0 14px rgba(255,255,255,.25)}.progress-fill .running-horse{font-size:1.65rem;top:-22px}.finish-flag{font-size:1.15rem;position:relative;z-index:2}.track-lane.finished{background:rgba(255,217,102,.13)}.track-lane.finished .running-horse{filter:drop-shadow(0 0 8px #ffe28b)}.track-lane.crossing .progress-fill{animation:finishFlash .5s ease 2}@keyframes finishFlash{50%{filter:brightness(2.1);box-shadow:0 0 22px #ffe28b}}.final-results{margin:1rem 0;padding:1rem;border:1px solid rgba(255,217,102,.3);border-radius:13px;background:linear-gradient(145deg,#17130c,#090807)}.final-results h3{font:700 1.05rem var(--font-display);color:var(--gold-200);margin-bottom:.75rem}.final-result-row{display:grid;grid-template-columns:38px 1fr auto auto;align-items:center;gap:.7rem;padding:.55rem .4rem;border-bottom:1px solid rgba(255,255,255,.06);font-size:.7rem}.final-result-row:first-of-type{background:rgba(255,217,102,.07);border-radius:7px}.finish-place{font:900 .9rem var(--font-display);color:var(--gold-300)}.final-result-row small{color:#948b7b}.final-result-row strong{color:#e9c66d}.race-statline{font-size:.55rem;color:#a7a08e;white-space:nowrap}
+        @media(max-width:700px){.betting-board{padding:.65rem}.board-heading h2{font-size:1rem}.horse-list-head,.horse-list-row{grid-template-columns:minmax(112px,1fr) minmax(128px,1.2fr) 58px 58px;gap:.45rem}.horse-list-head{font-size:.48rem;padding:.55rem .5rem}.horse-list-row{padding:.65rem .5rem;min-height:72px}.horse-silhouette{width:29px;height:29px;font-size:1rem}.horse-list-name{font-size:.69rem}.horse-jockey-line{font-size:.52rem}.list-stat{grid-template-columns:37px 1fr 17px;gap:4px}.list-stat label,.list-stat b{font-size:.45rem}.horse-list-odds{font-size:.78rem}.horse-bet-btn{padding:.48rem .35rem;font-size:.52rem}.horses-list{height:450px}.board-footer{font-size:.52rem}.leaderboard-rows{grid-template-columns:1fr}.track-distance-label{margin-left:92px;margin-right:30px}.lane-horse{width:82px;min-width:82px;font-size:.55rem}.lane-horse i{font-size:1rem}.race-track-wrapper{padding:.55rem}.track-lane{gap:.3rem}.progress-bg{height:15px}.progress-fill .running-horse{font-size:1.25rem;top:-18px}.finish-flag{font-size:.9rem}.final-result-row{grid-template-columns:27px 1fr auto;gap:.4rem}.final-result-row small{display:none}}
+        @media(max-width:390px){.horse-list-head,.horse-list-row{grid-template-columns:minmax(94px,1fr) minmax(112px,1.1fr) 50px 52px;gap:.3rem}.horse-list-name{font-size:.62rem}.horse-silhouette{display:none}.horse-list-row{padding:.6rem .35rem}.list-stat{grid-template-columns:33px 1fr 15px}.list-stat label,.list-stat b{font-size:.4rem}}
+
     </style>
 </head>
 <body>
@@ -1080,42 +1095,60 @@
                 <span><span class="dot"></span> Form</span>
             </div>
 
-            <!-- HORSES GRID -->
-            <div class="horses-grid" id="horsesGrid"></div>
-
-            <!-- BET CONTROLS -->
-            <div class="bet-controls">
-                <select id="betType" class="bet-type-select">
-                    <option value="win">🏆 Win</option>
-                    <option value="place">🥈 Place (Top 2)</option>
-                    <option value="show">🥉 Show (Top 3)</option>
-                    <option value="exacta">🎯 Exacta (1st & 2nd)</option>
-                    <option value="trifecta">💎 Trifecta (1st-3rd)</option>
-                </select>
-                <input type="number" id="betAmount" class="bet-input" value="50" step="1" min="0" max="99999">
-                <div class="quick-bet-controls" style="display:flex; gap:0.3rem; flex-wrap:wrap; justify-content:center;">
-                    <button type="button" class="chip-quick" data-bet="10" title="Add 10 GOLD">+10</button>
-                    <button type="button" class="chip-quick" data-bet="25" title="Add 25 GOLD">+25</button>
-                    <button type="button" class="chip-quick" data-bet="50" title="Add 50 GOLD">+50</button>
-                    <button type="button" class="chip-quick" id="halfBetBtn" title="Halve current bet">½</button>
-                    <button type="button" class="chip-quick" id="maxBetBtn" title="Set bet to your available wallet balance">MAX</button>
+            <!-- HORSE BETTING BOARD -->
+            <section class="betting-board" aria-label="Horse betting list">
+                <div class="board-heading">
+                    <div><span class="eyebrow">THE STARTING FIELD</span><h2>Choose Your Horse</h2><p>Select a runner to open its betting slip.</p></div>
+                    <div class="field-count" id="fieldCount">18 RUNNERS</div>
                 </div>
-                <button class="btn btn-play" id="startRaceBtn" disabled>
-                    <i class="fas fa-flag-checkered"></i> START RACE
-                </button>
+                <div class="horse-list-head"><span>HORSE / JOCKEY</span><span>FORM · SPEED · STAMINA</span><span>ODDS</span><span>BET</span></div>
+                <div class="horses-list" id="horsesGrid" tabindex="0" aria-label="Scrollable horse list"></div>
+                <div class="board-footer"><i class="fas fa-arrows-up-down"></i> Scroll to view the full field <span>6–7 runners visible</span></div>
+            </section>
+
+            <!-- BETTING SLIP OVERLAY -->
+            <div class="bet-modal-backdrop" id="betModalBackdrop" aria-hidden="true">
+                <section class="bet-modal" role="dialog" aria-modal="true" aria-labelledby="betModalTitle">
+                    <button class="modal-close" id="closeBetModal" aria-label="Close betting slip"><i class="fas fa-xmark"></i></button>
+                    <div class="modal-kicker"><i class="fas fa-ticket"></i> ROYAL TURF BETTING SLIP</div>
+                    <h2 id="betModalTitle">Place your bet</h2>
+                    <div class="selected-horse-summary" id="selectedHorseSummary"></div>
+                    <label class="modal-label" for="betType">WHAT ARE YOU BETTING ON?</label>
+                    <select id="betType" class="bet-type-select">
+                        <option value="win">WIN — Finish 1st</option>
+                        <option value="place">PLACE — Finish in top 2</option>
+                        <option value="show">SHOW — Finish in top 3</option>
+                        <option value="exacta">EXACTA — Pick 1st and 2nd in order</option>
+                        <option value="trifecta">TRIFECTA — Pick top 3 in order</option>
+                    </select>
+                    <div class="multi-pick-wrap" id="multiPickWrap" hidden><label class="modal-label">SELECT THE HORSES IN FINISHING ORDER</label><div id="multiPickList"></div></div>
+                    <label class="modal-label" for="betAmount">BET AMOUNT</label>
+                    <div class="bet-amount-row"><input type="number" id="betAmount" class="bet-input" value="50" step="1" min="5"><span>GOLD</span></div>
+                    <div class="quick-bet-controls">
+                        <button type="button" class="chip-quick" data-bet="10">+10</button><button type="button" class="chip-quick" data-bet="25">+25</button><button type="button" class="chip-quick" data-bet="50">+50</button><button type="button" class="chip-quick" id="halfBetBtn">½</button><button type="button" class="chip-quick" id="maxBetBtn">MAX</button>
+                    </div>
+                    <div class="payout-preview"><span>Potential payout</span><strong id="potentialPayout">— GOLD</strong></div>
+                    <button class="btn btn-play" id="startRaceBtn" disabled><i class="fas fa-flag-checkered"></i> CONFIRM BET & START RACE</button>
+                    <p class="modal-footnote" id="betModalFootnote">Your bet will be deducted when the race begins.</p>
+                </section>
             </div>
 
             <!-- RACE TRACK -->
             <div class="race-track-wrapper" id="raceTrackWrapper">
+                <div class="race-live-header"><div><span class="eyebrow">LIVE RACE COVERAGE</span><h3>Royal Turf Grand Prix</h3></div><div class="race-status" id="raceStatus">GETTING READY</div></div>
+                <div class="race-commentary" id="raceCommentary" aria-live="polite"><i class="fas fa-microphone-lines"></i> The field is taking its positions...</div>
+                <div class="live-leaderboard" id="liveLeaderboard"><div class="leaderboard-title">LIVE LEADERBOARD <span>TOP 3</span></div><div id="leaderboardRows"></div></div>
+                <div class="track-distance-label"><span>START</span><span>FINISH</span></div>
                 <div id="lanesContainer"></div>
             </div>
 
             <!-- RESULT MESSAGE -->
             <div class="result-message" id="resultMessage"></div>
+            <section class="final-results" id="finalResults" hidden></section>
 
             <!-- HISTORY -->
             <div class="history-panel" id="historyPanel">
-                <h4>📋 Recent Races</h4>
+                <h4><i class="fas fa-clipboard-list"></i> Recent Races</h4>
                 <div id="historyContent"></div>
             </div>
         </div>
@@ -1439,11 +1472,13 @@
                     const consistency = 0.4 + Math.random() * 0.6;
                     const form = 0.3 + Math.random() * 0.7;
                     const overallRating = speed * 0.45 + stamina * 0.3 + form * 0.25;
+                    const rarity = overallRating >= 1.08 ? 'Legendary' : overallRating >= .96 ? 'Epic' : overallRating >= .83 ? 'Rare' : overallRating >= .68 ? 'Uncommon' : 'Common';
+                    const previousPerformance = ['1st last race','2nd last race','3rd last race','4th last race','Unplaced last race'][Math.floor(Math.random()*5)];
                     const baseOdds = Math.max(1.3, 2.5 / (overallRating + 0.3));
                     const oddsVariation = (Math.random() - 0.5) * 1.5;
                     const odds = Math.max(1.2, Math.round((baseOdds + oddsVariation) * 100) / 100);
                     return {
-                        name: entry.name, color: entry.color, jockey: entry.jockey,
+                        name: entry.name, color: entry.color, jockey: entry.jockey, rarity, previousPerformance,
                         speed: Math.round(speed * 100) / 100,
                         stamina: Math.round(stamina * 100) / 100,
                         consistency: Math.round(consistency * 100) / 100,
@@ -1458,77 +1493,69 @@
                 });
                 horses.sort((a, b) => a.odds - b.odds);
                 selectedHorses = [];
+                const modal=document.getElementById('betModalBackdrop'); if(modal) modal.classList.remove('open');
             }
 
             function renderHorses() {
                 const grid = document.getElementById('horsesGrid');
-                grid.innerHTML = horses.map((h, idx) => {
-                    const statRow = (label, count, color) => `
-                        <div class="horse-stat">
-                            <span class="horse-stat-label">${label}</span>
-                            <span class="horse-stat-dots">${Array.from({length: 5}, (_, i) => `<i class="stat-dot ${i < count ? 'filled' : ''}" style="--stat-color:${color}"></i>`).join('')}</span>
-                        </div>`;
-                    return `
-                    <div class="horse-card" data-index="${idx}" onclick="window.selectHorse(${idx})" title="Jockey: ${h.jockey} | Speed: ${h.speed} | Stamina: ${h.stamina} | Form: ${h.form}" style="--card-accent:${h.color}">
-                        <div class="horse-icon-wrap"><i class="fas fa-horse horse-icon" style="color:${h.color}"></i></div>
-                        <div class="horse-name">${h.name}</div>
-                        <div class="horse-jockey">${h.jockey}</div>
-                        <div class="horse-stats">
-                            ${statRow('SPEED', h.statDots.speed, '#ffd966')}
-                            ${statRow('STAMINA', h.statDots.stamina, '#81c784')}
-                            ${statRow('FORM', h.statDots.form, '#64b5f6')}
-                        </div>
-                        <div class="horse-odds">ODDS <strong>${h.odds.toFixed(2)}x</strong></div>
-                        <div class="color-bar" style="background:${h.color};"></div>
-                    </div>`;
-                }).join('');
-                highlightSelected();
-                updateHistoryPanel();
+                document.getElementById('fieldCount').textContent = `${horses.length} RUNNERS`;
+                const stat = (label, value, cls) => `<div class="list-stat"><label>${label}</label><div class="list-stat-track"><div class="list-stat-fill ${cls}" style="width:${Math.round(value*100)}%"></div></div><b>${Math.round(value*100)}</b></div>`;
+                grid.innerHTML = horses.map((h, idx) => `
+                    <div class="horse-list-row ${selectedHorses.includes(idx) ? 'selected' : ''}" data-index="${idx}" title="${h.name}: Form ${Math.round(h.form*100)}, Speed ${Math.round(h.speed*100)}, Stamina ${Math.round(h.stamina*100)}, Odds ${h.odds.toFixed(2)}x, Jockey ${h.jockey}, Previous performance ${h.previousPerformance}">
+                        <div class="horse-identity"><div class="horse-silhouette"><i class="fas fa-horse" style="color:${h.color}"></i></div><div class="horse-identity-copy"><div class="horse-list-name">${h.name}</div><div class="horse-jockey-line">Jockey: ${h.jockey}</div><span class="rarity-tag rarity-${h.rarity.toLowerCase()}">${h.rarity}</span></div></div>
+                        <div class="horse-list-stats">${stat('FORM',h.form,'stat-form')}${stat('SPEED',h.speed,'stat-speed')}${stat('STAMINA',h.stamina,'stat-stamina')}</div>
+                        <div class="horse-list-odds"><small>ODDS</small>${h.odds.toFixed(2)}x</div>
+                        <button class="horse-bet-btn" type="button" onclick="window.selectHorse(${idx})" ${raceActive?'disabled':''}>BET</button>
+                    </div>`).join('');
             }
 
             window.selectHorse = function(index) {
                 if (raceActive) return;
+                selectedHorses = [index];
                 playTone('select');
-                const betType = document.getElementById('betType').value;
-                const maxSelections = { win: 1, place: 1, show: 1, exacta: 2, trifecta: 3 } [betType] || 1;
-
-                if (selectedHorses.includes(index)) {
-                    selectedHorses = selectedHorses.filter(i => i !== index);
-                } else {
-                    if (selectedHorses.length >= maxSelections) {
-                        // Shift out oldest for exacta/trifecta or replace for single
-                        if (maxSelections === 1) {
-                            selectedHorses = [index];
-                        } else {
-                            selectedHorses.shift();
-                            selectedHorses.push(index);
-                        }
-                    } else {
-                        selectedHorses.push(index);
-                    }
-                }
-                highlightSelected();
-                updateStartButtonState();
+                renderHorses();
+                openBetModal(index);
             };
 
+            function openBetModal(index) {
+                const h = horses[index];
+                document.getElementById('selectedHorseSummary').innerHTML = `<div><div class="selected-horse-name"><i class="fas fa-horse" style="color:${h.color};margin-right:.4rem"></i>${h.name}</div><div class="selected-horse-meta">${h.jockey} · ${h.rarity} · Previous: ${h.previousPerformance}</div></div><div class="selected-horse-odds">${h.odds.toFixed(2)}x</div>`;
+                document.getElementById('betModalBackdrop').classList.add('open');
+                document.getElementById('betModalBackdrop').setAttribute('aria-hidden','false');
+                document.getElementById('betModalFootnote').textContent = `Betting on ${h.name}. Your wager is deducted when the race begins.`;
+                updateBetPreview();
+                updateStartButtonState();
+            }
+            function closeBetModal() {
+                document.getElementById('betModalBackdrop').classList.remove('open');
+                document.getElementById('betModalBackdrop').setAttribute('aria-hidden','true');
+            }
+            function updateBetPreview() {
+                const type = document.getElementById('betType').value;
+                const bet = Math.max(0, Number(document.getElementById('betAmount').value)||0);
+                const idx = selectedHorses[0];
+                const h = horses[idx];
+                const pickedOdds=selectedHorses.map(i=>horses[i]?.odds||1);
+                const mult = type==='place' ? h.odds*.4 : type==='show' ? h.odds*.25 : type==='exacta' ? (pickedOdds.reduce((a,b)=>a*b,1)/2) : type==='trifecta' ? (pickedOdds.reduce((a,b)=>a*b,1)/3) : h.odds;
+                document.getElementById('potentialPayout').textContent = `${(Math.round(bet*mult*100)/100).toLocaleString()} GOLD`;
+                const multi = type==='exacta' || type==='trifecta';
+                document.getElementById('multiPickWrap').hidden = !multi;
+                if (multi) {
+                    const required = type==='exacta'?2:3;
+                    document.getElementById('multiPickList').innerHTML = horses.map((x,i)=>`<div class="multi-pick-option ${selectedHorses.includes(i)?'active':''}" onclick="window.toggleBetHorse(${i})"><span>${selectedHorses.includes(i)?`<b>${selectedHorses.indexOf(i)+1}.</b> `:''}${x.name}</span><strong>${x.odds.toFixed(2)}x</strong></div>`).join('');
+                    document.getElementById('betModalFootnote').textContent = `Choose ${required} horses in exact finishing order. Your first pick is ${h.name}.`;
+                }
+            }
+            window.toggleBetHorse = function(index) {
+                const type=document.getElementById('betType').value;
+                const required=type==='exacta'?2:3;
+                if (selectedHorses.includes(index)) { if(selectedHorses[0]===index) return; selectedHorses=selectedHorses.filter(i=>i!==index); }
+                else if(selectedHorses.length<required) selectedHorses.push(index);
+                else selectedHorses[required-1]=index;
+                updateBetPreview();updateStartButtonState();
+            };
             function highlightSelected() {
-                document.querySelectorAll('.horse-card').forEach(card => {
-                    card.classList.remove('selected');
-                    const orderBadge = card.querySelector('.selection-order');
-                    if (orderBadge) orderBadge.remove();
-                });
-                selectedHorses.forEach((idx, order) => {
-                    const card = document.querySelector(`.horse-card[data-index="${idx}"]`);
-                    if (card) {
-                        card.classList.add('selected');
-                        if (selectedHorses.length > 1) {
-                            const badge = document.createElement('span');
-                            badge.className = 'selection-order';
-                            badge.textContent = order + 1;
-                            card.appendChild(badge);
-                        }
-                    }
-                });
+                document.querySelectorAll('.horse-list-row').forEach(row=>row.classList.toggle('selected',selectedHorses.includes(Number(row.dataset.index))));
             }
 
             function setBetAmount(value) {
@@ -1549,7 +1576,7 @@
                 const bet = Math.floor(Number(document.getElementById('betAmount').value) || 0);
                 const wallet = Math.max(0, Math.floor(Number(currentUser?.balance) || 0));
                 const canAfford = getFreeRacesLeft() > 0 || (bet >= 5 && bet <= wallet);
-                btn.disabled = !(selectedHorses.length === required && !raceActive && canAfford);
+                btn.disabled = !(selectedHorses.length === required && !raceActive && canAfford && document.getElementById('betModalBackdrop').classList.contains('open'));
             }
 
             // ═══════════════════════════════════
@@ -1565,7 +1592,7 @@
 
                 if (!isFree && betAmount > currentUser.balance) {
                     const msgEl = document.getElementById('resultMessage');
-                    msgEl.innerHTML = '❌ Insufficient balance!';
+                    msgEl.innerHTML = '<i class="fas fa-circle-exclamation"></i> Insufficient balance!';
                     msgEl.className = 'result-message lose';
                     return;
                 }
@@ -1592,10 +1619,17 @@
                 updateFreeRacesDisplay();
 
                 // Prepare race
+                closeBetModal();
+                selectedHorses.forEach(idx=>{const row=document.querySelector(`.horse-list-row[data-index="${idx}"]`);if(row)row.classList.add('bet-placed');});
                 raceActive = true;
+                document.querySelectorAll('.horse-bet-btn').forEach(b=>b.disabled=true);
                 document.getElementById('startRaceBtn').disabled = true;
                 document.getElementById('resultMessage').innerHTML = '';
                 document.getElementById('resultMessage').className = 'result-message';
+                document.getElementById('finalResults').hidden = true;
+                document.getElementById('finalResults').innerHTML = '';
+                document.getElementById('raceStatus').textContent = 'RACE STARTING';
+                document.getElementById('raceCommentary').innerHTML = '<i class="fas fa-microphone-lines"></i> The gates are ready. The field is about to break!';
                 horses.forEach(h => { h.position = 0; h.finishTime = null; });
 
                 // Show track
@@ -1610,12 +1644,14 @@
                                 <i class="fas fa-horse running-horse" style="color:${h.color}"></i>
                             </div>
                         </div>
-                        <span class="finish-flag">🏁</span>
+                        <span class="finish-flag"><i class="fas fa-flag-checkered"></i></span>
                     </div>
                 `).join('');
 
+                updateLiveRacePanels(true);
                 // Countdown
                 await countdownSequence();
+                document.getElementById('raceStatus').textContent = 'LIVE';
 
                 // Start gallop sound
                 startGallopSound();
@@ -1665,10 +1701,12 @@
                         }
                         const fillEl = document.getElementById(`progress-${i}`);
                         if (fillEl) fillEl.style.width = h.position + '%';
+                        if (h.finishTime !== null) { const lane=document.getElementById(`trackLane-${i}`); if(lane){lane.classList.add('finished','crossing');setTimeout(()=>lane.classList.remove('crossing'),1100);} }
                     });
 
                     const leadingIdx = horses.reduce((best, h, i) => h.position > horses[best].position ? i : best, 0);
                     document.querySelectorAll('.track-lane').forEach((lane, i) => lane.classList.toggle('leading', i === leadingIdx));
+                    updateLiveRacePanels(false);
 
                     if (horses.every(h => h.finishTime !== null)) {
                         stopGallopSound();
@@ -1678,6 +1716,24 @@
                     }
                 }
                 requestAnimationFrame(simulateRace);
+            }
+
+
+            let lastCommentaryAt = 0;
+            let commentaryIndex = 0;
+            function updateLiveRacePanels(force) {
+                const ranked=[...horses].sort((a,b)=>{if(a.finishTime!==null&&b.finishTime!==null)return a.finishTime-b.finishTime;if(a.finishTime!==null)return -1;if(b.finishTime!==null)return 1;return b.position-a.position;});
+                const leaders=ranked.slice(0,3);
+                document.getElementById('leaderboardRows').innerHTML=`<div class="leaderboard-rows">${leaders.map((h,i)=>`<div class="leader-card"><span class="leader-rank">${['1ST','2ND','3RD'][i]}</span><span class="leader-name">${h.name}</span><span class="leader-progress">${Math.floor(h.position)}%</span></div>`).join('')}</div>`;
+                const now=performance.now();
+                if(force || now-lastCommentaryAt>2200){
+                    lastCommentaryAt=now;
+                    const leader=ranked[0], second=ranked[1], third=ranked[2];
+                    const lines=[`${leader.name} is setting the pace, with ${second.name} chasing hard in second.`,`The pack is stretching out! ${third.name} is fighting to stay in the top three.`,`${leader.name} has the lead, but there is plenty of track left.`,`The jockeys are urging their horses forward as the race intensifies.`,`What a contest! ${second.name} is closing the gap on ${leader.name}.`];
+                    const finished=ranked.filter(h=>h.finishTime!==null).length;
+                    const message=finished?`${finished} of ${horses.length} horses have crossed the finish line. ${leader.name} currently leads the remaining field.`:lines[commentaryIndex++%lines.length];
+                    document.getElementById('raceCommentary').innerHTML=`<i class="fas fa-microphone-lines"></i> ${message}`;
+                }
             }
 
             function countdownSequence() {
@@ -1710,148 +1766,44 @@
             }
 
             function raceFinished() {
-                const sorted = [...horses].sort((a, b) => a.finishTime - b.finishTime);
-                const winnerIdx = horses.indexOf(sorted[0]);
-                const secondIdx = horses.indexOf(sorted[1]);
-                const thirdIdx = horses.indexOf(sorted[2]);
-
-                // Highlight winner
-                document.querySelectorAll('.horse-card').forEach(c => c.classList.remove('winner'));
-                const winnerCard = document.querySelector(`.horse-card[data-index="${winnerIdx}"]`);
-                if (winnerCard) winnerCard.classList.add('winner');
-
-                const betType = document.getElementById('betType').value;
-                const betAmount = parseInt(document.getElementById('betAmount').value) || 50;
-                let winAmount = 0;
-                let multiplier = 0;
-
-                switch (betType) {
-                    case 'win':
-                        if (selectedHorses.includes(winnerIdx)) {
-                            multiplier = sorted[0].odds;
-                            winAmount = Math.round(betAmount * multiplier * 100) / 100;
-                        }
-                        break;
-                    case 'place':
-                        if (selectedHorses.includes(winnerIdx) || selectedHorses.includes(secondIdx)) {
-                            const horse = horses[selectedHorses[0]];
-                            multiplier = Math.round(horse.odds * 0.4 * 100) / 100;
-                            winAmount = Math.round(betAmount * multiplier * 100) / 100;
-                        }
-                        break;
-                    case 'show':
-                        if (selectedHorses.includes(winnerIdx) || selectedHorses.includes(secondIdx) || selectedHorses
-                            .includes(thirdIdx)) {
-                            const horse = horses[selectedHorses[0]];
-                            multiplier = Math.round(horse.odds * 0.25 * 100) / 100;
-                            winAmount = Math.round(betAmount * multiplier * 100) / 100;
-                        }
-                        break;
-                    case 'exacta':
-                        if (selectedHorses.length === 2 && selectedHorses[0] === winnerIdx && selectedHorses[1] ===
-                            secondIdx) {
-                            const odds1 = horses[selectedHorses[0]].odds;
-                            const odds2 = horses[selectedHorses[1]].odds;
-                            multiplier = Math.round((odds1 * odds2) / 2 * 100) / 100;
-                            winAmount = Math.round(betAmount * multiplier * 100) / 100;
-                        }
-                        break;
-                    case 'trifecta':
-                        if (selectedHorses.length === 3 && selectedHorses[0] === winnerIdx && selectedHorses[1] ===
-                            secondIdx && selectedHorses[2] === thirdIdx) {
-                            const odds1 = horses[selectedHorses[0]].odds;
-                            const odds2 = horses[selectedHorses[1]].odds;
-                            const odds3 = horses[selectedHorses[2]].odds;
-                            multiplier = Math.round((odds1 * odds2 * odds3) / 3 * 100) / 100;
-                            winAmount = Math.round(betAmount * multiplier * 100) / 100;
-                        }
-                        break;
+                const sorted=[...horses].sort((a,b)=>a.finishTime-b.finishTime);
+                const winnerIdx=horses.indexOf(sorted[0]), secondIdx=horses.indexOf(sorted[1]), thirdIdx=horses.indexOf(sorted[2]);
+                document.getElementById('raceStatus').textContent='FINISHED';
+                document.getElementById('raceCommentary').innerHTML=`<i class="fas fa-trophy"></i> The race is over! ${sorted[0].name} takes the crown, followed by ${sorted[1].name} and ${sorted[2].name}.`;
+                document.querySelectorAll('.horse-list-row').forEach(row=>row.classList.remove('selected'));
+                const betType=document.getElementById('betType').value;
+                const betAmount=parseInt(document.getElementById('betAmount').value)||50;
+                let winAmount=0,multiplier=0;
+                switch(betType){
+                    case 'win': if(selectedHorses.includes(winnerIdx)){multiplier=sorted[0].odds;winAmount=betAmount*multiplier;} break;
+                    case 'place': if(selectedHorses.includes(winnerIdx)||selectedHorses.includes(secondIdx)){const horse=horses[selectedHorses[0]];multiplier=Math.round(horse.odds*.4*100)/100;winAmount=betAmount*multiplier;} break;
+                    case 'show': if(selectedHorses.includes(winnerIdx)||selectedHorses.includes(secondIdx)||selectedHorses.includes(thirdIdx)){const horse=horses[selectedHorses[0]];multiplier=Math.round(horse.odds*.25*100)/100;winAmount=betAmount*multiplier;} break;
+                    case 'exacta': if(selectedHorses.length===2&&selectedHorses[0]===winnerIdx&&selectedHorses[1]===secondIdx){multiplier=Math.round((horses[selectedHorses[0]].odds*horses[selectedHorses[1]].odds/2)*100)/100;winAmount=betAmount*multiplier;} break;
+                    case 'trifecta': if(selectedHorses.length===3&&selectedHorses[0]===winnerIdx&&selectedHorses[1]===secondIdx&&selectedHorses[2]===thirdIdx){multiplier=Math.round((horses[selectedHorses[0]].odds*horses[selectedHorses[1]].odds*horses[selectedHorses[2]].odds/3)*100)/100;winAmount=betAmount*multiplier;} break;
                 }
-
-                const msgEl = document.getElementById('resultMessage');
-                if (winAmount > 0) {
-                    currentUser.balance += winAmount;
-                    currentUser.horseRacingStats.wins++;
-                    currentUser.horseRacingStats.totalWin += winAmount;
-                    currentUser.globalStats.totalWins++;
-                    currentUser.globalStats.currentStreak = (currentUser.globalStats.currentStreak || 0) + 1;
-                    if (currentUser.globalStats.currentStreak > currentUser.globalStats.bestStreak)
-                        currentUser.globalStats.bestStreak = currentUser.globalStats.currentStreak;
-                    playTone('bigwin');
-                    triggerConfetti(multiplier > 5 ? 'big' : 'normal');
-                    showWinOverlay(multiplier.toFixed(2) + 'x', winAmount);
-                    msgEl.innerHTML =
-                        `🎉 <strong>Winner!</strong> +${winAmount.toLocaleString()} GOLD (${multiplier.toFixed(2)}x)`;
-                    msgEl.className = 'result-message win';
-                    // Add to history
-                    currentUser.horseRacingStats.recentResults.unshift({
-                        win: true,
-                        amount: winAmount,
-                        multiplier,
-                        betType,
-                        horse: horses[winnerIdx].name,
-                        date: new Date().toISOString(),
-                    });
-                } else {
-                    currentUser.globalStats.currentStreak = 0;
-                    playTone('lose');
-                    msgEl.innerHTML = '😞 No luck this time — better luck next race!';
-                    msgEl.className = 'result-message lose';
-                    currentUser.horseRacingStats.recentResults.unshift({
-                        win: false,
-                        amount: 0,
-                        multiplier: 0,
-                        betType,
-                        horse: horses[winnerIdx].name,
-                        date: new Date().toISOString(),
-                    });
+                winAmount=Math.round(winAmount*100)/100;
+                const msgEl=document.getElementById('resultMessage');
+                if(winAmount>0){
+                    currentUser.balance+=winAmount;currentUser.horseRacingStats.wins++;currentUser.horseRacingStats.totalWin+=winAmount;currentUser.globalStats.totalWins++;currentUser.globalStats.currentStreak=(currentUser.globalStats.currentStreak||0)+1;
+                    if(currentUser.globalStats.currentStreak>currentUser.globalStats.bestStreak)currentUser.globalStats.bestStreak=currentUser.globalStats.currentStreak;
+                    playTone('bigwin');triggerConfetti(multiplier>5?'big':'normal');showWinOverlay(multiplier.toFixed(2)+'x',winAmount);
+                    msgEl.innerHTML=`<strong>BET WON!</strong> +${winAmount.toLocaleString()} GOLD (${multiplier.toFixed(2)}x)`;msgEl.className='result-message win';
+                    currentUser.horseRacingStats.recentResults.unshift({win:true,amount:winAmount,multiplier,betType,horse:sorted[0].name,date:new Date().toISOString()});
+                }else{
+                    currentUser.globalStats.currentStreak=0;playTone('lose');msgEl.innerHTML='BET LOST — Better luck in the next race.';msgEl.className='result-message lose';
+                    currentUser.horseRacingStats.recentResults.unshift({win:false,amount:0,multiplier:0,betType,horse:sorted[0].name,date:new Date().toISOString()});
                 }
-
-                // Trim history
-                if (currentUser.horseRacingStats.recentResults.length > 10) {
-                    currentUser.horseRacingStats.recentResults = currentUser.horseRacingStats.recentResults.slice(0, 10);
-                }
-
-                // Update global stats
-                currentUser.globalStats.totalGames++;
-                currentUser.globalStats.totalWagered += betAmount;
-                currentUser.globalStats.totalWon += winAmount;
-                currentUser.xp = (currentUser.xp || 0) + Math.floor(betAmount / 2);
-                currentUser.gamePlayCount['horse-racing'] = (currentUser.gamePlayCount['horse-racing'] || 0) + 1;
-                currentUser.gameOutcomes.unshift({
-                    game: 'HorseRacing',
-                    result: winAmount > 0 ? 'win' : 'loss',
-                    profit: winAmount - betAmount,
-                    multiplier,
-                    bet: betAmount,
-                    win: winAmount,
-                    date: new Date().toISOString(),
-                });
-                currentUser.transactions.unshift({
-                    desc: `🐎 Horse Racing | ${winAmount > 0 ? 'Won' : 'Lost'} ${Math.abs(winAmount - betAmount).toLocaleString()} GOLD`,
-                    amount: winAmount - betAmount,
-                    type: winAmount > 0 ? 'game_win' : 'game_loss',
-                    date: new Date().toISOString(),
-                });
-
-                saveUser().then(() => {
-                    updateBalanceDisplay();
-                    updateFreeRacesDisplay();
-                    updateHistoryPanel();
-                });
-
-                // Reset after delay
-                setTimeout(() => {
-                    raceActive = false;
-                    document.getElementById('raceTrackWrapper').style.display = 'none';
-                    selectedHorses = [];
-                    highlightSelected();
-                    updateStartButtonState();
-                    // Generate new horses for next race
-                    generateHorses();
-                    renderHorses();
-                    updateStartButtonState();
-                }, 3500);
+                currentUser.horseRacingStats.recentResults=currentUser.horseRacingStats.recentResults.slice(0,10);
+                currentUser.globalStats.totalGames++;currentUser.globalStats.totalWagered+=betAmount;currentUser.globalStats.totalWon+=winAmount;currentUser.xp=(currentUser.xp||0)+Math.floor(betAmount/2);currentUser.gamePlayCount['horse-racing']=(currentUser.gamePlayCount['horse-racing']||0)+1;
+                currentUser.gameOutcomes.unshift({game:'HorseRacing',result:winAmount>0?'win':'loss',profit:winAmount-betAmount,multiplier,bet:betAmount,win:winAmount,date:new Date().toISOString()});
+                currentUser.transactions.unshift({desc:`Horse Racing | ${winAmount>0?'Won':'Lost'} ${Math.abs(winAmount-betAmount).toLocaleString()} GOLD`,amount:winAmount-betAmount,type:winAmount>0?'game_win':'game_loss',date:new Date().toISOString()});
+                const results=document.getElementById('finalResults');
+                results.hidden=false;
+                results.innerHTML=`<h3><i class="fas fa-trophy"></i> OFFICIAL RACE RESULTS</h3>${sorted.map((h,i)=>`<div class="final-result-row"><span class="finish-place">${i===0?'<i class="fas fa-trophy"></i>':i===1?'<i class="fas fa-medal"></i>':i===2?'<i class="fas fa-award"></i>':`#${i+1}`}</span><div><strong>${h.name}</strong><br><small>${h.jockey} · ${h.rarity} · ${h.previousPerformance}</small></div><span class="race-statline">SPD ${Math.round(h.speed*100)} · STM ${Math.round(h.stamina*100)} · FRM ${Math.round(h.form*100)}</span><strong>${h.odds.toFixed(2)}x</strong></div>`).join('')}`;
+                saveUser().then(()=>{updateBalanceDisplay();updateFreeRacesDisplay();updateHistoryPanel();});
+                setTimeout(()=>{
+                    raceActive=false;document.getElementById('raceTrackWrapper').style.display='none';selectedHorses=[];generateHorses();renderHorses();updateStartButtonState();
+                },6500);
             }
 
             function showWinOverlay(multText, amount) {
@@ -1860,7 +1812,7 @@
                 overlay.innerHTML = `
                     <div class="win-multiplier">${multText}</div>
                     <div class="win-amount">+${amount.toLocaleString()} GOLD</div>
-                    <div class="win-subtitle">🏇 ROYAL TURF CLUB</div>
+                    <div class="win-subtitle"><i class="fas fa-horse-head"></i> ROYAL TURF CLUB</div>
                 `;
                 document.body.appendChild(overlay);
                 setTimeout(() => {
@@ -1897,12 +1849,14 @@
             // ═══════════════════════════════════
             document.getElementById('betType').addEventListener('change', () => {
                 playTone('click');
-                selectedHorses = [];
-                highlightSelected();
-                updateStartButtonState();
+                const keep=selectedHorses[0]; selectedHorses=[keep];
+                updateBetPreview(); updateStartButtonState();
             });
 
             document.getElementById('startRaceBtn').addEventListener('click', startRace);
+            document.getElementById('closeBetModal').addEventListener('click', closeBetModal);
+            document.getElementById('betModalBackdrop').addEventListener('click', e => { if(e.target.id==='betModalBackdrop') closeBetModal(); });
+            document.addEventListener('keydown', e => { if(e.key==='Escape') closeBetModal(); });
 
             document.getElementById('soundToggleBtn').addEventListener('click', () => {
                 soundEnabled = !soundEnabled;
@@ -1924,9 +1878,9 @@
                 const wallet = Math.max(0, Math.floor(Number(currentUser?.balance) || 0));
                 const minimum = wallet >= 5 ? 5 : 0;
                 e.target.value = Math.min(wallet, Math.max(minimum, raw));
-                updateStartButtonState();
+                updateBetPreview(); updateStartButtonState();
             });
-            document.getElementById('betAmount').addEventListener('change', e => setBetAmount(e.target.value));
+            document.getElementById('betAmount').addEventListener('change', e => {setBetAmount(e.target.value);updateBetPreview();});
             document.getElementById('betType').addEventListener('change', updateStartButtonState);
 
             // Quick bet controls
@@ -1937,13 +1891,13 @@
                     if (btn.id === 'halfBetBtn') setBetAmount(Math.floor(current / 2));
                     else if (btn.id === 'maxBetBtn') setBetAmount(currentUser?.balance || 0);
                     else setBetAmount(current + Number(btn.dataset.bet || 0));
-                    playTone('click');
+                    updateBetPreview(); playTone('click');
                 });
             });
 
             // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !raceActive && !document.getElementById('startRaceBtn').disabled) {
+                if (e.key === 'Enter' && !raceActive && !document.getElementById('startRaceBtn').disabled && document.getElementById('betModalBackdrop').classList.contains('open')) {
                     e.preventDefault();
                     startRace();
                 }
