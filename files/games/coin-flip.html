@@ -66,19 +66,9 @@
             animation: sparkleFloat 4s infinite ease-in;
             opacity: 0;
         }
-        .sparkle:nth-child(odd) {
-            animation-delay: 2s;
-            background: var(--gold-bright);
-        }
-        .sparkle:nth-child(3n) {
-            animation-delay: 1.3s;
-            width: 6px;
-            height: 6px;
-        }
-        .sparkle:nth-child(5n+2) {
-            animation-delay: 3.2s;
-            background: #f5b042;
-        }
+        .sparkle:nth-child(odd) { animation-delay: 2s; background: var(--gold-bright); }
+        .sparkle:nth-child(3n) { animation-delay: 1.3s; width: 6px; height: 6px; }
+        .sparkle:nth-child(5n+2) { animation-delay: 3.2s; background: #f5b042; }
         @keyframes sparkleFloat {
             0% { transform: translateY(0) translateX(0) scale(0); opacity: 0; }
             15% { opacity: 0.9; scale: 1.2; }
@@ -142,9 +132,7 @@
             gap: 0.5rem;
             transition: box-shadow 0.3s;
         }
-        .balance-tag.pulse {
-            animation: balancePulse 0.5s ease-out;
-        }
+        .balance-tag.pulse { animation: balancePulse 0.5s ease-out; }
         @keyframes balancePulse {
             0% { box-shadow: 0 0 0 0 rgba(255, 217, 102, 0.5); }
             100% { box-shadow: 0 0 0 20px rgba(255, 217, 102, 0); }
@@ -159,9 +147,7 @@
             padding: 0.3rem;
             touch-action: manipulation;
         }
-        .sound-btn:hover {
-            transform: scale(1.1);
-        }
+        .sound-btn:hover { transform: scale(1.1); }
 
         /* ── Main Game Card ── */
         .game-card {
@@ -195,110 +181,163 @@
             color: var(--gold);
             text-shadow: 0 0 30px rgba(255, 217, 102, 0.4);
         }
-        .game-title i {
-            margin: 0 0.4rem;
-        }
+        .game-title i { margin: 0 0.4rem; }
 
-        /* ── 3D COIN STAGE ── */
+        /* ══════════════════════════════════════════
+           3D COIN STAGE
+           ══════════════════════════════════════════ */
         .coin-stage {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 1rem 0;
-            perspective: 800px;
+            padding: 1.4rem 0 2.2rem;
+            perspective: 1100px;
+            perspective-origin: 50% 42%;
             position: relative;
+            isolation: isolate;
         }
+
+        /* Ambient halo behind the coin (never rotates) */
+        .coin-halo {
+            position: absolute;
+            width: calc(var(--coin-size) * 1.55);
+            height: calc(var(--coin-size) * 1.55);
+            border-radius: 50%;
+            background: radial-gradient(circle,
+                rgba(255, 200, 60, 0.22) 0%,
+                rgba(255, 200, 60, 0.08) 42%,
+                rgba(255, 200, 60, 0) 70%);
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 0.35s, transform 0.35s;
+            animation: haloBreathe 5s ease-in-out infinite;
+        }
+        @keyframes haloBreathe {
+            0%, 100% { opacity: 0.75; transform: scale(0.96); }
+            50%      { opacity: 1;    transform: scale(1.04); }
+        }
+        .coin-stage.is-flipping .coin-halo {
+            opacity: 1;
+            animation-duration: 0.9s;
+        }
+
+        /* Ground shadow */
+        .coin-shadow {
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            width: calc(var(--coin-size) * 0.72);
+            height: 16px;
+            margin-left: calc(var(--coin-size) * -0.36);
+            border-radius: 50%;
+            background: radial-gradient(ellipse at center, rgba(255, 190, 60, 0.35), rgba(255, 190, 60, 0) 70%);
+            filter: blur(3px);
+            opacity: 0.55;
+            z-index: 0;
+            pointer-events: none;
+        }
+
         .coin-scene {
             width: var(--coin-size);
             height: var(--coin-size);
             position: relative;
-            perspective: 900px;
+            transform-style: preserve-3d;
+            z-index: 1;
         }
+
+        .coin-hop,
+        .coin-sway,
         .coin {
             width: 100%;
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.4s ease-out;
-            cursor: default;
-            will-change: transform;
         }
-        /* Idle gentle floating rotation */
-        .coin.idle {
-            animation: coinIdle 3s ease-in-out infinite;
-            transition: none;
+        .coin-hop  { will-change: transform; }
+        .coin      { will-change: transform; }
+
+        /* Gentle permanent idle sway (lives on its own wrapper so the
+           flip rotation always starts from an exact 0°/180° base) */
+        .coin-sway {
+            animation: coinIdle 6s ease-in-out infinite;
         }
         @keyframes coinIdle {
-            0%, 100% { transform: rotateY(0deg) rotateX(5deg); }
-            25% { transform: rotateY(15deg) rotateX(-3deg); }
-            50% { transform: rotateY(-10deg) rotateX(8deg); }
-            75% { transform: rotateY(8deg) rotateX(-5deg); }
+            0%, 100% { transform: rotateY(-9deg) rotateX(5deg); }
+            50%      { transform: rotateY(9deg)  rotateX(-5deg); }
         }
-        /* Flipping animation */
-        .coin.flipping {
-            animation: coinFlip 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-            transition: none;
+
+        /* Cylinder "body" slices — injected by JS, no visible ribs */
+        .coin-slice {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: linear-gradient(118deg,
+                #6b4208 0%,
+                #a9711a 14%,
+                #d9a52c 30%,
+                #ffe9a0 46%,
+                #f5b840 60%,
+                #c98c20 78%,
+                #6b4208 100%);
+            transform-style: preserve-3d;
         }
-        @keyframes coinFlip {
-            0% { transform: rotateY(0deg) rotateX(0deg) scale(1) translateY(0); }
-            10% { transform: rotateY(72deg) rotateX(-10deg) scale(1.06) translateY(-18px); }
-            30% { transform: rotateY(324deg) rotateX(12deg) scale(1.12) translateY(-30px); }
-            50% { transform: rotateY(540deg) rotateX(-14deg) scale(1.15) translateY(-14px); }
-            70% { transform: rotateY(792deg) rotateX(8deg) scale(1.1) translateY(0px); }
-            85% { transform: rotateY(972deg) rotateX(-6deg) scale(1.04) translateY(-6px); }
-            100% { transform: rotateY(1080deg) rotateX(0deg) scale(1) translateY(0); }
-        }
+
         /* Coin faces */
         .coin-face {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             border-radius: 50%;
             backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             font-weight: 900;
             border: 4px solid #b8941e;
-            box-shadow:
-                inset 0 0 50px rgba(255, 217, 102, 0.3),
-                0 0 40px rgba(255, 180, 40, 0.4),
-                0 0 80px rgba(255, 180, 40, 0.18);
             overflow: hidden;
+        }
+        .coin-heads {
+            transform: translateZ(calc(var(--coin-thickness) / 2 + 0.2px));
+            background: radial-gradient(ellipse at 35% 28%, #fff3c4 0%, #ffd966 26%, #f0b535 52%, #c4851a 76%, #7a4e0a 100%);
+            box-shadow:
+                inset 0 6px 18px rgba(255, 255, 255, 0.45),
+                inset 0 -14px 26px rgba(90, 50, 0, 0.5),
+                0 0 34px rgba(255, 190, 50, 0.55);
+        }
+        .coin-tails {
+            transform: rotateY(180deg) translateZ(calc(var(--coin-thickness) / 2 + 0.2px));
+            background: radial-gradient(ellipse at 35% 28%, #fff3c4 0%, #ffd966 26%, #eeb033 52%, #bd7f18 76%, #6b4208 100%);
+            box-shadow:
+                inset 0 6px 18px rgba(255, 255, 255, 0.45),
+                inset 0 -14px 26px rgba(90, 50, 0, 0.5),
+                0 0 34px rgba(255, 190, 50, 0.55);
         }
         .coin-face::before {
             content: '';
             position: absolute;
-            inset: 8px;
+            inset: 9px;
             border-radius: 50%;
-            border: 2px solid rgba(255, 217, 102, 0.5);
+            border: 2px solid rgba(255, 240, 180, 0.45);
             pointer-events: none;
         }
         .coin-face::after {
             content: '';
             position: absolute;
-            inset: 16px;
+            inset: 17px;
             border-radius: 50%;
-            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border: 1px dashed rgba(90, 50, 0, 0.35);
             pointer-events: none;
-            animation: dashRotate 20s linear infinite;
+            animation: dashRotate 26s linear infinite;
         }
         @keyframes dashRotate { to { transform: rotate(360deg); } }
-        .coin-heads {
-            background: radial-gradient(ellipse at 35% 30%, #ffe9a0 0%, #f5b840 30%, #c98c20 65%, #7a4e0a 100%);
-            z-index: 1;
-        }
-        .coin-tails {
-            background: radial-gradient(ellipse at 35% 30%, #ffe9a0 0%, #f0b535 30%, #c4851a 65%, #6b4208 100%);
-            transform: rotateY(180deg);
-        }
+
         .coin-icon {
             font-size: 3.5rem;
             position: relative;
             z-index: 2;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
             color: #5c3808;
+            filter: drop-shadow(0 2px 3px rgba(255, 255, 255, 0.35));
         }
         .coin-label {
             font-size: 0.85rem;
@@ -308,45 +347,11 @@
             font-weight: 800;
             position: relative;
             z-index: 2;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-
-        /* Edge ribs for 3D thickness */
-        .coin-edge-rib {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: var(--coin-thickness);
-            height: var(--coin-size);
-            background: linear-gradient(to top, #7a4e0a, #f5b042, #ffd966, #c98c20, #5c3808);
-            transform-origin: center center;
-            transform: translate(-50%, -50%) rotateY(0deg) translateZ(calc(var(--coin-size) / 2));
-            backface-visibility: hidden;
-            border-radius: 2px;
-            box-shadow: 0 0 4px rgba(0,0,0,0.3);
-        }
-        .coin-edge-glow {
-            position: absolute;
-            inset: -6px;
-            border-radius: 50%;
-            background: transparent;
-            box-shadow: 0 0 35px 8px rgba(255, 200, 60, 0.5);
-            pointer-events: none;
-            z-index: -1;
-            opacity: 0.7;
-            transition: all 0.3s;
-        }
-        .coin.flipping .coin-edge-glow {
-            box-shadow: 0 0 55px 15px rgba(255, 200, 60, 0.85);
-            opacity: 1;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
         }
 
         /* ── Bet Area ── */
-        .bet-section {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
+        .bet-section { display: flex; flex-direction: column; gap: 0.8rem; }
         .bet-row {
             display: flex;
             align-items: center;
@@ -383,11 +388,7 @@
             border-color: var(--danger);
             box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
         }
-        .quick-bets {
-            display: flex;
-            gap: 0.4rem;
-            flex-wrap: wrap;
-        }
+        .quick-bets { display: flex; gap: 0.4rem; flex-wrap: wrap; }
         .quick-bet {
             background: rgba(255, 217, 102, 0.08);
             border: 1px solid rgba(255, 217, 102, 0.3);
@@ -401,19 +402,11 @@
             white-space: nowrap;
             touch-action: manipulation;
         }
-        .quick-bet:hover {
-            background: rgba(255, 217, 102, 0.2);
-            transform: scale(1.05);
-        }
-        .quick-bet:active {
-            transform: scale(0.94);
-        }
+        .quick-bet:hover { background: rgba(255, 217, 102, 0.2); transform: scale(1.05); }
+        .quick-bet:active { transform: scale(0.94); }
 
         /* ── Choice Buttons ── */
-        .choice-row {
-            display: flex;
-            gap: 1rem;
-        }
+        .choice-row { display: flex; gap: 1rem; }
         .choice-btn {
             flex: 1;
             border: 2px solid rgba(255, 217, 102, 0.3);
@@ -435,9 +428,7 @@
             gap: 0.3rem;
             touch-action: manipulation;
         }
-        .choice-btn i {
-            font-size: 2rem;
-        }
+        .choice-btn i { font-size: 2rem; }
         .choice-btn:hover:not(.disabled) {
             border-color: var(--border-active);
             background: rgba(255, 217, 102, 0.1);
@@ -456,11 +447,7 @@
             0%, 100% { box-shadow: 0 0 25px rgba(255, 217, 102, 0.25); }
             50% { box-shadow: 0 0 45px rgba(255, 217, 102, 0.5); }
         }
-        .choice-btn.disabled {
-            opacity: 0.45;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
+        .choice-btn.disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
         .choice-btn .payout-badge {
             font-size: 0.7rem;
             background: rgba(0, 0, 0, 0.4);
@@ -515,6 +502,31 @@
             to { transform: scale(4); opacity: 0; }
         }
 
+        .auto-btn {
+            width: 100%;
+            border: 2px solid rgba(255, 217, 102, 0.4);
+            border-radius: var(--radius-full);
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 0.8rem;
+            cursor: pointer;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            background: rgba(255, 217, 102, 0.08);
+            color: var(--gold);
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+        .auto-btn:hover { background: rgba(255, 217, 102, 0.2); transform: translateY(-2px); }
+        .auto-btn.on {
+            background: linear-gradient(135deg, #7a1f1f, #c0392b);
+            border-color: #ff7b6b;
+            color: #fff;
+            animation: autoPulse 1s infinite;
+        }
+        @keyframes autoPulse { 50% { box-shadow: 0 0 22px rgba(255, 90, 70, 0.5); } }
+
         /* ── Result ── */
         .result-panel {
             background: rgba(0, 0, 0, 0.5);
@@ -559,13 +571,9 @@
             -webkit-backdrop-filter: blur(10px);
         }
         @media (max-width: 500px) {
-            .stats-row {
-                grid-template-columns: repeat(3, 1fr);
-            }
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
         }
-        .stat-cell {
-            text-align: center;
-        }
+        .stat-cell { text-align: center; }
         .stat-value {
             font-weight: 800;
             font-size: 1.3rem;
@@ -597,16 +605,10 @@
             align-items: center;
             gap: 0.25rem;
         }
-        .history-tag.win {
-            color: #7ddf80;
-            background: rgba(76, 175, 80, 0.15);
-        }
-        .history-tag.loss {
-            color: #ff8888;
-            background: rgba(255, 107, 107, 0.12);
-        }
+        .history-tag.win { color: #7ddf80; background: rgba(76, 175, 80, 0.15); }
+        .history-tag.loss { color: #ff8888; background: rgba(255, 107, 107, 0.12); }
 
-        /* ── Shake animation for invalid actions ── */
+        /* ── Shake animation ── */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             20% { transform: translateX(-6px); }
@@ -614,9 +616,7 @@
             60% { transform: translateX(-4px); }
             80% { transform: translateX(4px); }
         }
-        .shake {
-            animation: shake 0.4s ease-in-out;
-        }
+        .shake { animation: shake 0.4s ease-in-out; }
 
         /* ── Confetti Canvas ── */
         #confettiCanvas {
@@ -646,10 +646,6 @@
             .flip-btn { font-size: 1rem; padding: 0.8rem; }
             .top-nav { padding: 0.6rem 1.2rem; }
         }
-        .auto-btn{width:100%;border:2px solid rgba(255,217,102,.4);border-radius:var(--radius-full);font-family:'Inter',sans-serif;font-weight:800;font-size:1rem;padding:.8rem;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;background:rgba(255,217,102,.08);color:var(--gold);transition:all .2s;touch-action:manipulation}
-        .auto-btn:hover{background:rgba(255,217,102,.2);transform:translateY(-2px)}
-        .auto-btn.on{background:linear-gradient(135deg,#7a1f1f,#c0392b);border-color:#ff7b6b;color:#fff;animation:autoPulse 1s infinite}
-        @keyframes autoPulse{50%{box-shadow:0 0 22px rgba(255,90,70,.5)}}
     </style>
 </head>
 <body>
@@ -678,21 +674,28 @@
             </div>
 
             <!-- 3D Coin -->
-            <div class="coin-stage">
+            <div class="coin-stage" id="coinStage">
+                <div class="coin-halo" aria-hidden="true"></div>
+
                 <div class="coin-scene">
-                    <div class="coin idle" id="theCoin" role="img" aria-label="3D coin showing result">
-                        <div class="coin-edge-glow"></div>
-                        <!-- Edge ribs injected dynamically via JavaScript -->
-                        <div class="coin-face coin-heads">
-                            <span class="coin-icon"><i class="fas fa-crown"></i></span>
-                            <span class="coin-label">HEADS</span>
-                        </div>
-                        <div class="coin-face coin-tails">
-                            <span class="coin-icon"><i class="fas fa-gem"></i></span>
-                            <span class="coin-label">TAILS</span>
+                    <div class="coin-hop" id="coinHop">
+                        <div class="coin-sway" id="coinSway">
+                            <div class="coin" id="theCoin" role="img" aria-label="3D coin showing result">
+                                <!-- cylinder slices injected by JS -->
+                                <div class="coin-face coin-heads">
+                                    <span class="coin-icon"><i class="fas fa-crown"></i></span>
+                                    <span class="coin-label">HEADS</span>
+                                </div>
+                                <div class="coin-face coin-tails">
+                                    <span class="coin-icon"><i class="fas fa-gem"></i></span>
+                                    <span class="coin-label">TAILS</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="coin-shadow" id="coinShadow" aria-hidden="true"></div>
             </div>
 
             <!-- Bet Input -->
@@ -731,7 +734,7 @@
             </button>
             <button id="autoBtn" class="auto-btn" type="button"><i class="fas fa-bolt"></i> AUTO: OFF</button>
 
-            <!-- Result (with aria-live for screen readers) -->
+            <!-- Result -->
             <div class="result-panel" id="resultMessage" role="status" aria-live="polite">
                 <i class="fas fa-info-circle"></i> Choose <strong>HEADS</strong> or <strong>TAILS</strong> and flip!
             </div>
@@ -766,56 +769,70 @@
 
     <script>
         (function() {
+            'use strict';
+
             // ══════════════════════════════════════════
-            // GAME ENGINE – Core state & constants
+            // CONSTANTS
             // ══════════════════════════════════════════
-            const PAYOUT_MULTIPLIER = 86.96;
-            const FLIP_ANIMATION_MS = 1800;
-            const RESULT_DISPLAY_MS = 2500;
-            const ANTI_SPAM_COOLDOWN_MS = 400;
+            const PAYOUT_MULTIPLIER   = 86.96;
+            const FLIP_SPIN_MS        = 1800;   // must match the WAAPI duration
+            const RESULT_HOLD_MS      = 2500;
+            const ANTI_SPAM_COOLDOWN  = 400;
+            const AUTO_GAP_MS         = 460;
+            const SLICE_COUNT         = 16;
 
             const state = {
                 currentUser: null,
                 sessionProfit: 0,
                 flipHistory: [],
                 isFlipping: false,
-                selectedChoice: null,
-                lastFlipEndTime: 0,       // timestamp of last flip end (for cooldown)
+                selectedChoice: null,     // ← persists forever once picked
+                lastFlipEndTime: 0,
                 soundEnabled: true,
-                audioCtx: null
+                audioCtx: null,
+                coinBaseRot: 0,           // 0 = heads facing viewer, 180 = tails
+                autoRunning: false,
+                lastSliceThickness: null
             };
 
             // ══════════════════════════════════════════
-            // DOM REFS – collected once
+            // DOM REFS
             // ══════════════════════════════════════════
             const DOM = {
-                coin: document.getElementById('theCoin'),
-                betInput: document.getElementById('betAmount'),
-                flipBtn: document.getElementById('flipBtn'),
-                headsBtn: document.getElementById('headsBtn'),
-                tailsBtn: document.getElementById('tailsBtn'),
-                resultMessage: document.getElementById('resultMessage'),
+                coin:           document.getElementById('theCoin'),
+                coinHop:        document.getElementById('coinHop'),
+                coinSway:       document.getElementById('coinSway'),
+                coinShadow:     document.getElementById('coinShadow'),
+                coinStage:      document.getElementById('coinStage'),
+                betInput:       document.getElementById('betAmount'),
+                flipBtn:        document.getElementById('flipBtn'),
+                autoBtn:        document.getElementById('autoBtn'),
+                headsBtn:       document.getElementById('headsBtn'),
+                tailsBtn:       document.getElementById('tailsBtn'),
+                resultMessage:  document.getElementById('resultMessage'),
                 soundToggleBtn: document.getElementById('soundToggleBtn'),
                 confettiCanvas: document.getElementById('confettiCanvas'),
-                balanceEl: document.getElementById('headerBalance'),
-                balanceTag: document.getElementById('balanceTag'),
-                flipsStat: document.getElementById('flipsStat'),
-                winsStat: document.getElementById('winsStat'),
-                sessionPLEl: document.getElementById('sessionPL'),
-                streakValue: document.getElementById('streakValue'),
+                balanceEl:      document.getElementById('headerBalance'),
+                balanceTag:     document.getElementById('balanceTag'),
+                flipsStat:      document.getElementById('flipsStat'),
+                winsStat:       document.getElementById('winsStat'),
+                sessionPLEl:    document.getElementById('sessionPL'),
+                streakValue:    document.getElementById('streakValue'),
                 historyContainer: document.getElementById('flipHistory'),
-                gameCard: document.getElementById('gameCard'),
-                bgParticles: document.getElementById('bgParticles')
+                gameCard:       document.getElementById('gameCard'),
+                bgParticles:    document.getElementById('bgParticles')
             };
 
+            const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
             // ══════════════════════════════════════════
-            // AUDIO ENGINE – Web Audio API tones
+            // AUDIO
             // ══════════════════════════════════════════
             function initAudioContext() {
                 if (!state.audioCtx && state.soundEnabled) {
                     try {
                         state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    } catch (e) { /* user gesture required */ }
+                    } catch (e) { /* requires gesture */ }
                 }
             }
 
@@ -857,6 +874,14 @@
                             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
                             osc.start(now); osc.stop(now + 0.5);
                             break;
+                        case 'land':
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(520, now);
+                            osc.frequency.exponentialRampToValueAtTime(240, now + 0.12);
+                            gain.gain.setValueAtTime(0.09, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+                            osc.start(now); osc.stop(now + 0.2);
+                            break;
                         case 'click':
                             osc.type = 'sine';
                             osc.frequency.setValueAtTime(600, now);
@@ -865,11 +890,11 @@
                             osc.start(now); osc.stop(now + 0.1);
                             break;
                     }
-                } catch (e) { /* audio not critical */ }
+                } catch (e) { /* non-critical */ }
             }
 
             // ══════════════════════════════════════════
-            // CONFETTI ANIMATION – canvas based
+            // CONFETTI
             // ══════════════════════════════════════════
             function triggerConfetti() {
                 const canvas = DOM.confettiCanvas;
@@ -878,7 +903,8 @@
                 const ctx = canvas.getContext('2d');
                 const particles = [];
                 const colors = ['#ffd966', '#f5b042', '#ffed4e', '#4caf50', '#ffaa00', '#c9a840', '#fff'];
-                const particleCount = window.innerWidth < 600 ? 100 : 200; // performance on low-end
+                const particleCount = window.innerWidth < 600 ? 100 : 200;
+
                 for (let i = 0; i < particleCount; i++) {
                     particles.push({
                         x: Math.random() * canvas.width,
@@ -889,8 +915,7 @@
                         color: colors[Math.floor(Math.random() * colors.length)],
                         rotation: Math.random() * 360,
                         rotSpeed: (Math.random() - 0.5) * 14,
-                        shape: Math.random() > 0.5 ? 'rect' : 'circle',
-                        opacity: 1
+                        shape: Math.random() > 0.5 ? 'rect' : 'circle'
                     });
                 }
 
@@ -904,13 +929,13 @@
                         return;
                     }
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const fade = Math.max(0, 1 - (now - start) / 2800);
                     particles.forEach(p => {
                         p.y += p.speedY;
                         p.x += p.speedX;
                         p.rotation += p.rotSpeed;
-                        p.opacity = Math.max(0, 1 - (now - start) / 2800);
                         ctx.save();
-                        ctx.globalAlpha = p.opacity;
+                        ctx.globalAlpha = fade;
                         ctx.translate(p.x, p.y);
                         ctx.rotate(p.rotation * Math.PI / 180);
                         ctx.fillStyle = p.color;
@@ -929,7 +954,7 @@
             }
 
             // ══════════════════════════════════════════
-            // STORAGE – load/save user data
+            // USER STORAGE
             // ══════════════════════════════════════════
             function initializeUserStats(user) {
                 const defaults = {
@@ -958,7 +983,6 @@
                 for (const [key, value] of Object.entries(defaults)) {
                     if (user[key] === undefined) user[key] = value;
                 }
-                // Ensure flipStats exists even if user loaded from older version
                 if (!user.flipStats) {
                     user.flipStats = { gamesPlayed: 0, wins: 0, losses: 0, totalBet: 0, totalWin: 0, headsCount: 0, tailsCount: 0, headsWins: 0, tailsWins: 0 };
                 }
@@ -970,7 +994,7 @@
                 if (!sess) { window.location.href = '../../sign-in.html'; return false; }
                 const sessionUser = JSON.parse(sess);
                 const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
-                let user = users[sessionUser.username];
+                const user = users[sessionUser.username];
                 if (!user) {
                     sessionStorage.removeItem('gold_current_user');
                     window.location.href = '../../sign-in.html';
@@ -988,7 +1012,7 @@
                 const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
                 users[state.currentUser.username] = state.currentUser;
                 localStorage.setItem('gold_users', JSON.stringify(users));
-                const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
+                const sess = JSON.parse(sessionStorage.getItem('gold_current_user') || 'null');
                 if (sess) {
                     sess.balance = state.currentUser.balance;
                     sessionStorage.setItem('gold_current_user', JSON.stringify(sess));
@@ -996,12 +1020,11 @@
             }
 
             // ══════════════════════════════════════════
-            // UI UPDATE HELPERS
+            // UI HELPERS
             // ══════════════════════════════════════════
             function updateBalanceDisplay() {
                 const balEl = DOM.balanceEl;
-                const prevText = balEl.textContent.replace(/,/g, '');
-                const prev = parseFloat(prevText) || 0;
+                const prev = parseFloat(balEl.textContent.replace(/,/g, '')) || 0;
                 const next = state.currentUser ? state.currentUser.balance : 0;
                 if (prev !== next) {
                     animateNumber(balEl, prev, next, 400);
@@ -1040,14 +1063,9 @@
                 const pl = state.sessionProfit;
                 DOM.sessionPLEl.textContent = (pl >= 0 ? '+' : '') + pl.toFixed(2);
                 DOM.sessionPLEl.style.color = pl >= 0 ? 'var(--success)' : 'var(--danger)';
-                // streak indicator
                 const streak = state.currentUser ? (state.currentUser.globalStats.currentStreak || 0) : 0;
                 DOM.streakValue.textContent = streak;
-                if (streak >= 3) {
-                    DOM.gameCard.classList.add('hot-streak');
-                } else {
-                    DOM.gameCard.classList.remove('hot-streak');
-                }
+                DOM.gameCard.classList.toggle('hot-streak', streak >= 3);
             }
 
             function clampAndValidateBet() {
@@ -1057,7 +1075,6 @@
                 const max = state.currentUser ? state.currentUser.balance : 0;
                 if (val > max) val = max;
                 if (val < 1) val = 1;
-                // keep two decimals
                 val = Math.floor(val * 100) / 100;
                 input.value = val;
                 validateBet();
@@ -1067,53 +1084,42 @@
                 const input = DOM.betInput;
                 const bet = parseFloat(input.value) || 0;
                 const balance = state.currentUser ? state.currentUser.balance : 0;
-                const valid = bet > 0 && bet <= balance && !state.isFlipping && state.selectedChoice !== null && Date.now() > state.lastFlipEndTime + ANTI_SPAM_COOLDOWN_MS;
-                if (!valid) {
-                    input.classList.add('invalid');
-                } else {
-                    input.classList.remove('invalid');
-                }
+                const valid = bet > 0
+                    && bet <= balance
+                    && !state.isFlipping
+                    && state.selectedChoice !== null
+                    && Date.now() > state.lastFlipEndTime + ANTI_SPAM_COOLDOWN;
+                input.classList.toggle('invalid', !valid);
                 DOM.flipBtn.disabled = !valid;
             }
 
             // ══════════════════════════════════════════
-            // COIN RENDERING – 3D ribs & visual feedback
+            // COIN 3D CONSTRUCTION
+            // Builds a solid cylinder from thin stacked discs.
+            // No protruding rib bars → no "lines" beside the coin.
             // ══════════════════════════════════════════
-            function createEdgeRibs() {
-                const coin = DOM.coin;
-                const ribCount = 8;
-                const angleStep = 360 / ribCount;
-                for (let i = 0; i < ribCount; i++) {
-                    const rib = document.createElement('div');
-                    rib.className = 'coin-edge-rib';
-                    rib.style.transform = `translate(-50%, -50%) rotateY(${i * angleStep}deg) translateZ(calc(var(--coin-size) / 2))`;
-                    coin.appendChild(rib);
+            function buildCoinSlices() {
+                const rootStyles = getComputedStyle(document.documentElement);
+                const thickness = parseFloat(rootStyles.getPropertyValue('--coin-thickness')) || 14;
+                if (state.lastSliceThickness === thickness) return;
+                state.lastSliceThickness = thickness;
+
+                DOM.coin.querySelectorAll('.coin-slice').forEach(n => n.remove());
+
+                const half = thickness / 2;
+                const frag = document.createDocumentFragment();
+                for (let i = 0; i < SLICE_COUNT; i++) {
+                    const z = -half + (i * thickness) / (SLICE_COUNT - 1);
+                    const slice = document.createElement('div');
+                    slice.className = 'coin-slice';
+                    slice.style.transform = `translateZ(${z.toFixed(3)}px)`;
+                    frag.appendChild(slice);
                 }
-            }
-
-            function resetCoinToIdle() {
-                const coin = DOM.coin;
-                coin.classList.remove('flipping');
-                coin.style.transition = 'transform 0.4s ease-out';
-                coin.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
-                const onTransitionEnd = () => {
-                    coin.removeEventListener('transitionend', onTransitionEnd);
-                    coin.style.transition = '';
-                    coin.style.transform = '';
-                    coin.classList.add('idle');
-                };
-                coin.addEventListener('transitionend', onTransitionEnd);
-                // fallback if transitionend doesn't fire
-                setTimeout(() => {
-                    if (coin.classList.contains('idle')) return;
-                    coin.style.transition = '';
-                    coin.style.transform = '';
-                    coin.classList.add('idle');
-                }, 500);
+                DOM.coin.insertBefore(frag, DOM.coin.firstChild);
             }
 
             // ══════════════════════════════════════════
-            // HISTORY RENDERING
+            // HISTORY
             // ══════════════════════════════════════════
             function addToHistory(coinResult, isWin, bet, winAmount) {
                 state.flipHistory.unshift({
@@ -1144,128 +1150,196 @@
             }
 
             // ══════════════════════════════════════════
-            // GAMEPLAY – choice, flip, stats recording
+            // CHOICE
+            // The selection is NEVER cleared after a flip —
+            // you pick once and keep flipping with it.
             // ══════════════════════════════════════════
             function selectChoice(choice) {
                 if (state.isFlipping) return;
                 state.selectedChoice = choice;
-                DOM.headsBtn.classList.remove('selected');
-                DOM.tailsBtn.classList.remove('selected');
-                if (choice === 'heads') {
-                    DOM.headsBtn.classList.add('selected');
-                } else {
-                    DOM.tailsBtn.classList.add('selected');
-                }
+                DOM.headsBtn.classList.toggle('selected', choice === 'heads');
+                DOM.tailsBtn.classList.toggle('selected', choice === 'tails');
                 playTone('click');
                 validateBet();
                 DOM.resultMessage.innerHTML = `<i class="fas fa-check-circle"></i> You chose <strong>${choice.toUpperCase()}</strong>. Ready to flip!`;
                 DOM.resultMessage.className = 'result-panel';
             }
 
-            async function flipCoin(e) {
-                // anti-spam cooldown
-                if (state.isFlipping || Date.now() < state.lastFlipEndTime + ANTI_SPAM_COOLDOWN_MS) return;
+            // ══════════════════════════════════════════
+            // THE FLIP  (async — resolves when the coin has landed)
+            // ══════════════════════════════════════════
+            async function doFlip(e, opts = {}) {
+                if (state.isFlipping) return false;
+                if (!opts.auto && Date.now() < state.lastFlipEndTime + ANTI_SPAM_COOLDOWN) return false;
 
                 const choice = state.selectedChoice;
                 if (!choice) {
                     showError('Please choose HEADS or TAILS first!');
-                    return;
+                    return false;
                 }
 
                 let bet = parseFloat(DOM.betInput.value);
                 if (isNaN(bet) || bet <= 0) bet = 1;
                 bet = Math.floor(bet * 100) / 100;
                 if (bet < 1) bet = 1;
-
                 if (bet > state.currentUser.balance) {
                     showError('Insufficient balance!');
-                    return;
+                    return false;
                 }
-
-                // Ensure UI consistency
                 DOM.betInput.value = bet;
 
-                addRipple(e, DOM.flipBtn);
+                if (e && typeof e.clientX === 'number') addRipple(e, DOM.flipBtn);
+
+                // ── lock UI ──
                 state.isFlipping = true;
                 DOM.flipBtn.disabled = true;
                 DOM.headsBtn.classList.add('disabled');
                 DOM.tailsBtn.classList.add('disabled');
                 DOM.betInput.disabled = true;
+                DOM.coinStage.classList.add('is-flipping');
                 DOM.resultMessage.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Flipping...';
                 DOM.resultMessage.className = 'result-panel';
 
-                // Deduct bet
+                // ── take the bet ──
                 state.currentUser.balance -= bet;
                 await saveUser();
                 updateBalanceDisplay();
 
-                // Fair 50/50 randomness
-                const randomValue = Math.random();
-                const playerWins = randomValue < 0.5;
+                // ── outcome ──
+                const playerWins = Math.random() < 0.5;
                 const coinResult = playerWins ? choice : (choice === 'heads' ? 'tails' : 'heads');
+                const targetFace = coinResult === 'heads' ? 0 : 180;
 
-                // Start flip animation
-                const coin = DOM.coin;
-                coin.classList.remove('idle');
-                void coin.offsetWidth; // force reflow to restart animation
-                coin.classList.add('flipping');
+                // ── compute an exact final rotation (no snap at the end) ──
+                const baseRot = state.coinBaseRot;
+                let endRot = (5 + Math.floor(Math.random() * 3)) * 360 + targetFace;
+                while (endRot <= baseRot + 900) endRot += 360;   // always spin forward
+                const delta = endRot - baseRot;
 
-                // Flip sounds
+                // ── 1. spin (rotateY) with a subtle 3D wobble ──
+                const spinFrames = [
+                    { offset: 0.00, r: 0.00, tilt:  0 },
+                    { offset: 0.20, r: 0.26, tilt: -9 },
+                    { offset: 0.50, r: 0.58, tilt:  8 },
+                    { offset: 0.75, r: 0.82, tilt: -6 },
+                    { offset: 0.90, r: 0.94, tilt:  4 },
+                    { offset: 1.00, r: 1.00, tilt:  0 }
+                ].map(f => ({
+                    offset: f.offset,
+                    transform: `rotateY(${(baseRot + delta * f.r).toFixed(2)}deg) rotateX(${f.tilt}deg)`
+                }));
+
+                const coinAnim = DOM.coin.animate(spinFrames, {
+                    duration: FLIP_SPIN_MS,
+                    easing: 'linear',
+                    fill: 'forwards'
+                });
+
+                // ── 2. hop (translateY + squash/stretch) ──
+                const hopAnim = DOM.coinHop.animate([
+                    { offset: 0.00, transform: 'translateY(0) scale(1)',        easing: 'ease-out' },
+                    { offset: 0.08, transform: 'translateY(10px) scale(0.96)',  easing: 'ease-out' },
+                    { offset: 0.30, transform: 'translateY(-58px) scale(1.03)', easing: 'ease-out' },
+                    { offset: 0.50, transform: 'translateY(-74px) scale(1.04)', easing: 'ease-in'  },
+                    { offset: 0.78, transform: 'translateY(-20px) scale(1.01)', easing: 'ease-in'  },
+                    { offset: 0.88, transform: 'translateY(0) scale(0.97)',     easing: 'ease-out' },
+                    { offset: 0.94, transform: 'translateY(-10px) scale(1.01)', easing: 'ease-in'  },
+                    { offset: 1.00, transform: 'translateY(0) scale(1)' }
+                ], {
+                    duration: FLIP_SPIN_MS,
+                    fill: 'forwards'
+                });
+
+                // ── 3. ground shadow reaction ──
+                const shadowAnim = DOM.coinShadow.animate([
+                    { offset: 0.00, transform: 'scale(1)',    opacity: 0.55 },
+                    { offset: 0.10, transform: 'scale(0.9)',  opacity: 0.40 },
+                    { offset: 0.50, transform: 'scale(0.58)', opacity: 0.20 },
+                    { offset: 0.80, transform: 'scale(0.88)', opacity: 0.38 },
+                    { offset: 0.90, transform: 'scale(1.06)', opacity: 0.62 },
+                    { offset: 1.00, transform: 'scale(1)',    opacity: 0.55 }
+                ], {
+                    duration: FLIP_SPIN_MS,
+                    easing: 'linear',
+                    fill: 'forwards'
+                });
+
+                // ── spin sounds ──
                 playTone('flip');
-                setTimeout(() => playTone('flip'), 400);
-                setTimeout(() => playTone('flip'), 800);
+                setTimeout(() => playTone('flip'), 420);
+                setTimeout(() => playTone('flip'), 880);
+                setTimeout(() => playTone('flip'), 1280);
+                setTimeout(() => playTone('land'), Math.round(FLIP_SPIN_MS * 0.9));
 
-                setTimeout(async () => {
-                    // Animation done – set final orientation
-                    coin.classList.remove('flipping');
-                    coin.style.transition = 'none';
-                    if (coinResult === 'heads') {
-                        coin.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
-                    } else {
-                        coin.style.transform = 'rotateY(180deg) rotateX(0deg) scale(1)';
-                    }
+                // ── wait for landing ──
+                await new Promise(resolve => {
+                    let settled = false;
+                    const done = () => {
+                        if (settled) return;
+                        settled = true;
+                        resolve();
+                    };
+                    try {
+                        coinAnim.finished.then(done).catch(done);
+                    } catch (err) { done(); }
+                    setTimeout(done, FLIP_SPIN_MS + 400);
+                });
 
-                    const winAmount = playerWins ? Math.floor(bet * PAYOUT_MULTIPLIER) : 0;
-                    const netProfit = winAmount - bet;
-                    state.sessionProfit += netProfit;
+                // ── freeze the coin on the exact final face, then hand over
+                //    to the CSS idle sway (zero visual jump) ──
+                DOM.coin.style.transform = `rotateY(${targetFace}deg)`;
+                state.coinBaseRot = targetFace;
 
-                    if (playerWins) {
-                        state.currentUser.balance += winAmount;
-                        DOM.resultMessage.innerHTML = `<i class="fas fa-trophy"></i> <strong>${coinResult.toUpperCase()}!</strong> You chose <strong>${choice.toUpperCase()}</strong> — <span style="color:#a5d6a7;">WON +${winAmount} GOLD!</span>`;
-                        DOM.resultMessage.className = 'result-panel win';
-                        triggerConfetti();
-                        playTone('win');
-                    } else {
-                        DOM.resultMessage.innerHTML = `<i class="fas fa-times-circle"></i> <strong>${coinResult.toUpperCase()}!</strong> You chose <strong>${choice.toUpperCase()}</strong> — <span style="color:#ffab91;">Lost ${bet} GOLD</span>`;
-                        DOM.resultMessage.className = 'result-panel loss';
-                        playTone('lose');
-                    }
+                try { coinAnim.cancel(); } catch (err) {}
+                try { hopAnim.cancel(); } catch (err) {}
+                try { shadowAnim.cancel(); } catch (err) {}
+                DOM.coinHop.style.transform = '';
+                DOM.coinShadow.style.transform = '';
 
-                    // Record stats
-                    recordFlip(playerWins, bet, winAmount, coinResult);
-                    addToHistory(coinResult, playerWins, bet, winAmount);
+                DOM.coinStage.classList.remove('is-flipping');
 
-                    await saveUser();
-                    updateBalanceDisplay();
-                    updateStatsUI();
+                // ── settle & pay ──
+                const winAmount = playerWins ? Math.floor(bet * PAYOUT_MULTIPLIER) : 0;
+                const netProfit = winAmount - bet;
+                state.sessionProfit += netProfit;
 
-                    // Re-enable UI with cooldown
-                    state.isFlipping = false;
-                    state.lastFlipEndTime = Date.now();
-                    DOM.headsBtn.classList.remove('disabled');
-                    DOM.tailsBtn.classList.remove('disabled');
-                    DOM.betInput.disabled = false;
-                    validateBet();
+                if (playerWins) {
+                    state.currentUser.balance += winAmount;
+                    DOM.resultMessage.innerHTML = `<i class="fas fa-trophy"></i> <strong>${coinResult.toUpperCase()}!</strong> You chose <strong>${choice.toUpperCase()}</strong> — <span style="color:#a5d6a7;">WON +${winAmount} GOLD!</span>`;
+                    DOM.resultMessage.className = 'result-panel win';
+                    triggerConfetti();
+                    playTone('win');
+                } else {
+                    DOM.resultMessage.innerHTML = `<i class="fas fa-times-circle"></i> <strong>${coinResult.toUpperCase()}!</strong> You chose <strong>${choice.toUpperCase()}</strong> — <span style="color:#ffab91;">Lost ${bet} GOLD</span>`;
+                    DOM.resultMessage.className = 'result-panel loss';
+                    playTone('lose');
+                }
 
-                    // Reset coin to idle after showing result
-                    setTimeout(resetCoinToIdle, RESULT_DISPLAY_MS);
-                }, FLIP_ANIMATION_MS);
+                recordFlip(playerWins, bet, winAmount, coinResult);
+                addToHistory(coinResult, playerWins, bet, winAmount);
+
+                await saveUser();
+                updateBalanceDisplay();
+                updateStatsUI();
+
+                // ── unlock UI (selection is preserved) ──
+                state.isFlipping = false;
+                state.lastFlipEndTime = Date.now();
+                DOM.headsBtn.classList.remove('disabled');
+                DOM.tailsBtn.classList.remove('disabled');
+                DOM.betInput.disabled = false;
+                validateBet();
+
+                return true;
             }
 
+            // ══════════════════════════════════════════
+            // STATS RECORDING
+            // ══════════════════════════════════════════
             function recordFlip(isWin, betAmount, winAmount, coinResult) {
                 const user = state.currentUser;
                 const netProfit = winAmount - betAmount;
-                // Global stats
+
                 user.globalStats.totalWagered = (user.globalStats.totalWagered || 0) + betAmount;
                 user.globalStats.totalWon = (user.globalStats.totalWon || 0) + winAmount;
                 user.globalStats.totalGames = (user.globalStats.totalGames || 0) + 1;
@@ -1280,7 +1354,6 @@
                 }
                 user.xp = (user.xp || 0) + Math.floor(betAmount);
 
-                // Flip-specific stats
                 const fs = user.flipStats;
                 fs.gamesPlayed = (fs.gamesPlayed || 0) + 1;
                 fs.totalBet = (fs.totalBet || 0) + betAmount;
@@ -1322,7 +1395,6 @@
             function showError(message) {
                 DOM.resultMessage.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
                 DOM.resultMessage.className = 'result-panel loss';
-                // shake the bet input or choice row?
                 DOM.betInput.classList.add('shake');
                 setTimeout(() => DOM.betInput.classList.remove('shake'), 400);
             }
@@ -1340,29 +1412,83 @@
             }
 
             // ══════════════════════════════════════════
+            // AUTO FLIP
+            //   • Starts once a side is chosen
+            //   • Keeps flipping indefinitely
+            //   • The chosen side is NEVER reset between flips
+            // ══════════════════════════════════════════
+            async function autoLoop() {
+                while (state.autoRunning) {
+                    if (!state.currentUser) { setAuto(false); break; }
+
+                    if (!state.selectedChoice) {
+                        setAuto(false);
+                        showError('Choose HEADS or TAILS to continue Auto.');
+                        break;
+                    }
+
+                    const bet = Math.max(1, parseFloat(DOM.betInput.value) || 1);
+                    if (bet > state.currentUser.balance) {
+                        setAuto(false);
+                        showError('Auto stopped — insufficient balance!');
+                        break;
+                    }
+
+                    if (state.isFlipping) { await sleep(120); continue; }
+
+                    await doFlip(null, { auto: true });
+                    await sleep(AUTO_GAP_MS);
+                }
+            }
+
+            function setAuto(on) {
+                if (on === state.autoRunning) return;
+
+                if (on) {
+                    if (!state.selectedChoice) {
+                        showError('Choose HEADS or TAILS first to use Auto!');
+                        return;
+                    }
+                    state.autoRunning = true;
+                    DOM.autoBtn.classList.add('on');
+                    DOM.autoBtn.innerHTML = '<i class="fas fa-stop"></i> AUTO: ON';
+                    autoLoop();
+                } else {
+                    state.autoRunning = false;
+                    DOM.autoBtn.classList.remove('on');
+                    DOM.autoBtn.innerHTML = '<i class="fas fa-bolt"></i> AUTO: OFF';
+                }
+            }
+
+            // ══════════════════════════════════════════
             // BACKGROUND SPARKLES
             // ══════════════════════════════════════════
             function createSparkles() {
                 const container = DOM.bgParticles;
-                const count = 40;
-                for (let i = 0; i < count; i++) {
+                const frag = document.createDocumentFragment();
+                for (let i = 0; i < 40; i++) {
                     const sparkle = document.createElement('div');
                     sparkle.className = 'sparkle';
                     sparkle.style.left = Math.random() * 100 + '%';
                     sparkle.style.bottom = -(Math.random() * 20 + 5) + '%';
                     sparkle.style.animationDelay = Math.random() * 5 + 's';
                     sparkle.style.animationDuration = (Math.random() * 5 + 3.5) + 's';
-                    container.appendChild(sparkle);
+                    frag.appendChild(sparkle);
                 }
+                container.appendChild(frag);
             }
 
             // ══════════════════════════════════════════
-            // EVENT BINDINGS
+            // EVENTS
             // ══════════════════════════════════════════
             function bindEvents() {
-                DOM.flipBtn.addEventListener('click', (e) => flipCoin(e));
+                DOM.flipBtn.addEventListener('click', (e) => { doFlip(e); });
 
-                // Quick bet buttons
+                DOM.autoBtn.addEventListener('click', () => {
+                    setAuto(!state.autoRunning);
+                    DOM.autoBtn.blur();
+                });
+
                 document.querySelectorAll('.quick-bet').forEach(btn => {
                     btn.addEventListener('click', () => {
                         if (btn.id === 'halfBetBtn') {
@@ -1382,7 +1508,6 @@
                     });
                 });
 
-                // Bet input changes
                 DOM.betInput.addEventListener('input', clampAndValidateBet);
                 DOM.betInput.addEventListener('blur', clampAndValidateBet);
                 DOM.betInput.addEventListener('keydown', (e) => {
@@ -1392,13 +1517,14 @@
                     }
                 });
 
-                // Choice buttons
                 DOM.headsBtn.addEventListener('click', () => selectChoice('heads'));
                 DOM.tailsBtn.addEventListener('click', () => selectChoice('tails'));
 
-                // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
                     if (state.isFlipping) return;
+                    const tag = (e.target.tagName || '').toLowerCase();
+                    if (tag === 'input' || tag === 'textarea') return;
+
                     if (e.key === 'h' || e.key === 'H') {
                         e.preventDefault();
                         selectChoice('heads');
@@ -1413,77 +1539,52 @@
                     }
                 });
 
-                // Sound toggle
                 DOM.soundToggleBtn.addEventListener('click', () => {
                     state.soundEnabled = !state.soundEnabled;
-                    DOM.soundToggleBtn.innerHTML = state.soundEnabled ?
-                        '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+                    DOM.soundToggleBtn.innerHTML = state.soundEnabled
+                        ? '<i class="fas fa-volume-up"></i>'
+                        : '<i class="fas fa-volume-mute"></i>';
                     if (state.soundEnabled) initAudioContext();
                     localStorage.setItem('gold_sound_enabled', state.soundEnabled);
                 });
 
-                // Window resize updates confetti canvas if needed
+                let resizeTimer;
                 window.addEventListener('resize', () => {
                     DOM.confettiCanvas.width = window.innerWidth;
                     DOM.confettiCanvas.height = window.innerHeight;
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(buildCoinSlices, 200);
                 });
             }
 
             // ══════════════════════════════════════════
-            // INITIALIZATION
+            // INIT
             // ══════════════════════════════════════════
             async function init() {
-                createEdgeRibs();
+                buildCoinSlices();
                 createSparkles();
+
                 if (!(await loadUser())) return;
+
                 bindEvents();
                 updateStatsUI();
                 renderHistory();
                 validateBet();
 
-                // Restore sound preference
                 const savedSound = localStorage.getItem('gold_sound_enabled');
-                state.soundEnabled = savedSound !== 'false'; // default true
-                DOM.soundToggleBtn.innerHTML = state.soundEnabled ?
-                    '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+                state.soundEnabled = savedSound !== 'false';
+                DOM.soundToggleBtn.innerHTML = state.soundEnabled
+                    ? '<i class="fas fa-volume-up"></i>'
+                    : '<i class="fas fa-volume-mute"></i>';
                 if (state.soundEnabled) initAudioContext();
-
-                // Start coin idle animation
-                DOM.coin.classList.add('idle');
 
                 console.log('%c🪙 Gold Flip %cClassic %cReady',
                     'color:#ffd966;font-size:1.2rem;font-weight:bold;',
                     'color:#ccc;', 'color:#888;');
-                console.log('%c💡 Tip: Press H for Heads, T for Tails, Space to Flip!',
+                console.log('%c💡 Tip: H = Heads, T = Tails, Space = Flip. Auto keeps running once a side is picked.',
                     'color:#aaa;font-style:italic;');
             }
-            // ── AUTO FLIP ──
-            const autoBtn = document.getElementById('autoBtn');
-            let autoTimer = null;
-            function setAuto(on) {
-                if (on) {
-                    if (!state.selectedChoice) { showError('Choose HEADS or TAILS first to use Auto!'); return; }
-                    autoBtn.classList.add('on');
-                    autoBtn.innerHTML = '<i class="fas fa-stop"></i> AUTO: ON';
-                    autoTimer = setInterval(() => {
-                        if (state.isFlipping) return;
-                        if (!state.selectedChoice) { setAuto(false); return; }
-                        const bet = parseFloat(DOM.betInput.value) || 1;
-                        if (bet > state.currentUser.balance) {
-                            setAuto(false);
-                            showError('Auto stopped — insufficient balance!');
-                            return;
-                        }
-                        if (!DOM.flipBtn.disabled) DOM.flipBtn.click();
-                    }, 150);
-                } else {
-                    clearInterval(autoTimer);
-                    autoTimer = null;
-                    autoBtn.classList.remove('on');
-                    autoBtn.innerHTML = '<i class="fas fa-bolt"></i> AUTO: OFF';
-                }
-            }
-            autoBtn.addEventListener('click', () => { setAuto(!autoTimer); autoBtn.blur(); });
+
             init();
         })();
     </script>
