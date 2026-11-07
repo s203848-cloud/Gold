@@ -6,436 +6,1697 @@
     <title>GOLD TOWER CLIMB | Higher you climb, more multiplier increases. Cash out anytime.</title>
     <link rel="icon" type="image/x-icon" href="../../assets/favcon/Gold-2D.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* ============================================================
+           TOKENS
+        ============================================================ */
         :root {
-            --gold: #ffd966;
-            --gold-bright: #ffed4e;
-            --gold-deep: #c9a840;
-            --bg-deep: #0a0908;
-            --bg-card: rgba(20, 18, 16, 0.8);
-            --border-gold: rgba(255, 217, 102, 0.3);
-            --border-active: rgba(255, 217, 102, 0.6);
-            --danger: #ff6b6b;
-            --success: #4caf50;
-            --text-muted: #9a9484;
-            --radius-xl: 2.2rem;
-            --radius-lg: 1.5rem;
-            --radius-md: 1.2rem;
-            --radius-full: 60px;
-            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            --cell: 52px;
+            --ink-0: #050505;
+            --ink-1: #0a0908;
+            --ink-2: #100e0c;
+            --ink-3: #16130f;
+
+            --line: rgba(255, 214, 130, 0.10);
+            --line-mid: rgba(255, 214, 130, 0.20);
+            --line-hot: rgba(255, 214, 130, 0.45);
+
+            --gold: #e9c97a;
+            --gold-hi: #ffeaa9;
+            --gold-mid: #d9b258;
+            --gold-deep: #8a6a24;
+            --gold-glow: rgba(255, 195, 80, 0.55);
+
+            --emerald-1: #2fbf7f;
+            --emerald-2: #16875a;
+            --emerald-3: #0a5c3c;
+
+            --danger: #ff5f4d;
+            --danger-glow: rgba(255, 70, 40, 0.8);
+
+            --text: #ece7dc;
+            --muted: #8b8478;
+            --muted-2: #605a50;
+
+            --r-xl: 26px;
+            --r-lg: 18px;
+            --r-md: 14px;
+            --r-sm: 10px;
+
+            --cell: clamp(46px, 5.4vw, 66px);
+            --plate: 40px;
+
+            --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+            --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { height: 100%; }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at 20% 30%, #14110c 0%, #030202 100%);
-            color: #f5f0e6;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% -15%, #1a150e 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 90% 110%, #120d08 0%, transparent 65%),
+                #050505;
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 1.5rem;
+            align-items: flex-start;
+            padding: 20px 18px 40px;
             overflow-x: hidden;
             position: relative;
+            -webkit-font-smoothing: antialiased;
         }
+
+        /* Architectural grid + vignette */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                repeating-linear-gradient(90deg, rgba(255, 214, 130, 0.030) 0 1px, transparent 1px 130px),
+                repeating-linear-gradient(0deg, rgba(255, 214, 130, 0.022) 0 1px, transparent 1px 130px),
+                radial-gradient(ellipse 70% 45% at 50% -8%, rgba(255, 200, 90, 0.10), transparent 70%),
+                radial-gradient(ellipse 50% 40% at 12% 88%, rgba(255, 160, 40, 0.045), transparent 70%);
+            mask-image: radial-gradient(ellipse 100% 100% at 50% 40%, #000 30%, transparent 90%);
+            -webkit-mask-image: radial-gradient(ellipse 100% 100% at 50% 40%, #000 30%, transparent 90%);
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(ellipse 80% 70% at 50% 45%, transparent 35%, rgba(0, 0, 0, 0.55) 85%, rgba(0, 0, 0, 0.9) 100%);
+        }
+
+        /* ============================================================
+           ATMOSPHERE
+        ============================================================ */
         .bg-particles {
-            position: fixed; inset:0; pointer-events:none; z-index:0;
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
         }
+
         .sparkle {
-            position: absolute; width:3px; height:3px; background:var(--gold);
-            border-radius:50%; animation:floatUp 4s infinite ease-in; opacity:0;
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--gold);
+            border-radius: 50%;
+            box-shadow: 0 0 6px 1px rgba(255, 210, 120, 0.7);
+            animation: floatUp 6s infinite ease-in;
+            opacity: 0;
         }
-        .sparkle:nth-child(odd){ animation-delay:2s; background:var(--gold-bright); }
-        .sparkle:nth-child(3n){ animation-delay:1.3s; width:5px; height:5px; }
+        .sparkle:nth-child(odd) { animation-delay: 2s; background: var(--gold-hi); }
+        .sparkle:nth-child(3n) { animation-delay: 1.3s; width: 3px; height: 3px; }
+
         @keyframes floatUp {
-            0% { transform:translateY(0) scale(0); opacity:0; }
-            15% { opacity:0.8; transform:scale(1.2); }
-            40% { transform:translateY(-160px) scale(1); opacity:0.4; }
-            70% { transform:translateY(-320px) scale(0.3); opacity:0.05; }
-            100% { transform:translateY(-420px) scale(0); opacity:0; }
+            0%   { transform: translateY(0) translateX(0) scale(0); opacity: 0; }
+            12%  { opacity: 0.75; transform: scale(1.2); }
+            45%  { transform: translateY(-38vh) translateX(14px) scale(1); opacity: 0.35; }
+            75%  { transform: translateY(-70vh) translateX(-10px) scale(0.5); opacity: 0.10; }
+            100% { transform: translateY(-105vh) translateX(6px) scale(0); opacity: 0; }
         }
-        .game-container {
-            width:100%; max-width:620px; display:flex; flex-direction:column; gap:1.2rem;
-            position:relative; z-index:1;
-        }
-        .top-nav {
-            display:flex; justify-content:space-between; align-items:center;
-            background:rgba(15,13,11,0.8); backdrop-filter:blur(20px);
-            border-radius:var(--radius-full); padding:0.7rem 2rem;
-            border:1px solid var(--border-gold); box-shadow:0 10px 30px rgba(0,0,0,0.5);
-            animation:slideDown 0.6s var(--transition-bounce);
-        }
-        @keyframes slideDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
-        .back-home { text-decoration:none; color:var(--gold); font-weight:600; background:rgba(255,217,102,0.08); padding:0.4rem 1.2rem; border-radius:40px; transition:0.3s; display:flex; align-items:center; gap:0.5rem; }
-        .back-home:hover { background:rgba(255,217,102,0.2); transform:translateX(-3px); }
-        .balance-tag { background:rgba(31,28,24,0.9); padding:0.3rem 1.2rem; border-radius:40px; font-weight:700; border:1px solid rgba(255,217,102,0.4); display:flex; align-items:center; gap:0.5rem; transition:box-shadow 0.3s; }
-        .balance-tag.pulse { animation:balancePulse 0.5s ease-out; }
-        @keyframes balancePulse { 0% { box-shadow:0 0 0 0 rgba(255,217,102,0.5); } 100% { box-shadow:0 0 0 20px rgba(255,217,102,0); } }
-        .sound-btn { background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--gold); transition:transform 0.2s; }
-        .sound-btn:hover { transform:scale(1.1); }
 
-        .game-card {
-            background:linear-gradient(145deg, rgba(28,25,21,0.95), rgba(10,9,7,0.98));
-            backdrop-filter:blur(20px); border-radius:var(--radius-xl); padding:1.8rem;
-            border:1px solid var(--border-gold); box-shadow:0 30px 50px rgba(0,0,0,0.7), 0 0 80px -10px rgba(255,217,102,0.1);
-            display:flex; flex-direction:column; gap:1.4rem;
-            animation:slideUp 0.6s var(--transition-bounce);
+        #confettiCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 900;
         }
-        @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
-        .game-title { text-align:center; font-size:1.6rem; font-weight:800; color:var(--gold); }
-        .game-title i { margin:0 0.3rem; }
 
-        .difficulty-selector {
-            display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap;
+        #flashLayer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 880;
+            opacity: 0;
         }
-        .diff-btn {
-            flex: 1; min-width: 90px; padding: 0.7rem 0.8rem; border-radius: var(--radius-full);
-            border: 2px solid rgba(255,217,102,0.3); background: rgba(0,0,0,0.3);
-            color: var(--gold); font-weight: 700; font-size: 0.9rem;
-            cursor: pointer; transition: all 0.2s; text-transform: uppercase;
-            letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center;
-            gap: 0.4rem; font-family: 'Inter', sans-serif;
+        #flashLayer.on { animation: flashFade 0.6s ease-out; }
+        @keyframes flashFade {
+            0%   { opacity: 0; }
+            14%  { opacity: 0.6; }
+            100% { opacity: 0; }
         }
-        .diff-btn i { font-size: 0.9rem; }
-        .diff-btn:hover:not(:disabled) {
-            background: rgba(255,217,102,0.1); border-color: var(--border-active);
-            transform: translateY(-2px);
+
+        /* ============================================================
+           SHELL
+        ============================================================ */
+        .app {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1240px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
         }
-        .diff-btn.active {
-            background: linear-gradient(135deg, #f5b042, #ffd966);
-            color: #1a150e; border-color: #ffed4e;
-            box-shadow: 0 0 18px rgba(255,217,102,0.5);
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 10px 14px 10px 10px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(28, 24, 19, 0.85), rgba(10, 9, 8, 0.92));
+            border: 1px solid var(--line);
+            box-shadow: 0 20px 40px -28px #000, inset 0 1px 0 rgba(255, 235, 180, 0.06);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            animation: dropIn 0.6s var(--ease-bounce);
+        }
+
+        @keyframes dropIn {
+            from { opacity: 0; transform: translateY(-16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--gold);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            padding: 9px 16px 9px 13px;
+            border-radius: 999px;
+            background: rgba(255, 214, 130, 0.06);
+            border: 1px solid rgba(255, 214, 130, 0.16);
+            transition: all 0.2s var(--ease-out);
+        }
+        .nav-back i { font-size: 0.65rem; }
+        .nav-back:hover {
+            background: rgba(255, 214, 130, 0.14);
+            border-color: var(--line-mid);
+            transform: translateX(-3px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-left: auto;
+            margin-right: auto;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+        .brand-mark {
+            width: 26px; height: 26px;
+            display: grid; place-items: center;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            color: #1b1305;
+            background: linear-gradient(160deg, var(--gold-hi), var(--gold-mid) 55%, var(--gold-deep));
+            box-shadow: 0 0 18px -4px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,0.55);
+        }
+        .brand-name {
+            font-family: 'Cinzel', serif;
+            font-weight: 800;
+            font-size: 0.95rem;
+            letter-spacing: 0.32em;
+            background: linear-gradient(180deg, #fff6d0, var(--gold-mid) 70%, var(--gold-deep));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+        .balance-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 18px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(255, 214, 130, 0.10), rgba(0, 0, 0, 0.4));
+            border: 1px solid rgba(255, 214, 130, 0.28);
+            font-weight: 800;
+            font-size: 0.92rem;
+            color: #fff8e6;
+            letter-spacing: 0.02em;
+            box-shadow: inset 0 1px 0 rgba(255, 235, 180, 0.12);
+        }
+        .balance-chip i { color: var(--gold); font-size: 0.85rem; }
+        .balance-chip.pulse { animation: chipPulse 0.6s var(--ease-out); }
+        @keyframes chipPulse {
+            0%   { box-shadow: 0 0 0 0 rgba(255, 214, 130, 0.55); }
+            100% { box-shadow: 0 0 0 22px rgba(255, 214, 130, 0); }
+        }
+
+        .icon-btn {
+            width: 38px; height: 38px;
+            display: grid; place-items: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            color: var(--gold);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out);
+        }
+        .icon-btn:hover {
+            background: rgba(255, 214, 130, 0.12);
+            border-color: var(--line-mid);
+            transform: translateY(-1px);
+        }
+
+        /* ============================================================
+           LAYOUT
+        ============================================================ */
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.62fr) minmax(340px, 1fr);
+            gap: 18px;
+            align-items: start;
+            animation: riseIn 0.7s var(--ease-bounce);
+        }
+
+        @keyframes riseIn {
+            from { opacity: 0; transform: translateY(26px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .layout.shake-hard { animation: shakeHard 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+        @keyframes shakeHard {
+            0%, 100% { transform: translate3d(0, 0, 0); }
+            10% { transform: translate3d(-10px, 5px, 0) rotate(-0.35deg); }
+            25% { transform: translate3d(9px, -6px, 0) rotate(0.35deg); }
+            40% { transform: translate3d(-7px, 4px, 0) rotate(-0.25deg); }
+            55% { transform: translate3d(6px, -3px, 0) rotate(0.2deg); }
+            70% { transform: translate3d(-4px, 2px, 0); }
+            85% { transform: translate3d(2px, -1px, 0); }
+        }
+
+        .panel {
+            position: relative;
+            border-radius: var(--r-xl);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.030), rgba(255, 255, 255, 0) 32%),
+                linear-gradient(158deg, #14120f 0%, #0b0a09 48%, #070706 100%);
+            border: 1px solid var(--line);
+            box-shadow:
+                0 50px 90px -55px #000,
+                0 1px 0 rgba(255, 255, 255, 0.045) inset,
+                0 0 0 1px rgba(0, 0, 0, 0.55);
+        }
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 30px; right: 30px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 214, 130, 0.45), transparent);
+            pointer-events: none;
+        }
+
+        /* ============================================================
+           TOWER PANEL
+        ============================================================ */
+        .tower-panel {
+            padding: 20px 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .game-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.15rem, 2.1vw, 1.55rem);
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            line-height: 1.1;
+            background: linear-gradient(180deg, #fff8dd 0%, #e9c97a 55%, #a9822c 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 40px rgba(255, 190, 70, 0.22);
+        }
+        .game-title .accent {
+            background: linear-gradient(180deg, #ffffff 0%, #ffe9a8 60%, #d9b258 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .game-sub {
+            margin-top: 6px;
+            font-size: 0.72rem;
+            color: var(--muted);
+            letter-spacing: 0.06em;
+        }
+
+        .floor-pill {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            padding: 8px 16px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(255, 214, 130, 0.13), rgba(0, 0, 0, 0.35));
+            border: 1px solid rgba(255, 214, 130, 0.28);
+            box-shadow: inset 0 1px 0 rgba(255, 235, 180, 0.14), 0 0 26px -12px var(--gold-glow);
+        }
+        .fp-label {
+            font-size: 0.52rem;
+            letter-spacing: 0.24em;
+            color: var(--muted);
             font-weight: 800;
         }
-        .diff-btn:disabled {
-            opacity: 0.4; cursor: not-allowed; transform: none;
+        .floor-pill b {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: var(--gold-hi);
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
         }
 
-        .tower-area {
-            background:linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 25%, #1a0a0a 75%, #0d0505 100%);
-            border-radius:var(--radius-lg); padding:1rem; border:2px solid var(--border-gold);
-            box-shadow:inset 0 0 30px rgba(0,0,0,0.5); overflow-y:auto; max-height:420px;
-            position:relative; scroll-behavior:smooth;
+        /* ---- TOWER VIEWPORT ---- */
+        .tower-viewport {
+            position: relative;
+            overflow: hidden;
+            height: clamp(400px, 60vh, 640px);
+            border-radius: var(--r-lg);
+            border: 1px solid rgba(255, 214, 130, 0.10);
+            background:
+                repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.014) 0 1px, transparent 1px 34px),
+                repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.011) 0 1px, transparent 1px 34px),
+                radial-gradient(ellipse 75% 45% at 50% 0%, rgba(255, 190, 80, 0.11), transparent 68%),
+                radial-gradient(ellipse 70% 40% at 50% 100%, rgba(255, 140, 40, 0.06), transparent 70%),
+                linear-gradient(180deg, #0e0d16 0%, #0a0910 34%, #130b08 78%, #090605 100%);
+            box-shadow:
+                inset 0 0 90px rgba(0, 0, 0, 0.92),
+                inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+                0 24px 50px -40px #000;
         }
-        .tower-grid { display:flex; flex-direction:column; gap:5px; align-items:center; }
-        .tower-row { display:flex; gap:5px; align-items:center; }
-        .row-number { width:30px; text-align:center; font-size:0.7rem; color:var(--text-muted); font-weight:700; }
-        .tower-cell {
-            width:var(--cell); height:var(--cell); border-radius:12px;
-            background:rgba(30,30,50,0.9); border:2px solid rgba(255,255,255,0.08);
-            cursor:default; transition:all 0.2s ease-out;
-            display:flex; align-items:center; justify-content:center;
-            font-weight:700; font-size:0.85rem; color:rgba(255,255,255,0.3);
-            position:relative;
-        }
-        .tower-cell.clickable { cursor:pointer; border-color:var(--gold); box-shadow:0 0 15px rgba(255,217,102,0.4); }
-        .tower-cell.clickable:hover { background:rgba(255,217,102,0.15); transform:scale(1.05); }
-        .tower-cell.climbed { background:rgba(76,175,80,0.3); border-color:var(--success); color:#fff; cursor:default; }
-        .tower-cell.mine-revealed { background:rgba(255,107,107,0.5); border-color:var(--danger); color:#fff; animation:mineShake 0.5s; }
-        @keyframes mineShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }
-        .tower-cell i { font-size:1.1rem; }
-        .tower-cell .cell-glow { position:absolute; inset:0; border-radius:12px; background:transparent; pointer-events:none; transition:0.3s; }
-        .tower-cell.clickable .cell-glow { box-shadow:inset 0 0 15px rgba(255,217,102,0.3); }
 
-        /* Multiplier panel */
-        .multiplier-panel {
-            background:rgba(0,0,0,0.6); border-radius:var(--radius-md); padding:1rem;
-            text-align:center; border:1px solid var(--border-gold);
-            transition:all 0.3s;
+        .tower-scroll {
+            position: relative;
+            will-change: transform;
+            transition: transform 0.72s var(--ease-out);
         }
-        .climb-counter { font-size:2.2rem; font-weight:900; color:var(--gold-bright); }
-        .multiplier-value { font-size:1.8rem; font-weight:800; color:var(--gold); }
-        .cashout-preview strong { color:#fff; font-size:1.2rem; }
-        .multiplier-progress { height:6px; background:rgba(255,255,255,0.1); border-radius:10px; margin-top:0.5rem; overflow:hidden; }
-        .multiplier-progress-fill { height:100%; background:linear-gradient(90deg, #ffd966, #ffaa33); border-radius:10px; transition:width 0.3s; }
 
-        .bet-row { display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap; }
-        .bet-row label { display:flex; align-items:center; gap:0.3rem; font-weight:600; color:var(--gold); }
+        .tower-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            padding: 18px 12px 120px;
+            align-items: center;
+        }
+
+        .tower-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        /* floor indicator plate */
+        .floor-plate {
+            flex: 0 0 var(--plate);
+            width: var(--plate);
+            height: 26px;
+            display: grid;
+            place-items: center;
+            border-radius: 7px;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            font-variant-numeric: tabular-nums;
+            color: rgba(255, 214, 130, 0.26);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(0, 0, 0, 0.4));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.35s var(--ease-out);
+        }
+
+        .tower-row.passed .floor-plate {
+            color: rgba(255, 214, 130, 0.72);
+            border-color: rgba(255, 214, 130, 0.2);
+            background: linear-gradient(180deg, rgba(255, 214, 130, 0.10), rgba(0, 0, 0, 0.4));
+        }
+
+        .tower-row.current .floor-plate {
+            color: #1b1305;
+            background: linear-gradient(180deg, #fff0bb, var(--gold-mid) 70%, #b8902f);
+            border-color: var(--gold-hi);
+            box-shadow: 0 0 22px -4px var(--gold-glow), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        /* the platform slab */
+        .platform {
+            position: relative;
+            padding: 7px;
+            border-radius: 15px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.050) 0%, rgba(255, 255, 255, 0.012) 42%, rgba(0, 0, 0, 0.32) 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.065),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.65),
+                0 12px 20px -16px #000;
+            transition: background 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+        }
+
+        .platform::after {
+            content: '';
+            position: absolute;
+            left: 10px; right: 10px; bottom: -1px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 214, 130, 0.16), transparent);
+            transition: background 0.4s var(--ease-out), height 0.3s;
+        }
+
+        .tower-row.passed .platform::after {
+            background: linear-gradient(90deg, transparent, rgba(255, 214, 130, 0.38), transparent);
+        }
+
+        .tower-row.current .platform {
+            background: linear-gradient(180deg, rgba(255, 214, 130, 0.17), rgba(255, 214, 130, 0.035) 55%, rgba(0, 0, 0, 0.34));
+            animation: rowGlow 2.8s ease-in-out infinite;
+        }
+        .tower-row.current .platform::after {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 214, 130, 0.9), transparent);
+        }
+
+        @keyframes rowGlow {
+            0%, 100% {
+                box-shadow:
+                    inset 0 1px 0 rgba(255, 235, 180, 0.20),
+                    0 0 30px -14px rgba(255, 190, 70, 0.55),
+                    0 0 0 1px rgba(255, 214, 130, 0.20);
+            }
+            50% {
+                box-shadow:
+                    inset 0 1px 0 rgba(255, 235, 180, 0.30),
+                    0 0 46px -8px rgba(255, 190, 70, 0.75),
+                    0 0 0 1px rgba(255, 214, 130, 0.38);
+            }
+        }
+
+        .tiles { display: flex; gap: 6px; }
+
+        /* ---- TILES ---- */
+        .tile {
+            position: relative;
+            width: var(--cell);
+            height: var(--cell);
+            border-radius: var(--r-sm);
+            border: 1px solid rgba(255, 255, 255, 0.055);
+            background:
+                radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.055), transparent 62%),
+                linear-gradient(165deg, #26221c 0%, #181510 45%, #0d0b09 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.07),
+                inset 0 -3px 7px rgba(0, 0, 0, 0.55),
+                0 4px 9px -5px #000;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            cursor: default;
+            appearance: none;
+            -webkit-appearance: none;
+            font-family: inherit;
+            font-size: 0.92rem;
+            color: rgba(255, 214, 130, 0.22);
+            overflow: hidden;
+            transition:
+                transform 0.18s var(--ease-out),
+                box-shadow 0.25s var(--ease-out),
+                border-color 0.25s var(--ease-out),
+                background 0.25s var(--ease-out),
+                color 0.2s;
+            transform: perspective(500px) rotateX(0deg);
+        }
+
+        .tile::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), transparent 48%);
+            pointer-events: none;
+            opacity: 0.75;
+        }
+
+        .tile-glyph {
+            width: 9px;
+            height: 9px;
+            border-radius: 1px;
+            transform: rotate(45deg);
+            background: linear-gradient(135deg, rgba(255, 214, 130, 0.35), rgba(255, 214, 130, 0.08));
+            border: 1px solid rgba(255, 214, 130, 0.18);
+            transition: all 0.25s var(--ease-out);
+            position: relative;
+            z-index: 2;
+        }
+
+        .tile i { position: relative; z-index: 2; }
+
+        /* clickable tiles */
+        .tower-row.current .tile.clickable {
+            cursor: pointer;
+            border-color: rgba(255, 214, 130, 0.36);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.10),
+                0 0 0 1px rgba(255, 214, 130, 0.10),
+                0 0 22px -8px rgba(255, 190, 70, 0.6);
+        }
+
+        .tower-row.current .tile.clickable .tile-glyph {
+            background: linear-gradient(135deg, var(--gold-hi), var(--gold-mid));
+            border-color: var(--gold-hi);
+            box-shadow: 0 0 12px rgba(255, 200, 80, 0.8);
+        }
+
+        .tower-row.current .tile.clickable:hover {
+            transform: translateY(-4px) scale(1.04);
+            border-color: var(--gold-hi);
+            background:
+                radial-gradient(circle at 50% 0%, rgba(255, 214, 130, 0.20), transparent 65%),
+                linear-gradient(165deg, #38301f 0%, #221d13 55%, #13100a 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 235, 180, 0.28),
+                0 0 0 1px rgba(255, 214, 130, 0.45),
+                0 14px 26px -12px rgba(255, 190, 70, 0.85);
+            color: var(--gold-hi);
+        }
+
+        .tower-row.current .tile.clickable:active { transform: translateY(-1px) scale(0.99); }
+
+        .tile:focus-visible {
+            outline: 2px solid var(--gold-hi);
+            outline-offset: 3px;
+        }
+
+        /* safe reveal */
+        .tile.safe {
+            background: linear-gradient(160deg, #fff3c4 0%, #f0d179 32%, #d9b258 62%, #a9822c 100%);
+            border-color: var(--gold-hi);
+            color: #2a1d05;
+            box-shadow:
+                0 0 30px -6px rgba(255, 200, 80, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7),
+                inset 0 -3px 9px rgba(120, 80, 10, 0.4);
+        }
+        .tile.safe .tile-glyph { display: none; }
+        .tile.safe::after { opacity: 0.5; }
+
+        /* mine reveal */
+        .tile.mine {
+            background: linear-gradient(160deg, #ff8a68 0%, #e0331d 42%, #7a1108 100%);
+            border-color: #ff9d7c;
+            color: #fff;
+            box-shadow:
+                0 0 34px -4px var(--danger-glow),
+                inset 0 0 22px rgba(255, 120, 60, 0.55);
+            animation: mineShake 0.5s ease-out;
+        }
+        @keyframes mineShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-5px) rotate(-2deg); }
+            45% { transform: translateX(5px) rotate(2deg); }
+            70% { transform: translateX(-3px); }
+        }
+
+        /* neutral revealed */
+        .tile.empty { opacity: 0.3; }
+        .tile.empty .tile-glyph {
+            background: rgba(255, 255, 255, 0.10);
+            border-color: rgba(255, 255, 255, 0.07);
+            box-shadow: none;
+        }
+
+        /* flip animation on the freshly revealed tile */
+        .tile.flip { animation: tileFlip 0.44s var(--ease-bounce); }
+        @keyframes tileFlip {
+            0%   { transform: perspective(500px) rotateX(0deg) scale(1); }
+            48%  { transform: perspective(500px) rotateX(84deg) scale(1.06); }
+            100% { transform: perspective(500px) rotateX(0deg) scale(1); }
+        }
+
+        /* pedestal at the base of the tower */
+        .tower-base {
+            width: 72%;
+            height: 22px;
+            margin-top: 10px;
+            border-radius: 50% / 100% 100% 0 0;
+            background: linear-gradient(180deg, rgba(255, 214, 130, 0.20), rgba(255, 214, 130, 0.02) 60%, transparent);
+            box-shadow: 0 -1px 0 rgba(255, 214, 130, 0.35), 0 0 50px -8px rgba(255, 190, 70, 0.35);
+        }
+
+        /* viewport fades */
+        .viewport-fade {
+            position: absolute;
+            left: 0; right: 0;
+            pointer-events: none;
+            z-index: 6;
+        }
+        .viewport-fade.top {
+            top: 0; height: 74px;
+            background: linear-gradient(180deg, #0b0a10 0%, rgba(11, 10, 16, 0.65) 42%, transparent 100%);
+        }
+        .viewport-fade.bottom {
+            bottom: 0; height: 96px;
+            background: linear-gradient(0deg, #0a0605 0%, rgba(10, 6, 5, 0.72) 45%, transparent 100%);
+        }
+
+        /* legend */
+        .tower-legend {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            padding: 0 4px;
+            font-size: 0.66rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted-2);
+            font-weight: 700;
+        }
+        .tower-legend .lg { display: inline-flex; align-items: center; gap: 7px; }
+        .tower-legend .hint {
+            margin-left: auto;
+            text-transform: none;
+            letter-spacing: 0.02em;
+            color: var(--muted-2);
+            font-weight: 500;
+            opacity: 0.8;
+        }
+        .dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+        .dot-gold { background: linear-gradient(135deg, var(--gold-hi), var(--gold-mid)); box-shadow: 0 0 8px rgba(255, 200, 80, 0.7); }
+        .dot-mine { background: linear-gradient(135deg, #ff8a68, #b81c0c); box-shadow: 0 0 8px rgba(255, 70, 40, 0.7); }
+        .dot-idle { background: linear-gradient(135deg, #2b2721, #14110d); border: 1px solid rgba(255, 255, 255, 0.1); }
+
+        /* ============================================================
+           CONTROL PANEL
+        ============================================================ */
+        .control-panel {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 0;
+        }
+
+        /* ---- MULTIPLIER HUD ---- */
+        .mult-hud {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            padding: 18px 18px 16px;
+            text-align: center;
+            background:
+                radial-gradient(ellipse 110% 130% at 50% -25%, rgba(255, 200, 90, 0.16), transparent 62%),
+                linear-gradient(180deg, rgba(32, 27, 20, 0.92), rgba(11, 10, 8, 0.96));
+            border: 1px solid rgba(255, 214, 130, 0.16);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 235, 180, 0.10),
+                0 24px 44px -36px #000;
+            transition: border-color 0.5s, box-shadow 0.5s;
+        }
+
+        .mult-hud::after {
+            content: '';
+            position: absolute;
+            left: -40%; right: -40%; top: -60%;
+            height: 120%;
+            background: radial-gradient(ellipse at 50% 50%, rgba(255, 220, 140, 0.10), transparent 60%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.6s;
+        }
+
+        .mult-hud.heat-1 { border-color: rgba(255, 214, 130, 0.30); box-shadow: inset 0 1px 0 rgba(255, 235, 180, 0.14), 0 0 40px -18px rgba(255, 190, 70, 0.7); }
+        .mult-hud.heat-2 { border-color: rgba(255, 214, 130, 0.42); box-shadow: inset 0 1px 0 rgba(255, 235, 180, 0.18), 0 0 56px -16px rgba(255, 190, 70, 0.9); }
+        .mult-hud.heat-3 { border-color: rgba(255, 230, 160, 0.55); box-shadow: inset 0 1px 0 rgba(255, 235, 180, 0.22), 0 0 74px -12px rgba(255, 195, 80, 1); }
+        .mult-hud.heat-2::after, .mult-hud.heat-3::after { opacity: 1; }
+
+        .mult-label {
+            font-size: 0.56rem;
+            letter-spacing: 0.26em;
+            font-weight: 800;
+            color: var(--muted);
+        }
+
+        .mult-value {
+            margin-top: 6px;
+            font-size: clamp(2.6rem, 5.2vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -0.03em;
+            font-variant-numeric: tabular-nums;
+            background: linear-gradient(180deg, #fffbe6 0%, #ffe28a 38%, #e2b957 68%, #a9822c 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 5px 22px rgba(255, 190, 70, 0.38));
+            transform-origin: center;
+        }
+        .mult-value.pulse { animation: multPulse 0.55s var(--ease-bounce); }
+        @keyframes multPulse {
+            0%   { transform: scale(1); }
+            42%  { transform: scale(1.14); filter: drop-shadow(0 0 34px rgba(255, 210, 110, 0.85)); }
+            100% { transform: scale(1); }
+        }
+
+        .payout-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .payout-label {
+            font-size: 0.56rem;
+            letter-spacing: 0.2em;
+            font-weight: 800;
+            color: var(--muted);
+            text-align: left;
+        }
+        .payout-value {
+            font-size: 1.12rem;
+            font-weight: 800;
+            color: #fff8e6;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.01em;
+            transition: color 0.3s;
+        }
+        .payout-value.lit { color: var(--gold-hi); text-shadow: 0 0 22px rgba(255, 200, 80, 0.6); }
+
+        .progress-track {
+            position: relative;
+            height: 7px;
+            margin-top: 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.055);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.85);
+            overflow: hidden;
+        }
+        .progress-fill {
+            position: relative;
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #8a6a24, var(--gold-mid) 45%, var(--gold-hi) 100%);
+            box-shadow: 0 0 14px rgba(255, 200, 80, 0.65);
+            transition: width 0.65s var(--ease-out), box-shadow 0.5s;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+            transform: translateX(-100%);
+            animation: sheen 2.6s ease-in-out infinite;
+        }
+        @keyframes sheen {
+            0%   { transform: translateX(-100%); }
+            55%  { transform: translateX(100%); }
+            100% { transform: translateX(100%); }
+        }
+        .mult-hud.heat-2 .progress-fill { box-shadow: 0 0 20px rgba(255, 200, 80, 0.9); }
+        .mult-hud.heat-3 .progress-fill { box-shadow: 0 0 28px rgba(255, 220, 120, 1); }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 7px;
+            font-size: 0.55rem;
+            letter-spacing: 0.16em;
+            font-weight: 800;
+            color: var(--muted-2);
+        }
+        .progress-meta b { color: var(--gold); font-weight: 800; }
+
+        /* ---- SECTIONS ---- */
+        .section { display: flex; flex-direction: column; gap: 9px; }
+
+        .section-title {
+            font-size: 0.56rem;
+            letter-spacing: 0.26em;
+            font-weight: 800;
+            color: var(--muted);
+            padding-left: 2px;
+        }
+
+        /* ---- DIFFICULTY CARDS ---- */
+        .difficulty-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .diff-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 12px 6px 11px;
+            border-radius: var(--r-md);
+            cursor: pointer;
+            font-family: inherit;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.042), rgba(0, 0, 0, 0.30));
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            transition: all 0.22s var(--ease-out);
+        }
+
+        .diff-btn .diff-name {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            color: var(--text);
+            transition: color 0.22s;
+        }
+        .diff-btn .diff-mines {
+            font-size: 0.56rem;
+            font-weight: 700;
+            letter-spacing: 0.10em;
+            color: var(--muted-2);
+            transition: color 0.22s;
+        }
+
+        .diff-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            border-color: rgba(255, 214, 130, 0.34);
+            background: linear-gradient(180deg, rgba(255, 214, 130, 0.10), rgba(0, 0, 0, 0.32));
+        }
+
+        .diff-btn.active {
+            border-color: rgba(255, 214, 130, 0.58);
+            background: linear-gradient(180deg, rgba(255, 214, 130, 0.17), rgba(255, 214, 130, 0.025));
+            box-shadow:
+                inset 0 1px 0 rgba(255, 235, 180, 0.22),
+                0 0 0 1px rgba(255, 214, 130, 0.18),
+                0 0 28px -10px var(--gold-glow);
+        }
+        .diff-btn.active .diff-name { color: var(--gold-hi); }
+        .diff-btn.active .diff-mines { color: rgba(255, 214, 130, 0.72); }
+
+        .diff-btn:disabled { opacity: 0.36; cursor: not-allowed; transform: none; }
+
+        /* ---- BET ---- */
+        .bet-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 15px;
+            border-radius: var(--r-md);
+            background: linear-gradient(180deg, #0b0a08, #131110);
+            border: 1px solid rgba(255, 214, 130, 0.14);
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7);
+            transition: border-color 0.22s, box-shadow 0.22s;
+        }
+        .bet-input-wrap:focus-within {
+            border-color: rgba(255, 214, 130, 0.5);
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7), 0 0 0 4px rgba(255, 214, 130, 0.07);
+        }
+        .bet-input-wrap.invalid {
+            border-color: rgba(255, 95, 77, 0.65);
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7), 0 0 0 4px rgba(255, 95, 77, 0.08);
+        }
+
+        .coin-ico { color: var(--gold-mid); font-size: 0.9rem; }
+
         .bet-input {
-            background:#1f1b17; border:2px solid rgba(255,217,102,0.2); border-radius:var(--radius-full);
-            padding:0.65rem 1.2rem; color:white; font-weight:700; width:110px; text-align:center;
-            font-size:1rem; transition:var(--transition-fast); outline:none;
+            flex: 1;
+            min-width: 0;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff8e6;
+            font-family: inherit;
+            font-size: 1.18rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            font-variant-numeric: tabular-nums;
         }
-        .bet-input:focus { border-color:var(--border-active); box-shadow:0 0 0 4px rgba(255,217,102,0.1); }
-        .bet-input.invalid { border-color:var(--danger); }
-        .quick-bets { display:flex; gap:0.4rem; flex-wrap:wrap; }
-        .quick-bet { background:rgba(255,217,102,0.08); border:1px solid rgba(255,217,102,0.3); border-radius:40px; padding:0.35rem 0.9rem; color:var(--gold); font-weight:600; cursor:pointer; transition:var(--transition-fast); font-size:0.8rem; }
-        .quick-bet:hover { background:rgba(255,217,102,0.2); transform:scale(1.05); }
+        .bet-input::-webkit-outer-spin-button,
+        .bet-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .bet-input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 
-        .action-buttons { display:flex; gap:1rem; }
+        .bet-unit {
+            font-size: 0.58rem;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            color: var(--muted-2);
+        }
+
+        .quick-bets {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+        }
+
+        .quick-bet {
+            padding: 8px 4px;
+            border-radius: 9px;
+            background: rgba(255, 214, 130, 0.055);
+            border: 1px solid rgba(255, 214, 130, 0.14);
+            color: var(--gold);
+            font-family: inherit;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: all 0.18s var(--ease-out);
+        }
+        .quick-bet:hover {
+            background: rgba(255, 214, 130, 0.16);
+            border-color: rgba(255, 214, 130, 0.36);
+            transform: translateY(-1px);
+        }
+        .quick-bet:active { transform: translateY(1px); }
+
+        /* ---- ACTIONS ---- */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
         .btn {
-            flex:1; border:none; border-radius:var(--radius-full); font-weight:800; font-size:1rem;
-            padding:0.9rem; cursor:pointer; transition:all 0.15s; text-transform:uppercase;
-            letter-spacing:1px; font-family:'Inter', sans-serif; position:relative; overflow:hidden;
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 15px 14px;
+            border-radius: var(--r-md);
+            border: 1px solid transparent;
+            font-family: inherit;
+            font-size: 0.76rem;
+            font-weight: 900;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.16s var(--ease-out), box-shadow 0.2s, filter 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
-        .btn:active { transform:translateY(3px); box-shadow:none!important; }
+
+        .btn i { font-size: 0.82rem; }
+
         .btn-start {
-            background:linear-gradient(135deg, #f5b042 0%, #ffd966 40%, #ffed4e 100%);
-            color:#1a150e; box-shadow:0 5px 0 #a05f15, 0 8px 20px rgba(255,180,40,0.3);
+            color: #1b1305;
+            background: linear-gradient(180deg, #fff3c4 0%, #f5d078 26%, #dcb158 58%, #b8902f 82%, #96721f 100%);
+            border-color: #ffeaa9;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.85),
+                inset 0 -2px 0 rgba(90, 60, 10, 0.45),
+                0 10px 26px -14px rgba(255, 190, 70, 0.95),
+                0 0 0 1px rgba(0, 0, 0, 0.45);
         }
-        .btn-start:hover:not(:disabled) { transform:translateY(-3px); box-shadow:0 8px 0 #a05f15, 0 14px 30px rgba(255,180,40,0.45); }
+        .btn-start:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.06);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.9),
+                inset 0 -2px 0 rgba(90, 60, 10, 0.45),
+                0 16px 34px -14px rgba(255, 190, 70, 1),
+                0 0 0 1px rgba(0, 0, 0, 0.45);
+        }
+        .btn-start:active:not(:disabled) { transform: translateY(1px); }
+
         .btn-cashout {
-            background:linear-gradient(135deg, #2e7d32, #1b5e20); color:white;
-            box-shadow:0 5px 0 #0a3a0a, 0 8px 20px rgba(76,175,80,0.3);
+            color: #eafff5;
+            background: linear-gradient(180deg, #34cc8b 0%, #1a9d67 40%, #0e6f4a 78%, #0a5236 100%);
+            border-color: rgba(140, 255, 205, 0.42);
+            text-shadow: 0 1px 2px rgba(0, 40, 25, 0.6);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.28),
+                inset 0 -2px 0 rgba(0, 40, 25, 0.65),
+                0 10px 26px -14px rgba(20, 220, 140, 0.7),
+                0 0 0 1px rgba(0, 0, 0, 0.45);
         }
-        .btn-cashout:hover:not(:disabled) { transform:translateY(-3px); box-shadow:0 8px 0 #0a3a0a, 0 14px 30px rgba(76,175,80,0.45); }
-        .btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:0 2px 0 #555; }
+        .btn-cashout:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.08);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.32),
+                inset 0 -2px 0 rgba(0, 40, 25, 0.65),
+                0 16px 34px -14px rgba(20, 220, 140, 0.9),
+                0 0 0 1px rgba(0, 0, 0, 0.45);
+        }
+        .btn-cashout:active:not(:disabled) { transform: translateY(1px); }
+
+        .btn:disabled {
+            opacity: 0.34;
+            cursor: not-allowed;
+            transform: none !important;
+            filter: grayscale(0.35);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.4);
+        }
+
         .ripple {
-            position:absolute; border-radius:50%; background:rgba(255,255,255,0.4);
-            transform:scale(0); animation:rippleEffect 0.7s ease-out; pointer-events:none;
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.45);
+            transform: scale(0);
+            animation: rippleEffect 0.7s ease-out;
+            pointer-events: none;
         }
-        @keyframes rippleEffect { to { transform:scale(4); opacity:0; } }
+        @keyframes rippleEffect { to { transform: scale(4); opacity: 0; } }
 
+        /* ---- RESULT ---- */
         .result-panel {
-            background:rgba(0,0,0,0.5); border-radius:var(--radius-md); padding:0.8rem;
-            text-align:center; font-weight:600; font-size:0.9rem; backdrop-filter:blur(10px);
-            min-height:44px; display:flex; align-items:center; justify-content:center; gap:0.5rem;
-            transition:0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 50px;
+            padding: 11px 14px;
+            border-radius: var(--r-md);
+            background: rgba(255, 255, 255, 0.024);
+            border: 1px solid rgba(255, 255, 255, 0.055);
+            font-size: 0.78rem;
+            font-weight: 600;
+            line-height: 1.35;
+            color: var(--muted);
+            text-align: center;
+            transition: all 0.35s var(--ease-out);
         }
-        .result-panel.win { color:#a5d6a7; }
-        .result-panel.loss { color:#ffab91; }
+        .result-panel i { font-size: 0.85rem; opacity: 0.9; }
+        .result-panel strong { color: #fff; font-weight: 800; }
 
+        .result-panel.win {
+            color: #b6f7d4;
+            background: linear-gradient(180deg, rgba(40, 200, 130, 0.11), rgba(20, 120, 80, 0.05));
+            border-color: rgba(60, 220, 150, 0.32);
+            box-shadow: 0 0 34px -18px rgba(50, 230, 150, 0.9);
+        }
+        .result-panel.loss {
+            color: #ffc2b3;
+            background: linear-gradient(180deg, rgba(255, 80, 50, 0.11), rgba(140, 30, 10, 0.05));
+            border-color: rgba(255, 95, 77, 0.32);
+            box-shadow: 0 0 34px -18px rgba(255, 80, 50, 0.9);
+        }
+
+        /* ---- STATS ---- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-radius: var(--r-md);
+            background: rgba(0, 0, 0, 0.34);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+        .stat-cell {
+            padding: 12px 6px;
+            text-align: center;
+            position: relative;
+        }
+        .stat-cell + .stat-cell::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 22%; bottom: 22%;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .stat-value {
+            font-size: 1.08rem;
+            font-weight: 900;
+            color: var(--gold);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.01em;
+        }
+        .stat-label {
+            margin-top: 3px;
+            font-size: 0.52rem;
+            letter-spacing: 0.16em;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--muted-2);
+        }
+
+        /* ---- WIN BUBBLE ---- */
         .win-multiplier-bubble {
-            position:fixed; left:50%; top:50%; transform:translate(-50%, -50%);
-            color:var(--gold-bright); font-weight:900; font-size:2.8rem;
-            text-shadow:0 0 30px gold; pointer-events:none; z-index:100;
-            animation:bubbleUp 1.8s ease-out forwards;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Cinzel', serif;
+            font-weight: 800;
+            font-size: clamp(2.4rem, 7vw, 4rem);
+            color: var(--gold-hi);
+            text-shadow: 0 0 18px rgba(255, 210, 110, 0.9), 0 0 60px rgba(255, 180, 40, 0.7);
+            pointer-events: none;
+            z-index: 950;
+            animation: bubbleUp 1.9s var(--ease-out) forwards;
         }
         @keyframes bubbleUp {
-            0% { opacity:1; transform:translate(-50%, -50%) scale(0.5); }
-            30% { opacity:1; transform:translate(-50%, -50%) scale(1.2); }
-            100% { opacity:0; transform:translate(-50%, -160%) scale(1); }
+            0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.55); }
+            22%  { opacity: 1; transform: translate(-50%, -50%) scale(1.14); }
+            42%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -175%) scale(0.95); }
         }
 
-        .stats-grid {
-            display:grid; grid-template-columns:repeat(3,1fr); gap:0.8rem;
-            background:rgba(0,0,0,0.4); border-radius:var(--radius-md); padding:0.8rem;
+        /* ============================================================
+           RESPONSIVE
+        ============================================================ */
+        @media (max-width: 1080px) {
+            .layout { grid-template-columns: 1fr; }
+            .tower-viewport { height: clamp(360px, 52vh, 520px); }
+            .control-panel { gap: 14px; }
         }
-        .stat-cell { text-align:center; }
-        .stat-value { font-weight:800; font-size:1.2rem; color:var(--gold); }
-        .stat-label { font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; }
 
-        #confettiCanvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:999; }
+        @media (max-width: 700px) {
+            body { padding: 12px 10px 30px; }
+            .brand { display: none; }
+            .tower-panel { padding: 15px 14px 13px; }
+            .control-panel { padding: 15px 14px; }
+            .game-sub { display: none; }
+            .tower-legend .hint { display: none; }
+            .panel { border-radius: 20px; }
+            .tower-viewport { border-radius: 14px; }
+        }
 
-        @media (max-width:500px) {
-            :root { --cell: 44px; }
-            .tower-cell { border-radius:8px; font-size:0.7rem; }
-            .game-card { padding:1.2rem; }
-            .btn { font-size:0.85rem; padding:0.7rem; }
-            .multiplier-value { font-size:1.4rem; }
-            .diff-btn { font-size: 0.75rem; padding: 0.5rem 0.6rem; }
+        @media (max-width: 560px) {
+            :root { --cell: clamp(40px, 11vw, 50px); --plate: 28px; }
+            .floor-plate { font-size: 0.55rem; height: 22px; border-radius: 6px; }
+            .tiles { gap: 5px; }
+            .platform { padding: 6px; border-radius: 13px; }
+            .tower-row { gap: 7px; }
+            .tower-grid { padding: 14px 8px 110px; gap: 6px; }
+            .action-buttons { grid-template-columns: 1fr; }
+            .quick-bets { grid-template-columns: repeat(3, 1fr); }
+            .mult-value { font-size: 2.7rem; }
+            .btn { padding: 14px; font-size: 0.72rem; }
+            .floor-pill { padding: 7px 13px; }
+            .topbar { padding: 8px 8px 8px 8px; }
+            .nav-back { padding: 8px 13px 8px 11px; font-size: 0.66rem; }
+            .balance-chip { padding: 8px 14px; font-size: 0.84rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
 <canvas id="confettiCanvas"></canvas>
+<div id="flashLayer"></div>
 <div class="bg-particles" id="bgParticles"></div>
 
-<div class="game-container">
-    <div class="top-nav">
-        <a href=".././home.html" class="back-home"><i class="fas fa-arrow-left"></i> Lobby</a>
-        <div class="balance-tag" id="balanceTag"><i class="fas fa-coins"></i> <span id="headerBalance">0</span></div>
-        <button id="soundToggleBtn" class="sound-btn"><i class="fas fa-volume-up"></i></button>
-    </div>
-
-    <div class="game-card">
-        <div class="game-title"><i class="fas fa-chess-rook"></i> TOWER CLIMB <i class="fas fa-chess-rook"></i></div>
-
-        <div class="difficulty-selector" id="difficultySelector">
-            <button class="diff-btn active" data-mines="1"><i class="fas fa-skull"></i> Easy</button>
-            <button class="diff-btn" data-mines="2"><i class="fas fa-skull"></i> Medium</button>
-            <button class="diff-btn" data-mines="3"><i class="fas fa-skull"></i> Hard</button>
+<div class="app">
+    <!-- ══════════ TOP BAR ══════════ -->
+    <header class="topbar">
+        <a href=".././home.html" class="nav-back">
+            <i class="fas fa-chevron-left"></i><span>LOBBY</span>
+        </a>
+        <div class="brand">
+            <span class="brand-mark"><i class="fas fa-crown"></i></span>
+            <span class="brand-name">GOLD</span>
         </div>
-
-        <div class="tower-area" id="towerArea">
-            <div class="tower-grid" id="towerGrid"></div>
-        </div>
-
-        <div class="multiplier-panel" id="multiplierPanel">
-            <div style="font-size:0.7rem; color:var(--text-muted);">FLOOR CLIMBED</div>
-            <div class="climb-counter" id="climbCount">0</div>
-            <div class="multiplier-value" id="multiplierDisplay">1.00×</div>
-            <div class="cashout-preview" id="cashoutPreview">Cash out: <strong>0 GOLD</strong></div>
-            <div class="multiplier-progress"><div class="multiplier-progress-fill" id="progressFill" style="width:0%"></div></div>
-        </div>
-
-        <div class="bet-row" id="betRow">
-            <label><i class="fas fa-coins"></i> Bet</label>
-            <input type="number" id="betAmount" class="bet-input" value="25" step="1" min="1" inputmode="numeric">
-            <div class="quick-bets">
-                <button class="quick-bet" data-bet="10">+10</button>
-                <button class="quick-bet" data-bet="25">+25</button>
-                <button class="quick-bet" data-bet="50">+50</button>
-                <button class="quick-bet" data-bet="100">+100</button>
-                <button class="quick-bet" id="halfBetBtn">½</button>
-                <button class="quick-bet" id="maxBetBtn">MAX</button>
+        <div class="topbar-right">
+            <div class="balance-chip" id="balanceTag">
+                <i class="fas fa-coins"></i>
+                <span id="headerBalance">0</span>
             </div>
+            <button id="soundToggleBtn" class="icon-btn" aria-label="Toggle sound">
+                <i class="fas fa-volume-up"></i>
+            </button>
         </div>
+    </header>
 
-        <div class="action-buttons">
-            <button class="btn btn-start" id="startBtn"><i class="fas fa-play"></i> START CLIMB</button>
-            <button class="btn btn-cashout" id="cashoutBtn" disabled><i class="fas fa-hand-holding-usd"></i> CASH OUT</button>
-        </div>
+    <!-- ══════════ MAIN LAYOUT ══════════ -->
+    <main class="layout" id="mainLayout">
 
-        <div class="result-panel" id="resultMessage"><i class="fas fa-info-circle"></i> Select difficulty & start climbing!</div>
+        <!-- ─────────── TOWER ─────────── -->
+        <section class="panel tower-panel">
+            <div class="panel-head">
+                <div class="title-wrap">
+                    <h1 class="game-title">TOWER <span class="accent">CLIMB</span></h1>
+                    <p class="game-sub">Ascend the vault — cash out before the mine.</p>
+                </div>
+                <div class="floor-pill">
+                    <span class="fp-label">FLOOR</span>
+                    <b id="towerFloorPill">1</b>
+                </div>
+            </div>
 
-        <div class="stats-grid">
-            <div class="stat-cell"><div class="stat-value" id="climbsStat">0</div><div class="stat-label">Climbs</div></div>
-            <div class="stat-cell"><div class="stat-value" id="bestFloorStat">0</div><div class="stat-label">Best Floor</div></div>
-            <div class="stat-cell"><div class="stat-value" id="sessionPL">0</div><div class="stat-label">Session P/L</div></div>
-        </div>
-    </div>
+            <div class="tower-viewport" id="towerViewport">
+                <div class="tower-scroll" id="towerScroll">
+                    <div class="tower-grid" id="towerGrid"></div>
+                </div>
+                <div class="viewport-fade top"></div>
+                <div class="viewport-fade bottom"></div>
+            </div>
+
+            <div class="tower-legend">
+                <span class="lg"><i class="dot dot-gold"></i>Safe</span>
+                <span class="lg"><i class="dot dot-mine"></i>Mine</span>
+                <span class="lg"><i class="dot dot-idle"></i>Sealed</span>
+                <span class="lg hint">Keys 1–5 to pick · Space to cash out</span>
+            </div>
+        </section>
+
+        <!-- ─────────── CONTROLS ─────────── -->
+        <aside class="panel control-panel">
+
+            <!-- Multiplier HUD -->
+            <div class="mult-hud" id="multHud">
+                <div class="mult-label">CURRENT MULTIPLIER</div>
+                <div class="mult-value" id="multiplierDisplay">1.00×</div>
+                <div class="payout-row">
+                    <span class="payout-label">POTENTIAL PAYOUT</span>
+                    <span class="payout-value" id="cashoutPreview">0 GOLD</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-meta">
+                    <span>FLOOR <b id="climbCount">0</b></span>
+                    <span>20 MAX</span>
+                </div>
+            </div>
+
+            <!-- Difficulty -->
+            <div class="section">
+                <div class="section-title">DIFFICULTY</div>
+                <div class="difficulty-cards" id="difficultySelector">
+                    <button class="diff-btn active" data-mines="1">
+                        <span class="diff-name">EASY</span>
+                        <span class="diff-mines">1 MINE</span>
+                    </button>
+                    <button class="diff-btn" data-mines="2">
+                        <span class="diff-name">MEDIUM</span>
+                        <span class="diff-mines">2 MINES</span>
+                    </button>
+                    <button class="diff-btn" data-mines="3">
+                        <span class="diff-name">HARD</span>
+                        <span class="diff-mines">3 MINES</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stake -->
+            <div class="section">
+                <div class="section-title">STAKE</div>
+                <div class="bet-input-wrap" id="betWrap">
+                    <i class="fas fa-coins coin-ico"></i>
+                    <input type="number" id="betAmount" class="bet-input" value="25" step="1" min="1" inputmode="numeric" aria-label="Bet amount">
+                    <span class="bet-unit">GOLD</span>
+                </div>
+                <div class="quick-bets">
+                    <button class="quick-bet" data-bet="10">+10</button>
+                    <button class="quick-bet" data-bet="25">+25</button>
+                    <button class="quick-bet" data-bet="50">+50</button>
+                    <button class="quick-bet" data-bet="100">+100</button>
+                    <button class="quick-bet" id="halfBetBtn">½</button>
+                    <button class="quick-bet" id="maxBetBtn">MAX</button>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="action-buttons">
+                <button class="btn btn-start" id="startBtn">
+                    <i class="fas fa-play"></i> START CLIMB
+                </button>
+                <button class="btn btn-cashout" id="cashoutBtn" disabled>
+                    <i class="fas fa-hand-holding-usd"></i> CASH OUT
+                </button>
+            </div>
+
+            <!-- Result -->
+            <div class="result-panel" id="resultMessage">
+                <i class="fas fa-info-circle"></i> Select difficulty &amp; start climbing!
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-cell">
+                    <div class="stat-value" id="climbsStat">0</div>
+                    <div class="stat-label">Climbs</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="stat-value" id="bestFloorStat">0</div>
+                    <div class="stat-label">Best Floor</div>
+                </div>
+                <div class="stat-cell">
+                    <div class="stat-value" id="sessionPL">0</div>
+                    <div class="stat-label">Session P/L</div>
+                </div>
+            </div>
+
+        </aside>
+    </main>
 </div>
 
 <script>
     (() => {
-        // ── AUDIO ──
+        /* ============================================================
+           AUDIO
+        ============================================================ */
         let audioCtx = null, soundEnabled = true;
-        function initAudio() { if (!audioCtx && soundEnabled) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
-        function playTone(type) {
-            if(!soundEnabled) return;
-            try {
-                initAudio(); if(!audioCtx) return;
-                const now = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                switch(type) {
-                    case 'start': osc.type='triangle'; osc.frequency.setValueAtTime(400,now); osc.frequency.exponentialRampToValueAtTime(800,now+0.2); gain.gain.setValueAtTime(0.1,now); gain.gain.exponentialRampToValueAtTime(0.001,now+0.3); osc.start(now); osc.stop(now+0.35); break;
-                    case 'step': osc.type='sine'; osc.frequency.setValueAtTime(660,now); gain.gain.setValueAtTime(0.07,now); gain.gain.exponentialRampToValueAtTime(0.001,now+0.1); osc.start(now); osc.stop(now+0.12); break;
-                    case 'cashout': osc.type='sine'; osc.frequency.setValueAtTime(660,now); osc.frequency.setValueAtTime(880,now+0.15); osc.frequency.setValueAtTime(1100,now+0.3); gain.gain.setValueAtTime(0.12,now); gain.gain.exponentialRampToValueAtTime(0.001,now+0.5); osc.start(now); osc.stop(now+0.6); break;
-                    case 'bust': osc.type='sawtooth'; osc.frequency.setValueAtTime(200,now); osc.frequency.exponentialRampToValueAtTime(60,now+0.5); gain.gain.setValueAtTime(0.12,now); gain.gain.exponentialRampToValueAtTime(0.001,now+0.6); osc.start(now); osc.stop(now+0.7); break;
-                    case 'click': osc.type='sine'; osc.frequency.setValueAtTime(500,now); gain.gain.setValueAtTime(0.05,now); gain.gain.exponentialRampToValueAtTime(0.001,now+0.06); osc.start(now); osc.stop(now+0.08); break;
-                }
-            } catch(e) {}
-        }
 
-        // ── CONFETTI ──
-        function triggerConfetti() {
-            const c = document.getElementById('confettiCanvas');
-            c.width = window.innerWidth; c.height = window.innerHeight;
-            const ctx = c.getContext('2d');
-            const particles = [];
-            const colors = ['#ffd966','#f5b042','#ffed4e','#4caf50','#ffaa00'];
-            for(let i=0;i<220;i++) particles.push({
-                x:Math.random()*c.width, y:-30-Math.random()*100,
-                size:Math.random()*7+3, speedY:Math.random()*6+5,
-                speedX:(Math.random()-0.5)*6, color:colors[Math.floor(Math.random()*colors.length)],
-                rot:Math.random()*360, rotSpeed:(Math.random()-0.5)*14,
-                shape:Math.random()>0.5?'rect':'circle', opacity:1
-            });
-            let frame; const start = performance.now();
-            function draw(now) {
-                if(now-start>2800){ ctx.clearRect(0,0,c.width,c.height); cancelAnimationFrame(frame); return; }
-                ctx.clearRect(0,0,c.width,c.height);
-                particles.forEach(p=>{
-                    p.y+=p.speedY; p.x+=p.speedX; p.rot+=p.rotSpeed;
-                    p.opacity = Math.max(0, 1-(now-start)/2800);
-                    ctx.save(); ctx.globalAlpha=p.opacity; ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
-                    ctx.fillStyle=p.color;
-                    if(p.shape==='circle'){ ctx.beginPath(); ctx.arc(0,0,p.size/2,0,Math.PI*2); ctx.fill(); }
-                    else ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);
-                    ctx.restore();
-                });
-                frame=requestAnimationFrame(draw);
+        function initAudio() {
+            if (!audioCtx && soundEnabled) {
+                try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
             }
-            frame=requestAnimationFrame(draw);
         }
 
-        // ── USER DATA ──
+        function playTone(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio(); if (!audioCtx) return;
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                switch (type) {
+                    case 'start':
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(400, now);
+                        osc.frequency.exponentialRampToValueAtTime(800, now + 0.2);
+                        gain.gain.setValueAtTime(0.1, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                        osc.start(now); osc.stop(now + 0.35); break;
+                    case 'step':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(660, now);
+                        gain.gain.setValueAtTime(0.07, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                        osc.start(now); osc.stop(now + 0.12); break;
+                    case 'cashout':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(660, now);
+                        osc.frequency.setValueAtTime(880, now + 0.15);
+                        osc.frequency.setValueAtTime(1100, now + 0.3);
+                        gain.gain.setValueAtTime(0.12, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                        osc.start(now); osc.stop(now + 0.6); break;
+                    case 'bust':
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(200, now);
+                        osc.frequency.exponentialRampToValueAtTime(60, now + 0.5);
+                        gain.gain.setValueAtTime(0.12, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                        osc.start(now); osc.stop(now + 0.7); break;
+                    case 'click':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(500, now);
+                        gain.gain.setValueAtTime(0.05, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                        osc.start(now); osc.stop(now + 0.08); break;
+                }
+            } catch (e) {}
+        }
+
+        /* ============================================================
+           PARTICLE ENGINE
+        ============================================================ */
+        const FX = (() => {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            let parts = [], raf = null, lastT = 0, vw = 0, vh = 0;
+
+            function resize() {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                vw = window.innerWidth; vh = window.innerHeight;
+                canvas.width = Math.floor(vw * dpr);
+                canvas.height = Math.floor(vh * dpr);
+                canvas.style.width = vw + 'px';
+                canvas.style.height = vh + 'px';
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            function tick(now) {
+                const dt = Math.min(now - lastT, 42);
+                lastT = now;
+                const k = dt / 16.667;
+                ctx.clearRect(0, 0, vw, vh);
+
+                for (let i = parts.length - 1; i >= 0; i--) {
+                    const p = parts[i];
+                    p.life -= dt;
+                    if (p.life <= 0) { parts.splice(i, 1); continue; }
+
+                    p.vy += p.gravity * k;
+                    p.vx *= Math.pow(0.988, k);
+                    p.x += p.vx * k;
+                    p.y += p.vy * k;
+                    p.rot += p.rotSpeed * k;
+
+                    const alpha = Math.min(1, p.life / (p.maxLife * 0.55));
+                    ctx.save();
+                    ctx.globalAlpha = alpha;
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot);
+                    ctx.fillStyle = p.color;
+
+                    if (p.shape === 'rect') {
+                        ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                    } else if (p.shape === 'spark') {
+                        ctx.shadowColor = p.color;
+                        ctx.shadowBlur = 12;
+                        ctx.beginPath();
+                        ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                }
+
+                if (parts.length) raf = requestAnimationFrame(tick);
+                else { raf = null; ctx.clearRect(0, 0, vw, vh); }
+            }
+
+            function start() {
+                if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(tick); }
+            }
+
+            function push(p) { parts.push(p); start(); }
+
+            function burst(x, y, opts) {
+                const o = opts || {};
+                const count = o.count || 18;
+                const colors = o.colors || ['#ffeaa9', '#ffd966', '#c9a24a'];
+                const speed = o.speed || 5;
+                const gravity = o.gravity != null ? o.gravity : 0.16;
+                const size = o.size || 3.4;
+                const life = o.life || 850;
+                const spread = o.spread != null ? o.spread : Math.PI * 2;
+                const angle = o.angle != null ? o.angle : -Math.PI / 2;
+                const shape = o.shape || 'circle';
+
+                for (let i = 0; i < count; i++) {
+                    const a = angle + (Math.random() - 0.5) * spread;
+                    const v = speed * (0.35 + Math.random() * 0.9);
+                    push({
+                        x, y,
+                        vx: Math.cos(a) * v,
+                        vy: Math.sin(a) * v,
+                        gravity,
+                        size: size * (0.6 + Math.random() * 1.0),
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        life: life * (0.7 + Math.random() * 0.6),
+                        maxLife: life,
+                        shape,
+                        rot: Math.random() * Math.PI * 2,
+                        rotSpeed: (Math.random() - 0.5) * 0.4
+                    });
+                }
+            }
+
+            function confetti() {
+                const colors = ['#ffeaa9', '#ffd966', '#f0c96a', '#c9a24a', '#ffffff', '#9be7c4'];
+                for (let i = 0; i < 200; i++) {
+                    push({
+                        x: Math.random() * vw,
+                        y: -30 - Math.random() * vh * 0.5,
+                        vx: (Math.random() - 0.5) * 3.2,
+                        vy: 2.2 + Math.random() * 4,
+                        gravity: 0.11,
+                        size: 4 + Math.random() * 8,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        life: 2000 + Math.random() * 1400,
+                        maxLife: 3400,
+                        shape: Math.random() > 0.5 ? 'rect' : 'circle',
+                        rot: Math.random() * Math.PI * 2,
+                        rotSpeed: (Math.random() - 0.5) * 0.32
+                    });
+                }
+            }
+
+            return { burst, confetti };
+        })();
+
+        function triggerConfetti() { FX.confetti(); }
+
+        function flashScreen(bg) {
+            const f = document.getElementById('flashLayer');
+            f.style.background = bg;
+            f.classList.remove('on');
+            void f.offsetWidth;
+            f.classList.add('on');
+        }
+
+        function shakeScreen(strength) {
+            const el = document.getElementById('mainLayout');
+            el.classList.remove('shake-hard');
+            void el.offsetWidth;
+            el.classList.add('shake-hard');
+            setTimeout(() => el.classList.remove('shake-hard'), 720);
+        }
+
+        /* ============================================================
+           USER DATA
+        ============================================================ */
         let currentUser = null, sessionProfit = 0;
-        const defaultTowerStats = { climbs:0, wins:0, losses:0, totalBet:0, totalWin:0, bestFloor:0, currentStreak:0, bestStreak:0 };
+
+        const defaultTowerStats = {
+            climbs: 0, wins: 0, losses: 0, totalBet: 0, totalWin: 0,
+            bestFloor: 0, currentStreak: 0, bestStreak: 0
+        };
 
         function initUserStats(u) {
             const def = {
-                globalStats: { totalWagered:0, totalWon:0, totalLosses:0, totalGames:0, currentStreak:0, bestStreak:0, totalWins:0 },
-                transactions:[], gameOutcomes:[], gamePlayCount:{}, bankBalance:0, xp:0,
-                avatar:'fas fa-crown', theme:'theme-gold', autoTransfer:false, earnedAchievements:[],
-                lastInterestDate:null, lastDailyBonusDate:null, lastWheelSpinDate:null,
-                dailyBalanceSnapshots:[],
+                globalStats: { totalWagered: 0, totalWon: 0, totalLosses: 0, totalGames: 0, currentStreak: 0, bestStreak: 0, totalWins: 0 },
+                transactions: [], gameOutcomes: [], gamePlayCount: {}, bankBalance: 0, xp: 0,
+                avatar: 'fas fa-crown', theme: 'theme-gold', autoTransfer: false, earnedAchievements: [],
+                lastInterestDate: null, lastDailyBonusDate: null, lastWheelSpinDate: null,
+                dailyBalanceSnapshots: [],
                 towerStats: { ...defaultTowerStats }
             };
-            for(let [k,v] of Object.entries(def)) if(u[k]===undefined) u[k]=v;
-            if(!u.towerStats) u.towerStats = { ...defaultTowerStats };
+            for (let [k, v] of Object.entries(def)) if (u[k] === undefined) u[k] = v;
+            if (!u.towerStats) u.towerStats = { ...defaultTowerStats };
             return u;
         }
 
         async function loadUser() {
             const sess = sessionStorage.getItem('gold_current_user');
-            if(!sess){ window.location.href='../../sign-in.html'; return false; }
+            if (!sess) { window.location.href = '../../sign-in.html'; return false; }
             const su = JSON.parse(sess);
-            const users = JSON.parse(localStorage.getItem('gold_users')||'{}');
+            const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
             let user = users[su.username];
-            if(!user){ sessionStorage.removeItem('gold_current_user'); window.location.href='../../sign-in.html'; return false; }
+            if (!user) {
+                sessionStorage.removeItem('gold_current_user');
+                window.location.href = '../../sign-in.html';
+                return false;
+            }
             currentUser = initUserStats(user);
-            updateBalance(); updateStats(); validateBet(); return true;
+            updateBalance(); updateStats(); validateBet();
+            return true;
         }
 
         async function saveUser() {
-            const users = JSON.parse(localStorage.getItem('gold_users')||'{}');
+            const users = JSON.parse(localStorage.getItem('gold_users') || '{}');
             users[currentUser.username] = currentUser;
             localStorage.setItem('gold_users', JSON.stringify(users));
             const sess = JSON.parse(sessionStorage.getItem('gold_current_user'));
-            if(sess){ sess.balance=currentUser.balance; sessionStorage.setItem('gold_current_user',JSON.stringify(sess)); }
+            if (sess) {
+                sess.balance = currentUser.balance;
+                sessionStorage.setItem('gold_current_user', JSON.stringify(sess));
+            }
         }
 
         function updateBalance() {
             const el = document.getElementById('headerBalance');
-            const prev = parseInt(el.textContent.replace(/,/g,''))||0;
+            const prev = parseInt(el.textContent.replace(/,/g, '')) || 0;
             const next = currentUser.balance;
-            if(prev!==next){
+            if (prev !== next) {
                 animateNumber(el, prev, next, 400);
-                if(next>prev) document.getElementById('balanceTag').classList.add('pulse'), setTimeout(()=>document.getElementById('balanceTag').classList.remove('pulse'),500);
-            } else el.textContent = next.toLocaleString();
+                if (next > prev) {
+                    const tag = document.getElementById('balanceTag');
+                    tag.classList.add('pulse');
+                    setTimeout(() => tag.classList.remove('pulse'), 520);
+                }
+            } else {
+                el.textContent = next.toLocaleString();
+            }
             validateBet();
         }
 
         function animateNumber(el, start, end, dur) {
-            if(start===end){ el.textContent=end.toLocaleString(); return; }
-            const range=end-start, st=performance.now();
-            function step(now){
-                const p=Math.min((now-st)/dur,1), eased=1-Math.pow(1-p,3);
-                el.textContent = Math.floor(start+range*eased).toLocaleString();
-                if(p<1) requestAnimationFrame(step); else el.textContent=end.toLocaleString();
+            if (start === end) { el.textContent = end.toLocaleString(); return; }
+            const range = end - start, st = performance.now();
+            function step(now) {
+                const p = Math.min((now - st) / dur, 1);
+                const eased = 1 - Math.pow(1 - p, 3);
+                el.textContent = Math.floor(start + range * eased).toLocaleString();
+                if (p < 1) requestAnimationFrame(step);
+                else el.textContent = end.toLocaleString();
             }
             requestAnimationFrame(step);
         }
 
         function updateStats() {
             const s = currentUser.towerStats;
-            document.getElementById('climbsStat').textContent = s.climbs||0;
-            document.getElementById('bestFloorStat').textContent = s.bestFloor||0;
+            document.getElementById('climbsStat').textContent = s.climbs || 0;
+            document.getElementById('bestFloorStat').textContent = s.bestFloor || 0;
             const pl = document.getElementById('sessionPL');
-            pl.textContent = (sessionProfit>=0?'+':'')+sessionProfit.toFixed(2);
-            pl.style.color = sessionProfit>=0?'var(--success)':'var(--danger)';
+            pl.textContent = (sessionProfit >= 0 ? '+' : '') + sessionProfit.toFixed(2);
+            pl.style.color = sessionProfit >= 0 ? '#7fe0a8' : '#ff8b78';
         }
 
         function validateBet() {
-            const inp = document.getElementById('betAmount'), bet = parseFloat(inp.value)||0;
+            const inp = document.getElementById('betAmount');
+            const wrap = document.getElementById('betWrap');
+            const bet = parseFloat(inp.value) || 0;
             const startBtn = document.getElementById('startBtn');
-            const invalid = gameActive || bet<=0 || bet>currentUser.balance;
-            inp.classList.toggle('invalid', bet>0 && bet>currentUser.balance);
+            const overBalance = currentUser ? (bet > currentUser.balance) : false;
+            const invalid = gameActive || bet <= 0 || overBalance;
+            wrap.classList.toggle('invalid', bet > 0 && overBalance);
             startBtn.disabled = invalid;
-            if(!invalid && bet>0) inp.classList.remove('invalid');
         }
 
         function addRipple(e, btn) {
             const ripple = document.createElement('span');
-            ripple.className='ripple';
-            const rect=btn.getBoundingClientRect(), size=Math.max(rect.width, rect.height);
-            ripple.style.width=ripple.style.height=size+'px';
-            ripple.style.left=(e.clientX-rect.left-size/2)+'px';
-            ripple.style.top=(e.clientY-rect.top-size/2)+'px';
+            ripple.className = 'ripple';
+            const rect = btn.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+            ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
             btn.appendChild(ripple);
-            ripple.addEventListener('animationend', ()=>ripple.remove());
+            ripple.addEventListener('animationend', () => ripple.remove());
         }
 
-        // ── TOWER LOGIC ──
-        const COLS=5, TOTAL_FLOORS=20;
-        let gameActive=false, currentFloor=0, baseBet=0;
-        let towerMines=[], climbedColumns=[];
-        let minesPerFloor = 1; // default difficulty
+        /* ============================================================
+           TOWER LOGIC
+        ============================================================ */
+        const COLS = 5, TOTAL_FLOORS = 20;
+        let gameActive = false, currentFloor = 0, baseBet = 0, focusFloor = 0;
+        let towerMines = [], climbedColumns = [];
+        let minesPerFloor = 1;
+        let towerPositioned = false;
 
         function shuffleArray(arr) {
             for (let i = arr.length - 1; i > 0; i--) {
@@ -451,130 +1712,274 @@
         }
 
         function generateTowerMines() {
-            towerMines = Array.from({length:TOTAL_FLOORS}, () => pickMines(minesPerFloor));
+            towerMines = Array.from({ length: TOTAL_FLOORS }, () => pickMines(minesPerFloor));
         }
 
         function getMultiplier(floor) {
             if (floor <= 0) return 1.0;
             const probSurvive = (COLS - minesPerFloor) / COLS;
             const fairMult = Math.pow(1 / probSurvive, floor);
-            // Apply a 5% house edge
             return Math.floor(fairMult * 100 * 0.95) / 100;
         }
 
+        /* ---- TOWER RENDERING ---- */
         function buildTower() {
             const grid = document.getElementById('towerGrid');
             grid.innerHTML = '';
-            for(let floor=TOTAL_FLOORS-1; floor>=0; floor--) {
+
+            const climbedCount = climbedColumns.length;
+            const revealed = !gameActive && climbedCount > 0;
+
+            for (let floor = TOTAL_FLOORS - 1; floor >= 0; floor--) {
                 const row = document.createElement('div');
-                row.className='tower-row';
-                const numSpan = document.createElement('span');
-                numSpan.className='row-number';
-                numSpan.textContent = floor+1;
-                row.appendChild(numSpan);
-                for(let col=0; col<COLS; col++) {
-                    const cell = document.createElement('div');
-                    cell.className='tower-cell';
-                    cell.dataset.floor=floor; cell.dataset.col=col;
-                    cell.innerHTML = '<i class="fas fa-question"></i><div class="cell-glow"></div>';
-                    if(gameActive && floor===currentFloor) {
-                        cell.classList.add('clickable');
-                    }
-                    if(climbedColumns[floor]!==undefined && climbedColumns[floor]===col) {
-                        cell.classList.add('climbed');
-                        cell.innerHTML = '<i class="fas fa-check-circle"></i>';
-                    }
-                    if(!gameActive && currentFloor>0 && climbedColumns.length) {
-                        if(floor < climbedColumns.length) {
-                            const mines = towerMines[floor] || [];
-                            if(mines.includes(col)) {
-                                cell.classList.add('mine-revealed');
-                                cell.innerHTML = '<i class="fas fa-bomb"></i>';
-                            } else if(climbedColumns[floor] === col) {
-                                cell.classList.add('climbed');
-                                cell.innerHTML = '<i class="fas fa-check-circle"></i>';
-                            } else {
-                                cell.style.color = 'rgba(255,255,255,0.2)';
-                                cell.innerHTML = '<i class="fas fa-circle"></i>';
-                            }
+                row.className = 'tower-row';
+                row.dataset.floor = floor;
+
+                const isCurrent = gameActive && floor === currentFloor;
+                if (isCurrent) row.classList.add('current');
+                if (climbedCount > 0 && floor < climbedCount) row.classList.add('passed');
+
+                /* floor indicator */
+                const plate = document.createElement('div');
+                plate.className = 'floor-plate';
+                plate.innerHTML = '<span>' + String(floor + 1).padStart(2, '0') + '</span>';
+                row.appendChild(plate);
+
+                /* platform slab */
+                const platform = document.createElement('div');
+                platform.className = 'platform';
+
+                const tiles = document.createElement('div');
+                tiles.className = 'tiles';
+
+                const climbedCol = climbedColumns[floor];
+                const mines = towerMines[floor] || [];
+
+                for (let col = 0; col < COLS; col++) {
+                    const cell = document.createElement('button');
+                    cell.type = 'button';
+                    cell.className = 'tile';
+                    cell.dataset.floor = floor;
+                    cell.dataset.col = col;
+                    cell.innerHTML = '<span class="tile-glyph"></span>';
+
+                    if (isCurrent) cell.classList.add('clickable');
+
+                    const isMine = mines.includes(col);
+                    const isClimbed = (climbedCol === col);
+
+                    if (revealed && floor < climbedCount) {
+                        if (isMine) {
+                            cell.classList.add('mine');
+                            cell.innerHTML = '<i class="fas fa-bomb"></i>';
+                        } else if (isClimbed) {
+                            cell.classList.add('safe');
+                            cell.innerHTML = '<i class="fas fa-check"></i>';
+                        } else {
+                            cell.classList.add('empty');
                         }
+                    } else if (isClimbed) {
+                        cell.classList.add('safe');
+                        cell.innerHTML = '<i class="fas fa-check"></i>';
                     }
+
                     cell.addEventListener('click', () => onCellClick(floor, col));
-                    row.appendChild(cell);
+                    tiles.appendChild(cell);
                 }
+
+                platform.appendChild(tiles);
+                row.appendChild(platform);
                 grid.appendChild(row);
             }
-            if(gameActive && currentFloor<TOTAL_FLOORS) {
-                const targetRow = grid.querySelector(`[data-floor="${currentFloor}"]`);
-                if(targetRow) targetRow.scrollIntoView({ behavior:'smooth', block:'center' });
+
+            /* pedestal */
+            const base = document.createElement('div');
+            base.className = 'tower-base';
+            grid.appendChild(base);
+
+            /* re-center the tower */
+            positionTower(focusFloor, towerPositioned);
+            towerPositioned = true;
+        }
+
+        function positionTower(floor, animate) {
+            const viewport = document.getElementById('towerViewport');
+            const scroll = document.getElementById('towerScroll');
+            if (!viewport || !scroll) return;
+            const row = scroll.querySelector('.tower-row[data-floor="' + floor + '"]');
+            if (!row) return;
+
+            const vh = viewport.clientHeight;
+            const anchor = gameActive ? 0.70 : 0.62;
+            const target = vh * anchor;
+            const y = target - (row.offsetTop + row.offsetHeight / 2);
+
+            if (!animate) {
+                const prev = scroll.style.transition;
+                scroll.style.transition = 'none';
+                scroll.style.transform = 'translate3d(0,' + y + 'px,0)';
+                void scroll.offsetHeight;
+                scroll.style.transition = prev || '';
+            } else {
+                scroll.style.transform = 'translate3d(0,' + y + 'px,0)';
             }
         }
 
+        /* ---- HUD ---- */
         function updateMultiplierPanel() {
             const mult = getMultiplier(currentFloor);
             const cashoutVal = Math.floor(baseBet * mult);
+
             document.getElementById('climbCount').textContent = currentFloor;
-            document.getElementById('multiplierDisplay').textContent = mult.toFixed(2)+'×';
-            document.getElementById('cashoutPreview').innerHTML = 'Cash out: <strong>'+cashoutVal.toLocaleString()+' GOLD</strong>';
-            document.getElementById('progressFill').style.width = (currentFloor/TOTAL_FLOORS*100)+'%';
+            document.getElementById('towerFloorPill').textContent = Math.min(TOTAL_FLOORS, currentFloor + 1);
+
+            const md = document.getElementById('multiplierDisplay');
+            md.textContent = mult.toFixed(2) + '×';
+            md.classList.remove('pulse');
+            void md.offsetWidth;
+            md.classList.add('pulse');
+
+            const payout = document.getElementById('cashoutPreview');
+            payout.textContent = cashoutVal.toLocaleString() + ' GOLD';
+            payout.classList.toggle('lit', currentFloor > 0);
+
+            document.getElementById('progressFill').style.width =
+                Math.min(100, (currentFloor / TOTAL_FLOORS) * 100) + '%';
+
+            const hud = document.getElementById('multHud');
+            hud.classList.remove('heat-1', 'heat-2', 'heat-3');
+            if (currentFloor >= 15) hud.classList.add('heat-3');
+            else if (currentFloor >= 10) hud.classList.add('heat-2');
+            else if (currentFloor >= 5) hud.classList.add('heat-1');
         }
 
+        /* ---- CLICK ---- */
         async function onCellClick(floor, col) {
-            if(!gameActive || floor!==currentFloor) return;
+            if (!gameActive || floor !== currentFloor) return;
             playTone('click');
+
+            /* measure the tile BEFORE the DOM rebuild so the burst lands correctly */
+            const tileEl = document.querySelector('.tile[data-floor="' + floor + '"][data-col="' + col + '"]');
+            let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+            if (tileEl) {
+                const r = tileEl.getBoundingClientRect();
+                cx = r.left + r.width / 2;
+                cy = r.top + r.height / 2;
+            }
+
             const mines = towerMines[floor] || [];
-            if(mines.includes(col)) {
+
+            /* ---------- MINE ---------- */
+            if (mines.includes(col)) {
                 gameActive = false;
                 climbedColumns[floor] = col;
+                focusFloor = floor;
                 buildTower();
-                const bustFloor = floor+1;
-                document.getElementById('resultMessage').innerHTML = `<i class="fas fa-bomb"></i> <strong>BUST!</strong> Mine hit on floor ${bustFloor}. Lost ${baseBet} GOLD.`;
-                document.getElementById('resultMessage').className = 'result-panel loss';
+
+                const busted = document.querySelector('.tile[data-floor="' + floor + '"][data-col="' + col + '"]');
+                if (busted) busted.classList.add('flip');
+
                 playTone('bust');
+                shakeScreen('hard');
+                flashScreen('radial-gradient(circle at ' + cx + 'px ' + cy + 'px, rgba(255,90,55,0.55), rgba(140,10,0,0.28) 42%, transparent 72%)');
+
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        FX.burst(cx, cy, {
+                            count: 26,
+                            colors: ['#ffd08a', '#ff8a4c', '#ff3b1f', '#8a1a08'],
+                            speed: 9,
+                            gravity: 0.34,
+                            size: 5,
+                            life: 1100
+                        });
+                    }, i * 75);
+                }
+
+                const res = document.getElementById('resultMessage');
+                res.innerHTML = '<i class="fas fa-bomb"></i> <span><strong>BUST!</strong> Mine on floor ' +
+                    (floor + 1) + ' — lost ' + baseBet.toLocaleString() + ' GOLD.</span>';
+                res.className = 'result-panel loss';
+
                 sessionProfit -= baseBet;
+
                 const ts = currentUser.towerStats;
                 ts.climbs++; ts.losses++; ts.totalBet += baseBet; ts.currentStreak = 0;
-                if(floor > ts.bestFloor) ts.bestFloor = floor;
+                if (floor > ts.bestFloor) ts.bestFloor = floor;
+
                 recordGame(false, floor, 0);
-                await saveUser(); updateBalance(); updateStats();
+                await saveUser();
+                updateBalance(); updateStats();
                 disableButtons();
-                setTimeout(resetGame, 2300);
+                setTimeout(resetGame, 2500);
                 return;
             }
-            // safe
+
+            /* ---------- SAFE ---------- */
             climbedColumns[floor] = col;
             currentFloor++;
+            focusFloor = currentFloor;
             buildTower();
+
+            const safeTile = document.querySelector('.tile[data-floor="' + floor + '"][data-col="' + col + '"]');
+            if (safeTile) safeTile.classList.add('flip');
+
+            FX.burst(cx, cy, {
+                count: 18,
+                colors: ['#fff6d0', '#ffeaa9', '#ffd966', '#c9a24a'],
+                speed: 6,
+                gravity: 0.14,
+                size: 3.6,
+                life: 820,
+                shape: 'spark'
+            });
+
             updateMultiplierPanel();
             playTone('step');
-            document.getElementById('resultMessage').innerHTML = `<i class="fas fa-arrow-up"></i> Safe! Now at floor ${currentFloor}.`;
-            document.getElementById('resultMessage').className = 'result-panel';
-            if(currentFloor >= TOTAL_FLOORS) {
+
+            const res = document.getElementById('resultMessage');
+            res.innerHTML = '<i class="fas fa-arrow-up"></i> <span>Safe! You are now on floor ' + currentFloor + '.</span>';
+            res.className = 'result-panel';
+
+            if (currentFloor >= TOTAL_FLOORS) {
                 await cashOut(true);
             }
         }
 
-        async function cashOut(isMax=false) {
-            if(!gameActive) return;
+        /* ---- CASH OUT ---- */
+        async function cashOut(isMax) {
+            if (!gameActive) return;
             gameActive = false;
+
             const multiplier = getMultiplier(currentFloor);
             const winAmount = Math.floor(baseBet * multiplier);
             const netProfit = winAmount - baseBet;
+
             currentUser.balance += winAmount;
             sessionProfit += netProfit;
-            document.getElementById('resultMessage').innerHTML = `<i class="fas fa-trophy"></i> <strong>CASHED OUT!</strong> Floor ${currentFloor} at ${multiplier.toFixed(2)}× = +${winAmount} GOLD!`;
-            document.getElementById('resultMessage').className = 'result-panel win';
+
+            focusFloor = Math.max(0, currentFloor - 1);
+            buildTower();
+
+            const res = document.getElementById('resultMessage');
+            res.innerHTML = '<i class="fas fa-trophy"></i> <span><strong>CASHED OUT!</strong> Floor ' +
+                currentFloor + ' at ' + multiplier.toFixed(2) + '× = +' + winAmount.toLocaleString() + ' GOLD!</span>';
+            res.className = 'result-panel win';
+
             playTone('cashout');
             triggerConfetti();
-            showMultiplierBubble(multiplier.toFixed(2)+'×');
-            buildTower();
+            flashScreen('radial-gradient(circle at 50% 45%, rgba(255,220,140,0.34), transparent 70%)');
+            showMultiplierBubble(multiplier.toFixed(2) + '×');
+
             const ts = currentUser.towerStats;
             ts.climbs++; ts.wins++; ts.totalBet += baseBet; ts.totalWin += winAmount;
-            ts.currentStreak = (ts.currentStreak||0)+1;
-            if(ts.currentStreak > (ts.bestStreak||0)) ts.bestStreak = ts.currentStreak;
-            if(currentFloor > ts.bestFloor) ts.bestFloor = currentFloor;
+            ts.currentStreak = (ts.currentStreak || 0) + 1;
+            if (ts.currentStreak > (ts.bestStreak || 0)) ts.bestStreak = ts.currentStreak;
+            if (currentFloor > ts.bestFloor) ts.bestFloor = currentFloor;
+
             recordGame(true, currentFloor, winAmount);
-            await saveUser(); updateBalance(); updateStats();
+            await saveUser();
+            updateBalance(); updateStats();
             disableButtons();
             setTimeout(resetGame, 2500);
         }
@@ -584,26 +1989,47 @@
             bubble.className = 'win-multiplier-bubble';
             bubble.textContent = text;
             document.body.appendChild(bubble);
-            bubble.addEventListener('animationend', ()=>bubble.remove());
+            bubble.addEventListener('animationend', () => bubble.remove());
         }
 
         function recordGame(isWin, floor, winAmount) {
             const netProfit = isWin ? (winAmount - baseBet) : -baseBet;
             const gs = currentUser.globalStats;
-            gs.totalWagered += baseBet; gs.totalWon += winAmount; gs.totalGames++;
-            if(isWin) { gs.totalWins++; gs.currentStreak = (gs.currentStreak||0)+1; if(gs.currentStreak>(gs.bestStreak||0)) gs.bestStreak=gs.currentStreak; }
-            else { gs.currentStreak=0; gs.totalLosses=(gs.totalLosses||0)+1; }
-            currentUser.xp = (currentUser.xp||0)+baseBet;
+            gs.totalWagered += baseBet;
+            gs.totalWon += winAmount;
+            gs.totalGames++;
+
+            if (isWin) {
+                gs.totalWins++;
+                gs.currentStreak = (gs.currentStreak || 0) + 1;
+                if (gs.currentStreak > (gs.bestStreak || 0)) gs.bestStreak = gs.currentStreak;
+            } else {
+                gs.currentStreak = 0;
+                gs.totalLosses = (gs.totalLosses || 0) + 1;
+            }
+
+            currentUser.xp = (currentUser.xp || 0) + baseBet;
             currentUser.gamePlayCount['tower-climb'] = (currentUser.gamePlayCount['tower-climb'] || 0) + 1;
+
             currentUser.transactions.unshift({
-                desc: `🗼 Tower Climb | Difficulty ${minesPerFloor} mine(s) | Floor ${floor} | ${isWin?'Cashed out +'+winAmount:'Bust -'+baseBet} GOLD`,
-                amount: netProfit, type: isWin?'game_win':'game_loss', date: new Date().toISOString()
+                desc: '🗼 Tower Climb | Difficulty ' + minesPerFloor + ' mine(s) | Floor ' + floor +
+                      ' | ' + (isWin ? 'Cashed out +' + winAmount : 'Bust -' + baseBet) + ' GOLD',
+                amount: netProfit,
+                type: isWin ? 'game_win' : 'game_loss',
+                date: new Date().toISOString()
             });
-            if(currentUser.transactions.length>30) currentUser.transactions.pop();
+            if (currentUser.transactions.length > 30) currentUser.transactions.pop();
+
             currentUser.gameOutcomes.unshift({
-                game:'Tower Climb', result:isWin?'win':'loss', profit:netProfit, floor, multiplier:getMultiplier(floor), bet:baseBet, date:new Date().toISOString()
+                game: 'Tower Climb',
+                result: isWin ? 'win' : 'loss',
+                profit: netProfit,
+                floor: floor,
+                multiplier: getMultiplier(floor),
+                bet: baseBet,
+                date: new Date().toISOString()
             });
-            if(currentUser.gameOutcomes.length>50) currentUser.gameOutcomes.pop();
+            if (currentUser.gameOutcomes.length > 50) currentUser.gameOutcomes.pop();
         }
 
         function disableButtons() {
@@ -613,48 +2039,65 @@
         }
 
         function setDifficultyButtonsEnabled(enabled) {
-            document.querySelectorAll('.diff-btn').forEach(btn => {
-                btn.disabled = !enabled;
-            });
+            document.querySelectorAll('.diff-btn').forEach(btn => { btn.disabled = !enabled; });
         }
 
+        /* ---- START ---- */
         async function startGame() {
-            if(gameActive) return;
+            if (gameActive) return;
             const bet = Math.floor(parseFloat(document.getElementById('betAmount').value));
-            if(isNaN(bet)||bet<1||bet>currentUser.balance) return;
+            if (isNaN(bet) || bet < 1 || bet > currentUser.balance) return;
+
             currentUser.balance -= bet;
             baseBet = bet;
             currentFloor = 0;
+            focusFloor = 0;
             climbedColumns = [];
             generateTowerMines();
             gameActive = true;
+
             setDifficultyButtonsEnabled(false);
-            await saveUser(); updateBalance();
+            await saveUser();
+            updateBalance();
+
             document.getElementById('cashoutBtn').disabled = false;
             document.getElementById('startBtn').disabled = true;
-            document.getElementById('resultMessage').innerHTML = '<i class="fas fa-arrow-up"></i> Choose a column to climb!';
-            document.getElementById('resultMessage').className = 'result-panel';
+
+            const res = document.getElementById('resultMessage');
+            res.innerHTML = '<i class="fas fa-arrow-up"></i> <span>Choose a column to climb — one tile hides a mine.</span>';
+            res.className = 'result-panel';
+
             updateMultiplierPanel();
             buildTower();
             playTone('start');
-            setTimeout(()=>{
-                const towerArea = document.getElementById('towerArea');
-                if(towerArea) towerArea.scrollTop = towerArea.scrollHeight;
-            }, 100);
         }
 
+        /* ---- RESET ---- */
         function resetGame() {
             gameActive = false;
-            currentFloor = 0; climbedColumns = []; towerMines = []; baseBet = 0;
+            currentFloor = 0;
+            focusFloor = 0;
+            climbedColumns = [];
+            towerMines = [];
+            baseBet = 0;
+
             document.getElementById('cashoutBtn').disabled = true;
             document.getElementById('startBtn').disabled = false;
             setDifficultyButtonsEnabled(true);
+
             document.getElementById('climbCount').textContent = '0';
+            document.getElementById('towerFloorPill').textContent = '1';
             document.getElementById('multiplierDisplay').textContent = '1.00×';
-            document.getElementById('cashoutPreview').innerHTML = 'Cash out: <strong>0 GOLD</strong>';
+            const payout = document.getElementById('cashoutPreview');
+            payout.textContent = '0 GOLD';
+            payout.classList.remove('lit');
             document.getElementById('progressFill').style.width = '0%';
-            document.getElementById('resultMessage').innerHTML = '<i class="fas fa-info-circle"></i> Select difficulty & start climbing!';
-            document.getElementById('resultMessage').className = 'result-panel';
+            document.getElementById('multHud').classList.remove('heat-1', 'heat-2', 'heat-3');
+
+            const res = document.getElementById('resultMessage');
+            res.innerHTML = '<i class="fas fa-info-circle"></i> <span>Select difficulty &amp; start climbing!</span>';
+            res.className = 'result-panel';
+
             buildTower();
             validateBet();
         }
@@ -663,90 +2106,120 @@
             if (gameActive) return;
             minesPerFloor = mines;
             document.querySelectorAll('.diff-btn').forEach(btn => {
-                const btnMines = parseInt(btn.dataset.mines);
-                btn.classList.toggle('active', btnMines === mines);
+                btn.classList.toggle('active', parseInt(btn.dataset.mines) === mines);
             });
-            updateMultiplierPanel(); // refresh multiplier display for floor 0
+            updateMultiplierPanel();
         }
 
-        // ── EVENT BINDINGS ──
+        /* ============================================================
+           EVENT BINDINGS
+        ============================================================ */
         function bindEvents() {
-            document.getElementById('startBtn').addEventListener('click', (e)=>{ addRipple(e, e.target); startGame(); });
-            document.getElementById('cashoutBtn').addEventListener('click', (e)=>{ addRipple(e, e.target); cashOut(false); });
+            document.getElementById('startBtn').addEventListener('click', (e) => {
+                addRipple(e, e.currentTarget); startGame();
+            });
+            document.getElementById('cashoutBtn').addEventListener('click', (e) => {
+                addRipple(e, e.currentTarget); cashOut(false);
+            });
 
             document.querySelectorAll('.diff-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const mines = parseInt(btn.dataset.mines);
-                    setDifficulty(mines);
+                    setDifficulty(parseInt(btn.dataset.mines));
                     playTone('click');
                 });
             });
 
             document.querySelectorAll('.quick-bet').forEach(btn => {
-                btn.addEventListener('click', ()=>{
+                btn.addEventListener('click', () => {
                     const inp = document.getElementById('betAmount');
-                    if(btn.id==='halfBetBtn'){ const v=parseFloat(inp.value)||0; inp.value=Math.max(1,Math.floor(v/2)); }
-                    else if(btn.id==='maxBetBtn'){ if(currentUser) inp.value=Math.floor(currentUser.balance); }
-                    else {
-                        const add=parseFloat(btn.dataset.bet); const val=parseFloat(inp.value)||0;
-                        let nv=val+add; if(currentUser && nv>currentUser.balance) nv=currentUser.balance;
-                        inp.value=Math.max(1,Math.floor(nv));
+                    if (btn.id === 'halfBetBtn') {
+                        const v = parseFloat(inp.value) || 0;
+                        inp.value = Math.max(1, Math.floor(v / 2));
+                    } else if (btn.id === 'maxBetBtn') {
+                        if (currentUser) inp.value = Math.floor(currentUser.balance);
+                    } else {
+                        const add = parseFloat(btn.dataset.bet);
+                        const val = parseFloat(inp.value) || 0;
+                        let nv = val + add;
+                        if (currentUser && nv > currentUser.balance) nv = currentUser.balance;
+                        inp.value = Math.max(1, Math.floor(nv));
                     }
                     validateBet();
                     playTone('click');
                 });
             });
+
             document.getElementById('betAmount').addEventListener('input', validateBet);
-            document.getElementById('soundToggleBtn').addEventListener('click', ()=>{
-                soundEnabled=!soundEnabled;
-                document.getElementById('soundToggleBtn').innerHTML = soundEnabled?'<i class="fas fa-volume-up"></i>':'<i class="fas fa-volume-mute"></i>';
+
+            document.getElementById('soundToggleBtn').addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                document.getElementById('soundToggleBtn').innerHTML =
+                    soundEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
                 localStorage.setItem('gold_sound_enabled', soundEnabled);
-                if(soundEnabled) initAudio();
+                if (soundEnabled) initAudio();
             });
 
-            // Keyboard shortcuts
-            document.addEventListener('keydown', (e)=>{
-                if(!gameActive) {
-                    if(e.key==='Enter') { e.preventDefault(); startGame(); }
+            /* keyboard shortcuts */
+            document.addEventListener('keydown', (e) => {
+                const tag = (e.target.tagName || '').toLowerCase();
+                if (tag === 'input' || tag === 'textarea') return;
+
+                if (!gameActive) {
+                    if (e.key === 'Enter') { e.preventDefault(); startGame(); }
                     return;
                 }
-                const key = e.key;
-                if(key>='1' && key<='5') {
-                    const col = parseInt(key)-1;
-                    if(currentFloor<TOTAL_FLOORS) onCellClick(currentFloor, col);
-                } else if(key===' ' || key==='Spacebar') {
+                if (e.key >= '1' && e.key <= '5') {
+                    const col = parseInt(e.key) - 1;
+                    if (currentFloor < TOTAL_FLOORS) onCellClick(currentFloor, col);
+                } else if (e.key === ' ' || e.key === 'Spacebar') {
                     e.preventDefault();
                     cashOut(false);
                 }
             });
+
+            window.addEventListener('resize', () => {
+                positionTower(focusFloor, false);
+            });
         }
 
-        // ── BACKGROUND PARTICLES ──
+        /* ============================================================
+           BACKGROUND DUST
+        ============================================================ */
         function createSparkles() {
             const cont = document.getElementById('bgParticles');
-            for(let i=0;i<40;i++){
+            for (let i = 0; i < 44; i++) {
                 const s = document.createElement('div');
-                s.className='sparkle';
-                s.style.left=Math.random()*100+'%';
-                s.style.bottom=-(Math.random()*20+5)+'%';
-                s.style.animationDelay=Math.random()*5+'s';
-                s.style.animationDuration=(Math.random()*4+3)+'s';
+                s.className = 'sparkle';
+                s.style.left = Math.random() * 100 + '%';
+                s.style.bottom = -(Math.random() * 20 + 5) + '%';
+                s.style.animationDelay = Math.random() * 7 + 's';
+                s.style.animationDuration = (Math.random() * 5 + 5) + 's';
                 cont.appendChild(s);
             }
         }
 
+        /* ============================================================
+           INIT
+        ============================================================ */
         async function init() {
             createSparkles();
-            if(!(await loadUser())) return;
-            setDifficulty(1); // default easy
+            if (!(await loadUser())) return;
+
+            setDifficulty(1);
             buildTower();
             bindEvents();
             updateStats();
             validateBet();
+
             const savedSound = localStorage.getItem('gold_sound_enabled');
-            if(savedSound==='false') { soundEnabled=false; document.getElementById('soundToggleBtn').innerHTML='<i class="fas fa-volume-mute"></i>'; }
-            else soundEnabled=true;
+            if (savedSound === 'false') {
+                soundEnabled = false;
+                document.getElementById('soundToggleBtn').innerHTML = '<i class="fas fa-volume-mute"></i>';
+            } else {
+                soundEnabled = true;
+            }
         }
+
         init();
     })();
 </script>
