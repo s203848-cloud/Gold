@@ -151,6 +151,13 @@
         .quick-bet:hover { background: rgba(255,217,102,0.2); transform: scale(1.05); }
         .quick-bet:active { transform: scale(0.93); background: rgba(255,217,102,0.3); }
         .risk-selector { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+        .risk-btn-med {
+            background: rgba(20,18,16,0.7); border: 2px solid rgba(255,217,102,0.3);
+            border-radius: var(--radius-full); padding: 0.7rem 1.8rem;
+            font-weight: 700; color: #ccc; cursor: pointer;
+            transition: all var(--transition-smooth);
+            display: flex; align-items: center; gap: 0.4rem;
+        }
         .risk-btn {
             background: rgba(20,18,16,0.7); border: 2px solid rgba(255,217,102,0.3);
             border-radius: var(--radius-full); padding: 0.7rem 1.8rem;
@@ -339,7 +346,7 @@
 
             <div class="risk-selector">
                 <button class="risk-btn selected" data-risk="low"><i class="fas fa-shield-alt"></i> LOW</button>
-                <button class="risk-btn" data-risk="medium"> <---- <i class="fas fa-balance-scale"></i> ----> </button>
+                <button class="risk-btn-med" data-risk="medium"> <---- <i class="fas fa-balance-scale"></i> ----> </button>
                 <button class="risk-btn" data-risk="high"><i class="fas fa-fire"></i> HIGH</button>
             </div>
 
