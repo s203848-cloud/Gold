@@ -1692,7 +1692,7 @@
         /* ============================================================
            TOWER LOGIC
         ============================================================ */
-        const COLS = 5, TOTAL_FLOORS = 20;
+        const COLS = 5, TOTAL_FLOORS = 65;
         let gameActive = false, currentFloor = 0, baseBet = 0, focusFloor = 0;
         let towerMines = [], climbedColumns = [];
         let minesPerFloor = 1;
@@ -1719,7 +1719,7 @@
             if (floor <= 0) return 1.0;
             const probSurvive = (COLS - minesPerFloor) / COLS;
             const fairMult = Math.pow(1 / probSurvive, floor);
-            return Math.floor(fairMult * 100 * 0.95) / 100;
+            return Math.floor(fairMult * 100 * 0.95) / 35;
         }
 
         /* ---- TOWER RENDERING ---- */
