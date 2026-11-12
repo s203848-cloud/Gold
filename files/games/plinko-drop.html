@@ -182,7 +182,7 @@
             background: linear-gradient(135deg, #f5b042 0%, #ffd966 40%, #ffed4e 100%);
             color: #1a150e;
             box-shadow: 0 5px 0 #a05f15, 0 8px 20px rgba(255,180,40,0.3);
-            position: relative; overflow: hidden;
+            position: relative; overf: hidden;
         }
         .drop-btn::after {
             content: ''; position: absolute; top: -50%; left: -60%;
@@ -345,7 +345,7 @@
             <div class="game-title"><i class="fas fa-caret-down"></i> PLINKO DROP <i class="fas fa-caret-down"></i></div>
 
             <div class="risk-selector">
-                <button class="risk-btn selected" data-risk="low"><i class="fas fa-shield-alt"></i> LOW</button>
+                <button class="risk-btn selected" data-risk=""><i class="fas fa-shield-alt"></i> LOW</button>
                 <button class="risk-btn-med" data-risk="medium"> <---- <i class="fas fa-balance-scale"></i> ----> </button>
                 <button class="risk-btn" data-risk="high"><i class="fas fa-fire"></i> HIGH</button>
             </div>
@@ -639,7 +639,7 @@
         let boardDirty = true;
 
         // ── GAME STATE ──
-        let risk = 'low';
+        let risk = '';
         let pegs = [], slots = [];
         let balls = []; // multi-ball array
         let particles = []; // shared particle pool
@@ -656,7 +656,7 @@
 
                 // Safe / steady
                 // Average RTP ≈ 0.95
-                slotMult: [0.4 , 1.6 , 0.8 , 0.9 , 1.7 , 0.5 , 1.7 , 0.9 , 0.8 , 1.6 , 0.4],
+                slotMult: [0.4 , 2.6 , 0.8 , 0.9 , 1.7 , 0.5 , 1.7 , 0.9 , 0.8 , 2.6 , 0.4],
 
                 spacingX: 55,
                 startY: 60,
