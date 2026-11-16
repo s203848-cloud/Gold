@@ -345,7 +345,7 @@
             <div class="game-title"><i class="fas fa-caret-down"></i> PLINKO DROP <i class="fas fa-caret-down"></i></div>
 
             <div class="risk-selector">
-                <button class="risk-btn selected" data-risk=""><i class="fas fa-shield-alt"></i> LOW</button>
+                <button class="risk-btn selected" data-risk="low"><i class="fas fa-shield-alt"></i> LOW</button>
                 <button class="risk-btn-med" data-risk="medium"> <---- <i class="fas fa-balance-scale"></i> ----> </button>
                 <button class="risk-btn" data-risk="high"><i class="fas fa-fire"></i> HIGH</button>
             </div>
@@ -639,7 +639,7 @@
         let boardDirty = true;
 
         // ── GAME STATE ──
-        let risk = '';
+        let risk = 'low';
         let pegs = [], slots = [];
         let balls = []; // multi-ball array
         let particles = []; // shared particle pool
